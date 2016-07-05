@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import com.mysql.jdbc.Connection;
 
 public class Settings {
-
+// To be replaced by properties file
 	String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	String user = "root";
 	String pass = "1234";
@@ -31,6 +31,11 @@ public class Settings {
 	String ugender = "gender"; // Gender
 	String uloc = "location"; // Location
 	
+	// Computing Variables
+	// Influence
+	double Wviews=0.3333;
+	double Wlikes=0.3333;
+	double Wcomments=0.3334;
 	
 	
 	

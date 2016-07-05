@@ -8,8 +8,9 @@ public class Opinion {
 	private Post main;
 	private int author_id;
 	private ArrayList<Post> comments = new ArrayList<Post>(); 
-	private int reach;
+	private double reach;
 	private int polarity;
+	private Settings dbc;
 	
 	
 	public Opinion(Post main){
@@ -21,8 +22,8 @@ public class Opinion {
 		return main.getUID();
 	}
 	
-	public void evalReach(int avgcom) {
-		//To DO;
+	public void evalReach(double avgPost, double avgLikes, double avgViews) {
+		this.reach = dbc.Wcomments*(ncomments()/avgPost) + dbc.Wlikes*(nlikes()/avgLikes) + dbc.Wviews*(nviews()/avgViews);
 	}
 	
 	public void evalPolarity() {
@@ -37,12 +38,32 @@ public class Opinion {
 		return polarity;
 	}
 	
-	public int getReach(){
+	public double getReach(){
 		return reach;
 	}
 	
 	public int getID(){
 		return author_id;
+	}
+	
+	public int ncomments(){
+		return comments.size();
+	}
+	
+	public int nlikes(){
+		int num = main.getLikes();
+		for(Post i : comments){
+			num=+i.getLikes();
+		}
+		return num;
+	}
+	
+	public int nviews(){
+		int num = main.getViews();
+		for(Post i : comments){
+			num=+i.getViews();
+		}
+		return num;
 	}
 	
 }
