@@ -1,0 +1,232 @@
+<head>
+<!--Styling CSS dos elementos HTML-->
+<style>
+ul.tab {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+ul.tab li {float: left;}
+
+ul.tab li a {
+    display: inline-block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+ul.tab li a:hover {background-color: #ddd;}
+
+ul.tab li a:focus, .active {background-color: #ccc;}
+
+.tabcontent {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+	padding-top: 50px;
+	padding-left: 50px;
+	padding-bottom: 50px;
+	padding-right: 50px;
+	-webkit-animation: fadeEffect 1s;
+    animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+@-webkit-keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+fieldset {
+	padding: 2em;
+	top: -10px;
+	font:80%/1 sans-serif;
+}
+
+label {
+	float:left;
+	width:25%;
+	margin-right:0.5em;
+	padding-top:0.2em;
+	text-align:right;
+	font-weight:bold;
+}
+
+.checkboxes label {
+    float: right;
+	position: relative;
+    top: -400px;
+	right: 16px;
+}
+.checkboxes input {
+	position: relative;
+    top: 0px;
+}
+
+button {
+	background-color: #555555;
+	border: none;
+	color: white;
+	padding: 15px 32px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	margin:200px;
+	position: relative;
+	font-size: 15px;
+}
+
+.divider{
+    width:15px;
+    height:auto;
+    display:inline-block;
+}
+</style>
+  
+<script>
+ function openTab(evt, tabName) {
+ 
+    var i, tabcontent, tablinks;
+
+    // Obter elementos "tabcontent" e escondê-los
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Obter elementos "tablinks" e remover "active"
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Mostrar tab actual e adicionar classe "active" ao link que abriu a tab
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+ function changeDropdowns(value){
+    if(value=="global"){
+        document.getElementById('specloc').style.display='none';
+    }else if(value=="specific"){
+        document.getElementById('specloc').style.display='block';
+    }
+}
+	</script>
+ 
+</head>
+
+<body>
+<!--Logotipo-->
+<center><img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top"></center>
+<br></br>
+</body>
+
+<!--Tabs-->
+<ul class="tab">
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Configuration')">1. Configuration</a></li>
+  <li><a href="#" class="tablinks" onclick="openTab(event, 'Filters')">2. Filters</a></li>
+</ul>
+
+<!--Conteúdo da tab "Configuration"-->
+<div id= "Configuration" class="tabcontent">
+	
+	<!--Lista de PSSs-->
+	<form action="diversity.html">
+	Select PSS:  <select name="PSS List" align="center">
+					<option value="volvo">PSS1</option>
+					<option value="saab">PSS2</option>
+					<option value="fiat">PSS3</option>
+			</select><br></br>
+	
+	<!--Lista de Frequencies-->
+	Frequency: 	<select name="Frequency List" align="center">
+					<option value="daily">Daily</option>
+					<option value="monthly">Monthly</option>
+				</select>
+	</form>
+	
+	<center>
+	<!--Conjunto de fields "Sources"-->
+		<fieldset style="width:270px;height:270px">
+			<legend>Sources</legend>
+			<!--Lista de sites-->
+				<form action="configuration.html">
+				Add Site:  <select id="pss" name="PSS List">
+								<option value="site1" onclick="addSiteToTextBox(this.value)">Site 1</option>
+								<option value="site2" onclick="addSiteToTextBox(this.value)">Site 2</option>
+								<option value="site3" onclick="addSiteToTextBox(this.value)">Site 3</option>
+							</select>
+				
+			<br></br>
+			<!--Adicionar URL próprio-->
+				Add URL: <input id="b" type="url" name="page">
+						 <input type="submit" value="Add">
+				<hr>
+				Selected URLs: <br></br> <textarea name="selected" style="height:150px"></textarea>
+				</form>
+		</fieldset>
+	</center>
+	
+	<!--Checkboxes de posts-->
+	<form action="diversity.html">
+		<div class="checkboxes">
+			<label for="x"><input type="checkbox" id="own"/>Include own posts?</label><br></br>
+			<label for="y"><input type="checkbox" id="third"/>Include third-party posts?</label>
+		</div>
+	</form>
+		
+	<!--Botão "Next"-->
+	<button type="button" onclick="openTab(event, 'Filters')">Next</button>
+</div>
+
+<!--Conteúdo da tab "Filters"-->
+<div id= "Filters" class="tabcontent">
+		<!--Escolher localização-->
+		<form>
+		Location:<input type="radio" name="location" value="global" onclick="changeDropdowns(this.value)"> Global<br></br>
+				<input type="radio" name="location" value="specific" onclick="changeDropdowns(this.value)"> Specific<br></br>
+				
+				<!--Lista de localizações específicas-->
+				<select id="specloc" name ="Specific Locations"  hidden>
+					<optgroup label="Europe">
+						<option value="germany">Germany</option>
+						<option value="portugal">Portugal</option>
+						<option value="italy">Italy</option>
+						<option value="greece">Greece</option>
+					</optgroup>
+					<optgroup label="Asia">
+					</optgroup>
+				</select>
+				
+		Gender:<input type="radio" name="gender" value="global"> Female<br></br>
+			<input type="radio" name="gender" value="specific"> Male<br></br>
+			
+		Ages:  <select id="pss" name="PSS List">
+					<option value="agelimit1">0-30 years old</option>
+					<option value="agelimit2">31-60 years old</option>
+					<option value="agelimit3">61+ years old</option>
+				</select>
+				
+		</form>
+	
+	<div style="text-align: left"> 
+	
+		<!--Botão "Previous"-->
+		<button type="button" onclick="openTab(event, 'Configuration')">Previous</button>
+			<div class="divider"/>
+		<!--Botão "Next"-->
+		<button type="button">Next</button>
+	</div>
+</div>

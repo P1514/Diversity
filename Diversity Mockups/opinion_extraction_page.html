@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Opinion Extraction Page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="sorttable.js"></script>
+  <!-- script responsável por desenhar os gráficos Google Charts -->
+  <script>
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(drawCharts);
+
+	//gráfico 1 (Sentimento segundo Age Range e Gender)
+    function drawBasic() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Age Range');
+      data.addColumn('number', 'Male');
+	  data.addColumn('number', 'Female');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['0-20', 20, 80],
+		['21-40', 40, 60],
+		['41-60', 60, 40],
+		['61+', 80, 20]
+	  ]);
+
+      var options = {
+        title: 'Average Sentiment By Gender',
+		colors : [ '#0000FF', '#00FFFF' ],
+		hAxis: {
+			title: 'Age Range'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		chartArea: {  width: "50%", height: "70%" }
+      };
+
+      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+	
+	//gráfico 2 (Sentimento segundo Age Range e Location)
+	function drawBasic2() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Age Range');
+      data.addColumn('number', 'East');
+	  data.addColumn('number', 'West');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['0-20', 10, 90],
+		['21-40', 20, 80],
+		['41-60', 30, 70],
+		['61+', 40, 60]
+	  ]);
+	  
+      var options = {
+        title: 'Average Sentiment By Location',
+		colors : [ '#006600', '#00FF00' ],
+		hAxis: {
+			title: 'Age Range'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		chartArea: {  width: "50%", height: "70%" }
+      };
+
+      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+
+      chart.draw(data, options);
+    }
+	
+	//desenhar ambos os gráficos
+	function drawCharts() {
+		drawBasic();
+		drawBasic2();
+	}
+</script>
+<!-- 
+1ª função - adicionar margem esquerda ao gráfico 2
+2ª função - fazer display dos icones de sort antes da tabela estar ordenada 
+-->
+<style>
+#chart_div2 {
+	margin-left: 200px;
+}
+
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+    content: " \25B4\25BE" 
+}
+</style>
+</head>
+
+<body>
+<!-- Logotipo Diversity-->
+<center><img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top"></center>
+
+<!-- Gráficos -->
+<div class = "container">
+<h2>Charts</h2>
+<hr>
+<br></br>
+	<center>
+		<table class="columns">
+			<tr>
+				<td><div id="chart_div"></div></td>
+				<td><div id="chart_div2"></div></td>
+			</tr>
+		</table>
+	</center>
+</div>
+
+<br>
+</br>
+
+<!-- Tabela de posts -->
+<div class="container">
+<h2>Posts</h2>
+<hr>
+<table class="table sortable">
+	<thead>
+    <tr>
+		<th>Original Author</th>
+        <th>Post</th>
+		<th># Comments</th>
+		<th>Date</th>
+		<th>Polarity</th>
+		<th>Reach</th>
+		<th>Influence</th>
+        <th>Location</th>
+        <th>Gender</th>
+        <th>Age</th>
+    </tr>
+	</thead>
+    <tbody>
+	<!--Dados dummy-->
+    <tr>
+		<td>David Jones</td>
+        <td>These shoes are horrendous!</td>
+		<td>123</td>
+		<td>20/04/2015</td>
+		<td>0.20</td>
+		<td>0.2</td>
+		<td>0.42</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>24</td>
+    </tr>
+    <tr>
+        <td>Martha Stewart</td>
+        <td>Good shoes!</td>
+		<td>34</td>
+		<td>12/02/2015</td>
+		<td>0.80</td>
+		<td>0.8</td>
+		<td>0.91</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>32</td>
+    </tr>
+    <tr>
+		<td>James Osterberg</td>
+        <td>In a word: great!</td>
+		<td>264</td>
+		<td>10/03/2016</td>
+		<td>0.90</td>
+		<td>0.9</td>
+		<td>0.96</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>26</td>
+    </tr>
+    <tr>
+        <td>Carmen Gaspar</td>
+        <td>Bad</td>
+		<td>34</td>
+		<td>12/02/2015</td>
+		<td>0.30</td>
+		<td>0.3</td>
+		<td>0.35</td>
+        <td>East</td>
+        <td>Female</td>
+        <td>40</td>
+    </tr>
+    <tr>
+        <td>Jack Barker</td>
+        <td>These shoes are mediocre.</td>
+		<td>54</td>
+		<td>19/10/2015</td>
+		<td>0.50</td>
+		<td>0.5</td>
+		<td>0.54</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>39</td>
+    </tr>
+	<tr>
+        <td>Lisa Stanford</td>
+        <td>Excellent!</td>
+		<td>10</td>
+		<td>06/12/2014</td>
+		<td>0.93</td>
+		<td>0.943</td>
+		<td>1</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>Richard Parker</td>
+        <td>Bad shoes!</td>
+		<td>32</td>
+		<td>03/05/2015</td>
+		<td>0.22</td>
+		<td>0.2</td>
+		<td>0.23</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>50</td>
+    </tr>
+    <tr>
+        <td>Thomas Anderson</td>
+        <td>In a word: horrendous!</td>
+		<td>26</td>
+		<td>28/02/2014</td>
+		<td>0.11</td>
+		<td>0.1</td>
+		<td>0.10</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>19</td>
+    </tr>
+    <tr>
+        <td>Jane Turner</td>
+        <td>These shoes are good!</td>
+		<td>53</td>
+		<td>06/12/2014</td>
+		<td>0.84</td>
+		<td>0.8</td>
+		<td>0.83</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>47</td>
+    </tr>
+    <tr>
+        <td>Rachel Smith</td>
+        <td>Fabulous shoes!</td>
+		<td>75</td>
+		<td>06/12/2014</td>
+		<td>0.96</td>
+		<td>0.967</td>
+		<td>1</td>
+        <td>East</td>
+        <td>Female</td>
+        <td>42</td>
+    </tr>
+	<tr>
+        <td>Jeff Dunham</td>
+        <td>Mediocre shoes.</td>
+		<td>86</td>
+		<td>30/06/2016</td>
+		<td>0.55</td>
+		<td>0.5</td>
+		<td>0.525</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>50</td>
+    </tr>
+	<tr>
+        <td>John Williams</td>
+        <td>Good shoes.</td>
+		<td>86</td>
+		<td>20/01/2016</td>
+		<td>0.80</td>
+		<td>0.8</td>
+		<td>0.81</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>29</td>
+    </tr>
+	</tbody>
+</table>
+</div>
+      

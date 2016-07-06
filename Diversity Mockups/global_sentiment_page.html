@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Global Sentiment Page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- script responsável por desenhar os gráficos Google Charts -->
+  <script>
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(drawCharts);
+  
+	//gráfico sentimento global
+    function drawGlobal() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Date');
+      data.addColumn('number', 'Sentiment');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['31/01/2016', 20],
+		['28/02/2016', 35],
+		['31/03/2016', 40],
+		['30/04/2016', 55],
+		['31/05/2016', 60],
+		['30/06/2016', 75],
+		['31/07/2016', 80],
+		['31/08/2016', 95],
+		['30/09/2016', 100]
+	  ]);
+
+      var options = {
+        title: 'Average Sentiment By Gender',
+		colors : [ '#0000FF', '#00FFFF' ],
+		hAxis: {
+			title: 'Date'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		chartArea: {  width: "50%", height: "70%" }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div_global'));
+
+      chart.draw(data, options);
+    }
+	
+
+	//gráfico 1 (Sentimento segundo Age Range e Gender)
+    function drawBasic() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Age Range');
+      data.addColumn('number', 'Male');
+	  data.addColumn('number', 'Female');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['0-20', 20, 80],
+		['21-40', 40, 60],
+		['41-60', 60, 40],
+		['61+', 80, 20]
+	  ]);
+
+      var options = {
+        title: 'Average Sentiment By Gender',
+		colors : [ '#0000FF', '#00FFFF' ],
+		hAxis: {
+			title: 'Age Range'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		chartArea: {  width: "50%", height: "70%" }
+      };
+
+      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+	
+	//gráfico 2 (Sentimento segundo Age Range e Location)
+	function drawBasic2() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Age Range');
+      data.addColumn('number', 'East');
+	  data.addColumn('number', 'West');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['0-20', 10, 90],
+		['21-40', 20, 80],
+		['41-60', 30, 70],
+		['61+', 40, 60]
+	  ]);
+	  
+      var options = {
+        title: 'Average Sentiment By Location',
+		colors : [ '#006600', '#00FF00' ],
+		hAxis: {
+			title: 'Age Range'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		chartArea: {  width: "50%", height: "70%" }
+      };
+
+      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+
+      chart.draw(data, options);
+    }
+	
+	//desenhar ambos os gráficos
+	function drawCharts() {
+		drawGlobal();
+		drawBasic();
+		drawBasic2();
+	}
+</script>
+<!-- 
+1ª função - adicionar margem esquerda ao gráfico 2
+2ª função - fazer display dos icones de sort antes da tabela estar ordenada 
+-->
+<style>
+#chart_div2 {
+	margin-left: 200px;
+}
+
+table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
+    content: " \25B4\25BE" 
+}
+</style>
+</head>
+
+<body>
+<!-- Logotipo Diversity-->
+<center><img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top"></center>
+
+<!-- Gráficos -->
+<div class = "container">
+	<center>
+	<h2 align="left">Global Sentiment</h2>
+	<div id ="chart_div_global"></div>
+	<h2 align="left">Sentiment by Gender and Location</h2>
+		<table class="columns">
+			<tr>
+				<td><div id="chart_div"></div></td>
+				<td><div id="chart_div2"></div></td>
+			</tr>
+		</table>
+	</center>
+</div>      
