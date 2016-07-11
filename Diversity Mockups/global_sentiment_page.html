@@ -35,7 +35,7 @@
 	  ]);
 
       var options = {
-        title: 'Average Sentiment By Gender',
+        title: 'Average Sentiment Over Time',
 		colors : [ '#0000FF', '#00FFFF' ],
 		hAxis: {
 			title: 'Date'
@@ -46,8 +46,7 @@
 					max : 0,
 					min : 100
 				}
-        },
-		chartArea: {  width: "50%", height: "70%" }
+        }
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div_global'));
@@ -56,87 +55,123 @@
     }
 	
 
-	//gráfico 1 (Sentimento segundo Age Range e Gender)
+	//gráfico 1 (Sentimento ao longo do tempo segundo o género)
     function drawBasic() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Age Range');
+      data.addColumn('string', 'Date');
       data.addColumn('number', 'Male');
-	  data.addColumn('number', 'Female');
-	  
-	  //dados dummy
-	  //dados reais a serem adicionadas posteriormente
-	  data.addRows([
-		['0-20', 20, 80],
-		['21-40', 40, 60],
-		['41-60', 60, 40],
-		['61+', 80, 20]
-	  ]);
+      data.addColumn('number', 'Female');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['31/01/2016', 10, 5],
+		['28/02/2016', 25, 15],
+		['31/03/2016', 30, 20],
+		['30/04/2016', 45, 35],
+		['31/05/2016', 50, 40],
+		['30/06/2016', 65, 55],
+		['31/07/2016', 70, 60],
+		['31/08/2016', 85, 75],
+		['30/09/2016', 100, 90]
+      ]);
 
       var options = {
-        title: 'Average Sentiment By Gender',
-		colors : [ '#0000FF', '#00FFFF' ],
-		hAxis: {
-			title: 'Age Range'
-		},
-        vAxis: {
-          title: 'Sentiment',
-		  viewWindow : {
-					max : 0,
-					min : 100
-				}
+		title: 'Average Sentiment Over Time By Gender',
+        hAxis: {
+          title: 'Date'
         },
-		chartArea: {  width: "50%", height: "70%" }
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#00008B', '#0000FF']
       };
 
-      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
       chart.draw(data, options);
     }
 	
-	//gráfico 2 (Sentimento segundo Age Range e Location)
+	//gráfico 2 (Sentimento ao longo do tempo segundo a localização)
 	function drawBasic2() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Age Range');
+      data.addColumn('string', 'Date');
       data.addColumn('number', 'East');
-	  data.addColumn('number', 'West');
-	  
-	  //dados dummy
-	  //dados reais a serem adicionadas posteriormente
-	  data.addRows([
-		['0-20', 10, 90],
-		['21-40', 20, 80],
-		['41-60', 30, 70],
-		['61+', 40, 60]
-	  ]);
-	  
+      data.addColumn('number', 'West');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['31/01/2016', 2, 8],
+		['28/02/2016', 10, 16],
+		['31/03/2016', 18, 24],
+		['30/04/2016', 26, 31],
+		['31/05/2016', 34, 39],
+		['30/06/2016', 42, 47],
+		['31/07/2016', 50, 55],
+		['31/08/2016', 58, 63],
+		['30/09/2016', 66, 71]
+      ]);
+
       var options = {
-        title: 'Average Sentiment By Location',
-		colors : [ '#006600', '#00FF00' ],
-		hAxis: {
-			title: 'Age Range'
-		},
-        vAxis: {
-          title: 'Sentiment',
-		  viewWindow : {
-					max : 0,
-					min : 100
-				}
+		title: 'Average Sentiment Over Time By Location',
+        hAxis: {
+          title: 'Date'
         },
-		chartArea: {  width: "50%", height: "70%" }
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#006400', '#008000']
       };
 
-      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
-
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
       chart.draw(data, options);
     }
+	
+	//gráfico 2 (Sentimento ao longo do tempo segundo faixas etárias)
+	function drawBasic3(){
+	
+	  var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Date');
+      data.addColumn('number', '0-30');
+      data.addColumn('number', '31-60');
+	  data.addColumn('number', '61+');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['31/01/2016', 2, 8, 10],
+		['28/02/2016', 10, 16, 18],
+		['31/03/2016', 18, 24, 26],
+		['30/04/2016', 26, 31, 33],
+		['31/05/2016', 34, 39, 42],
+		['30/06/2016', 42, 47, 49],
+		['31/07/2016', 50, 55, 57],
+		['31/08/2016', 58, 63, 65],
+		['30/09/2016', 66, 71, 73]
+      ]);
+
+      var options = {
+		title: 'Average Sentiment Over Time By Age Range',
+        hAxis: {
+          title: 'Date'
+        },
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#8B4513', '#A0522D', '#D2691E']
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div3'));
+      chart.draw(data, options);
+		
+	
+	}
 	
 	//desenhar ambos os gráficos
 	function drawCharts() {
 		drawGlobal();
 		drawBasic();
 		drawBasic2();
+		drawBasic3();
 	}
 </script>
 <!-- 
@@ -145,11 +180,11 @@
 -->
 <style>
 #chart_div2 {
-	margin-left: 200px;
+	margin-left: 50px;
 }
 
-table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
-    content: " \25B4\25BE" 
+#chart_div3 {
+	margin-left: 50px;
 }
 </style>
 </head>
@@ -162,12 +197,16 @@ table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sor
 <div class = "container">
 	<center>
 	<h2 align="left">Global Sentiment</h2>
+	<br></br>
 	<div id ="chart_div_global"></div>
+	<br></br>
 	<h2 align="left">Sentiment by Gender and Location</h2>
+	<br></br>
 		<table class="columns">
 			<tr>
 				<td><div id="chart_div"></div></td>
 				<td><div id="chart_div2"></div></td>
+				<td><div id="chart_div3"></div></td>
 			</tr>
 		</table>
 	</center>
