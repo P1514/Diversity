@@ -84,7 +84,8 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#00008B', '#0000FF']
+		colors: ['#00008B', '#0000FF'],
+		legend: 'bottom'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -120,7 +121,8 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#006400', '#008000']
+		colors: ['#006400', '#008000'],
+		legend: 'bottom'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
@@ -157,7 +159,8 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#8B4513', '#A0522D', '#D2691E']
+		colors: ['#8B4513', '#A0522D', '#D2691E'],
+		legend: 'bottom'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div3'));
@@ -180,11 +183,16 @@
 -->
 <style>
 #chart_div2 {
-	margin-left: 50px;
+	margin-left: 25px;
 }
 
 #chart_div3 {
-	margin-left: 50px;
+	margin-left: 25px;
+}
+
+#global{
+	max-width: 60%;
+	margin-left: 10px;
 }
 </style>
 </head>
@@ -194,7 +202,7 @@
 <center><img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top"></center>
 
 <!-- Gráficos -->
-<div class = "container">
+<div id="global" class = "container">
 	<center>
 	<h2 align="left">Global Sentiment</h2>
 	<br></br>
