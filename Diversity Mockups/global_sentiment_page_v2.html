@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Global Sentiment Page</title>
+  <title>Global Sentiment Page V2</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -11,7 +11,7 @@
   <!-- script responsável por desenhar os gráficos Google Charts -->
   <script>
   google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(drawCharts);
+  google.charts.setOnLoadCallback(checkValue);
   
 	//gráfico sentimento global
     function drawGlobal() {
@@ -35,7 +35,7 @@
 	  ]);
 
       var options = {
-        title: 'Average Sentiment Over Time',
+        title: 'Average Global Sentiment Over Time',
 		colors : [ '#0000FF', '#00FFFF' ],
 		hAxis: {
 			title: 'Date'
@@ -46,10 +46,12 @@
 					max : 0,
 					min : 100
 				}
-        }
+        },
+		width: '100%',
+		height: '100%'
       };
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div_global'));
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
       chart.draw(data, options);
     }
@@ -85,7 +87,8 @@
           title: 'Sentiment'
         },
 		colors: ['#00008B', '#0000FF'],
-		legend: 'bottom'
+		width: '100%',
+		height: '100%'
       };
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
@@ -122,10 +125,11 @@
           title: 'Sentiment'
         },
 		colors: ['#006400', '#008000'],
-		legend: 'bottom'
+		width: '100%',
+		height: '100%'
       };
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
       chart.draw(data, options);
     }
 	
@@ -160,27 +164,43 @@
           title: 'Sentiment'
         },
 		colors: ['#FF7F50', '#FA8072', '#FFA500'],
-		legend: 'bottom'
+		width: '100%',
+		height: '100%'
       };
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div3'));
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
       chart.draw(data, options);
 		
 	
 	}
 	
-	//desenhar ambos os gráficos
-	function drawCharts() {
-		drawGlobal();
-		drawBasic();
-		drawBasic2();
-		drawBasic3();
+	//desenha o gráfico consoante a opção escolhida nos radio buttons
+	function checkValue(){
+        switch(document.test.field.value){
+		
+            case "global":
+             
+				drawGlobal();
+				break;
+
+            case "gender":
+
+				drawBasic();
+				break;
+
+            case "location":
+
+				drawBasic2();
+				break;
+
+			case "age":
+
+				drawBasic3();
+				break;
+        }
 	}
 </script>
-<!-- 
-1ª função - adicionar margem esquerda ao gráfico 2
-2ª função - fazer display dos icones de sort antes da tabela estar ordenada 
--->
+
 <style>
 #global{
 	width: 88.5%;
@@ -192,32 +212,50 @@
 	float: none;
 	margin-left: auto;
 }
+
+input[type=radio] {
+	margin-top: 50px;
+    margin-left: 50px;
+}
+
+#chart_div{
+	width: 100%;
+	max-width: 1232px;
+	padding-left: 0.75%;
+	padding-right: 0.75%;
+	margin: auto;
+	clear: none;
+	float: none;
+	margin-left: auto;
+	margin-top: 25px;
+}
 </style>
 </head>
 
 <body>
 <!-- Logotipo Diversity-->
-<center>	
+<center>
 	<a href="sentiment_home_page.html">
 		<img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
 	</a>
-</center>
 
 <!-- Gráficos -->
 <div id="global" class = "container">
-	<center>
 	<h2 align="left">Global Sentiment</h2>
 	<br></br>
-	<div id ="chart_div_global"></div>
+	
+	<form align="left" name='test'>
+	<label>Choose chart:</label>
+		<input type="radio" name="field" value="global" onChange="checkValue()" checked>Global 
+		<input type="radio" name="field" value="gender" onChange="checkValue()">Gender 
+		<input type="radio" name="field" value="location" onChange="checkValue()">Location
+		<input type="radio" name="field" value="age" onChange="checkValue()">Age Range		
+	</form>
+	
 	<br></br>
-	<h2 align="left">Sentiment by Gender and Location</h2>
-	<br></br>
-		<table class="columns">
-			<tr>
-				<td><div id="chart_div"></div></td>
-				<td><div id="chart_div2"></div></td>
-				<td><div id="chart_div3"></div></td>
-			</tr>
-		</table>
-	</center>
-</div>      
+	
+	<div id='chart_div'></div>
+	
+</div>
+</center>      
+</body>

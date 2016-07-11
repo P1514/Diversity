@@ -41,6 +41,7 @@
 		['61+', 90, 95]
 	  ]);
 
+	  //seleccionador de faixa etária
               var compPicker = new google.visualization.ControlWrapper({
                 'controlType': 'CategoryFilter',
                 'containerId': 'control2',
@@ -100,9 +101,10 @@
               });
 
               // Create a dashboard
-          var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart, chart2, table]);;
+          var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart, table]);
+		  var drawChart2 = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart2, table]);
           drawChart.draw(data);
-		  drawChart.draw(data2);
+		  drawChart2.draw(data2);
 
         
 document.getElementById('values').onchange = function(evt) {
@@ -139,7 +141,7 @@ if (evt.target.selectedIndex == 0) {
   chart2.setOption('colors', ["#ff0000","#92d050"]);    
 }
 drawChart.draw(data);
-drawChart.draw(data2);
+drawChart2.draw(data2);
 };
             }
 
