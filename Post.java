@@ -8,63 +8,63 @@ public class Post {
 	private int userid;
 	private Date time;
 	private String message = new String();
-	private int likes;
-	private int views;
-	private int polarity;
-	
-	public Post(int _id, int _userid, Date _time, int _likes, int _views, String _message){
+	private int likes=0;
+	private int views=0;
+	private double polarity=50;
+
+	public Post(int _id, int _userid, Date _time, int _likes, int _views, String _message) {
 		this.id = _id;
 		this.userid = _userid;
 		this.time = _time;
-		this.views=_views;
-		this.likes=_likes;
-		this.message=_message;
-		
-		//To replace with API
-		
-    	String[] words = message.split("[^\\w'-]+");
-    	
-    	Adjectives adjs = new Adjectives();
-    	int sentiment=50;
-    	for(int i = 0; i<words.length; i++){
-    		
-    		String currentWord  = words[i];
-    		
-    		if(adjs.matches(currentWord)){
-    			sentiment = adjs.getSentiment(currentWord);
-    		}
-    	}
+		this.views = _views;
+		this.likes = _likes;
+		this.message = _message;
+
+		// To replace with API
+
+		String[] words = message.split("[^\\w'-]+");
+
+		Adjectives adjs = new Adjectives();
+		int sentiment = 50;
+		for (int i = 0; i < words.length; i++) {
+
+			String currentWord = words[i];
+
+			if (adjs.matches(currentWord)) {
+				sentiment = adjs.getSentiment(currentWord);
+			}
+		}
 		// End of To Replace
-		
-		this.polarity=sentiment;
+
+		this.polarity = sentiment;
 	}
-	
+
 	public int getUID() {
 		return userid;
 	}
-	
-	public String getComment(){
+
+	public String getComment() {
 		return message;
 	}
-	
-	public int getID(){
+
+	public int getID() {
 		return id;
 	}
-	
-	public Date getTime(){
+
+	public Date getTime() {
 		return time;
 	}
-	
-	public int getLikes(){
+
+	public int getLikes() {
 		return likes;
 	}
-	
-	public int getViews(){
+
+	public int getViews() {
 		return views;
 	}
-	
-	public int getPolarity(){
+
+	public double getPolarity() {
 		return polarity;
 	}
-	
+
 }
