@@ -14,7 +14,7 @@
   google.charts.load('current', {packages: ['corechart', 'bar']});
   google.charts.setOnLoadCallback(drawCharts);
 
-	socket= new WebSocket('ws:127.0.0.1:20000');
+	socket= new WebSocket('ws:127.0.0.1:20000/');
 	socket.onopen= function() {
 		socket.send('sentimentbygender');
 	};
@@ -22,14 +22,17 @@
 	var queryObject = "";
 	var queryObjectLen = "";
 	$.ajax({
-		url : '127.0.0.1',
-		dataType : 'json',
+		//url : 'http://127.0.0.1:20000',
+		//dataType : 'json',
 		success : function(data) {
 			queryObject = eval('(' + JSON.stringify(data) + ')');
 			console.log(JSON.stringify(data));
 			queryObjectLen = queryObject.opdetails.length;
 		},
-		error : function(xhr, type) {
+		error : function(data/*xhr, type*/) {
+		queryObject = eval('(' + JSON.stringify(data) + ')');
+			console.log(JSON.stringify(data));
+			queryObjectLen = queryObject.opdetails.length;
 			alert('server error occoured')
 		}
 	});
