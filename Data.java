@@ -15,7 +15,8 @@ public class Data {
 	private int totallikes;
 
 	Settings dbc = new Settings();
-	Connection cn = null;
+	Connection cndata = null;
+	Connection cnlocal = null;
 
 	public Data() {
 		this.totalcomments = 0;
@@ -27,13 +28,17 @@ public class Data {
 	public void load() throws SQLException {
 
 		try {
-			cn = dbc.connect();
+			cndata = dbc.conndata();
+			cnlocal = dbc.connlocal();
 		} catch (ClassNotFoundException | SQLException e4) {
 			e4.printStackTrace();
 		}
+
 		ResultSet rs = null;
-		String query = ("Select * from " + dbc.posttn);
-		Statement stmt = cn.createStatement();
+		String query = ("Select * from " + dbc.posttn + " Where " + dbc.ptime + " < \'" + dbc.LastUpdated + "\'");
+		System.out.println(query);
+		dbc.setLastUpdated();
+		Statement stmt = cndata.createStatement();
 		rs = stmt.executeQuery(query);
 
 		List<Integer> users = new ArrayList<Integer>();
@@ -62,8 +67,8 @@ public class Data {
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 		query = ("Select * from " + dbc.usertn + " where " + dbc.user_id + " in " + querycond);
-		System.out.println(query);
-		stmt = cn.createStatement();
+		// System.out.println(query);
+		stmt = cndata.createStatement();
 		rs = stmt.executeQuery(query);
 		rs.next();// ALTERAR
 		do {
@@ -75,11 +80,21 @@ public class Data {
 		} while (rs.next());
 
 		opiniondb.forEach((k, v) -> {
-			Author temp_author = authordb.get(v.getID());
-			temp_author.addComments(v.ncomments());
-			temp_author.addLikes(v.nlikes());
-			temp_author.addViews(v.nviews());
-			authordb.put(temp_author.getID(), temp_author);
+			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
+			ArrayList<Post> temp_post = v.getPosts();
+			temp_post.forEach((v2) -> {
+				if (!uniqueauthors.contains(v2.getUID()))
+					uniqueauthors.add(v2.getUID());
+			});
+			uniqueauthors.forEach((v3) -> {
+				Author temp_author = authordb.get(v3);
+				temp_author.addComments(v.ncomments());
+				temp_author.addLikes(v.nlikes());
+				temp_author.addViews(v.nviews());
+				temp_author.addPosts();
+				authordb.put(temp_author.getID(), temp_author);
+			});
+
 			totalcomments += v.ncomments();
 			totallikes += v.nlikes();
 			totalviews += v.nviews();
@@ -87,7 +102,7 @@ public class Data {
 
 		this.totalposts = opiniondb.size();
 		authordb.forEach((k, v) -> {
-			v.calcInfluence(totalcomments / ((double) opiniondb.size()), totallikes / ((double) opiniondb.size()),
+			v.calcInfluence((totalcomments / ((double) opiniondb.size())), totallikes / ((double) opiniondb.size()),
 					totalviews / ((double) opiniondb.size()));
 		});
 		opiniondb.forEach((k, v) -> {
@@ -98,7 +113,82 @@ public class Data {
 
 		System.out.println("I AM COMPLETE BEHOLD\n\r");
 		opiniondb.forEach((k, v) -> {
-			System.out.println("AMEN " + v.getPolarity() + "/" + v.getReach());
+			System.out.println("AMEN ID : " + " " + v.getPolarity() + "/" + v.getReach());
+		});
+
+		authordb.forEach((k, author) -> {
+			String insert = "INSERT INTO authors " + "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY "
+					+ "UPDATE age=?, influence=?, comments=?, likes=?, views=?";
+			// System.out.println(query);
+			PreparedStatement query1;
+			try {
+				query1 = cnlocal.prepareStatement(insert);
+				query1.setInt(1, author.getID());
+				query1.setInt(2, author.getAge());
+				query1.setString(3, author.getName());
+				query1.setString(4, author.getGender());
+				query1.setString(5, author.getLocation());
+				query1.setDouble(6, author.getInfluence());
+				query1.setInt(7, author.getComments());
+				query1.setInt(8, author.getLikes());
+				query1.setInt(9, author.getViews());
+				query1.setInt(10, author.getAge());
+				query1.setDouble(11, author.getInfluence());
+				query1.setInt(12, author.getComments());
+				query1.setInt(13, author.getLikes());
+				query1.setInt(14, author.getViews());
+
+				System.out.println(query1);
+				query1.executeUpdate();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+
+		opiniondb.forEach((k, opinion) -> {
+			String update = "INSERT INTO opinions " + "Values (?,?,?,?,?,?,?) ON DUPLICATE KEY"
+					+ " UPDATE reach=?, polarity=?, total_inf=?";
+			// System.out.println(query);
+			PreparedStatement query1;
+			try {
+				query1 = cnlocal.prepareStatement(update);
+				query1.setInt(1, k);
+				query1.setDouble(2, opinion.getReach());
+				query1.setDouble(3, opinion.getPolarity());
+				query1.setDouble(4, opinion.getTotalInf());
+				query1.setInt(5, opinion.getUID());
+				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime().getTime());
+				query1.setDate(6, sqlDate);
+				query1.setString(7, opinion.getTag());
+				query1.setDouble(8, opinion.getReach());
+				query1.setDouble(9, opinion.getPolarity());
+				query1.setDouble(10, opinion.getTotalInf());
+
+				System.out.println(query1);
+				query1.executeUpdate();
+
+				opinion.getPosts().forEach((post) -> {
+					try {
+						String update1 = "REPLACE INTO posts " + "Values (?,?,?,?,?)";
+						PreparedStatement query2 = cnlocal.prepareStatement(update1);
+						query2.setInt(1, post.getID());
+						query2.setDouble(2, post.getPolarity());
+						query2.setString(3, post.getComment());
+						query2.setInt(4, k);
+						query2.setInt(5, post.getUID());
+
+						System.out.println(query2);
+						query2.executeUpdate();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		});
 	}
 
@@ -130,7 +220,7 @@ public class Data {
 	 * @return Object
 	 */
 	public Author getAuthor(Opinion op) {
-		return authordb.get(op.getID());
+		return authordb.get(op.getUID());
 	}
 
 	/**

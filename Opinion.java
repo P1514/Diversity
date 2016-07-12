@@ -1,6 +1,7 @@
 package resources;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 //Opinion Individual Object
@@ -13,10 +14,14 @@ public class Opinion {
 	private double polarity = 0;
 	private Settings dbc = new Settings();
 	private double total_inf=0;
+	private Date timestamp;
+	private String tag;
 
 	public Opinion(Post _main) {
 		this.main=_main;
 		this.author_id = main.getUID();
+		timestamp = main.getTime();
+		tag="";
 		
 
 	}
@@ -51,10 +56,21 @@ public class Opinion {
 		return reach;
 	}
 
-	public int getID() {
+	public int getUID() {
 		return author_id;
 	}
 
+	public double getTotalInf(){
+		return total_inf;
+	}
+	
+	public java.util.Date getTime(){
+		return timestamp;
+	}
+	
+	public String getTag(){
+		return tag;
+	}
 	public int ncomments() {
 		
 		return (comments.isEmpty() ? 0 : comments.size());
@@ -74,6 +90,12 @@ public class Opinion {
 			num = +i.getViews();
 		}
 		return num;
+	}
+	
+	public ArrayList<Post> getPosts(){
+		ArrayList<Post> output = comments;
+		output.add(main);
+		return output;
 	}
 
 }

@@ -10,6 +10,7 @@ public class Author {
 	private String gender;
 	private String location;
 	private int comments;
+	private int posts;
 	private int likes;
 	private int views;
 	private Settings dbc;
@@ -53,7 +54,7 @@ public class Author {
 	}
 
 	public void addComments(int number) {
-		this.comments = +number;
+		this.comments += number;
 	}
 
 	public void addViews(int number) {
@@ -64,6 +65,9 @@ public class Author {
 		this.likes = +number;
 	}
 
+	public void addPosts(){
+		this.posts += 1;
+	}
 	public int getComments() {
 		return this.comments;
 	}
@@ -75,10 +79,10 @@ public class Author {
 	public int getViews() {
 		return this.views;
 	}
-
+	
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
-		this.influence = dbc.aWcomments * (this.comments / avgcom) + dbc.aWlikes * (this.likes / avglike)
-				+ dbc.aWviews * (this.views / avgview);
+		this.influence = dbc.aWcomments * ((this.comments/this.posts) / avgcom) + dbc.aWlikes * ((this.likes/this.posts) / avglike)
+				+ dbc.aWviews * ((this.views/this.posts) / avgview);
 	}
 
 }
