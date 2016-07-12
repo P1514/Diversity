@@ -17,28 +17,28 @@
     function drawGlobal() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Date');
+      data.addColumn('string', 'Month');
       data.addColumn('number', 'Sentiment');
 	  
 	  //dados dummy
 	  //dados reais a serem adicionadas posteriormente
 	  data.addRows([
-		['31/01/2016', 20],
-		['28/02/2016', 35],
-		['31/03/2016', 40],
-		['30/04/2016', 55],
-		['31/05/2016', 60],
-		['30/06/2016', 75],
-		['31/07/2016', 80],
-		['31/08/2016', 95],
-		['30/09/2016', 100]
+		['January', 20],
+		['February', 35],
+		['March', 40],
+		['April', 55],
+		['May', 60],
+		['June', 75],
+		['July', 80],
+		['August', 95],
+		['September', 100]
 	  ]);
 
       var options = {
         title: 'Average Global Sentiment Over Time',
 		colors : [ '#0000FF', '#00FFFF' ],
 		hAxis: {
-			title: 'Date'
+			title: 'Month'
 		},
         vAxis: {
           title: 'Sentiment',
@@ -61,27 +61,27 @@
     function drawBasic() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Date');
+      data.addColumn('string', 'Month');
       data.addColumn('number', 'Male');
       data.addColumn('number', 'Female');
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['31/01/2016', 10, 5],
-		['28/02/2016', 25, 15],
-		['31/03/2016', 30, 20],
-		['30/04/2016', 45, 35],
-		['31/05/2016', 50, 40],
-		['30/06/2016', 65, 55],
-		['31/07/2016', 70, 60],
-		['31/08/2016', 85, 75],
-		['30/09/2016', 100, 90]
+        ['January', 10, 5],
+		['February', 25, 15],
+		['March', 30, 20],
+		['April', 45, 35],
+		['May', 50, 40],
+		['June', 65, 55],
+		['July', 70, 60],
+		['August', 85, 75],
+		['September', 100, 90]
       ]);
 
       var options = {
 		title: 'Average Sentiment Over Time By Gender',
         hAxis: {
-          title: 'Date'
+          title: 'Month'
         },
         vAxis: {
           title: 'Sentiment'
@@ -99,27 +99,27 @@
 	function drawBasic2() {
 
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Date');
+      data.addColumn('string', 'Month');
       data.addColumn('number', 'East');
       data.addColumn('number', 'West');
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['31/01/2016', 2, 8],
-		['28/02/2016', 10, 16],
-		['31/03/2016', 18, 24],
-		['30/04/2016', 26, 31],
-		['31/05/2016', 34, 39],
-		['30/06/2016', 42, 47],
-		['31/07/2016', 50, 55],
-		['31/08/2016', 58, 63],
-		['30/09/2016', 66, 71]
+        ['January', 2, 8],
+		['February', 10, 16],
+		['March', 18, 24],
+		['April', 26, 31],
+		['May', 34, 39],
+		['June', 42, 47],
+		['July', 50, 55],
+		['August', 58, 63],
+		['September', 66, 71]
       ]);
 
       var options = {
 		title: 'Average Sentiment Over Time By Location',
         hAxis: {
-          title: 'Date'
+          title: 'Month'
         },
         vAxis: {
           title: 'Sentiment'
@@ -137,28 +137,28 @@
 	function drawBasic3(){
 	
 	  var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Date');
+      data.addColumn('string', 'Month');
       data.addColumn('number', '0-30');
       data.addColumn('number', '31-60');
 	  data.addColumn('number', '61+');
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['31/01/2016', 2, 8, 10],
-		['28/02/2016', 10, 16, 18],
-		['31/03/2016', 18, 24, 26],
-		['30/04/2016', 26, 31, 33],
-		['31/05/2016', 34, 39, 42],
-		['30/06/2016', 42, 47, 49],
-		['31/07/2016', 50, 55, 57],
-		['31/08/2016', 58, 63, 65],
-		['30/09/2016', 66, 71, 73]
+        ['January', 2, 8, 10],
+		['February', 10, 16, 18],
+		['March', 18, 24, 26],
+		['April', 26, 31, 33],
+		['May', 34, 39, 42],
+		['June', 42, 47, 49],
+		['July', 50, 55, 57],
+		['August', 58, 63, 65],
+		['September', 66, 71, 73]
       ]);
 
       var options = {
 		title: 'Average Sentiment Over Time By Age Range',
         hAxis: {
-          title: 'Date'
+          title: 'Month'
         },
         vAxis: {
           title: 'Sentiment'
@@ -204,7 +204,9 @@
 <style>
 #global{
 	width: 88.5%;
-	max-width: 1232px;
+	max-width: 100%;
+	height: 88.5%;
+	max-height: 100%;
 	padding-left: 0.75%;
 	padding-right: 0.75%;
 	margin: auto;
@@ -214,20 +216,20 @@
 }
 
 input[type=radio] {
-	margin-top: 50px;
-    margin-left: 50px;
+	margin-top: 5%;
+    margin-left: 5%;
 }
 
 #chart_div{
 	width: 100%;
-	max-width: 1232px;
+	max-width: 100%;
 	padding-left: 0.75%;
 	padding-right: 0.75%;
 	margin: auto;
 	clear: none;
 	float: none;
 	margin-left: auto;
-	margin-top: 25px;
+	margin-top: 5%;
 }
 </style>
 </head>
@@ -245,15 +247,12 @@ input[type=radio] {
 	<br></br>
 	
 	<form align="left" name='test'>
-	<label>Choose chart:</label>
 		<input type="radio" name="field" value="global" onChange="checkValue()" checked>Global 
 		<input type="radio" name="field" value="gender" onChange="checkValue()">Gender 
 		<input type="radio" name="field" value="location" onChange="checkValue()">Location
 		<input type="radio" name="field" value="age" onChange="checkValue()">Age Range		
 	</form>
-	
-	<br></br>
-	
+		
 	<div id='chart_div'></div>
 	
 </div>

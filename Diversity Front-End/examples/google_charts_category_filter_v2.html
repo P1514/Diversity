@@ -22,10 +22,9 @@
          //dados dummy
          //dados reais a serem adicionadas posteriormente
          data.addRows([
-         ['0-20', 20, 40, 55, 60],
-         ['21-40', 40, 60, 70, 76],
-         ['41-60', 60, 65, 80, 85],
-         ['61+', 80, 85, 90, 95]
+         ['0-30', 20, 40, 55, 60],
+         ['31-60', 40, 60, 70, 76],
+         ['61+', 60, 65, 80, 85]
          ]);
          
          
@@ -60,17 +59,9 @@
          'chartArea': {  width: "50%", height: "70%" }
            });
          
-                 // Define a table
-                 var table = new google.visualization.ChartWrapper({
-                   'chartType': 'Table',
-                   'containerId': 'chart2',
-                   'options': {
-                     'width': '400px'
-                   }
-                 });
          
                  // Create a dashboard
-             var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart, table]);;
+             var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart]);;
                drawChart.draw(data);
            
          document.getElementById('names').onchange = function(evt) {
@@ -79,18 +70,12 @@
          chart.setView({'columns': [0,1,2,3,4]});
          chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);
          } else if (evt.target.selectedIndex == 1) {
-         chart.setView({'columns':  [0,1]});
-         chart.setOption('colors', ["#FFC000"]);
+         chart.setView({'columns':  [0,1,2]});
+         chart.setOption('colors', ["#FFC000", "#00b0f0"]);
          } else if (evt.target.selectedIndex == 2) {
-         chart.setView({'columns':  [0,2]});
-         chart.setOption('colors', ["#00b0f0"]);
-         } else if (evt.target.selectedIndex == 3) {
-         chart.setView({'columns':  [0,3]});
-         chart.setOption('colors', ["#ff0000"]);
-         } else if (evt.target.selectedIndex == 4) {
-         chart.setView({'columns':  [0,4]});
-         chart.setOption('colors', ["#92d050"]);
-         } else {
+         chart.setView({'columns':  [0,3,4]});
+         chart.setOption('colors', ["#ff0000", "#92d050"]);
+         }else {
          chart.setView({'columns': [0,1,2,3,4]});
          chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);     
          }
@@ -110,10 +95,9 @@
       <div id="dashboard">
          <select id="names">
             <option value="all">all</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="East">East</option>
-            <option value="West">West</option>
+            <option value="Male">Gender</option>
+            <option value="Female">Location</option>
+
          </select>
          <table>
             <tr style='vertical-align: top'>
@@ -126,8 +110,6 @@
             <tr>
                <td>
                   <div style="float: left;" id="chart1"></div>
-                  <div style="float: left;" id="chart2"></div>
-                  <div style="float: left;" id="chart3"></div>
                </td>
             </tr>
          </table>
