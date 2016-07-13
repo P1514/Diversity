@@ -23,13 +23,14 @@
          data.addColumn('number', 'Female');
          data.addColumn('number', 'East');
          data.addColumn('number', 'West');
+		 data.addColumn('number', 'Global');
          
          //dados dummy
          //dados reais a serem adicionadas posteriormente
          data.addRows([
-         ['0-30', 20, 40, 55, 60],
-         ['31-60', 40, 60, 70, 76],
-         ['61+', 60, 65, 80, 85]
+         ['0-30', 20, 40, 55, 60, 70],
+         ['31-60', 40, 60, 70, 75, 80],
+         ['61+', 60, 65, 80, 85, 90]
          ]);
          
          
@@ -40,7 +41,7 @@
                    'options': {
                      'filterColumnLabel': 'Age Range',
                      'ui': {
-                     'labelStacking': 'vertical',
+                     'labelStacking': 'horizontal',
                        'allowTyping': false,
                        'allowMultiple': true
                      }
@@ -59,10 +60,11 @@
                               gridlines: {color:'#CCC', count: 6}
                             },
                             bar: { groupWidth: '80%' },
-                            colors: ["#00617F","#0093C8","#FA1414","#A60202"]
+                            colors: ["#000000"]
                          
                         },
-         'chartArea': {  width: "50%", height: "70%" }
+         'chartArea': {  width: "50%", height: "70%" },
+		 'view' : {'columns': [0, 5]}
            });
          
          
@@ -73,8 +75,8 @@
          $(document).ready(function() {
 			$('input:radio[name=field]').change(function() {
 				if (this.value == '') {
-					chart.setView({'columns': [0,1,2,3,4]});
-					chart.setOption('colors', ["#00617F","#0093C8","#FA1414","#A60202"]);
+					chart.setView({'columns': [0,5]});
+					chart.setOption('colors', ["#000000"]);
 				}
 				else if (this.value == 'gender') {
 					chart.setView({'columns':  [0,1,2]});
