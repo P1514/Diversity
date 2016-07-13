@@ -28,7 +28,7 @@
          ]);
          
          
-         
+				//filtro de faixas etárias
                  var compPicker = new google.visualization.ControlWrapper({
                    'controlType': 'CategoryFilter',
                    'containerId': 'control2',
@@ -41,6 +41,7 @@
                      }
                    }
                  });
+				 
            // Define a chart
            var chart = new google.visualization.ChartWrapper({
              'chartType': 'ColumnChart',
@@ -102,9 +103,7 @@
          <table>
             <tr style='vertical-align: top'>
                <td>
-                  <div id="control1"></div>
-                  <div id="control2"></div>
-                  <div id="control3"></div>
+                  <div id="control2"></div> 
                </td>
             </tr>
             <tr>

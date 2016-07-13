@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+      <title>
+         Sentiment Filter Example
+      </title>
+      <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+      <script type="text/javascript">
+         google.load('visualization', '1.1', {packages: ['controls']});
+      </script>
+      <script type="text/javascript">
+         function drawVisualization() {
+          var data = new google.visualization.DataTable();
+         data.addColumn('string', 'Age Range');
+         data.addColumn('number', 'Male');
+         data.addColumn('number', 'Female');
+         data.addColumn('number', 'East');
+         data.addColumn('number', 'West');
+         
+         //dados dummy
+         //dados reais a serem adicionadas posteriormente
+         data.addRows([
+         ['0-30', 20, 40, 55, 60],
+         ['31-60', 40, 60, 70, 76],
+         ['61+', 60, 65, 80, 85]
+         ]);
+         
+         
+				//filtro de faixas etárias
+                 var compPicker = new google.visualization.ControlWrapper({
+                   'controlType': 'CategoryFilter',
+                   'containerId': 'control2',
+                   'options': {
+                     'filterColumnLabel': 'Age Range',
+                     'ui': {
+                     'labelStacking': 'vertical',
+                       'allowTyping': false,
+                       'allowMultiple': true
+                     }
+                   }
+                 });
+				 
+           // Define a chart
+           var chart = new google.visualization.ChartWrapper({
+             'chartType': 'ColumnChart',
+             'containerId': 'chart1',
+             'options': {'width':'100%',
+                      'height':300,
+                         'vAxis': { 
+                                 viewWindow: {max:100,min:0},
+         	  title: 'Sentiment',
+                              gridlines: {color:'#CCC', count: 6}
+                            },
+                            bar: { groupWidth: '80%' },
+                            colors: ["#FFC000","#00b0f0","#ff0000","#92d050"]
+                         
+                        },
+         'chartArea': {  width: "50%", height: "70%" }
+           });
+         
+         
+                 // Create a dashboard
+             var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart]);;
+               drawChart.draw(data);
+           
+         /*document.getElementById('names').onchange = function(evt) {
+         if (evt.target.selectedIndex == 0) {
+         // Expectancy
+         chart.setView({'columns': [0,1,2,3,4]});
+         chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);
+         } else if (evt.target.selectedIndex == 1) {
+         chart.setView({'columns':  [0,1,2]});
+         chart.setOption('colors', ["#FFC000", "#00b0f0"]);
+         } else if (evt.target.selectedIndex == 2) {
+         chart.setView({'columns':  [0,3,4]});
+         chart.setOption('colors', ["#ff0000", "#92d050"]);
+         }else {
+         chart.setView({'columns': [0,1,2,3,4]});
+         chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);     
+         }
+         drawChart.draw(data);
+         };*/
+		 
+		 $(document).ready(function() {
+			$('input:radio[name=field]').change(function() {
+				if (this.value == '') {
+					chart.setView({'columns': [0,1,2,3,4]});
+					chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);
+				}
+				else if (this.value == 'gender') {
+					chart.setView({'columns':  [0,1,2]});
+					chart.setOption('colors', ["#FFC000", "#00b0f0"]);
+				}
+				else if (this.value == 'location') {
+					chart.setView({'columns':  [0,3,4]});
+					chart.setOption('colors', ["#ff0000", "#92d050"]);
+				}
+				drawChart.draw(data);
+			});
+		});
+		 
+               }
+         
+         google.setOnLoadCallback(drawVisualization);
+      </script>
+      <style>
+         #chart2 {
+         margin-left: 50px;
+         }
+      </style>
+   </head>
+   <body style="font-family: Arial;border: 0 none;">
+      <div id="dashboard">
+		 <form align="left" name='test'>
+			<input type="radio" name="field" value="" checked>None 
+			<input type="radio" name="field" value="gender" >Gender 
+			<input type="radio" name="field" value="location">Location
+		</form>
+         <table>
+            <tr style='vertical-align: top'>
+               <td>
+                  <div id="control2"></div> 
+               </td>
+            </tr>
+            <tr>
+               <td>
+                  <div style="float: left;" id="chart1"></div>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

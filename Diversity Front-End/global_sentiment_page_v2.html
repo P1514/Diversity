@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Global Sentiment Page V2</title>
+  <title>Global Sentiment</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -36,7 +36,7 @@
 
       var options = {
         title: 'Average Global Sentiment Over Time',
-		colors : [ '#0000FF', '#00FFFF' ],
+		colors : [ '#000000' ],
 		hAxis: {
 			title: 'Month'
 		},
@@ -86,7 +86,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#00008B', '#0000FF'],
+		colors: ['#00617F', '#0093C8'],
 		width: '100%',
 		height: '100%'
       };
@@ -124,7 +124,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#006400', '#008000'],
+		colors: ['#FA1414', '#A60202'],
 		width: '100%',
 		height: '100%'
       };
@@ -163,7 +163,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#FF7F50', '#FA8072', '#FFA500'],
+		colors: ['#BFD730', '#8CA122', '#5C6E0E'],
 		width: '100%',
 		height: '100%'
       };
@@ -244,7 +244,6 @@ input[type=radio] {
 <!-- Gráficos -->
 <div id="global" class = "container">
 	<h2 align="left">Global Sentiment</h2>
-	<br></br>
 	
 	<form align="left" name='test'>
 		<input type="radio" name="field" value="global" onChange="checkValue()" checked>Global 
