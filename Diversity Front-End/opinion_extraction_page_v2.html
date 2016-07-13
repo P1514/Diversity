@@ -59,7 +59,7 @@
                               gridlines: {color:'#CCC', count: 6}
                             },
                             bar: { groupWidth: '80%' },
-                            colors: ["#FFC000","#00b0f0","#ff0000","#92d050"]
+                            colors: ["#00617F","#0093C8","#FA1414","#A60202"]
                          
                         },
          'chartArea': {  width: "50%", height: "70%" }
@@ -74,15 +74,15 @@
 			$('input:radio[name=field]').change(function() {
 				if (this.value == '') {
 					chart.setView({'columns': [0,1,2,3,4]});
-					chart.setOption('colors', ["#FFC000","#00b0f0","#ff0000","#92d050"]);
+					chart.setOption('colors', ["#00617F","#0093C8","#FA1414","#A60202"]);
 				}
 				else if (this.value == 'gender') {
 					chart.setView({'columns':  [0,1,2]});
-					chart.setOption('colors', ["#FFC000", "#00b0f0"]);
+					chart.setOption('colors', ["#00617F", "#0093C8"]);
 				}
 				else if (this.value == 'location') {
 					chart.setView({'columns':  [0,3,4]});
-					chart.setOption('colors', ["#ff0000", "#92d050"]);
+					chart.setOption('colors', ["#FA1414", "#A60202"]);
 				}
 				drawChart.draw(data);
 			});
