@@ -20,7 +20,6 @@
 	};
 	ws.onmessage = function (event) {
 				console.log(event.data);
-                data.addRows(event.data);
 				drawCharts();
             };
 	
@@ -35,11 +34,7 @@
 	  
 	  //dados dummy
 	  //dados reais a serem adicionadas posteriormente
-	  data.addRows([
-		['0-30', 20, 40],
-		['31-60', 40, 60],
-		['61+', 60, 80]
-	  ]);
+	  
 
       var options = {
         title: 'Average Sentiment By Gender',

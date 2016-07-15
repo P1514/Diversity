@@ -9,6 +9,7 @@ public class Operations {
 	public Operations(){
 		op = new HashMap<String,Integer>();
 		op.put("chartrequest", 1);
+		op.put("load", 2);
 		
 		
 	}

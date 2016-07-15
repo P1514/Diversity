@@ -29,7 +29,6 @@ public class Server {
 		private String msg;
 		private Operations op;
 		private Backend be;
-
 		public Assistant(Session _session, String _msg) {
 			session = _session;
 			msg = _msg;
@@ -39,6 +38,7 @@ public class Server {
 
 		//@Override
 		public void runn() {
+			
 
 			System.out.println(msg);
 			try {
@@ -55,6 +55,7 @@ public class Server {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						session.getBasicRemote().sendText("LOADED SUCCESSFULLY");
 					break;
 					default:
 						session.getBasicRemote().sendText("MISTAKE");

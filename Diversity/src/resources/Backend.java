@@ -46,6 +46,22 @@ public class Backend{
 			obj.put("male_avg", sentimentbygender(60, 90, "MALE"));
 			obj.put("female_avg", sentimentbygender(60, 90, "FEMALE"));
 			result.put(obj);
+			//Location
+			obj = new JSONObject();
+			obj.put("age_range", "0-30");
+			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
+			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("age_range", "30-60");
+			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
+			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("age_range", "60+");
+			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
+			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
+			result.put(obj);
 			return result;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -68,6 +84,35 @@ public class Backend{
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
 			query1.setString(3, gender);
+			System.out.println(query1);
+			rs = query1.executeQuery();
+
+			for (i = 0; rs.next(); i++) {
+				auxcalc += (double) rs.getInt("polarity");
+			}
+			result = auxcalc / (i == 0 ? 1 : i);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+
+	}
+	
+	private double sentimentbylocation(int minage, int maxage, String location) {
+		double result = (double) 0;
+		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND LOCATION=?))";
+		PreparedStatement query1;
+		ResultSet rs = null;
+		Double auxcalc = (double) 0;
+		int i;
+		try {
+			query1 = cnlocal.prepareStatement(insert);
+			query1.setInt(1, minage);
+			query1.setInt(2, maxage);
+			query1.setString(3, location);
 			System.out.println(query1);
 			rs = query1.executeQuery();
 
