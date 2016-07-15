@@ -35,6 +35,7 @@ public class Data {
 		}
 
 		ResultSet rs = null;
+		//java.sql.Date sqlDate = new java.sql.;
 		String query = ("Select * from " + dbc.posttn + " Where " + dbc.ptime + " < \'" + dbc.LastUpdated + "\'");
 		System.out.println(query);
 		dbc.setLastUpdated();

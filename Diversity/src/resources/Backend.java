@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import org.json.*;
 
-public class Backend  extends Thread  {
+public class Backend /*extends Thread*/ {
 
 	private static ServerSocket service;
 	private static Socket conn;
@@ -45,54 +45,63 @@ public class Backend  extends Thread  {
 			return;
 		}
 		try {
-			test = inbuffer.readLine();
-			System.out.println(test);
+			do {
+				test = inbuffer.readLine();
+				System.out.println(test);
+			} while (inbuffer.ready());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		test = test.trim();
-		if (test.matches("sentimentbygender")) {
-			JSONObject obj = new JSONObject();
-			try {
-				obj.put("age_range", "0-30");
-				obj.put("male_avg", sentimentbygender(0,30,"MALE"));
-				obj.put("female_avg", sentimentbygender(0,30,"FEMALE"));
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("age_range", "0-30");
-				obj.put("male_avg", sentimentbygender(0,30,"MALE"));
-				obj.put("female_avg", sentimentbygender(0,30,"FEMALE"));
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("age_range", "0-30");
-				obj.put("male_avg", sentimentbygender(0,30,"MALE"));
-				obj.put("female_avg", sentimentbygender(0,30,"FEMALE"));
-				result.put(obj);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		// if (test.matches("sentimentbygender")) {
+		JSONObject obj = new JSONObject();
+		try {
+			obj.put("age_range", "0-30");
+			obj.put("male_avg", sentimentbygender(0, 30, "MALE"));
+			obj.put("female_avg", sentimentbygender(0, 30, "FEMALE"));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("age_range", "30-60");
+			obj.put("male_avg", sentimentbygender(30, 60, "MALE"));
+			obj.put("female_avg", sentimentbygender(30, 60, "FEMALE"));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("age_range", "60+");
+			obj.put("male_avg", sentimentbygender(60, 90, "MALE"));
+			obj.put("female_avg", sentimentbygender(60, 90, "FEMALE"));
+			result.put(obj);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
+		// }
+		System.out.print(result);
 		OutputStreamWriter out;
 		try {
-			out = new OutputStreamWriter(
-			        conn.getOutputStream(), StandardCharsets.UTF_8);
+			out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
 			out.write(result.toString());
+			out.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		try {
+			dis.close();
+			dos.close();
+		conn.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private double sentimentbygender(int minage, int maxage, String gender) {
-		double result =(double)0;
-		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND GENDER=?)";
+		double result = (double) 0;
+		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND GENDER=?))";
 		PreparedStatement query1;
 		ResultSet rs = null;
-		Double auxcalc=(double)0;
+		Double auxcalc = (double) 0;
 		int i;
 		try {
 			query1 = cnlocal.prepareStatement(insert);
@@ -101,11 +110,11 @@ public class Backend  extends Thread  {
 			query1.setString(3, gender);
 			System.out.println(query1);
 			rs = query1.executeQuery();
-			
+
 			for (i = 0; rs.next(); i++) {
-				auxcalc+= (double)rs.getInt("polarity");
+				auxcalc += (double) rs.getInt("polarity");
 			}
-			result = auxcalc/i;
+			result = auxcalc / (i == 0 ? 1 : i);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
