@@ -15,7 +15,7 @@ public class Settings {
 	// Data Origin DB Specs
 	String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	String user = "root";
-	String pass = "1234";
+	String pass = "root";
 
 	// Post Table
 	String posttn = "post"; // Table Name
@@ -51,7 +51,7 @@ public class Settings {
 	// Local DB Specs
 	String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	String user2 = "root";
-	String pass2 = "1234";
+	String pass2 = "root";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 		

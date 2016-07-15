@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+	<head>
+<title>Posts</title>
+<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap.no-icons.min.css" rel="stylesheet">
+<script>
+(function(document) {
+	'use strict';
+
+	var LightTableFilter = (function(Arr) {
+
+		var _input;
+    var _select;
+
+		function _onInputEvent(e) {
+			_input = e.target;
+			var tables = document.getElementsByClassName(_input.getAttribute('data-table'));
+			Arr.forEach.call(tables, function(table) {
+				Arr.forEach.call(table.tBodies, function(tbody) {
+					Arr.forEach.call(tbody.rows, _filter);
+				});
+			});
+		}
+    
+		function _onSelectEvent(e) {
+			_select = e.target;
+			var tables = document.getElementsByClassName(_select.getAttribute('data-table'));
+			Arr.forEach.call(tables, function(table) {
+				Arr.forEach.call(table.tBodies, function(tbody) {
+					Arr.forEach.call(tbody.rows, _filterSelect);
+				});
+			});
+		}
+
+		function _filter(row) {
+      
+			var text = row.textContent.toLowerCase(), val = _input.value.toLowerCase();
+			row.style.display = text.indexOf(val) === -1 ? 'none' : 'table-row';
+
+		}
+    
+		function _filterSelect(row) {
+     
+			var text_select = row.textContent.toLowerCase(), val_select = _select.options[_select.selectedIndex].value.toLowerCase();
+			row.style.display = text_select.indexOf(val_select) === -1 ? 'none' : 'table-row';
+
+		}
+
+		return {
+			init: function() {
+				var inputs = document.getElementsByClassName('light-table-filter');
+				var selects = document.getElementsByClassName('select-table-filter');
+				Arr.forEach.call(inputs, function(input) {
+					input.oninput = _onInputEvent;
+				});
+				Arr.forEach.call(selects, function(select) {
+         select.onchange  = _onSelectEvent;
+				});
+			}
+		};
+	})(Array.prototype);
+
+	document.addEventListener('readystatechange', function() {
+		if (document.readyState === 'complete') {
+			LightTableFilter.init();
+		}
+	});
+
+})(document);
+</script>
+
+	</head>
+	<body>
+<section class="container">
+
+	<h2>Posts</h2>
+  
+  <select type="search" class="select-table-filter" data-table="table">
+    <option value="">Select</option>  
+    <option value="East">East</option>  
+    <option value="West">West</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  <select>
+
+	<table class="table">
+		<thead>
+    <tr>
+		<th>Original Author</th>
+        <th>Post</th>
+		<th># Comments</th>
+		<th>Date</th>
+		<th>Polarity</th>
+		<th>Reach</th>
+		<th>Influence</th>
+        <th>Location</th>
+        <th>Gender</th>
+        <th>Age</th>
+    </tr>
+	</thead>
+    <tbody>
+	<!--Dados dummy-->
+    <tr>
+		<td>David Jones</td>
+        <td>These shoes are horrendous!</td>
+		<td>123</td>
+		<td>20/04/2015</td>
+		<td>0.20</td>
+		<td>0.20</td>
+		<td>0.42</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>24</td>
+    </tr>
+    <tr>
+        <td>Martha Stewart</td>
+        <td>Good shoes!</td>
+		<td>34</td>
+		<td>12/02/2015</td>
+		<td>0.80</td>
+		<td>0.80</td>
+		<td>0.91</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>32</td>
+    </tr>
+    <tr>
+		<td>James Osterberg</td>
+        <td>In a word: great!</td>
+		<td>264</td>
+		<td>10/03/2016</td>
+		<td>0.90</td>
+		<td>0.90</td>
+		<td>0.96</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>26</td>
+    </tr>
+    <tr>
+        <td>Carmen Gaspar</td>
+        <td>Bad</td>
+		<td>34</td>
+		<td>12/02/2015</td>
+		<td>0.30</td>
+		<td>0.30</td>
+		<td>0.35</td>
+        <td>East</td>
+        <td>Female</td>
+        <td>40</td>
+    </tr>
+    <tr>
+        <td>Jack Barker</td>
+        <td>These shoes are mediocre.</td>
+		<td>54</td>
+		<td>19/10/2015</td>
+		<td>0.50</td>
+		<td>0.50</td>
+		<td>0.54</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>39</td>
+    </tr>
+	<tr>
+        <td>Lisa Stanford</td>
+        <td>Excellent!</td>
+		<td>10</td>
+		<td>06/12/2014</td>
+		<td>0.93</td>
+		<td>0.93</td>
+		<td>1</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>Richard Parker</td>
+        <td>Bad shoes!</td>
+		<td>32</td>
+		<td>03/05/2015</td>
+		<td>0.22</td>
+		<td>0.22</td>
+		<td>0.23</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>50</td>
+    </tr>
+    <tr>
+        <td>Thomas Anderson</td>
+        <td>In a word: horrendous!</td>
+		<td>26</td>
+		<td>28/02/2014</td>
+		<td>0.11</td>
+		<td>0.11</td>
+		<td>0.10</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>19</td>
+    </tr>
+    <tr>
+        <td>Jane Turner</td>
+        <td>These shoes are good!</td>
+		<td>53</td>
+		<td>06/12/2014</td>
+		<td>0.84</td>
+		<td>0.84</td>
+		<td>0.83</td>
+        <td>West</td>
+        <td>Female</td>
+        <td>47</td>
+    </tr>
+    <tr>
+        <td>Rachel Smith</td>
+        <td>Fabulous shoes!</td>
+		<td>75</td>
+		<td>06/12/2014</td>
+		<td>0.96</td>
+		<td>0.96</td>
+		<td>1</td>
+        <td>East</td>
+        <td>Female</td>
+        <td>42</td>
+    </tr>
+	<tr>
+        <td>Jeff Dunham</td>
+        <td>Mediocre shoes.</td>
+		<td>86</td>
+		<td>30/06/2016</td>
+		<td>0.55</td>
+		<td>0.55</td>
+		<td>0.525</td>
+        <td>East</td>
+        <td>Male</td>
+        <td>50</td>
+    </tr>
+	<tr>
+        <td>John Williams</td>
+        <td>Good shoes.</td>
+		<td>86</td>
+		<td>20/01/2016</td>
+		<td>0.80</td>
+		<td>0.81</td>
+		<td>0.81</td>
+        <td>West</td>
+        <td>Male</td>
+        <td>29</td>
+    </tr>
+	</tbody>
+  </table>
+
+</section>
+
+	</body>
+</html>

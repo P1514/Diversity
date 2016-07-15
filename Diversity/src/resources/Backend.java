@@ -11,20 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import org.json.*;
 
-public class Backend /*extends Thread*/ {
-
-	private static ServerSocket service;
-	private static Socket conn;
-	private static DataInputStream dis;
-	private static DataOutputStream dos;
-	private Connection cnlocal = null;
-
-	public Backend(DataInputStream _dis, DataOutputStream _dos, Socket _conn) {
-		dis = _dis;
-		dos = _dos;
-		conn = _conn;
-		Settings dbc = new Settings();
-
+public class Backend{
+	private Settings dbc = new Settings();
+	private Connection cnlocal;
+	
+	public Backend() {
 		try {
 			cnlocal = dbc.connlocal();
 		} catch (ClassNotFoundException e) {
@@ -34,27 +25,11 @@ public class Backend /*extends Thread*/ {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		}
 
-	}
 
-	public void run() {
-		BufferedReader inbuffer = new BufferedReader(new InputStreamReader(dis));
-		String test = "";
+	public JSONArray chartrequest() {
 		JSONArray result = new JSONArray();
-		if (cnlocal == null) {
-			return;
-		}
-		try {
-			do {
-				test = inbuffer.readLine();
-				System.out.println(test);
-			} while (inbuffer.ready());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		test = test.trim();
-		// if (test.matches("sentimentbygender")) {
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("age_range", "0-30");
@@ -71,29 +46,14 @@ public class Backend /*extends Thread*/ {
 			obj.put("male_avg", sentimentbygender(60, 90, "MALE"));
 			obj.put("female_avg", sentimentbygender(60, 90, "FEMALE"));
 			result.put(obj);
+			return result;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
-		// }
-		System.out.print(result);
-		OutputStreamWriter out;
-		try {
-			out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
-			out.write(result.toString());
-			out.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			dis.close();
-			dos.close();
-		conn.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		
 	}
 
 	private double sentimentbygender(int minage, int maxage, String gender) {

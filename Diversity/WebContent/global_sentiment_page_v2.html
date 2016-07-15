@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Global Sentiment</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <!-- script responsável por desenhar os gráficos Google Charts -->
+  <script>
+  google.charts.load('current', {packages: ['corechart', 'bar']});
+  google.charts.setOnLoadCallback(checkValue);
+  
+	//gráfico sentimento global
+    function drawGlobal() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', 'Sentiment');
+	  
+	  //dados dummy
+	  //dados reais a serem adicionadas posteriormente
+	  data.addRows([
+		['January', 20],
+		['February', 35],
+		['March', 40],
+		['April', 55],
+		['May', 60],
+		['June', 75],
+		['July', 80],
+		['August', 95],
+		['September', 100]
+	  ]);
+
+      var options = {
+        title: 'Average Global Sentiment Over Time',
+		colors : [ '#000000' ],
+		hAxis: {
+			title: 'Month'
+		},
+        vAxis: {
+          title: 'Sentiment',
+		  viewWindow : {
+					max : 0,
+					min : 100
+				}
+        },
+		width: '100%',
+		height: '100%'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+	
+
+	//gráfico 1 (Sentimento ao longo do tempo segundo o género)
+    function drawBasic() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', 'Male');
+      data.addColumn('number', 'Female');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['January', 10, 5],
+		['February', 25, 15],
+		['March', 30, 20],
+		['April', 45, 35],
+		['May', 50, 40],
+		['June', 65, 55],
+		['July', 70, 60],
+		['August', 85, 75],
+		['September', 100, 90]
+      ]);
+
+      var options = {
+		title: 'Average Sentiment Over Time By Gender',
+        hAxis: {
+          title: 'Month'
+        },
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#00617F', '#0093C8'],
+		width: '100%',
+		height: '100%'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+	
+	//gráfico 2 (Sentimento ao longo do tempo segundo a localização)
+	function drawBasic2() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', 'East');
+      data.addColumn('number', 'West');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['January', 2, 8],
+		['February', 10, 16],
+		['March', 18, 24],
+		['April', 26, 31],
+		['May', 34, 39],
+		['June', 42, 47],
+		['July', 50, 55],
+		['August', 58, 63],
+		['September', 66, 71]
+      ]);
+
+      var options = {
+		title: 'Average Sentiment Over Time By Location',
+        hAxis: {
+          title: 'Month'
+        },
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#FA1414', '#A60202'],
+		width: '100%',
+		height: '100%'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+	
+	//gráfico 2 (Sentimento ao longo do tempo segundo faixas etárias)
+	function drawBasic3(){
+	
+	  var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', '0-30');
+      data.addColumn('number', '31-60');
+	  data.addColumn('number', '61+');
+
+	  //dados dummy (dados reais a serem posteriormente adicionados)
+      data.addRows([
+        ['January', 2, 8, 10],
+		['February', 10, 16, 18],
+		['March', 18, 24, 26],
+		['April', 26, 31, 33],
+		['May', 34, 39, 42],
+		['June', 42, 47, 49],
+		['July', 50, 55, 57],
+		['August', 58, 63, 65],
+		['September', 66, 71, 73]
+      ]);
+
+      var options = {
+		title: 'Average Sentiment Over Time By Age Range',
+        hAxis: {
+          title: 'Month'
+        },
+        vAxis: {
+          title: 'Sentiment'
+        },
+		colors: ['#BFD730', '#8CA122', '#5C6E0E'],
+		width: '100%',
+		height: '100%'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+		
+	
+	}
+	
+	//desenha o gráfico consoante a opção escolhida nos radio buttons
+	function checkValue(){
+        switch(document.test.field.value){
+		
+            case "global":
+             
+				drawGlobal();
+				break;
+
+            case "gender":
+
+				drawBasic();
+				break;
+
+            case "location":
+
+				drawBasic2();
+				break;
+
+			case "age":
+
+				drawBasic3();
+				break;
+        }
+	}
+</script>
+
+<style>
+#global{
+	width: 88.5%;
+	max-width: 100%;
+	height: 88.5%;
+	max-height: 100%;
+	padding-left: 0.75%;
+	padding-right: 0.75%;
+	margin: auto;
+	clear: none;
+	float: none;
+	margin-left: auto;
+}
+
+input[type=radio] {
+	margin-top: 5%;
+    margin-left: 5%;
+}
+
+#chart_div{
+	width: 100%;
+	max-width: 100%;
+	padding-left: 0.75%;
+	padding-right: 0.75%;
+	margin: auto;
+	clear: none;
+	float: none;
+	margin-left: auto;
+	margin-top: 5%;
+}
+</style>
+</head>
+
+<body>
+<!-- Logotipo Diversity-->
+<center>
+	<a href="sentiment_home_page.html">
+		<img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
+	</a>
+
+<!-- Gráficos -->
+<div id="global" class = "container">
+	<h2 align="left">Global Sentiment</h2>
+	
+	<form align="left" name='test'>
+		<input type="radio" name="field" value="global" onChange="checkValue()" checked>Global 
+		<input type="radio" name="field" value="gender" onChange="checkValue()">Gender 
+		<input type="radio" name="field" value="location" onChange="checkValue()">Location
+		<input type="radio" name="field" value="age" onChange="checkValue()">Age Range		
+	</form>
+		
+	<div id='chart_div'></div>
+	
+</div>
+</center>      
+</body>

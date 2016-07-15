@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Sentiment Home Page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+	#pss{
+		margin-top: 150px;
+	}
+	
+	#buttons{
+		margin-top: 150px;
+	}
+	
+	#opinion{
+		display:inline-block;
+	}
+	
+	#global{
+		display:inline-block;
+		margin-left:100px;
+	}
+	
+  </style>
+</head>
+<body>
+
+<center>
+<a href="sentiment_home_page.html">
+<img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
+</a>
+
+<!--Lista de PSS-->
+<div id="pss">
+<label>Choose PSS:</label>
+<select>
+  <option value="PSS1">PSS1</option>
+  <option value="PSS2">PSS2</option>
+  <option value="PSS3">PSS3</option>
+  <option value="PSS4">PSS4</option>
+</select>
+</div>
+
+<!-- Botões opcionais -->
+<table id="buttons">
+	<td>
+		<form action="opinion_extraction_page_v2.html">
+			<input id="opinion" class="btn btn-default" type="submit" value="Get Opinion"/>
+		</form>
+	</td>
+	<td>
+		<form action="global_sentiment_page_v2.html">
+			<input id="global" class="btn btn-default" type="submit" value="Get Global Sentiment"/>
+		</form>
+	</td>
+</table>
+
+
+
+
+
+</center>
+</body>
