@@ -9,30 +9,43 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <!-- script responsável por desenhar os gráficos Google Charts -->
-  <script>
+  <script type="text/javascript">
+  var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+  var jsonData;
+  
+	ws.onopen = function () {
+		var json = {
+                "op":"globalsentiment",
+				"param":null,
+				"n_values":0,
+				"value":null,
+                }
+                ws.send(JSON.stringify(json));
+            };
+			
+    ws.onmessage = function (event) {
+				jsonData = JSON.parse(event.data);
+				drawGlobal();
+            };
+	
+  
   google.charts.load('current', {packages: ['corechart', 'bar']});
   google.charts.setOnLoadCallback(checkValue);
-  
+
 	//gráfico sentimento global
     function drawGlobal() {
 
+
+	
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Month');
-      data.addColumn('number', 'Sentiment');
-	  
-	  //dados dummy
-	  //dados reais a serem adicionadas posteriormente
-	  data.addRows([
-		['January', 20],
-		['February', 35],
-		['March', 40],
-		['April', 55],
-		['May', 60],
-		['June', 75],
-		['July', 80],
-		['August', 95],
-		['September', 100]
-	  ]);
+	data.addColumn('string', 'Month');
+	data.addColumn('number', 'Global');	  
+	  				
+				for (var i = 0; i < jsonData.length; i++) {
+					var counter = jsonData[i];
+					console.log(counter.month + " " + counter.sentiment);
+					data.addRows([[counter.month, counter.sentiment]]);
+				}
 
       var options = {
         title: 'Average Global Sentiment Over Time',
@@ -55,7 +68,6 @@
 
       chart.draw(data, options);
     }
-	
 
 	//gráfico 1 (Sentimento ao longo do tempo segundo o género)
     function drawBasic() {
@@ -64,18 +76,20 @@
       data.addColumn('string', 'Month');
       data.addColumn('number', 'Male');
       data.addColumn('number', 'Female');
+	  data.addColumn('number', 'Global');
+
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['January', 10, 5],
-		['February', 25, 15],
-		['March', 30, 20],
-		['April', 45, 35],
-		['May', 50, 40],
-		['June', 65, 55],
-		['July', 70, 60],
-		['August', 85, 75],
-		['September', 100, 90]
+        ['January', 10, 5, 20],
+		['February', 25, 15, 35],
+		['March', 30, 20, 40],
+		['April', 45, 35, 55],
+		['May', 50, 40, 60],
+		['June', 65, 55, 75],
+		['July', 70, 60, 80],
+		['August', 85, 75, 95],
+		['September', 100, 90, 100]
       ]);
 
       var options = {
@@ -86,7 +100,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#00617F', '#0093C8'],
+		colors: ['#00617F', '#0093C8', '#000000'],
 		width: '100%',
 		height: '100%'
       };
@@ -102,18 +116,19 @@
       data.addColumn('string', 'Month');
       data.addColumn('number', 'East');
       data.addColumn('number', 'West');
+	  data.addColumn('number', 'Global');
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['January', 2, 8],
-		['February', 10, 16],
-		['March', 18, 24],
-		['April', 26, 31],
-		['May', 34, 39],
-		['June', 42, 47],
-		['July', 50, 55],
-		['August', 58, 63],
-		['September', 66, 71]
+        ['January', 2, 8, 20],
+		['February', 10, 16, 35],
+		['March', 18, 24, 40],
+		['April', 26, 31, 55],
+		['May', 34, 39, 60],
+		['June', 42, 47, 75],
+		['July', 50, 55, 80],
+		['August', 58, 63, 95],
+		['September', 66, 71, 100]
       ]);
 
       var options = {
@@ -124,7 +139,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#FA1414', '#A60202'],
+		colors: ['#FA1414', '#A60202', '#000000'],
 		width: '100%',
 		height: '100%'
       };
@@ -141,18 +156,19 @@
       data.addColumn('number', '0-30');
       data.addColumn('number', '31-60');
 	  data.addColumn('number', '61+');
+	  data.addColumn('number', 'Global');
 
 	  //dados dummy (dados reais a serem posteriormente adicionados)
       data.addRows([
-        ['January', 2, 8, 10],
-		['February', 10, 16, 18],
-		['March', 18, 24, 26],
-		['April', 26, 31, 33],
-		['May', 34, 39, 42],
-		['June', 42, 47, 49],
-		['July', 50, 55, 57],
-		['August', 58, 63, 65],
-		['September', 66, 71, 73]
+        ['January', 2, 8, 10, 20],
+		['February', 10, 16, 18, 35],
+		['March', 18, 24, 26, 40],
+		['April', 26, 31, 33, 55],
+		['May', 34, 39, 42, 60],
+		['June', 42, 47, 49, 75],
+		['July', 50, 55, 57, 80],
+		['August', 58, 63, 65, 95],
+		['September', 66, 71, 73, 100]
       ]);
 
       var options = {
@@ -163,7 +179,7 @@
         vAxis: {
           title: 'Sentiment'
         },
-		colors: ['#BFD730', '#8CA122', '#5C6E0E'],
+		colors: ['#BFD730', '#8CA122', '#5C6E0E', '#000000'],
 		width: '100%',
 		height: '100%'
       };
@@ -201,12 +217,13 @@
 	}
 </script>
 
+
 <style>
 #global{
 	width: 88.5%;
-	max-width: 100%;
+	max-width: 900px;
 	height: 88.5%;
-	max-height: 100%;
+	max-height: 1800px;
 	padding-left: 0.75%;
 	padding-right: 0.75%;
 	margin: auto;
@@ -222,7 +239,6 @@ input[type=radio] {
 
 #chart_div{
 	width: 100%;
-	max-width: 100%;
 	padding-left: 0.75%;
 	padding-right: 0.75%;
 	margin: auto;
@@ -238,7 +254,7 @@ input[type=radio] {
 <!-- Logotipo Diversity-->
 <center>
 	<a href="sentiment_home_page.html">
-		<img src="imagens\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
+		<img src="images\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
 	</a>
 
 <!-- Gráficos -->
