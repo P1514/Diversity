@@ -2,9 +2,11 @@
 package resources;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 
+import javax.json.Json;
 import javax.websocket.EncodeException;
 import javax.websocket.OnMessage;
 import javax.websocket.PongMessage;
@@ -12,13 +14,24 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.json.*;
 
+import com.sun.javafx.scene.paint.GradientUtils.Parser;
+
+import jdk.nashorn.internal.parser.JSONParser;
+
 @ServerEndpoint("/server")
 public class Server {
 
 	@OnMessage
 	public void echoTextMessage(Session session, String msg, boolean last) {
-
-		Assistant assist = new Assistant(session, msg);
+		
+		JSONObject resolve=null;
+		try {
+			resolve = new JSONObject(msg);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Assistant assist = new Assistant(session, resolve);
 		
 		assist.runn();
 
@@ -26,10 +39,10 @@ public class Server {
 
 	public class Assistant /*implements Runnable*/ {
 		private Session session;
-		private String msg;
+		private JSONObject msg;
 		private Operations op;
 		private Backend be;
-		public Assistant(Session _session, String _msg) {
+		public Assistant(Session _session, JSONObject _msg) {
 			session = _session;
 			msg = _msg;
 			op = new Operations();
@@ -44,21 +57,36 @@ public class Server {
 			try {
 				if (session.isOpen()) {
 
-					switch (op.getOP(msg)) {
-					case 1:
-						session.getBasicRemote().sendText(be.chartrequest().toString());
+					try {
+						switch (op.getOP(msg.getString("op"))) {
+						case 1:
+							session.getBasicRemote().sendText(be.chartrequest().toString());
+							break;
+						case 2: Data dat = new Data();
+							try {
+								dat.load();
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							session.getBasicRemote().sendText("LOADED SUCCESSFULLY");
 						break;
-					case 2: Data dat = new Data();
-						try {
-							dat.load();
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						case 3:
+							session.getBasicRemote().sendText(be.globalsentiment(1,5, null, null).toString());
+							break;
+						case 4:
+							try {
+								session.getBasicRemote().sendText(be.globalsentiment(1, 5, msg.getString("param"), msg.getString("value")).toString());
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						default:
+							session.getBasicRemote().sendText("MISTAKE");
 						}
-						session.getBasicRemote().sendText("LOADED SUCCESSFULLY");
-					break;
-					default:
-						session.getBasicRemote().sendText("MISTAKE");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 
 					/*

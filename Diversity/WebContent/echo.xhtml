@@ -98,8 +98,11 @@
         function echo() {
             if (ws != null) {
                 var message = document.getElementById('message').value;
-                log('Sent: ' + message);
-                ws.send(message);
+                var json = {
+                "op":message
+                }
+                log('Sent: ' + JSON.stringify(json));
+                ws.send(JSON.stringify(json));
             } else {
                 alert('WebSocket connection not established, please connect.');
             }

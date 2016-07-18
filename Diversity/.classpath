@@ -13,9 +13,9 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="E:/Desktop/Diversity/Backend/WebContent/WEB-INF/lib/javaee-api-7.0.jar"/>
-	<classpathentry kind="lib" path="E:/Desktop/Diversity/Backend/WebContent/WEB-INF/lib/jstl-1.2.jar"/>
-	<classpathentry kind="lib" path="E:/Desktop/Diversity/Backend/WebContent/WEB-INF/lib/mysql-connector-java-5.1.39-bin.jar"/>
-	<classpathentry kind="lib" path="E:/Desktop/Diversity/Backend/WebContent/WEB-INF/lib/org.json.jar"/>
+	<classpathentry kind="lib" path="F:/Diversity/WebContent/WEB-INF/lib/javaee-api-7.0.jar"/>
+	<classpathentry kind="lib" path="F:/Diversity/WebContent/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry kind="lib" path="F:/Diversity/WebContent/WEB-INF/lib/mysql-connector-java-5.1.39-bin.jar"/>
+	<classpathentry kind="lib" path="F:/Diversity/WebContent/WEB-INF/lib/org.json.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

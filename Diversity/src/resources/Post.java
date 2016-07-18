@@ -25,7 +25,7 @@ public class Post {
 		String[] words = message.split("[^\\w'-]+");
 
 		Adjectives adjs = new Adjectives();
-		int sentiment = 50;
+		double sentiment = 50;
 		for (int i = 0; i < words.length; i++) {
 
 			String currentWord = words[i];

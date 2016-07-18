@@ -11,10 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import org.json.*;
 
-public class Backend{
+public class Backend {
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
-	
+
 	public Backend() {
 		try {
 			cnlocal = dbc.connlocal();
@@ -25,42 +25,31 @@ public class Backend{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		}
-
+	}
 
 	public JSONArray chartrequest() {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("age_range", "0-30");
-			obj.put("male_avg", sentimentbygender(0, 30, "MALE"));
-			obj.put("female_avg", sentimentbygender(0, 30, "FEMALE"));
+			obj.put("male_avg", sentimentby(0, 30, "GENDER", "MALE"));
+			obj.put("female_avg", sentimentby(0, 30, "GENDER", "FEMALE"));
+			obj.put("east_avg", sentimentby(0, 30, "LOCATION", "EAST"));
+			obj.put("west_avg", sentimentby(0, 30, "LOCATION", "WEST"));
 			result.put(obj);
 			obj = new JSONObject();
 			obj.put("age_range", "30-60");
-			obj.put("male_avg", sentimentbygender(30, 60, "MALE"));
-			obj.put("female_avg", sentimentbygender(30, 60, "FEMALE"));
+			obj.put("male_avg", sentimentby(30, 60, "GENDER", "MALE"));
+			obj.put("female_avg", sentimentby(30, 60, "GENDER", "FEMALE"));
+			obj.put("east_avg", sentimentby(30, 60, "LOCATION", "EAST"));
+			obj.put("west_avg", sentimentby(30, 60, "LOCATION", "WEST"));
 			result.put(obj);
 			obj = new JSONObject();
 			obj.put("age_range", "60+");
-			obj.put("male_avg", sentimentbygender(60, 90, "MALE"));
-			obj.put("female_avg", sentimentbygender(60, 90, "FEMALE"));
-			result.put(obj);
-			//Location
-			obj = new JSONObject();
-			obj.put("age_range", "0-30");
-			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
-			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("age_range", "30-60");
-			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
-			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("age_range", "60+");
-			obj.put("east_avg", sentimentbylocation(60, 90, "EAST"));
-			obj.put("west_avg", sentimentbylocation(60, 90, "WEST"));
+			obj.put("male_avg", sentimentby(60, 90, "GENDER", "MALE"));
+			obj.put("female_avg", sentimentby(60, 90, "GENDER", "FEMALE"));
+			obj.put("east_avg", sentimentby(60, 90, "LOCATION", "EAST"));
+			obj.put("west_avg", sentimentby(60, 90, "LOCATION", "WEST"));
 			result.put(obj);
 			return result;
 		} catch (JSONException e) {
@@ -68,13 +57,44 @@ public class Backend{
 			e.printStackTrace();
 			return null;
 		}
-		
-		
+
 	}
 
-	private double sentimentbygender(int minage, int maxage, String gender) {
+	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, String value) {
+		JSONArray result = new JSONArray();
+		JSONObject obj;
+		String[] time = new String[12];
+		time[0] = "JANUARY";
+		time[1] = "FEBRUARY";
+		time[2] = "MARCH";
+		time[3] = "APRIL";
+		time[4] = "MAY";
+		time[5] = "JUNE";
+		time[6] = "JULY";
+		time[7] = "AUGUST";
+		time[8] = "SEPTEMBER";
+		time[9] = "OCTOBER";
+		time[10] = "NOVEMBER";
+		time[11] = "DECEMBER";
+		for (int i = start; i < timespan * 12 + start; i++) {
+			try {
+				obj = new JSONObject();
+				obj.put("month", time[i % 12]);
+				obj.put("sentiment", globalsentimenttime(i, param, value));
+				result.put(obj);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
+	private double sentimentby(int minage, int maxage, String param, String gender) {
 		double result = (double) 0;
-		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND GENDER=?))";
+		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
+				+ param + "=?))";
 		PreparedStatement query1;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
@@ -84,7 +104,6 @@ public class Backend{
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
 			query1.setString(3, gender);
-			System.out.println(query1);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
@@ -100,34 +119,46 @@ public class Backend{
 		return result;
 
 	}
-	
-	private double sentimentbylocation(int minage, int maxage, String location) {
+
+	private double globalsentimenttime(int month, String param, String value) {
 		double result = (double) 0;
-		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND LOCATION=?))";
+		String insert;
 		PreparedStatement query1;
+		if (param == null) {
+			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<?";
+		} else {
+			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + param + "=?";	
+		}
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i;
+		int i = 0;
+		month -= 1;
+		int year = month / 12;
+		month = month % 12;
+		Calendar data = new GregorianCalendar(2016 + year, month, 1);
 		try {
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setInt(1, minage);
-			query1.setInt(2, maxage);
-			query1.setString(3, location);
-			System.out.println(query1);
+			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
+			data.add(Calendar.MONTH, 1);
+			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
+			if(param!=null)query1.setString(3, value);
 			rs = query1.executeQuery();
+			System.out.println(query1);
 
-			for (i = 0; rs.next(); i++) {
-				auxcalc += (double) rs.getInt("polarity");
+			int totalreach = 0;
+			while (rs.next()) {
+
+				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
+				totalreach += rs.getDouble("reach");
 			}
-			result = auxcalc / (i == 0 ? 1 : i);
+
+			result = auxcalc / (totalreach == 0 ? 1 : totalreach);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return result;
 
 	}
-
 }
