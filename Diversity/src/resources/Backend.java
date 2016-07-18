@@ -15,17 +15,10 @@ import org.json.*;
 public class Backend {
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
+	// private HashMap
 
 	public Backend() {
-		try {
-			cnlocal = dbc.connlocal();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 	}
 
 	public JSONArray chartrequest() {
@@ -61,10 +54,11 @@ public class Backend {
 
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, int n_values, String values) {
+	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, String values) {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
-				
+		String[] words;
+
 		String[] time = new String[12];
 		time[0] = "JANUARY";
 		time[1] = "FEBRUARY";
@@ -78,14 +72,21 @@ public class Backend {
 		time[9] = "OCTOBER";
 		time[10] = "NOVEMBER";
 		time[11] = "DECEMBER";
+		if (param != "null") {
+			words = values.split(",");
+		} else {
+			words = new String[1];
+			words[0] = "sentiment";
+		}
+
 		for (int i = start; i < timespan * 12 + start; i++) {
 			try {
 				obj = new JSONObject();
 				obj.put("month", time[i % 12]);
-				//for(int ii=0;ii<n_values;ii++)
-				obj.put("sentiment", globalsentimentby(i, null, null));
+				for (int ii = 0; ii < words.length; ii++)
+					obj.put(words[ii], globalsentimentby(i, param, words[ii]));
 				result.put(obj);
-				
+
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -96,13 +97,15 @@ public class Backend {
 	}
 
 	private double sentimentby(int minage, int maxage, String param, String value) {
+		dbconnect();
 		double result = (double) 0;
 		String insert;
-		if(param!=null){
-		insert= "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
-				+ param + "=?))";}else{
-					insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ?";
-				}
+		if (param != "null") {
+			insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
+					+ param + "=?))";
+		} else {
+			insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ?";
+		}
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
@@ -111,7 +114,8 @@ public class Backend {
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
-			if(param!=null)query1.setString(3, value);
+			if (param != "null")
+				query1.setString(3, value);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
@@ -123,9 +127,24 @@ public class Backend {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-		    try { if (rs != null) rs.close(); } catch (Exception e) {};
-		    try { if (query1 != null) query1.close(); } catch (Exception e) {};
-		    try { if (cnlocal != null) cnlocal.close(); } catch (Exception e) {};
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (query1 != null)
+					query1.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (Exception e) {
+			}
+			;
 		}
 		String temp;
 		temp = String.format("%.2f", result);
@@ -137,24 +156,25 @@ public class Backend {
 			System.out.println("ERROR 2 " + temp);
 			result = Double.parseDouble(temp);
 		}
-		
+
 		System.out.println(result);
 		return result;
 
 	}
 
 	private double globalsentimentby(int month, String param, String value) {
+		dbconnect();
 		double result = (double) 0;
 		String insert;
-		PreparedStatement query1;
-		if (param == null) {
-			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<?";
+		PreparedStatement query1 = null;
+		if (param == "null") {
+			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? ";
 		} else {
-			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + param + "=?";
+			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
+					+ " authors_id in (Select id from authors where " + param + "=?)";
 		}
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i = 0;
 		month -= 1;
 		int year = month / 12;
 		month = month % 12;
@@ -164,14 +184,14 @@ public class Backend {
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			if (param != null)
+			if (param != "null")
 				query1.setString(3, value);
-			rs = query1.executeQuery();
 			System.out.println(query1);
+			rs = query1.executeQuery();
+			
 
 			double totalreach = 0;
 			while (rs.next()) {
-
 				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
 				totalreach += rs.getDouble("reach");
 			}
@@ -181,6 +201,25 @@ public class Backend {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (query1 != null)
+					query1.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (Exception e) {
+			}
+			;
 		}
 		String temp;
 		temp = String.format("%.2f", result);
@@ -193,6 +232,16 @@ public class Backend {
 			result = Double.parseDouble(temp);
 		}
 		return result;
+
+	}
+
+	private void dbconnect() {
+		try {
+			cnlocal = dbc.connlocal();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 }

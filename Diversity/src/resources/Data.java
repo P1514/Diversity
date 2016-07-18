@@ -209,6 +209,7 @@ public class Data {
 				e.printStackTrace();
 			}
 		});
+		    try { if (cnlocal != null) cnlocal.close(); } catch (Exception e) {};
 	}
 
 	/**

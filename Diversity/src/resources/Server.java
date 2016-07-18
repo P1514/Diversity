@@ -13,8 +13,8 @@ public class Server {
 
 	@OnMessage
 	public void echoTextMessage(Session session, String msg, boolean last) {
-		
-		JSONObject resolve=null;
+
+		JSONObject resolve = null;
 		try {
 			resolve = new JSONObject(msg);
 		} catch (JSONException e) {
@@ -22,16 +22,17 @@ public class Server {
 			e.printStackTrace();
 		}
 		Assistant assist = new Assistant(session, resolve);
-		
+
 		assist.runn();
 
 	}
 
-	public class Assistant /*implements Runnable*/ {
+	public class Assistant /* implements Runnable */ {
 		private Session session;
 		private JSONObject msg;
 		private Operations op;
 		private Backend be;
+
 		public Assistant(Session _session, JSONObject _msg) {
 			session = _session;
 			msg = _msg;
@@ -39,9 +40,8 @@ public class Server {
 			be = new Backend();
 		}
 
-		//@Override
+		// @Override
 		public void runn() {
-			
 
 			System.out.println(msg);
 			try {
@@ -52,7 +52,8 @@ public class Server {
 						case 1:
 							session.getBasicRemote().sendText(be.chartrequest().toString());
 							break;
-						case 2: Data dat = new Data();
+						case 2:
+							Data dat = new Data();
 							try {
 								dat.load();
 							} catch (SQLException e) {
@@ -60,12 +61,15 @@ public class Server {
 								e.printStackTrace();
 							}
 							session.getBasicRemote().sendText("LOADED SUCCESSFULLY");
-						break;
-						case 3:
-							session.getBasicRemote().sendText(be.globalsentiment(1,5,null, 0, null).toString());
 							break;
+						case 3:
+							// session.getBasicRemote().sendText(be.globalsentiment(1,5,null,
+							// null).toString());
+							// break;
 						case 4:
-							session.getBasicRemote().sendText(be.globalsentiment(1, 5, msg.getString("param"), msg.getInt("n_values"), msg.getString("values")).toString());
+							session.getBasicRemote().sendText(be
+									.globalsentiment(1, 5, msg.getString("param"), msg.getString("values")).toString());
+							break;
 						default:
 							session.getBasicRemote().sendText("MISTAKE");
 						}

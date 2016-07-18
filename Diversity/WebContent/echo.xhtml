@@ -98,8 +98,13 @@
         function echo() {
             if (ws != null) {
                 var message = document.getElementById('message').value;
+                var message2 = document.getElementById('message2').value;
+                var message3 = document.getElementById('message3').value;
+                
                 var json = {
-                "op":message
+                "op":message,
+                "param":message2,
+                "values":message3
                 }
                 log('Sent: ' + JSON.stringify(json));
                 ws.send(JSON.stringify(json));
@@ -173,7 +178,9 @@
             <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
         </div>
         <div>
-            <textarea id="message" style="width: 350px">Here is a message!</textarea>
+            <textarea id="message" style="width: 350px">OP</textarea>
+            <textarea id="message2" style="width: 350px">Parameters</textarea>
+            <textarea id="message3" style="width: 350px">Values</textarea>
         </div>
         <div>
             <button id="echo" onclick="echo();" disabled="disabled">Echo message</button>
