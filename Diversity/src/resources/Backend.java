@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -60,9 +61,10 @@ public class Backend {
 
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, String value) {
+	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, int n_values, String values) {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
+				
 		String[] time = new String[12];
 		time[0] = "JANUARY";
 		time[1] = "FEBRUARY";
@@ -80,8 +82,10 @@ public class Backend {
 			try {
 				obj = new JSONObject();
 				obj.put("month", time[i % 12]);
-				obj.put("sentiment", globalsentimenttime(i, param, value));
+				//for(int ii=0;ii<n_values;ii++)
+				obj.put("sentiment", globalsentimentby(i, null, null));
 				result.put(obj);
+				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -91,11 +95,15 @@ public class Backend {
 		return result;
 	}
 
-	private double sentimentby(int minage, int maxage, String param, String gender) {
+	private double sentimentby(int minage, int maxage, String param, String value) {
 		double result = (double) 0;
-		String insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
-				+ param + "=?))";
-		PreparedStatement query1;
+		String insert;
+		if(param!=null){
+		insert= "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
+				+ param + "=?))";}else{
+					insert = "Select polarity FROM posts WHERE author_id in (Select id from authors WHERE (AGE > ? AND AGE < ?";
+				}
+		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		int i;
@@ -103,7 +111,7 @@ public class Backend {
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
-			query1.setString(3, gender);
+			if(param!=null)query1.setString(3, value);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
@@ -114,20 +122,35 @@ public class Backend {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+		    try { if (rs != null) rs.close(); } catch (Exception e) {};
+		    try { if (query1 != null) query1.close(); } catch (Exception e) {};
+		    try { if (cnlocal != null) cnlocal.close(); } catch (Exception e) {};
 		}
-
+		String temp;
+		temp = String.format("%.2f", result);
+		try {
+			System.out.println("ERROR 1 " + temp);
+			result = Double.valueOf(temp);
+		} catch (Exception e) {
+			temp = temp.replaceAll(",", ".");
+			System.out.println("ERROR 2 " + temp);
+			result = Double.parseDouble(temp);
+		}
+		
+		System.out.println(result);
 		return result;
 
 	}
 
-	private double globalsentimenttime(int month, String param, String value) {
+	private double globalsentimentby(int month, String param, String value) {
 		double result = (double) 0;
 		String insert;
 		PreparedStatement query1;
 		if (param == null) {
 			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<?";
 		} else {
-			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + param + "=?";	
+			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + param + "=?";
 		}
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
@@ -141,11 +164,12 @@ public class Backend {
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			if(param!=null)query1.setString(3, value);
+			if (param != null)
+				query1.setString(3, value);
 			rs = query1.executeQuery();
 			System.out.println(query1);
 
-			int totalreach = 0;
+			double totalreach = 0;
 			while (rs.next()) {
 
 				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
@@ -157,6 +181,16 @@ public class Backend {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		String temp;
+		temp = String.format("%.2f", result);
+		try {
+			System.out.println("ERROR 1 " + temp);
+			result = Double.valueOf(temp);
+		} catch (Exception e) {
+			temp = temp.replaceAll(",", ".");
+			System.out.println("ERROR 2 " + temp);
+			result = Double.parseDouble(temp);
 		}
 		return result;
 

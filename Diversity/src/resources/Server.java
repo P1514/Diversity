@@ -2,21 +2,11 @@
 package resources;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.ByteBuffer;
 import java.sql.SQLException;
-
-import javax.json.Json;
-import javax.websocket.EncodeException;
 import javax.websocket.OnMessage;
-import javax.websocket.PongMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.json.*;
-
-import com.sun.javafx.scene.paint.GradientUtils.Parser;
-
-import jdk.nashorn.internal.parser.JSONParser;
 
 @ServerEndpoint("/server")
 public class Server {
@@ -72,15 +62,10 @@ public class Server {
 							session.getBasicRemote().sendText("LOADED SUCCESSFULLY");
 						break;
 						case 3:
-							session.getBasicRemote().sendText(be.globalsentiment(1,5, null, null).toString());
+							session.getBasicRemote().sendText(be.globalsentiment(1,5,null, 0, null).toString());
 							break;
 						case 4:
-							try {
-								session.getBasicRemote().sendText(be.globalsentiment(1, 5, msg.getString("param"), msg.getString("value")).toString());
-							} catch (JSONException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							session.getBasicRemote().sendText(be.globalsentiment(1, 5, msg.getString("param"), msg.getInt("n_values"), msg.getString("values")).toString());
 						default:
 							session.getBasicRemote().sendText("MISTAKE");
 						}

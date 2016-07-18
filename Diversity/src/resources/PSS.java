@@ -5,18 +5,16 @@ import java.util.HashMap;
 
 //Post individual Object
 public class PSS {
-	private int id;
-	private String tag;
-	private double GlobalSentiment;
+	private HashMap<String,Integer> tags = new HashMap<String,Integer>();
 
 	public PSS() {
 	}
 
-	public void evalGlobal(HashMap<Integer, Opinion> opiniondb){
-		
+	public boolean tagexists(String word){
+		return tags.containsKey(word);
 	}
-
-	public double getGlobal(){
-		return GlobalSentiment;
+	
+	public int getTag(String word){
+		return tags.get(word);
 	}
 }

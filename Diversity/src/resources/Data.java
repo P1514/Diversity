@@ -35,7 +35,12 @@ public class Data {
 		}
 
 		ResultSet rs = null;
-		//java.sql.Date sqlDate = new java.sql.;
+		//Load PSS
+		
+		
+		
+		
+		//Load Posts
 		String query = ("Select * from " + dbc.posttn + " Where " + dbc.ptime + " < \'" + dbc.LastUpdated + "\'");
 		System.out.println(query);
 		dbc.setLastUpdated();
@@ -57,7 +62,21 @@ public class Data {
 				users.add(user_id);
 			}
 			if (post_id == 0) {
-				opiniondb.put(id, new Opinion(_post));
+				
+				String[] words = message.split("[^\\w'-]+");
+
+				PSS pss = new PSS();
+				int tag = 0;
+				for (int i = 0; i < words.length; i++) {
+
+					String currentWord = words[i];
+
+					if (pss.tagexists(currentWord)) {
+						tag = pss.getTag(currentWord);
+					}
+				}
+				
+				opiniondb.put(id, new Opinion(_post, tag));
 			} else {
 				Opinion _opin = opiniondb.get(post_id);
 				_opin.addcomment(_post);
@@ -67,18 +86,18 @@ public class Data {
 		rs = null;
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
+		//Load users
 		query = ("Select * from " + dbc.usertn + " where " + dbc.user_id + " in " + querycond);
 		// System.out.println(query);
 		stmt = cndata.createStatement();
 		rs = stmt.executeQuery(query);
-		rs.next();// ALTERAR
-		do {
+		while (rs.next()){
 			if (authordb.containsKey(rs.getInt(dbc.user_id))) {
 			} else {
 				authordb.put(rs.getInt(dbc.user_id), new Author(rs.getInt(dbc.user_id), rs.getString(dbc.uname),
 						rs.getInt(dbc.uage), rs.getString(dbc.ugender), rs.getString(dbc.uloc)));
 			}
-		} while (rs.next());
+		} ;
 
 		opiniondb.forEach((k, v) -> {
 			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
@@ -112,7 +131,6 @@ public class Data {
 			v.evalPolarity(authordb);
 		});
 
-		System.out.println("I AM COMPLETE BEHOLD\n\r");
 		opiniondb.forEach((k, v) -> {
 			System.out.println("AMEN ID : " + " " + v.getPolarity() + "/" + v.getReach());
 		});
@@ -161,7 +179,7 @@ public class Data {
 				query1.setInt(5, opinion.getUID());
 				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime().getTime());
 				query1.setDate(6, sqlDate);
-				query1.setString(7, opinion.getTag());
+				query1.setInt(7, opinion.getTag());
 				query1.setDouble(8, opinion.getReach());
 				query1.setDouble(9, opinion.getPolarity());
 				query1.setDouble(10, opinion.getTotalInf());

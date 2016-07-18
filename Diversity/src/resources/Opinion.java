@@ -15,13 +15,13 @@ public class Opinion {
 	private Settings dbc = new Settings();
 	private double total_inf=0;
 	private Date timestamp;
-	private String tag;
+	private int tag;
 
-	public Opinion(Post _main) {
+	public Opinion(Post _main, int _tag) {
 		this.main=_main;
 		this.author_id = main.getUID();
 		timestamp = main.getTime();
-		tag="";
+		tag=_tag;
 		
 
 	}
@@ -68,7 +68,7 @@ public class Opinion {
 		return timestamp;
 	}
 	
-	public String getTag(){
+	public int getTag(){
 		return tag;
 	}
 	public int ncomments() {
