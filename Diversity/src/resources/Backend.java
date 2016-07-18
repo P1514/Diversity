@@ -97,7 +97,6 @@ public class Backend {
 	}
 
 	private double sentimentby(int minage, int maxage, String param, String value) {
-		dbconnect();
 		double result = (double) 0;
 		String insert;
 		if (param != "null") {
@@ -111,6 +110,7 @@ public class Backend {
 		Double auxcalc = (double) 0;
 		int i;
 		try {
+			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
@@ -163,15 +163,22 @@ public class Backend {
 	}
 
 	private double globalsentimentby(int month, String param, String value) {
-		dbconnect();
+
 		double result = (double) 0;
 		String insert;
+		String[] values = new String[2];
 		PreparedStatement query1 = null;
 		if (param == "null") {
 			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? ";
 		} else {
-			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
-					+ " authors_id in (Select id from authors where " + param + "=?)";
+			if (!value.contains("-")) {
+				insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
+						+ " authors_id in (Select id from authors where " + param + "=?)";
+			} else {
+				values = value.split("-");
+				insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
+						+ " authors_id in (Select id from authors where " + param + ">=? && " + param + "<=?)";
+			}
 		}
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
@@ -180,15 +187,21 @@ public class Backend {
 		month = month % 12;
 		Calendar data = new GregorianCalendar(2016 + year, month, 1);
 		try {
+			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			if (param != "null")
-				query1.setString(3, value);
+			if (param != "null") {
+				if (!value.contains("-")) {
+					query1.setString(3, value);
+				} else {
+					query1.setString(3, values[0]);
+					query1.setString(4, values[1]);
+				}
+			}
 			System.out.println(query1);
 			rs = query1.executeQuery();
-			
 
 			double totalreach = 0;
 			while (rs.next()) {

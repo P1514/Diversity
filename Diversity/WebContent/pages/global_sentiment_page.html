@@ -8,7 +8,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <!-- script responsável por desenhar os gráficos Google Charts -->
   <script type="text/javascript">
   var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
   var jsonData;
@@ -17,7 +16,6 @@
 		var json = {
                 "op":"globalsentiment",
 				"param":null,
-				"n_values":0,
 				"value":null,
                 }
                 ws.send(JSON.stringify(json));
@@ -25,27 +23,46 @@
 			
     ws.onmessage = function (event) {
 				jsonData = JSON.parse(event.data);
-				drawGlobal();
-            };
+
+				switch(document.test.field.value){
+		
+					case "Global":
+					drawGlobal();
+					break;
+					
+					case "Gender":
+					drawBasic();
+					break;
+					
+					case "Location":
+					drawBasic2();
+					break;
+					
+					case "Age":
+					drawBasic3();
+					break;
+					}
+				};
+				
 	
   
-  google.charts.load('current', {packages: ['corechart', 'bar']});
-  google.charts.setOnLoadCallback(checkValue);
+	google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(checkValue);
+	
+	var globaldata;
 
-	//gráfico sentimento global
+	//global sentiment graph
     function drawGlobal() {
 
-
-	
-      var data = new google.visualization.DataTable();
-	data.addColumn('string', 'Month');
-	data.addColumn('number', 'Global');	  
+    globaldata = new google.visualization.DataTable();
+	globaldata.addColumn('string', 'Month');
+	globaldata.addColumn('number', 'Global');	  
 	  				
-				for (var i = 0; i < jsonData.length; i++) {
-					var counter = jsonData[i];
-					console.log(counter.month + " " + counter.sentiment);
-					data.addRows([[counter.month, counter.sentiment]]);
-				}
+	for (var i = 0; i < jsonData.length; i++) {
+		var counter = jsonData[i];
+		console.log(counter.month + " " + counter.sentiment);
+		globaldata.addRows([[counter.month, counter.sentiment]]);
+	}
 
       var options = {
         title: 'Average Global Sentiment Over Time',
@@ -66,31 +83,22 @@
 
       var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
-      chart.draw(data, options);
+      chart.draw(globaldata, options);
     }
 
-	//gráfico 1 (Sentimento ao longo do tempo segundo o género)
+	//sentiment over time according to gender graph
     function drawBasic() {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Month');
+	  var data = globaldata.clone();
       data.addColumn('number', 'Male');
       data.addColumn('number', 'Female');
-	  data.addColumn('number', 'Global');
-
-
-	  //dados dummy (dados reais a serem posteriormente adicionados)
-      data.addRows([
-        ['January', 10, 5, 20],
-		['February', 25, 15, 35],
-		['March', 30, 20, 40],
-		['April', 45, 35, 55],
-		['May', 50, 40, 60],
-		['June', 65, 55, 75],
-		['July', 70, 60, 80],
-		['August', 85, 75, 95],
-		['September', 100, 90, 100]
-      ]);
+	  
+	  for (var i = 0; i < jsonData.length; i++) {
+		var counter = jsonData[i];
+		console.log(counter.month + " " + counter.male + " " + counter.female + " " + counter.sentiment);
+		data.setCell(i,2, counter.male);
+		data.setCell(i,3, counter.female);
+	}
 
       var options = {
 		title: 'Average Sentiment Over Time By Gender',
@@ -109,27 +117,19 @@
       chart.draw(data, options);
     }
 	
-	//gráfico 2 (Sentimento ao longo do tempo segundo a localização)
+	//sentiment over time according to location graph
 	function drawBasic2() {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Month');
+      var data = globaldata.clone();
       data.addColumn('number', 'East');
       data.addColumn('number', 'West');
-	  data.addColumn('number', 'Global');
-
-	  //dados dummy (dados reais a serem posteriormente adicionados)
-      data.addRows([
-        ['January', 2, 8, 20],
-		['February', 10, 16, 35],
-		['March', 18, 24, 40],
-		['April', 26, 31, 55],
-		['May', 34, 39, 60],
-		['June', 42, 47, 75],
-		['July', 50, 55, 80],
-		['August', 58, 63, 95],
-		['September', 66, 71, 100]
-      ]);
+	  
+	  for (var i = 0; i < jsonData.length; i++) {
+		var counter = jsonData[i];
+		console.log(counter.month + " " + counter.east + " " + counter.west + " " + counter.sentiment);
+		data.setCell(i,2, counter.east);
+		data.setCell(i,3, counter.west);
+	}
 
       var options = {
 		title: 'Average Sentiment Over Time By Location',
@@ -148,28 +148,22 @@
       chart.draw(data, options);
     }
 	
-	//gráfico 2 (Sentimento ao longo do tempo segundo faixas etárias)
+	//sentiment over time according to age ranges chart
 	function drawBasic3(){
 	
-	  var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Month');
+	  var data = globaldata.clone();
       data.addColumn('number', '0-30');
       data.addColumn('number', '31-60');
-	  data.addColumn('number', '61+');
-	  data.addColumn('number', 'Global');
+	  data.addColumn('number', '61-90');
 
-	  //dados dummy (dados reais a serem posteriormente adicionados)
-      data.addRows([
-        ['January', 2, 8, 10, 20],
-		['February', 10, 16, 18, 35],
-		['March', 18, 24, 26, 40],
-		['April', 26, 31, 33, 55],
-		['May', 34, 39, 42, 60],
-		['June', 42, 47, 49, 75],
-		['July', 50, 55, 57, 80],
-		['August', 58, 63, 65, 95],
-		['September', 66, 71, 73, 100]
-      ]);
+	  
+	  for (var i = 0; i < jsonData.length; i++) {
+		var counter = jsonData[i];
+		console.log(counter.month + " " + counter.sentiment);
+		data.setCell(i,2, counter["0-30"]);
+		data.setCell(i,3, counter["31-60"]);
+		data.setCell(i,4, counter["61-90"]);
+	}
 
       var options = {
 		title: 'Average Sentiment Over Time By Age Range',
@@ -190,31 +184,51 @@
 	
 	}
 	
-	//desenha o gráfico consoante a opção escolhida nos radio buttons
+	//draws chart according to selected radio button
 	function checkValue(){
         switch(document.test.field.value){
 		
-            case "global":
-             
-				drawGlobal();
+            case "Global":
+				var json = {
+					"op":"globalsentiment",
+					"param":null,
+					"values":null,
+				}
+                ws.send(JSON.stringify(json));
+       			break;
+
+            case "Gender":
+
+				var json = {
+					"op":"globalsentiment",
+					"param":"gender",
+					"values":"Male,Female",
+				}
+                ws.send(JSON.stringify(json));
 				break;
 
-            case "gender":
+            case "Location":
 
-				drawBasic();
+				var json = {
+					"op":"globalsentiment",
+					"param":"location",
+					"values":"East,West",
+				}
+                ws.send(JSON.stringify(json));	
 				break;
 
-            case "location":
+			case "Age":
 
-				drawBasic2();
-				break;
-
-			case "age":
-
-				drawBasic3();
+				var json = {
+					"op":"globalsentiment",
+					"param":"age",
+					"values":"0-30,31-60,61-90"
+				}
+                ws.send(JSON.stringify(json));	
 				break;
         }
 	}
+	
 </script>
 
 
@@ -238,37 +252,54 @@ input[type=radio] {
 }
 
 #chart_div{
-	width: 100%;
-	padding-left: 0.75%;
-	padding-right: 0.75%;
-	margin: auto;
-	clear: none;
-	float: none;
-	margin-left: auto;
 	margin-top: 5%;
+}
+
+#buttons{
+		margin-top: 150px;
+}
+
+#refresh{
+		display:inline-block;
+	}
+	
+#back{
+		display:inline-block;
+		margin-left:100px;
 }
 </style>
 </head>
 
 <body>
-<!-- Logotipo Diversity-->
+<!-- Diversity Logo-->
 <center>
-	<a href="sentiment_home_page.html">
 		<img src="images\Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
-	</a>
 
-<!-- Gráficos -->
+<!-- Charts -->
 <div id="global" class = "container">
 	<h2 align="left">Global Sentiment</h2>
 	
 	<form align="left" name='test'>
-		<input type="radio" name="field" value="global" onChange="checkValue()" checked>Global 
-		<input type="radio" name="field" value="gender" onChange="checkValue()">Gender 
-		<input type="radio" name="field" value="location" onChange="checkValue()">Location
-		<input type="radio" name="field" value="age" onChange="checkValue()">Age Range		
+		<input type="radio" name="field" value="Global" onChange="checkValue()" checked>Global 
+		<input type="radio" name="field" value="Gender" onChange="checkValue()">Gender 
+		<input type="radio" name="field" value="Location" onChange="checkValue()">Location
+		<input type="radio" name="field" value="Age" onChange="checkValue()">Age Range		
 	</form>
 		
 	<div id='chart_div'></div>
+
+	<table id="buttons">
+	<td>
+		<form>
+			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="history.go()">
+		</form>
+	</td>
+	<td>
+		<form action="index.html">
+			<input id="back" class="btn btn-default" type="submit" value="Back"/>
+		</form>
+	</td>
+	</table>
 	
 </div>
 </center>      
