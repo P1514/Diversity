@@ -1,11 +1,13 @@
-package resources;
+package importDB;
+
+import backend.Settings;
 
 //Author Individual Object
 public class Author {
 
 	private int id; // Keys
 	private String name; //
-	private double influence; // calculada
+	private double influence; // Calculated
 	private int age;
 	private String gender;
 	private String location;

@@ -1,8 +1,10 @@
-package resources;
+package importDB;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import backend.Settings;
 
 //Opinion Individual Object
 public class Opinion {

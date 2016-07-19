@@ -1,10 +1,10 @@
-package resources;
-
-import resources.Settings;
+package importDB;
 
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
+
+import backend.Settings;
 
 public class Data {
 	private HashMap<Integer, Author> authordb = new HashMap<Integer, Author>();
