@@ -13,19 +13,52 @@
       <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="sorttable.js"></script>
       <script type="text/javascript">
-         google.load('visualization', '1.1', {packages: ['controls']});
-      </script>
-      <script type="text/javascript">
-         function drawVisualization() {
-          var data = new google.visualization.DataTable();
-         data.addColumn('string', 'Age Range');
-         data.addColumn('number', 'Male');
-         data.addColumn('number', 'Female');
-         data.addColumn('number', 'East');
-         data.addColumn('number', 'West');
-		 data.addColumn('number', 'Global');
+	var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+	var json;
+	
+	ws.onopen = function () {
+		json = {
+            "op":"getposts",
+            }
+        ws.send(JSON.stringify(json));
+    };
+	 
+	ws.onmessage = function (event) {
+		json = JSON.parse(event.data);
+		
+		//populate table
+		var tr;
+        for (var i = 0; i < json.length; i++) {
+            tr = $('<tr/>');
+            tr.append("<td>" + json[i].Name + "</td>");
+            tr.append("<td>" + json[i].Message + "</td>");
+            tr.append("<td>" + json[i].Comments + "</td>");
+			tr.append("<td>" + json[i].Date + "</td>");
+            tr.append("<td>" + json[i].Polarity + "</td>");
+            tr.append("<td>" + json[i].Reach + "</td>");
+			tr.append("<td>" + json[i].Influence + "</td>");
+            tr.append("<td>" + json[i].Location + "</td>");
+            tr.append("<td>" + json[i].Gender + "</td>");
+			tr.append("<td>" + json[i].Age + "</td>");
+            $('#posts tbody').append(tr);
+			}
+	};
+	
+	
+	  
+    google.charts.load('current', {packages: ['corechart', 'bar']});
+	google.charts.setOnLoadCallback(drawChart);
          
-         //dados dummy
+	function drawChart() {
+         var data = new google.visualization.DataTable();
+         data.addColumn('string', 'Age Range');//0
+         data.addColumn('number', 'Male');//1
+         data.addColumn('number', 'Female');//2
+         data.addColumn('number', 'East');//3
+         data.addColumn('number', 'West');//4
+		 data.addColumn('number', 'Global');//5
+         
+         //dummy data
          //dados reais a serem adicionadas posteriormente
          data.addRows([
          ['0-30', 20, 40, 55, 60, 70],
@@ -33,79 +66,102 @@
          ['61+', 60, 65, 80, 85, 90]
          ]);
          
-         
-         //filtro de faixas etárias
-                 var compPicker = new google.visualization.ControlWrapper({
-                   'controlType': 'CategoryFilter',
-                   'containerId': 'control',
-                   'options': {
-                     'filterColumnLabel': 'Age Range',
-                     'ui': {
-                     'labelStacking': 'horizontal',
-                       'allowTyping': false,
-                       'allowMultiple': true
-                     }
-                   }
-                 });
-         
-           // Define a chart
-           var chart = new google.visualization.ChartWrapper({
-             'chartType': 'ColumnChart',
-             'containerId': 'chart',
-             'options': {'width':'100%',
-                      'height':300,
-                         'vAxis': { 
-                                 viewWindow: {max:100,min:0},
-         	  title: 'Sentiment',
-                              gridlines: {color:'#CCC', count: 6}
-                            },
-                            bar: { groupWidth: '80%' },
-                            colors: ["#000000"]
-                         
-                        },
-         'chartArea': {  width: "50%", height: "70%" },
-		 'view' : {'columns': [0, 5]}
-           });
-         
-         
-                 // Create a dashboard
-             var drawChart = new google.visualization.Dashboard(document.getElementById('dashboard')).bind([compPicker], [chart]);;
-               drawChart.draw(data);
+		 //chart options
+		 var options = {
+			title: 'Average Sentiment',
+			colors : ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"],
+			hAxis: {
+				title: 'Age Range'
+			},
+			vAxis: {
+				title: 'Sentiment',
+				viewWindow : {
+					max : 0,
+					min : 100
+				}
+			}
+		};
+		 
+		//chart definition 
+		var chart = new google.visualization.ChartWrapper({
+          chartType: 'ColumnChart',
+          dataTable: data,
+          options: options,
+          containerId: 'chart_div'
+        });
+		        				
+		//draws chart
+		chart.draw();
            
-         $(document).ready(function() {
-			$('input:radio[name=field]').change(function() {
-				if (this.value == '') {
-					chart.setView({'columns': [0,5]});
-					chart.setOption('colors', ["#000000"]);
+		//gender filter
+		$(document).ready(function() {
+			$('#genderfilt').change(function() {
+			var x = document.getElementById("genderfilt").value;
+				if(x == 'All'){
+					chart.setView({'columns' : [0,1,2,3,4,5]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
 				}
-				else if (this.value == 'gender') {
-					chart.setView({'columns':  [0,1,2]});
-					chart.setOption('colors', ["#00617F", "#0093C8"]);
+				else if(x == 'Male'){
+					chart.setView({'columns' : [0,1]});
+					chart.setOption('colors', ["#00617F"]);
 				}
-				else if (this.value == 'location') {
-					chart.setView({'columns':  [0,3,4]});
-					chart.setOption('colors', ["#FA1414", "#A60202"]);
+				else if(x == 'Female'){
+					chart.setView({'columns' : [0,2]});
+					chart.setOption('colors', ["#0093C8"]);
 				}
-				drawChart.draw(data);
+			chart.draw();
 			});
 		});
-               }
-         
-         google.setOnLoadCallback(drawVisualization);
+		
+		//location filter
+		$(document).ready(function() {
+			$('#locationfilt').change(function() {
+			var x = document.getElementById("locationfilt").value;
+				if(x == 'All'){
+					chart.setView({'columns' : [0,1,2,3,4,5]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
+				}
+				else if(x == 'East'){
+					chart.setView({'columns' : [0,3]});
+					chart.setOption('colors', ["#FA1414"]);
+				}
+				else if(x == 'West'){
+					chart.setView({'columns' : [0,4]});
+					chart.setOption('colors', ["#A60202"]);
+				}
+			chart.draw();
+			});
+		});
+		
+		//age filter
+		$(document).ready(function() {
+			$('#agefilt').change(function() {
+			var x = document.getElementById("agefilt").value;
+				if(x == 'All'){
+					chart.setView({'rows' : [0,1,2]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
+				}
+				else if(x == '0-30'){
+					chart.setView({'rows' : [0]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
+				}
+				else if(x == '31-60'){
+					chart.setView({'rows' : [1]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
+				}
+				else if(x == '61-90'){
+					chart.setView({'rows' : [2]});
+					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
+				}
+			chart.draw();
+			});
+		});
+    }         
       </script>
       <style>
          table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
 			content: " \25B4\25BE" 
          }
-		 
-		#names {
-			display:inline-block;
-			margin-right: 20%;
-		} 
-		
-		#control {
-			display:inline-block;
-		} 
 		 
 		 #chart {
 			height: 100%; 
@@ -113,9 +169,13 @@
 			left: 0; 
 			width: 60%; 
 		}
+
+		#locationfilt{
+			margin-left: 100px;
+		}
 		
-		input[type="radio"]{
-			margin: 0 0 0 20px;
+		#agefilt{
+			margin-left: 100px;
 		}
       </style>
    </head>
@@ -133,13 +193,31 @@
          <h2>Chart</h2>
          <hr>
          <center>          
-		<form id="names" align="left" name='test'>
-			<input type="radio" name="field" value="" checked>All 
-			<input type="radio" name="field" value="gender" >Gender 
-			<input type="radio" name="field" value="location">Location
-		</form>
-                     <div id="control"></div>
-            <div id="chart"></div>
+			<table id="filters">
+				<tr>
+					<select id="genderfilt">
+						<option value="All">Choose Gender
+						<option value="Male">Male
+						<option value="Female">Female
+					</select>
+				</tr>
+				<tr>
+					<select id="locationfilt">
+						<option value="All">Choose Location
+						<option value="East">East
+						<option value="West">West
+					</select>
+				</tr>
+				<tr>
+					<select id="agefilt">
+						<option value="All">Choose Age Range
+						<option value="0-30">0-30
+						<option value="31-60">31-60
+						<option value="61-90">61-90
+					</select>
+				</tr>
+			</table>
+			<div id="chart_div"></div>
          </center>
       </div>
 	  
@@ -147,7 +225,7 @@
       <div class="container">
          <h2>Posts</h2>
          <hr>
-         <table class="table sortable">
+         <table id="posts" class="table sortable">
             <thead>
                <tr>
                   <th>Original Author</th>
@@ -163,151 +241,6 @@
                </tr>
             </thead>
             <tbody>
-               <!--Dados dummy-->
-               <tr>
-                  <td>David Jones</td>
-                  <td>These shoes are horrendous!</td>
-                  <td>123</td>
-                  <td>20/04/2015</td>
-                  <td>0.20</td>
-                  <td>0.20</td>
-                  <td>0.42</td>
-                  <td>East</td>
-                  <td>Male</td>
-                  <td>24</td>
-               </tr>
-               <tr>
-                  <td>Martha Stewart</td>
-                  <td>Good shoes!</td>
-                  <td>34</td>
-                  <td>12/02/2015</td>
-                  <td>0.80</td>
-                  <td>0.80</td>
-                  <td>0.91</td>
-                  <td>West</td>
-                  <td>Female</td>
-                  <td>32</td>
-               </tr>
-               <tr>
-                  <td>James Osterberg</td>
-                  <td>In a word: great!</td>
-                  <td>264</td>
-                  <td>10/03/2016</td>
-                  <td>0.90</td>
-                  <td>0.90</td>
-                  <td>0.96</td>
-                  <td>West</td>
-                  <td>Male</td>
-                  <td>26</td>
-               </tr>
-               <tr>
-                  <td>Carmen Gaspar</td>
-                  <td>Bad</td>
-                  <td>34</td>
-                  <td>12/02/2015</td>
-                  <td>0.30</td>
-                  <td>0.30</td>
-                  <td>0.35</td>
-                  <td>East</td>
-                  <td>Female</td>
-                  <td>40</td>
-               </tr>
-               <tr>
-                  <td>Jack Barker</td>
-                  <td>These shoes are mediocre.</td>
-                  <td>54</td>
-                  <td>19/10/2015</td>
-                  <td>0.50</td>
-                  <td>0.50</td>
-                  <td>0.54</td>
-                  <td>East</td>
-                  <td>Male</td>
-                  <td>39</td>
-               </tr>
-               <tr>
-                  <td>Lisa Stanford</td>
-                  <td>Excellent!</td>
-                  <td>10</td>
-                  <td>06/12/2014</td>
-                  <td>0.93</td>
-                  <td>0.93</td>
-                  <td>1</td>
-                  <td>West</td>
-                  <td>Female</td>
-                  <td>20</td>
-               </tr>
-               <tr>
-                  <td>Richard Parker</td>
-                  <td>Bad shoes!</td>
-                  <td>32</td>
-                  <td>03/05/2015</td>
-                  <td>0.22</td>
-                  <td>0.22</td>
-                  <td>0.23</td>
-                  <td>West</td>
-                  <td>Male</td>
-                  <td>50</td>
-               </tr>
-               <tr>
-                  <td>Thomas Anderson</td>
-                  <td>In a word: horrendous!</td>
-                  <td>26</td>
-                  <td>28/02/2014</td>
-                  <td>0.11</td>
-                  <td>0.11</td>
-                  <td>0.10</td>
-                  <td>East</td>
-                  <td>Male</td>
-                  <td>19</td>
-               </tr>
-               <tr>
-                  <td>Jane Turner</td>
-                  <td>These shoes are good!</td>
-                  <td>53</td>
-                  <td>06/12/2014</td>
-                  <td>0.84</td>
-                  <td>0.84</td>
-                  <td>0.83</td>
-                  <td>West</td>
-                  <td>Female</td>
-                  <td>47</td>
-               </tr>
-               <tr>
-                  <td>Rachel Smith</td>
-                  <td>Fabulous shoes!</td>
-                  <td>75</td>
-                  <td>06/12/2014</td>
-                  <td>0.96</td>
-                  <td>0.96</td>
-                  <td>1</td>
-                  <td>East</td>
-                  <td>Female</td>
-                  <td>42</td>
-               </tr>
-               <tr>
-                  <td>Jeff Dunham</td>
-                  <td>Mediocre shoes.</td>
-                  <td>86</td>
-                  <td>30/06/2016</td>
-                  <td>0.55</td>
-                  <td>0.55</td>
-                  <td>0.525</td>
-                  <td>East</td>
-                  <td>Male</td>
-                  <td>50</td>
-               </tr>
-               <tr>
-                  <td>John Williams</td>
-                  <td>Good shoes.</td>
-                  <td>86</td>
-                  <td>20/01/2016</td>
-                  <td>0.80</td>
-                  <td>0.81</td>
-                  <td>0.81</td>
-                  <td>West</td>
-                  <td>Male</td>
-                  <td>29</td>
-               </tr>
             </tbody>
          </table>
       </div>
