@@ -187,8 +187,8 @@ public class Data {
 		});
 
 		opiniondb.forEach((k, opinion) -> {
-			String update = "INSERT INTO opinions " + "Values (?,?,?,?,?,?,?) ON DUPLICATE KEY"
-					+ " UPDATE reach=?, polarity=?, total_inf=?";
+			String update = "INSERT INTO opinions " + "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY"
+					+ " UPDATE reach=?, polarity=?, total_inf=?, comments=?";
 			// System.out.println(query);
 			PreparedStatement query1=null;
 			try {
@@ -201,9 +201,12 @@ public class Data {
 				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime().getTime());
 				query1.setDate(6, sqlDate);
 				query1.setInt(7, opinion.getTag());
-				query1.setDouble(8, opinion.getReach());
-				query1.setDouble(9, opinion.getPolarity());
-				query1.setDouble(10, opinion.getTotalInf());
+				query1.setInt(8, opinion.ncomments());
+				query1.setDouble(9, opinion.getReach());
+				query1.setDouble(10, opinion.getPolarity());
+				query1.setDouble(11, opinion.getTotalInf());
+				query1.setInt(12, opinion.ncomments());
+				
 
 				System.out.println(query1);
 				query1.executeUpdate();

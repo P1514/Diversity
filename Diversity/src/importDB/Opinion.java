@@ -99,5 +99,4 @@ public class Opinion {
 		output.add(main);
 		return output;
 	}
-
 }

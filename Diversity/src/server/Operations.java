@@ -11,6 +11,7 @@ public class Operations {
 		op.put("chartrequest", 1);
 		op.put("load", 2);
 		op.put("globalsentiment", 3);
+		op.put("getposts", 4);
 		
 		
 	}

@@ -16,6 +16,9 @@ public class Backend {
 	}
 
 	public String resolve() {
+		String param;
+		String values;
+		String tmp;
 
 		try {
 			switch (op) {
@@ -34,18 +37,17 @@ public class Backend {
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
 
-				String param, values;
-
 				param = (msg.has("param")) ? msg.getString("param") : null;
 				values = (msg.has("values")) ? msg.getString("values") : null;
-				String tmp = gs.globalsentiment(1, 5, param, values).toString();
+				tmp = gs.globalsentiment(1, 5, param, values).toString();
 				//System.out.println(tmp);
 				return tmp;
 			case 4:
-				// session.getBasicRemote().sendText(be
-				// .globalsentiment(1, 5, msg.getString("param"),
-				// msg.getString("values")).toString());
-				// break;
+				GetPosts gp = new GetPosts();
+				param = (msg.has("param")) ? msg.getString("param") : null;
+				values = (msg.has("values")) ? msg.getString("values") : null;
+				tmp = gp.getTop(param, values).toString();
+				return tmp;
 			default:
 
 			}

@@ -31,14 +31,14 @@
         #console-container {
             float: left;
             margin-left: 15px;
-            width: 400px;
+            width: 600px;
         }
 
         #console {
             border: 1px solid #CCCCCC;
             border-right-color: #999999;
             border-bottom-color: #999999;
-            height: 170px;
+            height: 600px;
             overflow-y: scroll;
             padding: 5px;
             width: 100%;
@@ -100,11 +100,14 @@
                 var message = document.getElementById('message').value;
                 var message2 = document.getElementById('message2').value;
                 var message3 = document.getElementById('message3').value;
-                
+                if(message2!="null"){
                 var json = {
                 "op":message,
-                "param":message2,
+				"param":message2,
                 "values":message3
+                }}else{
+                var json = {
+                "op":message}
                 }
                 log('Sent: ' + JSON.stringify(json));
                 ws.send(JSON.stringify(json));
