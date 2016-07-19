@@ -67,10 +67,9 @@ public class GetPosts {
 			System.out.println(query1);
 			rs = query1.executeQuery();
 
-			for (i = 0, rs.next(); rs.next(); i++) {
-				topid[i] = rs.getInt("id");// Done so far return id of the top
-				n_tops++; // MAXTOP opinion makers of the
-				// asked parameters
+			for (i = 0; rs.next(); i++) {
+				topid[i] = rs.getInt("id");
+				n_tops++; 
 			}
 
 			insert = "Select name,influence,location,gender,age from authors where id in (Select authors_id from opinions where id = ?)";
@@ -140,16 +139,16 @@ public class GetPosts {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
 			try {
-				obj.put("name", pre_results[0]);
-				obj.put("influence", pre_results[1]);
-				obj.put("location", pre_results[2]);
-				obj.put("gender", pre_results[3]);
-				obj.put("age", pre_results[4]);
-				obj.put("date", pre_results[5]);
-				obj.put("polarity", pre_results[6]);
-				obj.put("reach", pre_results[7]);
-				obj.put("comments", pre_results[8]);
-				obj.put("message", pre_results[9]);
+				obj.put("Name", pre_results[0]);
+				obj.put("Influence",trunc(pre_results[1]));
+				obj.put("Location", pre_results[2]);
+				obj.put("Gender", pre_results[3]);
+				obj.put("Age", pre_results[4]);
+				obj.put("Date", pre_results[5]);
+				obj.put("Polarity", trunc(pre_results[6]));
+				obj.put("Reach", trunc(pre_results[7]));
+				obj.put("Comments", pre_results[8]);
+				obj.put("Message", pre_results[9]);
 				result.put(obj);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -161,6 +160,23 @@ public class GetPosts {
 
 	}
 
+	private String trunc(String number){
+		double result=0;
+		try {
+			
+			result =  Double.valueOf(number);
+			number = String.format("%.2f", result);
+			result = Double.parseDouble(number);
+			
+		} catch (Exception e) {
+			number = number.replaceAll(",", ".");
+			result = Double.parseDouble(number);
+			
+		}
+		System.out.println(result);
+		return Double.toString(result);
+		
+	}
 	private void dbconnect() {
 		try {
 			cnlocal = dbc.connlocal();

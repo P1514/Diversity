@@ -107,11 +107,9 @@ public class SentimentChart {
 		String temp;
 		temp = String.format("%.2f", result);
 		try {
-			System.out.println("ERROR 1 " + temp);
 			result = Double.valueOf(temp);
 		} catch (Exception e) {
 			temp = temp.replaceAll(",", ".");
-			System.out.println("ERROR 2 " + temp);
 			result = Double.parseDouble(temp);
 		}
 
