@@ -3,16 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Upcoming
-- Globalsentiment page Table
 - Sentiment Graph
 - PSS Tags
 - Influence and Reach Page
 
 
 ## [1.0.2.2] 2016-07-19
-### Added
+### Added/Fixed
 - Output Top Opinions Max 5 HardCored
-### Fixed
 - Max Decimal places reduced to 2 on all pages
 
 ## [1.0.2.1] - 2016-07-19
