@@ -15,8 +15,6 @@
 	ws.onopen = function () {
 		var json = {
                 "op":"globalsentiment",
-				"param":null,
-				"value":null,
                 }
                 ws.send(JSON.stringify(json));
             };
@@ -191,8 +189,6 @@
             case "Global":
 				var json = {
 					"op":"globalsentiment",
-					"param":null,
-					"values":null,
 				}
                 ws.send(JSON.stringify(json));
        			break;
@@ -228,6 +224,14 @@
 				break;
         }
 	}
+	
+	function refreshDB(){
+		var json = {
+                "op":"load",
+                }
+                ws.send(JSON.stringify(json));
+    };
+	
 	
 </script>
 
@@ -272,8 +276,7 @@ input[type=radio] {
 
 <body>
 <!-- Diversity Logo-->
-<center>
-<a href="index.html">
+<center><a href="index.html">
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
 </a>
 <!-- Charts -->
@@ -292,7 +295,7 @@ input[type=radio] {
 	<table id="buttons">
 	<td>
 		<form>
-			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="history.go()">
+			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="refreshDB()">
 		</form>
 	</td>
 	<td>
