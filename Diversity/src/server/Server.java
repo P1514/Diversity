@@ -2,6 +2,9 @@
 package server;
 
 import java.io.IOException;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
@@ -12,7 +15,7 @@ import backend.Backend;
 public class Server {
 
 	@OnMessage
-	public void echoTextMessage(Session session, String msg, boolean last) {
+	public void receivedMessage(Session session, String msg, boolean last) {
 
 		JSONObject resolve = null;
 		try {
@@ -26,6 +29,25 @@ public class Server {
 		assist.runn();
 
 	}
+	 @OnClose
+	    public void onClose(Session session) {
+		 try {
+			session.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	    }
+	 @OnError
+	 public void onError(Session session, Throwable thr) {
+		 try {
+				session.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	 }
 
 	public class Assistant /* implements Runnable */ {
 		private Session session;

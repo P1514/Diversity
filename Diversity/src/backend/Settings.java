@@ -12,8 +12,8 @@ public class Settings {
 	public Date LastUpdated;
 	// Data Origin DB Specs
 	public String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
-	public String user = "root";
-	public String pass = "root";
+	public String user = "diversity";
+	public String pass = "diversity";
 
 	// Post Table
 	public String posttn = "post"; // Table Name
@@ -48,8 +48,8 @@ public class Settings {
 	
 	// Local DB Specs
 	public String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
-	public String user2 = "root";
-	public String pass2 = "root";
+	public String user2 = "diversity";
+	public String pass2 = "diversity";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 		

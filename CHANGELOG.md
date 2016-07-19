@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 - Sentiment Page
 - PSS Tags
 
+
+## [1.0.2.1] - 2016-07-19
+### Fixed
+- Resource Management Optimized
+- Simplified Workspace Organization
+
 ## [1.0.2] - 2016-07-18
 ### Added
 - This CHANGELOG file.

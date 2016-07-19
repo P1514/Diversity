@@ -38,8 +38,9 @@ public class Backend {
 
 				param = (msg.has("param")) ? msg.getString("param") : null;
 				values = (msg.has("values")) ? msg.getString("values") : null;
-
-				return gs.globalsentiment(1, 5, param, values).toString();
+				String tmp = gs.globalsentiment(1, 5, param, values).toString();
+				//System.out.println(tmp);
+				return tmp;
 			case 4:
 				// session.getBasicRemote().sendText(be
 				// .globalsentiment(1, 5, msg.getString("param"),

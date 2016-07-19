@@ -29,18 +29,14 @@ public class Data {
 
 		try {
 			cndata = dbc.conndata();
-			cnlocal = dbc.connlocal();
 		} catch (ClassNotFoundException | SQLException e4) {
 			e4.printStackTrace();
 		}
 
 		ResultSet rs = null;
-		//Load PSS
-		
-		
-		
-		
-		//Load Posts
+		// Load PSS
+
+		// Load Posts
 		String query = ("Select * from " + dbc.posttn + " Where " + dbc.ptime + " < \'" + dbc.LastUpdated + "\'");
 		System.out.println(query);
 		dbc.setLastUpdated();
@@ -62,7 +58,7 @@ public class Data {
 				users.add(user_id);
 			}
 			if (post_id == 0) {
-				
+
 				String[] words = message.split("[^\\w'-]+");
 
 				PSS pss = new PSS();
@@ -75,7 +71,7 @@ public class Data {
 						tag = pss.getTag(currentWord);
 					}
 				}
-				
+
 				opiniondb.put(id, new Opinion(_post, tag));
 			} else {
 				Opinion _opin = opiniondb.get(post_id);
@@ -86,18 +82,38 @@ public class Data {
 		rs = null;
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
-		//Load users
+		// Load users
 		query = ("Select * from " + dbc.usertn + " where " + dbc.user_id + " in " + querycond);
 		// System.out.println(query);
 		stmt = cndata.createStatement();
 		rs = stmt.executeQuery(query);
-		while (rs.next()){
+		while (rs.next()) {
 			if (authordb.containsKey(rs.getInt(dbc.user_id))) {
 			} else {
 				authordb.put(rs.getInt(dbc.user_id), new Author(rs.getInt(dbc.user_id), rs.getString(dbc.uname),
 						rs.getInt(dbc.uage), rs.getString(dbc.ugender), rs.getString(dbc.uloc)));
 			}
-		} ;
+		}
+		;
+
+		try {
+			if (rs != null)
+				rs.close();
+		} catch (Exception e) {
+		}
+		;
+		try {
+			if (stmt != null)
+				stmt.close();
+		} catch (Exception e) {
+		}
+		;
+		try {
+			if (cndata != null)
+				cndata.close();
+		} catch (Exception e) {
+		}
+		;
 
 		opiniondb.forEach((k, v) -> {
 			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
@@ -131,15 +147,16 @@ public class Data {
 			v.evalPolarity(authordb);
 		});
 
-		opiniondb.forEach((k, v) -> {
-			System.out.println("AMEN ID : " + " " + v.getPolarity() + "/" + v.getReach());
-		});
-
+		try {
+			cnlocal = dbc.connlocal();
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		authordb.forEach((k, author) -> {
 			String insert = "INSERT INTO authors " + "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY "
 					+ "UPDATE age=?, influence=?, comments=?, likes=?, views=?";
-			// System.out.println(query);
-			PreparedStatement query1;
+			PreparedStatement query1 =null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, author.getID());
@@ -156,12 +173,16 @@ public class Data {
 				query1.setInt(12, author.getComments());
 				query1.setInt(13, author.getLikes());
 				query1.setInt(14, author.getViews());
-
-				System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				try {
+					if (query1 != null)
+						query1.close();
+				} catch (Exception e) {
+				}
 			}
 		});
 
@@ -169,7 +190,7 @@ public class Data {
 			String update = "INSERT INTO opinions " + "Values (?,?,?,?,?,?,?) ON DUPLICATE KEY"
 					+ " UPDATE reach=?, polarity=?, total_inf=?";
 			// System.out.println(query);
-			PreparedStatement query1;
+			PreparedStatement query1=null;
 			try {
 				query1 = cnlocal.prepareStatement(update);
 				query1.setInt(1, k);
@@ -188,9 +209,10 @@ public class Data {
 				query1.executeUpdate();
 
 				opinion.getPosts().forEach((post) -> {
+					PreparedStatement query2 = null;
 					try {
 						String update1 = "REPLACE INTO posts " + "Values (?,?,?,?,?)";
-						PreparedStatement query2 = cnlocal.prepareStatement(update1);
+						query2 = cnlocal.prepareStatement(update1);
 						query2.setInt(1, post.getID());
 						query2.setDouble(2, post.getPolarity());
 						query2.setString(3, post.getComment());
@@ -199,17 +221,36 @@ public class Data {
 
 						System.out.println(query2);
 						query2.executeUpdate();
+						if (query2 != null)
+							query2.close();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					} finally {
+						try {
+							if (query2 != null)
+								query2.close();
+						} catch (Exception e) {
+						}
 					}
 				});
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}finally {
+				try {
+					if (query1 != null)
+						query1.close();
+				} catch (Exception e) {
+				}
 			}
 		});
-		    try { if (cnlocal != null) cnlocal.close(); } catch (Exception e) {};
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (Exception e) {
+		}
+		;
 	}
 
 	/**

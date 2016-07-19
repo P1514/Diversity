@@ -37,7 +37,7 @@ public class Globalsentiment {
 		time[9] = "OCTOBER";
 		time[10] = "NOVEMBER";
 		time[11] = "DECEMBER";
-		if (param != "null") {
+		if (param != null) {
 			words = values.split(",");
 		} else {
 			words = new String[1];
@@ -67,7 +67,7 @@ public class Globalsentiment {
 		String insert;
 		String[] values = new String[2];
 		PreparedStatement query1 = null;
-		if (param == "null") {
+		if (param == null) {
 			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? ";
 		} else {
 			if (!value.contains("-")) {
@@ -85,13 +85,14 @@ public class Globalsentiment {
 		int year = month / 12;
 		month = month % 12;
 		Calendar data = new GregorianCalendar(2016 + year, month, 1);
+		double totalreach = 0;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			if (param != "null") {
+			if (param != null) {
 				if (!value.contains("-")) {
 					query1.setString(3, value);
 				} else {
@@ -99,17 +100,13 @@ public class Globalsentiment {
 					query1.setString(4, values[1]);
 				}
 			}
-			System.out.println(query1);
 			rs = query1.executeQuery();
 
-			double totalreach = 0;
+			
 			while (rs.next()) {
 				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
 				totalreach += rs.getDouble("reach");
 			}
-
-			result = auxcalc / (totalreach == 0 ? 1 : totalreach);
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,14 +130,13 @@ public class Globalsentiment {
 			}
 			;
 		}
+		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
 		String temp;
 		temp = String.format("%.2f", result);
 		try {
-			System.out.println("ERROR 1 " + temp);
 			result = Double.valueOf(temp);
 		} catch (Exception e) {
 			temp = temp.replaceAll(",", ".");
-			System.out.println("ERROR 2 " + temp);
 			result = Double.parseDouble(temp);
 		}
 		return result;

@@ -65,7 +65,7 @@ public class SentimentChart {
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i;
+		int i=0;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
@@ -78,7 +78,7 @@ public class SentimentChart {
 			for (i = 0; rs.next(); i++) {
 				auxcalc += (double) rs.getInt("polarity");
 			}
-			result = auxcalc / (i == 0 ? 1 : i);
+			
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -103,6 +103,7 @@ public class SentimentChart {
 			}
 			;
 		}
+		result = auxcalc / (i == 0 ? 1 : i);
 		String temp;
 		temp = String.format("%.2f", result);
 		try {
