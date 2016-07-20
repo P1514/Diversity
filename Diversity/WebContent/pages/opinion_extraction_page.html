@@ -24,6 +24,12 @@
 		
         ws.send(JSON.stringify(json));
 		
+		json = {
+            "Op":"getposts",
+            }
+		
+        ws.send(JSON.stringify(json));
+		
 		/*json = {
 	            "Op":"getposts",
 	            "Param":"gender,gender,age"
@@ -31,6 +37,7 @@
 	            }
 			
 	        ws.send(JSON.stringify(json));*/
+			
     };
 	 
 	ws.onmessage = function (event) {
@@ -39,7 +46,7 @@
 		if(json[0].Op == "table"){
 		//populate table
 		var tr;
-        for (var i = 0; i < json.length; i++) {
+        for (var i = 1; i < json.length; i++) {
             tr = $('<tr/>');
             tr.append("<td>" + json[i].Name + "</td>");
             tr.append("<td>" + json[i].Message + "</td>");
@@ -70,17 +77,16 @@ function drawChart() {
   data.addColumn('number', 'Female');//2
   data.addColumn('number', 'East');//3
   data.addColumn('number', 'West');//4
-  data.addColumn('number', 'Global');//5
   
   
-	for (var i = 0; i < jsonData.length; i++) {
+	for (var i = 1; i < jsonData.length; i++) {
 		var counter = jsonData[i];
 		console.log(counter.Age + " " + counter.Male + " " + counter.Female + " " + counter.East + " " + counter.West + " " + counter.Global);
-		data.addRows([[counter.Age, counter.Male, counter.Female, counter.East, counter.West, counter.Global]]);
+		data.addRows([[counter.Age, counter.Male, counter.Female, counter.East, counter.West]]);
 	}
 
   // chart colors
-  var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"];
+  var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202"];
 
   //chart options
   var options = {
