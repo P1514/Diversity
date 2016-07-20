@@ -18,14 +18,16 @@ public class GetPosts {
 	public GetPosts() {
 	}
 
-	public JSONArray getTop(String param, String value) {
+	public JSONArray getTop(String param, String value) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
+		obj.put("Op", "table");
+		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[MAXTOP];
-		String[] params = (param != null) ? param.split(","): null;
-		String[] values = (value != null) ? value.split(","): null;
+		String[] params = (param != null) ? param.split(",") : null;
+		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
 		int n_tops = 0;
 		insert = "Select id FROM opinions";
@@ -41,7 +43,7 @@ public class GetPosts {
 					insert += params[i] + ">=? && " + params[i] + "<=? ";
 				}
 			}
-			insert+=")";
+			insert += ")";
 		}
 
 		insert += " ORDER BY reach DESC LIMIT ?";
@@ -51,7 +53,7 @@ public class GetPosts {
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 0;
 			int i = 0;
-			for (i = 1;value != null && i <= values.length; i++) {
+			for (i = 1; value != null && i <= values.length; i++) {
 
 				if (!values[i - 1].contains("-")) {
 					query1.setString(i + rangeindex, values[i - 1]);
@@ -69,7 +71,7 @@ public class GetPosts {
 
 			for (i = 0; rs.next(); i++) {
 				topid[i] = rs.getInt("id");
-				n_tops++; 
+				n_tops++;
 			}
 
 			insert = "Select name,influence,location,gender,age from authors where id in (Select authors_id from opinions where id = ?)";
@@ -138,49 +140,46 @@ public class GetPosts {
 		for (int i = 0; i < n_tops; i++) {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
-			try {
-				obj.put("Name", pre_results[0]);
-				obj.put("Influence",trunc(pre_results[1]));
-				obj.put("Location", pre_results[2]);
-				obj.put("Gender", pre_results[3]);
-				obj.put("Age", pre_results[4]);
-				obj.put("Date", pre_results[5]);
-				obj.put("Polarity", trunc(pre_results[6]));
-				obj.put("Reach", trunc(pre_results[7]));
-				obj.put("Comments", pre_results[8]);
-				obj.put("Message", pre_results[9]);
-				result.put(obj);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			obj.put("Name", pre_results[0]);
+			obj.put("Influence", trunc(pre_results[1]));
+			obj.put("Location", pre_results[2]);
+			obj.put("Gender", pre_results[3]);
+			obj.put("Age", pre_results[4]);
+			obj.put("Date", pre_results[5]);
+			obj.put("Polarity", trunc(pre_results[6]));
+			obj.put("Reach", trunc(pre_results[7]));
+			obj.put("Comments", pre_results[8]);
+			obj.put("Message", pre_results[9]);
+			result.put(obj);
+
 		}
 
 		return result;
 
 	}
 
-	private String trunc(String number){
-		double result=0;
+	private String trunc(String number) {
+		double result = 0;
 		try {
-			
-			result =  Double.valueOf(number);
+
+			result = Double.valueOf(number);
 			number = String.format("%.2f", result);
 			result = Double.parseDouble(number);
-			
+
 		} catch (Exception e) {
 			number = number.replaceAll(",", ".");
 			result = Double.parseDouble(number);
-			
+
 		}
 		System.out.println(result);
 		return Double.toString(result);
-		
+
 	}
+
 	private void dbconnect() {
 		try {
 			cnlocal = dbc.connlocal();
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

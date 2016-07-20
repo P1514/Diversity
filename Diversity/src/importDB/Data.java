@@ -44,6 +44,7 @@ public class Data {
 		rs = stmt.executeQuery(query);
 
 		List<Integer> users = new ArrayList<Integer>();
+		
 		while (rs.next()) {
 
 			int post_id = rs.getInt(dbc.rpost_id);

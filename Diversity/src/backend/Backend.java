@@ -19,8 +19,10 @@ public class Backend {
 		String param;
 		String values;
 		String tmp;
-
 		try {
+			param = (msg.has("Param")) ? msg.getString("Param") : null;
+			values = (msg.has("Values")) ? msg.getString("Values") : null;
+			
 			switch (op) {
 			case 1:
 				SentimentChart sc = new SentimentChart();
@@ -36,16 +38,10 @@ public class Backend {
 				return "LOADED SUCCESSFULLY";
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
-
-				param = (msg.has("param")) ? msg.getString("param") : null;
-				values = (msg.has("values")) ? msg.getString("values") : null;
 				tmp = gs.globalsentiment(1, 5, param, values).toString();
-				//System.out.println(tmp);
 				return tmp;
 			case 4:
 				GetPosts gp = new GetPosts();
-				param = (msg.has("param")) ? msg.getString("param") : null;
-				values = (msg.has("values")) ? msg.getString("values") : null;
 				tmp = gp.getTop(param, values).toString();
 				return tmp;
 			default:

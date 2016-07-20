@@ -41,13 +41,13 @@ public class Globalsentiment {
 			words = values.split(",");
 		} else {
 			words = new String[1];
-			words[0] = "sentiment";
+			words[0] = "Sentiment";
 		}
 
 		for (int i = start; i < timespan * 12 + start; i++) {
 			try {
 				obj = new JSONObject();
-				obj.put("month", time[i % 12]);
+				obj.put("Month", time[i % 12]);
 				for (int ii = 0; ii < words.length; ii++)
 					obj.put(words[ii], globalsentimentby(i, param, words[ii]));
 				result.put(obj);
@@ -143,13 +143,7 @@ public class Globalsentiment {
 
 	}
 
-	private void dbconnect() {
-		try {
+	private void dbconnect() throws ClassNotFoundException, SQLException{
 			cnlocal = dbc.connlocal();
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 }

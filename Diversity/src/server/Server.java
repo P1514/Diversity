@@ -13,6 +13,7 @@ import backend.Backend;
 
 @ServerEndpoint("/server")
 public class Server {
+	public static boolean isloading = false;
 
 	@OnMessage
 	public void receivedMessage(Session session, String msg, boolean last) {
@@ -24,36 +25,39 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Assistant assist = new Assistant(session, resolve);
-
-		assist.runn();
+		Assistant a = new Assistant(session, resolve);
+		Thread assist = new Thread(a);
+		assist.start();
 
 	}
-	 @OnClose
-	    public void onClose(Session session) {
-		 try {
+
+	@OnClose
+	public void onClose(Session session) {
+		try {
 			session.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-	    }
-	 @OnError
-	 public void onError(Session session, Throwable thr) {
-		 try {
-				session.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	 }
+	}
 
-	public class Assistant /* implements Runnable */ {
+	@OnError
+	public void onError(Session session, Throwable thr) {
+		try {
+			session.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public class Assistant  implements Runnable  {
 		private Session session;
 		private JSONObject msg;
 		private Operations op;
 		private Backend be;
+		private boolean isloading;
 
 		public Assistant(Session _session, JSONObject _msg) {
 			session = _session;
@@ -62,16 +66,31 @@ public class Server {
 		}
 
 		// @Override
-		public void runn() {
+		public void run() {
 
-			
-			
 			try {
 				if (session.isOpen()) {
 					try {
-						be = new Backend(op.getOP(msg.getString("op")), msg);
+						while (true) {
+							if (Server.isloading == true) {
+								if (op.getOP(msg.getString("Op")) == 2)
+									return;
+								Thread.sleep(1000);
+
+							}else{break;}
+						}
+						if (op.getOP(msg.getString("Op")) == 2) {
+							Server.isloading = true;
+							Thread.sleep(2000);
+						}
+						be = new Backend(op.getOP(msg.getString("Op")), msg);
+						if (op.getOP(msg.getString("Op")) == 2)
+							Server.isloading=false;
 						session.getBasicRemote().sendText(be.resolve());
 					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

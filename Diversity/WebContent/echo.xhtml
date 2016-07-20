@@ -102,12 +102,12 @@
                 var message3 = document.getElementById('message3').value;
                 if(message2!="null"){
                 var json = {
-                "op":message,
-				"param":message2,
-                "values":message3
+                "Op":message,
+				"Param":message2,
+                "Values":message3
                 }}else{
                 var json = {
-                "op":message}
+                "Op":message}
                 }
                 log('Sent: ' + JSON.stringify(json));
                 ws.send(JSON.stringify(json));

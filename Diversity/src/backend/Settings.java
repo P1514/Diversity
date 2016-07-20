@@ -8,7 +8,7 @@ import java.util.Date;
 import com.mysql.jdbc.Connection;
 
 public class Settings {
-	// To be replaced by properties file	
+	// To be replaced by properties file
 	public Date LastUpdated;
 	// Data Origin DB Specs
 	public String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
@@ -32,9 +32,9 @@ public class Settings {
 	public String uage = "age"; // Age
 	public String ugender = "gender"; // Gender
 	public String uloc = "location"; // Location
-	
-	//Posts Table
-	public String ptime="timestamp";
+
+	// Posts Table
+	public String ptime = "timestamp";
 
 	// Computing Variables
 	// Reach
@@ -45,28 +45,40 @@ public class Settings {
 	public double aWviews = 0.3333;
 	public double aWlikes = 0.3333;
 	public double aWcomments = 0.3334;
-	
+
 	// Local DB Specs
 	public String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public String user2 = "diversity";
 	public String pass2 = "diversity";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
-		
+
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, 2);
-		//DateFormat newDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-		this.LastUpdated=cal.getTime();
+		// DateFormat newDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+		this.LastUpdated = cal.getTime();
 		Class.forName("com.mysql.jdbc.Driver");
 		return (Connection) DriverManager.getConnection(url, user, pass);
 	}
-	
-	public Connection connlocal() throws ClassNotFoundException, SQLException {
+
+	public Connection connlocal() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
-		return (Connection) DriverManager.getConnection(url2, user2, pass2);
+		while (true) {
+			try {
+				return (Connection) DriverManager.getConnection(url2, user2, pass2);
+			} catch (SQLException e) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				e.printStackTrace();
+			}
+		}
 	}
-	
-	public void setLastUpdated(){
-		this.LastUpdated = Calendar.getInstance().getTime();		
+
+	public void setLastUpdated() {
+		this.LastUpdated = Calendar.getInstance().getTime();
 	}
 }
