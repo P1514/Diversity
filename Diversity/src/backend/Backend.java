@@ -1,6 +1,5 @@
 package backend;
 
-import java.sql.SQLException;
 import org.json.*;
 
 import importDB.Data;
@@ -29,16 +28,11 @@ public class Backend {
 				return sc.chartrequest(param,values).toString();
 			case 2:
 				Data dat = new Data();
-				try {
-					dat.load();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				return "LOADED SUCCESSFULLY";
+				return dat.load();
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
 				tmp = gs.globalsentiment(1, 5, param, values).toString();
+				System.out.println(tmp);
 				return tmp;
 			case 4:
 				GetPosts gp = new GetPosts();

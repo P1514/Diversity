@@ -80,6 +80,12 @@ public class Server {
 						}
 						if (op.getOP(msg.getString("Op")) == 2) {
 							Server.isloading = true;
+							JSONArray result = new JSONArray();
+							JSONObject obj = new JSONObject();
+							obj.put("Op", "Error");
+							obj.put("Message", "Close this Message and wait for the next one to confirm Database loading");
+							result.put(obj);
+							session.getBasicRemote().sendText(result.toString());
 							Thread.sleep(2000);
 						}
 						be = new Backend(op.getOP(msg.getString("Op")), msg);
