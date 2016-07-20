@@ -18,14 +18,18 @@
 	
 	ws.onopen = function () {
 		json = {
-            "op":"getposts",
+            "op":"table",
             }
+		json = {
+			"op":"graph",
+		}
         ws.send(JSON.stringify(json));
     };
 	 
 	ws.onmessage = function (event) {
 		json = JSON.parse(event.data);
 		
+		if(json.op == "table"){
 		//populate table
 		var tr;
         for (var i = 0; i < json.length; i++) {
@@ -42,121 +46,97 @@
 			tr.append("<td>" + json[i].Age + "</td>");
             $('#posts tbody').append(tr);
 			}
+		}
 	};
 	
-	
-	  
-    google.charts.load('current', {packages: ['corechart', 'bar']});
-	google.charts.setOnLoadCallback(drawChart);
-         
-	function drawChart() {
-         var data = new google.visualization.DataTable();
-         data.addColumn('string', 'Age Range');//0
-         data.addColumn('number', 'Male');//1
-         data.addColumn('number', 'Female');//2
-         data.addColumn('number', 'East');//3
-         data.addColumn('number', 'West');//4
-		 data.addColumn('number', 'Global');//5
-         
-         //dummy data
-         //dados reais a serem adicionadas posteriormente
-         data.addRows([
-         ['0-30', 20, 40, 55, 60, 70],
-         ['31-60', 40, 60, 70, 75, 80],
-         ['61+', 60, 65, 80, 85, 90]
-         ]);
-         
-		 //chart options
-		 var options = {
-			title: 'Average Sentiment',
-			colors : ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"],
-			hAxis: {
-				title: 'Age Range'
-			},
-			vAxis: {
-				title: 'Sentiment',
-				viewWindow : {
-					max : 0,
-					min : 100
-				}
-			}
-		};
-		 
-		//chart definition 
-		var chart = new google.visualization.ChartWrapper({
-          chartType: 'ColumnChart',
-          dataTable: data,
-          options: options,
-          containerId: 'chart_div'
-        });
-		        				
-		//draws chart
-		chart.draw();
-           
-		//gender filter
-		$(document).ready(function() {
-			$('#genderfilt').change(function() {
-			var x = document.getElementById("genderfilt").value;
-				if(x == 'All'){
-					chart.setView({'columns' : [0,1,2,3,4,5]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-				else if(x == 'Male'){
-					chart.setView({'columns' : [0,1]});
-					chart.setOption('colors', ["#00617F"]);
-				}
-				else if(x == 'Female'){
-					chart.setView({'columns' : [0,2]});
-					chart.setOption('colors', ["#0093C8"]);
-				}
-			chart.draw();
-			});
-		});
-		
-		//location filter
-		$(document).ready(function() {
-			$('#locationfilt').change(function() {
-			var x = document.getElementById("locationfilt").value;
-				if(x == 'All'){
-					chart.setView({'columns' : [0,1,2,3,4,5]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-				else if(x == 'East'){
-					chart.setView({'columns' : [0,3]});
-					chart.setOption('colors', ["#FA1414"]);
-				}
-				else if(x == 'West'){
-					chart.setView({'columns' : [0,4]});
-					chart.setOption('colors', ["#A60202"]);
-				}
-			chart.draw();
-			});
-		});
-		
-		//age filter
-		$(document).ready(function() {
-			$('#agefilt').change(function() {
-			var x = document.getElementById("agefilt").value;
-				if(x == 'All'){
-					chart.setView({'rows' : [0,1,2]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-				else if(x == '0-30'){
-					chart.setView({'rows' : [0]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-				else if(x == '31-60'){
-					chart.setView({'rows' : [1]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-				else if(x == '61-90'){
-					chart.setView({'rows' : [2]});
-					chart.setOption('colors', ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"]);
-				}
-			chart.draw();
-			});
-		});
-    }         
+google.charts.load('current', {packages: ['corechart', 'bar']});
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Age Range');//0
+  data.addColumn('number', 'Male');//1
+  data.addColumn('number', 'Female');//2
+  data.addColumn('number', 'East');//3
+  data.addColumn('number', 'West');//4
+  data.addColumn('number', 'Global');//5
+  
+  if(json.op == "graph"){
+	for (var i = 0; i < jsonData.length; i++) {
+		var counter = jsonData[i];
+		console.log(counter.Age + " " + counter.Male + " " + counter.Female + " " + counter.East + " " + counter.West + " " + counter.Global);
+		data.addRows([[counter.Age, counter.Male, counter.Female, counter.East, counter.West, counter.Global]]);
+	}
+  }
+
+  // chart colors
+  var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"];
+
+  //chart options
+  var options = {
+    title: 'Average Sentiment',
+    colors : colors,
+    hAxis: {
+        title: 'Age Range'
+    },
+    vAxis: {
+        title: 'Sentiment',
+        viewWindow : {
+            max : 0,
+            min : 100
+        }
+    }
+  };
+
+  //chart definition
+  var chart = new google.visualization.ChartWrapper({
+    chartType: 'ColumnChart',
+    dataTable: data,
+    options: options,
+    containerId: 'chart_div'
+  });
+
+  //draws chart
+  chart.draw();
+
+  $('#genderfilt').change(setColumnsRows);
+  $('#locationfilt').change(setColumnsRows);
+  $('#agefilt').change(setColumnsRows);
+
+  function setColumnsRows() {
+    var gender = document.getElementById("genderfilt").value;
+    var location = document.getElementById("locationfilt").value;
+    var age = document.getElementById("agefilt").value;
+
+    var rows = [];
+    for (var i = 0; i < data.getNumberOfRows(); i++) {
+      if ((data.getValue(i, 0) === age) || (age === 'All')) {
+        rows.push(i);
+      }
+    }
+
+    var columns = [0];
+    for (var i = 1; i <= 2; i++) {
+      if ((data.getColumnLabel(i) === gender) || (gender === 'All')) {
+        columns.push(i);
+      }
+    }
+    for (var i = 3; i < data.getNumberOfColumns(); i++) {
+      if ((data.getColumnLabel(i) === location) || (location === 'All')) {
+        columns.push(i);
+      }
+    }
+
+    var newColors = [];
+    for (var i = 1; i < columns.length; i++) {
+      newColors.push(colors[columns[i]]);
+    }
+
+    chart.setOption('colors', newColors);
+    chart.setView({'columns' : columns, 'rows' : rows});
+    chart.draw();
+  }
+}         
       </script>
       <style>
          table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
