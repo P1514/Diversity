@@ -44,6 +44,11 @@
 	ws.onmessage = function (event) {
 		json = JSON.parse(event.data);
 		console.log(json[0]);
+		
+		if(json[0].Op == "Error"){
+			alert(json[0].Message);
+		}
+		
 		if(json[0].Op == "table"){
 		//populate table
 		var tr;
