@@ -20,6 +20,7 @@
 	ws.onopen = function () {
 		json = {
             "Op":"chartrequest",
+			"Param":"Global",
             }
 		
         ws.send(JSON.stringify(json));
@@ -77,16 +78,22 @@ function drawChart() {
   data.addColumn('number', 'Female');//2
   data.addColumn('number', 'East');//3
   data.addColumn('number', 'West');//4
+  data.addColumn('number', 'Global');//5
   
   
 	for (var i = 1; i < jsonData.length; i++) {
 		var counter = jsonData[i];
 		console.log(counter.Age + " " + counter.Male + " " + counter.Female + " " + counter.East + " " + counter.West + " " + counter.Global);
-		data.addRows([[counter.Age, counter.Male, counter.Female, counter.East, counter.West]]);
+		data.setCell(i, 0, counter.Age);
+		data.setCell(i, 1, counter.Male);
+		data.setCell(i, 2, counter.Female);
+		data.setCell(i, 3, counter.East);
+		data.setCell(i, 4, counter.West);
+		data.setCell(i, 5, counter.Global);
 	}
 
   // chart colors
-  var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202"];
+  var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"];
 
   //chart options
   var options = {
@@ -115,14 +122,16 @@ function drawChart() {
   //draws chart
   chart.draw();
 
-  $('#genderfilt').change(setColumnsRows);
+ $('#genderfilt').change(setColumnsRows);
   $('#locationfilt').change(setColumnsRows);
   $('#agefilt').change(setColumnsRows);
+  $('input:radio[name=field]').change(setColumnsRows);
 
   function setColumnsRows() {
     var gender = document.getElementById("genderfilt").value;
     var location = document.getElementById("locationfilt").value;
     var age = document.getElementById("agefilt").value;
+    var segment = $('input:radio[name=field]:checked').val();
 
     var rows = [];
     for (var i = 0; i < data.getNumberOfRows(); i++) {
@@ -132,20 +141,27 @@ function drawChart() {
     }
 
     var columns = [0];
-    for (var i = 1; i <= 2; i++) {
-      if ((data.getColumnLabel(i) === gender) || (gender === 'All')) {
-        columns.push(i);
+    if ((segment === 'gender') || (segment === '')) {
+      for (var i = 1; i <= 2; i++) {
+        if ((data.getColumnLabel(i) === gender) || (gender === 'All')) {
+          columns.push(i);
+        }
       }
     }
-    for (var i = 3; i < data.getNumberOfColumns(); i++) {
-      if ((data.getColumnLabel(i) === location) || (location === 'All')) {
-        columns.push(i);
+    if ((segment === 'location') || (segment === '')) {
+      for (var i = 3; i <= 4; i++) {
+        if ((data.getColumnLabel(i) === location) || (location === 'All')) {
+          columns.push(i);
+        }
       }
+    }
+    if (segment === '') {
+      columns.push(5);
     }
 
     var newColors = [];
     for (var i = 1; i < columns.length; i++) {
-      newColors.push(colors[columns[i]]);
+      newColors.push(colors[columns[i - 1]]);
     }
 
     chart.setOption('colors', newColors);
@@ -153,6 +169,77 @@ function drawChart() {
     chart.draw();
   }
 }         
+
+function changeRequest(){
+    var gender = document.getElementById("genderfilt").value;
+    var location = document.getElementById("locationfilt").value;
+    var age = document.getElementById("agefilt").value;
+	
+	var params;
+	
+	if(gender = "All"){
+		json={
+			"Op":"getposts",
+			"Param":"Male, Female",
+		}
+	}
+	else if (gender = "Male"){
+		json={
+			"Op":"getposts",
+			"Param":"Male",
+		}
+	}
+	else if (gender = "Female"){
+		json={
+			"Op":"getposts",
+			"Param":"Female",
+		}
+	}
+	
+	if(location = "All"){
+		json={
+			"Op":"getposts",
+			"Param":"East, West",
+		}
+	}
+	else if(location = "East"){
+		json={
+			"Op":"getposts",
+			"Param":"East",
+		}
+	}
+	else if(location = "West"){
+		json={
+			"Op":"getposts",
+			"Param":"West",
+		}
+	}
+	
+	if(age == "All"){
+		json={
+			"Op":"getposts",
+			"Param":"0-30, 31-60, 61-90",
+		}
+	}
+	else if(age == "0-30"){
+		json={
+			"Op":"getposts",
+			"Param":"0-30",
+		}
+	}
+	else if(age == "31-60"){
+		json={
+			"Op":"getposts",
+			"Param":"31-60",
+		}
+	}
+	else if(age == "61-90"){
+		json={
+			"Op":"getposts",
+			"Param":"61-90",
+		}
+	}
+}
       </script>
       <style>
          table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after { 
@@ -173,6 +260,10 @@ function drawChart() {
 		#agefilt{
 			margin-left: 100px;
 		}
+		
+		#refresh{
+			margin-left: 100px;
+		}
       </style>
    </head>
    <body>
@@ -190,6 +281,15 @@ function drawChart() {
          <hr>
          <center>          
 			<table id="filters">
+				<tr>
+					<th>
+					<form id="names" align="left" name='test'>
+						<input type="radio" name="field" value="" checked>All
+						<input type="radio" name="field" value="gender" >Gender
+						<input type="radio" name="field" value="location">Location
+					</form>
+					</th>
+				</tr>
 				<tr>
 					<select id="genderfilt">
 						<option value="All">Choose Gender
@@ -211,6 +311,9 @@ function drawChart() {
 						<option value="31-60">31-60
 						<option value="61-90">61-90
 					</select>
+				</tr>
+				<tr>
+					<button class="btn btn-default" id="refresh" onclick="changeRequest()">Refresh</button>
 				</tr>
 			</table>
 			<div id="chart_div"></div>
