@@ -224,15 +224,6 @@
 				break;
         }
 	}
-	
-	function refreshDB(){
-		var json = {
-                "Op":"load",
-                }
-                ws.send(JSON.stringify(json));
-    };
-	
-	
 </script>
 
 
@@ -293,11 +284,6 @@ input[type=radio] {
 	<div id='chart_div'></div>
 
 	<table id="buttons">
-	<td>
-		<form>
-			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="refreshDB()">
-		</form>
-	</td>
 	<td>
 		<form action="index.html">
 			<input id="back" class="btn btn-default" type="submit" value="Back"/>

@@ -8,6 +8,14 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script>
+  function refreshDB(){
+		var json = {
+              "Op":"load",
+              }
+              ws.send(JSON.stringify(json));
+  };
+  </script>
   <style>
 	#pss{
 		margin-top: 150px;
@@ -22,6 +30,11 @@
 	}
 	
 	#global{
+		display:inline-block;
+		margin-left:100px;
+	}
+	
+	#refresh{
 		display:inline-block;
 		margin-left:100px;
 	}
@@ -56,6 +69,11 @@
 	<td>
 		<form action="global_sentiment_page.html">
 			<input id="global" class="btn btn-default" type="submit" value="Get Global Sentiment"/>
+		</form>
+	</td>
+	<td>
+		<form>
+			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="refreshDB()">
 		</form>
 	</td>
 </table>
