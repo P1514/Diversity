@@ -15,21 +15,28 @@
       <script type="text/javascript">
 	var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
 	var json;
+	var jsonData;
 	
 	ws.onopen = function () {
 		json = {
-            "op":"table",
+            "Op":"chartrequest",
             }
-		json = {
-			"op":"graph",
-		}
+		
         ws.send(JSON.stringify(json));
+		
+		/*json = {
+	            "Op":"getposts",
+	            "Param":"gender,gender,age"
+	            "Values":"female,male,0-30"
+	            }
+			
+	        ws.send(JSON.stringify(json));*/
     };
 	 
 	ws.onmessage = function (event) {
 		json = JSON.parse(event.data);
-		
-		if(json.op == "table"){
+		console.log(json[0]);
+		if(json[0].Op == "table"){
 		//populate table
 		var tr;
         for (var i = 0; i < json.length; i++) {
@@ -47,6 +54,10 @@
             $('#posts tbody').append(tr);
 			}
 		}
+		if(json[0].Op == "graph"){
+        	jsonData = json;
+        }
+        	drawChart();
 	};
 	
 google.charts.load('current', {packages: ['corechart', 'bar']});
@@ -61,13 +72,12 @@ function drawChart() {
   data.addColumn('number', 'West');//4
   data.addColumn('number', 'Global');//5
   
-  if(json.op == "graph"){
+  
 	for (var i = 0; i < jsonData.length; i++) {
 		var counter = jsonData[i];
 		console.log(counter.Age + " " + counter.Male + " " + counter.Female + " " + counter.East + " " + counter.West + " " + counter.Global);
 		data.addRows([[counter.Age, counter.Male, counter.Female, counter.East, counter.West, counter.Global]]);
 	}
-  }
 
   // chart colors
   var colors = ["#00617F", "#0093C8", "#FA1414", "#A60202", "#000000"];
