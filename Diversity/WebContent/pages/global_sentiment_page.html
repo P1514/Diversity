@@ -22,8 +22,8 @@
     ws.onmessage = function (event) {
 				jsonData = JSON.parse(event.data);
 				
-				if(json[0].Op == "Error"){
-					alert(json[0].Message);
+				if(jsonData[0].Op == "Error"){
+					alert(jsonData[0].Message);
 				}
 
 				switch(document.test.field.value){

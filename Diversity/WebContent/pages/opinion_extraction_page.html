@@ -20,7 +20,8 @@
 	ws.onopen = function () {
 		json = {
             "Op":"chartrequest",
-			"Param":"Global",
+			/*"Param":"Age,Male,Female",
+			"Value":"0-30, 50, 50",*/
             }
 		
         ws.send(JSON.stringify(json));
