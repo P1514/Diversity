@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Influence and Reach Page
 - Filters on Tables
 
-## [1.0.3] 2016-07-2016-07-18
+## [1.0.3] 2016-07-18
 ### Added
 - Multi-Threading
 - Sentiment Graph and Table

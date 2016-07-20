@@ -14,7 +14,7 @@
   
 	ws.onopen = function () {
 		var json = {
-                "op":"globalsentiment",
+                "Op":"globalsentiment",
                 }
                 ws.send(JSON.stringify(json));
             };
@@ -184,7 +184,7 @@
 		
             case "Global":
 				var json = {
-					"op":"globalsentiment",
+					"Op":"globalsentiment",
 				}
                 ws.send(JSON.stringify(json));
        			break;
@@ -192,9 +192,9 @@
             case "Gender":
 
 				var json = {
-					"op":"globalsentiment",
-					"param":"gender",
-					"values":"Male,Female",
+					"Op":"globalsentiment",
+					"Param":"gender",
+					"Values":"Male,Female",
 				}
                 ws.send(JSON.stringify(json));
 				break;
@@ -202,9 +202,9 @@
             case "Location":
 
 				var json = {
-					"op":"globalsentiment",
-					"param":"location",
-					"values":"East,West",
+					"Op":"globalsentiment",
+					"Param":"location",
+					"Values":"East,West",
 				}
                 ws.send(JSON.stringify(json));	
 				break;
@@ -212,9 +212,9 @@
 			case "Age":
 
 				var json = {
-					"op":"globalsentiment",
-					"param":"age",
-					"values":"0-30,31-60,61-90"
+					"Op":"globalsentiment",
+					"Param":"age",
+					"Values":"0-30,31-60,61-90"
 				}
                 ws.send(JSON.stringify(json));	
 				break;
@@ -223,7 +223,7 @@
 	
 	function refreshDB(){
 		var json = {
-                "op":"load",
+                "Op":"load",
                 }
                 ws.send(JSON.stringify(json));
     };

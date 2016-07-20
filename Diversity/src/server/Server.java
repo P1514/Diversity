@@ -57,7 +57,6 @@ public class Server {
 		private JSONObject msg;
 		private Operations op;
 		private Backend be;
-		private boolean isloading;
 
 		public Assistant(Session _session, JSONObject _msg) {
 			session = _session;

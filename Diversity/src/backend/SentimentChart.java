@@ -18,34 +18,83 @@ public class SentimentChart {
 
 	}
 
-	public JSONArray chartrequest() {
+	public JSONArray chartrequest(String param, String value) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		String[] params = (param != null) ? param.split(",") : null;
+		String[] values = (value != null) ? value.split(",") : null;
+		String[] agerange = new String[3];
+		String[] locs = new String[3];
+		String[] genders = new String[3];
+		String[] outparams = new String[4];
+		int nages = 0, ngenders = 0, nlocs = 0;
+		for (int i = 0; i < params.length; i++) {
+
+			if (params[i].contains("Age")) {
+				agerange[nages] = values[i];
+				nages++;
+				continue;
+			}
+			if (params[i].contains("Gender")) {
+				genders[ngenders] = values[i];
+				ngenders++;
+				continue;
+			}
+			if (params[i].contains("Location")) {
+				locs[nlocs] = values[i];
+				nlocs++;
+				continue;
+			}
+		}
+
+		if (nlocs == 1 && ngenders == 2) {
+			outparams[0] = "Male";
+			outparams[1] = "Female";
+		} else {
+			if (nlocs == 2 && ngenders == 1) {
+				outparams[0] = "East";
+				outparams[1] = "West";
+			} else {
+				if (nlocs == 1 && ngenders == 1) {
+					outparams[0] = "Sentiment";
+				} else {
+					outparams[0] = "Global";
+
+				}
+			}
+		}
 
 		try {
 			obj.put("Op", "graph");
 			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Age", "0-30");
-			obj.put("Male", sentimentby(0, 30, "GENDER", "MALE"));
-			obj.put("Female", sentimentby(0, 30, "GENDER", "FEMALE"));
-			obj.put("East", sentimentby(0, 30, "LOCATION", "EAST"));
-			obj.put("West", sentimentby(0, 30, "LOCATION", "WEST"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Age", "31-60");
-			obj.put("Male", sentimentby(30, 60, "GENDER", "MALE"));
-			obj.put("Female", sentimentby(30, 60, "GENDER", "FEMALE"));
-			obj.put("East", sentimentby(30, 60, "LOCATION", "EAST"));
-			obj.put("West", sentimentby(30, 60, "LOCATION", "WEST"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Age", "61-90");
-			obj.put("Male", sentimentby(60, 90, "GENDER", "MALE"));
-			obj.put("Female", sentimentby(60, 90, "GENDER", "FEMALE"));
-			obj.put("East", sentimentby(60, 90, "LOCATION", "EAST"));
-			obj.put("West", sentimentby(60, 90, "LOCATION", "WEST"));
-			result.put(obj);
+
+			if (params[0].contains("Global")) {
+				agerange[0] = "0-30";
+				agerange[1] = "31-60";
+				agerange[2] = "61-90";
+				nages = 3;
+				ngenders = 1;
+				nlocs = 1;
+				genders[0] = null;
+				locs[0] = null;
+			}
+
+			for (int age = 0; age < nages; age++) {
+
+				int temp = 0;
+				for (int gender = 0; gender < ngenders; gender++) {
+					for (int loc = 0; loc < nlocs; loc++) {
+						obj = new JSONObject();
+						obj.put("Age", agerange[age]);
+						obj.put("Param", outparams[temp]);
+						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc]));
+						result.put(obj);
+						System.out.println(temp + " " + obj + "\r\n");
+						temp++;
+
+					}
+				}
+			}
 			System.out.println(result);
 			return result;
 		} catch (JSONException e) {
@@ -56,14 +105,17 @@ public class SentimentChart {
 
 	}
 
-	private double sentimentby(int minage, int maxage, String param, String value) {
+	private double sentimentby(String age, String gender, String location) {
+		String[] agerange = age.split("-");
+		int minage = Integer.parseInt(agerange[0]);
+		int maxage = Integer.parseInt(agerange[1]);
 		double result = (double) 0;
 		String insert;
-		if (param != "null") {
-			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE > ? AND AGE < ? AND "
-					+ param + "=?))";
+		if (gender != null) {
+			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE >= ? AND AGE <= ? AND"
+					+ " GENDER = ? AND LOCATION = ?))";
 		} else {
-			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE > ? AND AGE < ?";
+			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE >= ? AND AGE <= ?))";
 		}
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
@@ -74,8 +126,11 @@ public class SentimentChart {
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
-			if (param != "null")
-				query1.setString(3, value);
+			if (gender != null) {
+				query1.setString(3, gender);
+				query1.setString(4, location);
+			}
+			System.out.println(query1);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {

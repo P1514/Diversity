@@ -26,7 +26,7 @@ public class Backend {
 			switch (op) {
 			case 1:
 				SentimentChart sc = new SentimentChart();
-				return sc.chartrequest().toString();
+				return sc.chartrequest(param,values).toString();
 			case 2:
 				Data dat = new Data();
 				try {
