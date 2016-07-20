@@ -89,10 +89,10 @@
 			function drawChart() {
 				var data = new google.visualization.DataTable();
 				data.addColumn('string', 'Age Range');//0
-				data.addColumn('number', 'Male');//1
-				data.addColumn('number', 'Female');//2
-				data.addColumn('number', 'East');//3
-				data.addColumn('number', 'West');//4
+				//data.addColumn('number', 'Male');//1
+				//data.addColumn('number', 'Female');//2
+				//data.addColumn('number', 'East');//3
+				//data.addColumn('number', 'West');//4
 				data.addColumn('number', 'Global');//5
 				
 				for(var i = 0; i<3; i++)data.addRow();
@@ -115,7 +115,7 @@
 					// counter.Global == counter["Global"];
 					for (; (j < (jsonData.length)) && (jsonData[j].Age == age); j++) {
 						if (counter.Param == "Global")	
-							data.setCell(i, 5, counter.Value);
+							data.setCell(i, 1, counter.Value);
 					}
 				}
 				console.log(data);

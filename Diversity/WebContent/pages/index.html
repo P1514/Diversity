@@ -9,11 +9,17 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
+  var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
   function refreshDB(){
 		var json = {
               "Op":"load",
               }
-              ws.send(JSON.stringify(json));
+		
+		if(json[0].Op == "Error"){
+			alert(json[0].Message);
+		}
+		
+        ws.send(JSON.stringify(json));
   };
   </script>
   <style>
