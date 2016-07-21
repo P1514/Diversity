@@ -13,6 +13,7 @@
   var json; 
   
   ws.onmessage = function (event) {
+	  json = JSON.parse(event.data);
 		
 		if(json[0].Op == "Error"){
 			alert(json[0].Message);

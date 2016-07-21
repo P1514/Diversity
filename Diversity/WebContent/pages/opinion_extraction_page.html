@@ -88,25 +88,35 @@
 
 			function drawChart() {
 				var data = new google.visualization.DataTable();
-				for(var i=2;jsonData[i].Age==jsonData[i-1].Age;i++);
-				var paramcount=i-1;
-				
+
+				// Code to convert JSON to chart data
+				for (var i = 2;	(i < jsonData.length) && 
+								(jsonData[i].Age == jsonData[i - 1].Age);i++) console.log("HELLO");
+				var paramcount = i - 1;
 				data.addColumn('string', 'Age Range');// Adds Age to X axis
-				
-				for(var i=1;i<=paramcount;i++){
+
+				for (var i = 1; i <= paramcount; i++) {
+					console.log(jsonData[i].Param);
 					data.addColumn('number', jsonData[i].Param); // Adds all parameters that come from server
 				}
-				var j=1;
-				for(var i=0;j<jsonData.length;i++){
-					data.addRow();
-					data.setCell(i,0, jsonData[j].Age);
-					for(var ii=1;ii<=paramcount;ii++){
-						data.setCell(i,ii, jsonData[j].Value);
+				var j = 1;
+				var row_count=0;
+				data.addRow();
+				data.setCell(0, 0, jsonData[j].Age);
+				row_count++;
+				for (var i = 1; j < jsonData.length; i++) {
+					if(data.getValue(row_count-1, 0) != jsonData[i].Age){
+						data.addRow();
+						data.setCell(row_count,0,jsonData[i].Age);
+						row_count++;
+					}
+					
+					for (var ii = 1; ii <= paramcount; ii++) {
+						data.setCell(row_count-1, ii, jsonData[j].Value);
 						j++;
 					}
 				}
-
-				console.log(data);
+				// End of it
 
 				// chart colors
 				var colors = [ "#00617F", "#0093C8", "#FA1414", "#A60202",
@@ -139,12 +149,13 @@
 				//draws chart
 				chart.draw();
 
+				/*
 				$('#genderfilt').change(setColumnsRows);
 				$('#locationfilt').change(setColumnsRows);
 				$('#agefilt').change(setColumnsRows);
 				$('input:radio[name=field]').change(setColumnsRows);
 
-				function setColumnsRows() {
+				function setColumnsRows() { Not needed
 					var gender = document.getElementById("genderfilt").value;
 					var location = document.getElementById("locationfilt").value;
 					var age = document.getElementById("agefilt").value;
@@ -189,7 +200,7 @@
 						'rows' : rows
 					});
 					chart.draw();
-				}
+				}*/
 			}
 
 			function changeRequest() {
@@ -206,33 +217,33 @@
 				if (gender == "All" && location == "All" && age == "All") {
 					json.Param += "Global";
 				} else {
-					if (gender == "Male" || gender =="All") {
+					if (gender == "Male" || gender == "All") {
 						json.Param += "Gender,";
 						json.Values += "Male,";
 					}
-					if (gender == "Female" || gender =="All") {
+					if (gender == "Female" || gender == "All") {
 						json.Param += "Gender,";
 						json.Values += "Female,";
 					}
 
-					if (location == "East" || location =="All") {
+					if (location == "East" || location == "All") {
 						json.Param += "Location,";
 						json.Values += "East,";
 					}
-					if (location == "West" || location =="All") {
+					if (location == "West" || location == "All") {
 						json.Param += "Location,";
 						json.Values += "West,";
 					}
 
-					if (age == "0-30" || age =="All") {
+					if (age == "0-30" || age == "All") {
 						json.Param += "Age,";
 						json.Values += "0-30,";
 					}
-					if (age == "31-60" || age =="All") {
+					if (age == "31-60" || age == "All") {
 						json.Param += "Age,";
 						json.Values += "31-60,";
 					}
-					if (age == "61-90" || age =="All") {
+					if (age == "61-90" || age == "All") {
 						json.Param += "Age,";
 						json.Values += "61-90,";
 					}
@@ -283,29 +294,29 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 				<tr>
 					<th>
 						<form id="names" align="left" name='test'>
-							<input type="radio" name="field" value="" checked>All <input
-								type="radio" name="field" value="gender">Gender <input
-									type="radio" name="field" value="location">Location 
+							<input type="radio" name="field" value="Global" checked>All
+								<input type="radio" name="field" value="Gender">Gender <input
+									type="radio" name="field" value="Location">Location 
 						</form>
 					</th>
 				</tr>
 				<tr>
 					<select id="genderfilt">
-						<option value="All">Choose Gender
+						<option value="All">All Genders
 							<option value="Male">Male
 								<option value="Female">Female
 					</select>
 				</tr>
 				<tr>
 					<select id="locationfilt">
-						<option value="All">Choose Location
+						<option value="All">All Locations
 							<option value="East">East
 								<option value="West">West
 					</select>
 				</tr>
 				<tr>
 					<select id="agefilt">
-						<option value="All">Choose Age Range
+						<option value="All">All Ages
 							<option value="0-30">0-30
 								<option value="31-60">31-60
 									<option value="61-90">61-90

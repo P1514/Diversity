@@ -95,13 +95,7 @@ public class Opinion {
 	}
 	
 	public ArrayList<Post> getPosts(){
-		ArrayList<Post> output = comments;
-		output.add(main);
-		return output;
-	}
-	//TODO FIX THIS ERROR
-	// Description: TOP ONE adds main TWICE because it's called twice
-	public ArrayList<Post> getPosts2(){
+		if(!comments.contains(this.main))comments.add(this.main);
 		return comments;
 	}
 }

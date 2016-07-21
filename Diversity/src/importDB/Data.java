@@ -42,7 +42,6 @@ public class Data {
 		try {
 			cnlocal = dbc.connlocal();
 			query = "DELETE from posts";
-
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
@@ -262,7 +261,7 @@ public class Data {
 				System.out.println(query1);
 				query1.executeUpdate();
 
-				opinion.getPosts2().forEach((post) -> {
+				opinion.getPosts().forEach((post) -> {
 					PreparedStatement query2 = null;
 					try {
 						String update1 = "INSERT INTO posts " + "Values (?,?,?,?,?)";
