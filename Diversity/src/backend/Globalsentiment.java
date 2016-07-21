@@ -19,7 +19,7 @@ public class Globalsentiment {
 	public Globalsentiment() {
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, int start /* month */, String param, String values) {
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values) {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		String[] words;
@@ -43,13 +43,17 @@ public class Globalsentiment {
 			words = new String[1];
 			words[0] = "Sentiment";
 		}
+		
+		Calendar data = Calendar.getInstance();
+		data.add(Calendar.YEAR, -1);
+		
 
-		for (int i = start; i < timespan * 12 + start; i++) {
+		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			try {
 				obj = new JSONObject();
-				obj.put("Month", time[i % 12]);
+				obj.put("Month", time[month % 12]);
 				for (int ii = 0; ii < words.length; ii++)
-					obj.put(words[ii], globalsentimentby(i, param, words[ii]));
+					obj.put(words[ii], globalsentimentby(month%12,data.get(Calendar.YEAR)+month/12, param, words[ii]));
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -61,7 +65,7 @@ public class Globalsentiment {
 		return result;
 	}
 
-	private double globalsentimentby(int month, String param, String value) {
+	private double globalsentimentby(int month, int year, String param, String value) {
 
 		double result = (double) 0;
 		String insert;
@@ -82,9 +86,7 @@ public class Globalsentiment {
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		month -= 1;
-		int year = month / 12;
-		month = month % 12;
-		Calendar data = new GregorianCalendar(2016 + year, month, 1);
+		Calendar data = new GregorianCalendar(year, month, 1);
 		double totalreach = 0;
 		try {
 			dbconnect();

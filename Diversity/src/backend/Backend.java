@@ -31,7 +31,7 @@ public class Backend {
 				return dat.load();
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
-				tmp = gs.globalsentiment(1, 5, param, values).toString();
+				tmp = gs.globalsentiment(1, param, values).toString();
 				System.out.println(tmp);
 				return tmp;
 			case 4:
