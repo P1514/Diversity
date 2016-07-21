@@ -17,7 +17,6 @@ public class Operations {
 	}
 
 	public int getOP(String msg){
-		System.out.println(msg);
 		if(op.containsKey(msg))
 		return op.get(msg);
 		return 0;

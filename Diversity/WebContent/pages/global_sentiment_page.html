@@ -1,234 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Global Sentiment</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-  var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
-  var jsonData;
-  
-	ws.onopen = function () {
-		var json = {
-                "Op":"globalsentiment",
-                }
-                ws.send(JSON.stringify(json));
-            };
-			
-    ws.onmessage = function (event) {
-				jsonData = JSON.parse(event.data);
-				
-				if(jsonData[0].Op == "Error"){
-					alert(jsonData[0].Message);
-				}
+<title>Global Sentiment</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+	var ws;
+	var jsonData;
+	function connect() {
+		ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+		ws.onopen = function() {
+			var json = {
+				"Op" : "globalsentiment",
+			}
+			ws.send(JSON.stringify(json));
+		};
 
-				switch(document.test.field.value){
-		
-					case "Global":
-					drawGlobal();
-					break;
-					
-					case "Gender":
-					drawBasic();
-					break;
-					
-					case "Location":
-					drawBasic2();
-					break;
-					
-					case "Age":
-					drawBasic3();
-					break;
-					}
-				};
-				
-	google.charts.load('current', {packages: ['corechart', 'bar']});
-	google.charts.setOnLoadCallback(checkValue);
-	
+		ws.onmessage = function(event) {
+			jsonData = JSON.parse(event.data);
+
+			if (jsonData[0].Op == "Error") {
+				alert(jsonData[0].Message);
+			}
+			drawGlobal();
+		};
+	}
+
+	google.charts.load('current', {
+		packages : [ 'corechart', 'bar' ]
+	});
+	google.charts.setOnLoadCallback(connect);
+
 	var globaldata;
 
 	//global sentiment graph
-    function drawGlobal() {
+	function drawGlobal() {
 
-    globaldata = new google.visualization.DataTable();
-	globaldata.addColumn('string', 'Month');
-	globaldata.addColumn('number', 'Global');	  
-	  				
-	for (var i = 0; i < jsonData.length; i++) {
-		var counter = jsonData[i];
-		console.log(counter.Month + " " + counter.Sentiment);
-		globaldata.addRows([[counter.Month, counter.Sentiment]]);
-	}
+		globaldata = new google.visualization.DataTable();
+		globaldata.addColumn('string', 'Month');
+		globaldata.addColumn('number', 'Global');
 
-      var options = {
-        title: 'Average Global Sentiment Over Time',
-		colors : [ '#000000' ],
-		hAxis: {
-			title: 'Month'
-		},
-        vAxis: {
-          title: 'Sentiment',
-		  viewWindow : {
+		for (var i = 0; i < jsonData.length; i++) {
+			var counter = jsonData[i];
+			console.log(counter.Month + " " + counter.Sentiment);
+			globaldata.addRows([ [ counter.Month, counter.Sentiment ] ]);
+		}
+
+		var options = {
+			title : 'Average Global Sentiment Over Time',
+			colors : [ '#000000' ],
+			hAxis : {
+				title : 'Month'
+			},
+			vAxis : {
+				title : 'Sentiment',
+				viewWindow : {
 					max : 0,
 					min : 100
 				}
-        },
-		width: '100%',
-		height: '100%'
-      };
+			},
+			width : '100%',
+			height : '100%'
+		};
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
 
-      chart.draw(globaldata, options);
-    }
-
-	//sentiment over time according to gender graph
-    function drawBasic() {
-
-	  var data = globaldata.clone();
-      data.addColumn('number', 'Male');
-      data.addColumn('number', 'Female');
-	  
-	  for (var i = 0; i < jsonData.length; i++) {
-		var counter = jsonData[i];
-		console.log(counter.month + " " + counter.Male + " " + counter.Female + " " + counter.sentiment);
-		data.setCell(i,2, counter.Male);
-		data.setCell(i,3, counter.Female);
+		chart.draw(globaldata, options);
 	}
 
-      var options = {
-		title: 'Average Sentiment Over Time By Gender',
-        hAxis: {
-          title: 'Month'
-        },
-        vAxis: {
-          title: 'Sentiment'
-        },
-		colors: ['#000000', '#00617F', '#0093C8'],
-		width: '100%',
-		height: '100%'
-      };
+	//sentiment over time according to gender graph
+	function drawBasic() {
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
-	
+		var data = globaldata.clone();
+		data.addColumn('number', 'Male');
+		data.addColumn('number', 'Female');
+
+		for (var i = 0; i < jsonData.length; i++) {
+			var counter = jsonData[i];
+			console.log(counter.month + " " + counter.Male + " "
+					+ counter.Female + " " + counter.sentiment);
+			data.setCell(i, 2, counter.Male);
+			data.setCell(i, 3, counter.Female);
+		}
+
+		var options = {
+			title : 'Average Sentiment Over Time By Gender',
+			hAxis : {
+				title : 'Month'
+			},
+			vAxis : {
+				title : 'Sentiment'
+			},
+			colors : [ '#000000', '#00617F', '#0093C8' ],
+			width : '100%',
+			height : '100%'
+		};
+
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
+		chart.draw(data, options);
+	}
+
 	//sentiment over time according to location graph
 	function drawBasic2() {
 
-      var data = globaldata.clone();
-      data.addColumn('number', 'East');
-      data.addColumn('number', 'West');
-	  
-	  for (var i = 0; i < jsonData.length; i++) {
-		var counter = jsonData[i];
-		console.log(counter.month + " " + counter.East + " " + counter.West + " " + counter.sentiment);
-		data.setCell(i,2, counter.East);
-		data.setCell(i,3, counter.West);
+		var data = globaldata.clone();
+		data.addColumn('number', 'East');
+		data.addColumn('number', 'West');
+
+		for (var i = 0; i < jsonData.length; i++) {
+			var counter = jsonData[i];
+			console.log(counter.month + " " + counter.East + " " + counter.West
+					+ " " + counter.sentiment);
+			data.setCell(i, 2, counter.East);
+			data.setCell(i, 3, counter.West);
+		}
+
+		var options = {
+			title : 'Average Sentiment Over Time By Location',
+			hAxis : {
+				title : 'Month'
+			},
+			vAxis : {
+				title : 'Sentiment'
+			},
+			colors : [ '#000000', '#FA1414', '#A60202' ],
+			width : '100%',
+			height : '100%'
+		};
+
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
+		chart.draw(data, options);
 	}
 
-      var options = {
-		title: 'Average Sentiment Over Time By Location',
-        hAxis: {
-          title: 'Month'
-        },
-        vAxis: {
-          title: 'Sentiment'
-        },
-		colors: ['#000000', '#FA1414', '#A60202'],
-		width: '100%',
-		height: '100%'
-      };
-
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
-	
 	//sentiment over time according to age ranges chart
-	function drawBasic3(){
-	
-	  var data = globaldata.clone();
-      data.addColumn('number', '0-30');
-      data.addColumn('number', '31-60');
-	  data.addColumn('number', '61-90');
+	function drawBasic3() {
 
-	  
-	  for (var i = 0; i < jsonData.length; i++) {
-		var counter = jsonData[i];
-		console.log(counter.month + " " + counter.sentiment);
-		data.setCell(i,2, counter["0-30"]);
-		data.setCell(i,3, counter["31-60"]);
-		data.setCell(i,4, counter["61-90"]);
+		var data = globaldata.clone();
+		data.addColumn('number', '0-30');
+		data.addColumn('number', '31-60');
+		data.addColumn('number', '61-90');
+
+		for (var i = 0; i < jsonData.length; i++) {
+			var counter = jsonData[i];
+			console.log(counter.month + " " + counter.sentiment);
+			data.setCell(i, 2, counter["0-30"]);
+			data.setCell(i, 3, counter["31-60"]);
+			data.setCell(i, 4, counter["61-90"]);
+		}
+
+		var options = {
+			title : 'Average Sentiment Over Time By Age Range',
+			hAxis : {
+				title : 'Month'
+			},
+			vAxis : {
+				title : 'Sentiment'
+			},
+			colors : [ '#000000', '#BFD730', '#8CA122', '#5C6E0E' ],
+			width : '100%',
+			height : '100%'
+		};
+
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
+		chart.draw(data, options);
 	}
 
-      var options = {
-		title: 'Average Sentiment Over Time By Age Range',
-        hAxis: {
-          title: 'Month'
-        },
-        vAxis: {
-          title: 'Sentiment'
-        },
-		colors: ['#000000', '#BFD730', '#8CA122', '#5C6E0E'],
-		width: '100%',
-		height: '100%'
-      };
-
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-	}
-	
 	//draws chart according to selected radio button
-	function checkValue(){
-        switch(document.test.field.value){
-		
-            case "Global":
-				var json = {
-					"Op":"globalsentiment",
-				}
-                ws.send(JSON.stringify(json));
-       			break;
+	function checkValue() {
+		switch (document.test.field.value) {
 
-            case "Gender":
+		case "Global":
+			var json = {
+				"Op" : "globalsentiment",
+			}
+			ws.send(JSON.stringify(json));
+			break;
 
-				var json = {
-					"Op":"globalsentiment",
-					"Param":"gender",
-					"Values":"Male,Female",
-				}
-                ws.send(JSON.stringify(json));
-				break;
+		case "Gender":
 
-            case "Location":
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "gender",
+				"Values" : "Male,Female",
+			}
+			ws.send(JSON.stringify(json));
+			break;
 
-				var json = {
-					"Op":"globalsentiment",
-					"Param":"location",
-					"Values":"East,West",
-				}
-                ws.send(JSON.stringify(json));	
-				break;
+		case "Location":
 
-			case "Age":
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "location",
+				"Values" : "East,West",
+			}
+			ws.send(JSON.stringify(json));
+			break;
 
-				var json = {
-					"Op":"globalsentiment",
-					"Param":"age",
-					"Values":"0-30,31-60,61-90"
-				}
-                ws.send(JSON.stringify(json));	
-				break;
-        }
+		case "Age":
+
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "age",
+				"Values" : "0-30,31-60,61-90"
+			}
+			ws.send(JSON.stringify(json));
+			break;
+		}
 	}
 </script>
 
 
 <style>
-#global{
+#global {
 	width: 88.5%;
 	max-width: 900px;
 	height: 88.5%;
@@ -243,54 +238,53 @@
 
 input[type=radio] {
 	margin-top: 5%;
-    margin-left: 5%;
+	margin-left: 5%;
 }
 
-#chart_div{
+#chart_div {
 	margin-top: 5%;
 }
 
-#buttons{
-		margin-top: 150px;
+#buttons {
+	margin-top: 150px;
 }
 
-#refresh{
-		display:inline-block;
-	}
-	
-#back{
-		display:inline-block;
-		margin-left:100px;
+#refresh {
+	display: inline-block;
+}
+
+#back {
+	display: inline-block;
+	margin-left: 100px;
 }
 </style>
 </head>
 
 <body>
-<!-- Diversity Logo-->
-<center><a href="index.html">
-		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
-</a>
-<!-- Charts -->
-<div id="global" class = "container">
-	<h2 align="left">Global Sentiment</h2>
-	
-	<form align="left" name='test'>
-		<input type="radio" name="field" value="Global" onChange="checkValue()" checked>Global 
-		<input type="radio" name="field" value="Gender" onChange="checkValue()">Gender 
-		<input type="radio" name="field" value="Location" onChange="checkValue()">Location
-		<input type="radio" name="field" value="Age" onChange="checkValue()">Age Range		
-	</form>
-		
-	<div id='chart_div'></div>
+	<!-- Diversity Logo-->
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+		<!-- Charts -->
+		<div id="global" class="container">
+			<h2 align="left">Global Sentiment</h2>
 
-	<table id="buttons">
-	<td>
-		<form action="index.html">
-			<input id="back" class="btn btn-default" type="submit" value="Back"/>
-		</form>
-	</td>
-	</table>
-	
-</div>
-</center>      
+			<form align="left" name='test'>
+				<!-- <input type="radio" name="field" value="Global"
+					onChange="checkValue()" checked>Global <!--  <input type="radio"
+					name="field" value="Gender" onChange="checkValue()">Gender
+				<input type="radio" name="field" value="Location"
+					onChange="checkValue()">Location <input type="radio"
+					name="field" value="Age" onChange="checkValue()">Age Range-->
+			</form>
+
+			<div id='chart_div'></div>
+	</center>
+
+	</div>
+	<form action="index.html">
+		<center>
+			<input id="back" class="btn btn-default" type="submit" value="Back" />
+		</center>
+	</form>
 </body>

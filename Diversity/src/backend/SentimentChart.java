@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,20 +45,60 @@ public class SentimentChart {
 				continue;
 			}
 		}
-
-		if (nlocs == 1 && ngenders == 2) {
+		// TODO find a cleaner way to process ALL this this Class need an Overhaul
+		// OVERHAUL java needs a OVERHAUL tag
+		if (nlocs == 2 && ngenders == 2) {
 			outparams[0] = "Male";
 			outparams[1] = "Female";
-		} else {
-			if (nlocs == 2 && ngenders == 1) {
-				outparams[0] = "East";
-				outparams[1] = "West";
-			} else {
-				if (nlocs == 1 && ngenders == 1) {
-					outparams[0] = "Sentiment";
-				} else {
-					outparams[0] = "Global";
+			outparams[2] = "East";
+			outparams[3] = "West";
+			try {
+				obj = new JSONObject();
+				obj.put("Op", "graph");
+				result.put(obj);
 
+				int temp = 0;
+				for (int gender = 0; gender < ngenders; gender++) {
+					obj = new JSONObject();
+
+					obj.put("Age", agerange[0]);
+					obj.put("Param", outparams[temp]);
+					obj.put("Value", sentimentby(agerange[0], genders[gender], null));
+					result.put(obj);
+					temp++;
+
+				}
+				for (int loc = 0; loc < nlocs; loc++) {
+					obj = new JSONObject();
+
+					obj.put("Age", agerange[0]);
+					obj.put("Param", outparams[temp]);
+					obj.put("Value", sentimentby(agerange[0], null, locs[loc]));
+					result.put(obj);
+					temp++;
+
+				}
+				System.out.print(result.toString());
+				return result;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			if (nlocs == 1 && ngenders == 2) {
+				outparams[0] = "Male";
+				outparams[1] = "Female";
+			} else {
+				if (nlocs == 2 && ngenders == 1) {
+					outparams[0] = "East";
+					outparams[1] = "West";
+				} else {
+					if (nlocs == 1 && ngenders == 1) {
+						outparams[0] = "Global";
+					} else {
+						outparams[0] = "Global";
+
+					}
 				}
 			}
 		}
@@ -80,7 +119,6 @@ public class SentimentChart {
 			}
 
 			for (int age = 0; age < nages; age++) {
-
 				int temp = 0;
 				for (int gender = 0; gender < ngenders; gender++) {
 					for (int loc = 0; loc < nlocs; loc++) {
@@ -89,16 +127,14 @@ public class SentimentChart {
 						obj.put("Param", outparams[temp]);
 						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc]));
 						result.put(obj);
-						System.out.println(temp + " " + obj + "\r\n");
 						temp++;
 
 					}
 				}
 			}
-			System.out.println(result);
+			System.out.print(result.toString());
 			return result;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -110,27 +146,57 @@ public class SentimentChart {
 		int minage = Integer.parseInt(agerange[0]);
 		int maxage = Integer.parseInt(agerange[1]);
 		double result = (double) 0;
-		String insert;
+		String insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
 		if (gender != null) {
-			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE >= ? AND AGE <= ? AND"
-					+ " GENDER = ? AND LOCATION = ?))";
-		} else {
-			insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE (AGE >= ? AND AGE <= ?))";
+			if (!gender.contains("-")) {
+				insert += " AND (GENDER = ?)";
+			} else {
+				insert += " AND (GENDER >= ? AND GENDER <= ?)";
+			}
 		}
+		if (location != null) {
+			if (!location.contains("-")) {
+				insert += " AND (LOCATION = ?)";
+			} else {
+				insert += " AND (LOCATION >= ? AND LOCATION <= ?)";
+			}
+		}
+
+		insert += "))";
+
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i = 0;
+		int i = 3;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setInt(1, minage);
 			query1.setInt(2, maxage);
 			if (gender != null) {
-				query1.setString(3, gender);
-				query1.setString(4, location);
+				if (gender.contains("-")) {
+					String[] genders = gender.split("-");
+					query1.setString(i, genders[0]);
+					i++;
+					query1.setString(i, genders[1]);
+					i++;
+				} else {
+					query1.setString(i, gender);
+					i++;
+				}
 			}
-			System.out.println(query1);
+			if (location != null) {
+				if (location.contains("-")) {
+					String[] locations = location.split("-");
+					query1.setString(i, locations[0]);
+					i++;
+					query1.setString(i, locations[1]);
+					i++;
+				} else {
+					query1.setString(i, location);
+					i++;
+				}
+			}
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
@@ -138,7 +204,6 @@ public class SentimentChart {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
@@ -169,8 +234,6 @@ public class SentimentChart {
 			temp = temp.replaceAll(",", ".");
 			result = Double.parseDouble(temp);
 		}
-
-		System.out.println(result);
 		return result;
 
 	}
@@ -179,7 +242,6 @@ public class SentimentChart {
 		try {
 			cnlocal = dbc.connlocal();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

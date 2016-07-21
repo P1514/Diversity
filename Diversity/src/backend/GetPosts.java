@@ -65,7 +65,6 @@ public class GetPosts {
 
 			}
 			query1.setInt(i + rangeindex, MAXTOP);
-			System.out.println(query1);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
@@ -82,7 +81,6 @@ public class GetPosts {
 				rs.next();
 				pre_result[i] = rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
 						+ rs.getString("location") + ",," + rs.getString("gender") + ",," + rs.getInt("age") + ",,";
-				System.out.println(query1 + "\r\n");
 				rs.close();
 				query1.close();
 			}
@@ -106,7 +104,6 @@ public class GetPosts {
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
-				System.out.println(query1);
 				rs.next();
 				pre_result[i] += rs.getString("message");
 				rs.close();
@@ -171,7 +168,6 @@ public class GetPosts {
 			result = Double.parseDouble(number);
 
 		}
-		System.out.println(result);
 		return Double.toString(result);
 
 	}

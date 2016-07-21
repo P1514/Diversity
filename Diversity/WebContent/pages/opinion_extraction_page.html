@@ -18,7 +18,40 @@
 			var json;
 			var jsonData;
 			var ws;
+
+			//create trigger to resizeEnd event     
+			$(window).resize(function() {
+				if (this.resizeTO)
+					clearTimeout(this.resizeTO);
+				this.resizeTO = setTimeout(function() {
+					$(this).trigger('resizeEnd');
+				}, 500);
+			});
+
+			//redraw graph when window resize is completed  
+			$(window).on('resizeEnd', function() {
+				if (jsonData != 0)
+					drawChart();
+			});
+			function fixbuttons(data) {
+
+				if (data == "Global") {
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Gender") {
+					document.getElementById('genderfilt').selectedIndex=0;
+					document.getElementById("genderfilt").disabled = true;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Location") {
+					document.getElementById('locationfilt').selectedIndex=0;
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = true;
+				}
+			}
 			function connect() {
+
 				ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
 
 				ws.onopen = function() {
@@ -90,8 +123,9 @@
 				var data = new google.visualization.DataTable();
 
 				// Code to convert JSON to chart data
-				for (var i = 2;	(i < jsonData.length) && 
-								(jsonData[i].Age == jsonData[i - 1].Age);i++) console.log("HELLO");
+				for (var i = 2; (i < jsonData.length)
+						&& (jsonData[i].Age == jsonData[i - 1].Age); i++)
+					;
 				var paramcount = i - 1;
 				data.addColumn('string', 'Age Range');// Adds Age to X axis
 
@@ -100,27 +134,32 @@
 					data.addColumn('number', jsonData[i].Param); // Adds all parameters that come from server
 				}
 				var j = 1;
-				var row_count=0;
+				var row_count = 0;
 				data.addRow();
 				data.setCell(0, 0, jsonData[j].Age);
 				row_count++;
 				for (var i = 1; j < jsonData.length; i++) {
-					if(data.getValue(row_count-1, 0) != jsonData[i].Age){
+					if (data.getValue(row_count - 1, 0) != jsonData[j].Age) {
 						data.addRow();
-						data.setCell(row_count,0,jsonData[i].Age);
+						data.setCell(row_count, 0, jsonData[j].Age);
 						row_count++;
 					}
-					
+
 					for (var ii = 1; ii <= paramcount; ii++) {
-						data.setCell(row_count-1, ii, jsonData[j].Value);
+						data.setCell(row_count - 1, ii, jsonData[j].Value);
 						j++;
 					}
 				}
 				// End of it
 
 				// chart colors
-				var colors = [ "#00617F", "#0093C8", "#FA1414", "#A60202",
-						"#000000" ];
+				
+				var colors = new Array();
+				//colors[0]=chartcolor(data.getColumnLabel(0));
+				for(var i = 1; i<paramcount+1;i++){
+					colors.push(chartcolor(data.getColumnLabel(i)));
+				}
+				console.log(colors);
 
 				//chart options
 				var options = {
@@ -202,10 +241,35 @@
 					chart.draw();
 				}*/
 			}
+			
+			function chartcolor(data){
+				switch (data)
+				{
+				case "Global":
+					return "#604460";
+				case "Male": 
+					return "#00617F";
+				case "Female":
+					return "#0093C8";
+				case "East":
+					return "#0093C8";
+				case "West":
+					return "#A60202";
+				case "0-30":
+					return "#BFD730";
+				case "31-60":
+					return "#8CA122";
+				case "60-90":
+					return "#5C6EoE";			
+				}
+			}
 
 			function changeRequest() {
 				var gender = document.getElementById("genderfilt").value;
 				var location = document.getElementById("locationfilt").value;
+				var globalradio = document.getElementById('Global').checked;
+				var genderradio = document.getElementById('Gender').checked;
+				var locationradio = document.getElementById('Location').checked;
 				var age = document.getElementById("agefilt").value;
 
 				var json = {
@@ -214,25 +278,44 @@
 					"Values" : ""
 				};
 
-				if (gender == "All" && location == "All" && age == "All") {
+				if (gender == "All" && location == "All" && age == "All" && globalradio) {
 					json.Param += "Global";
+					json.Values += "Global";
 				} else {
-					if (gender == "Male" || gender == "All") {
-						json.Param += "Gender,";
-						json.Values += "Male,";
+					if (genderradio == false) {
+						if (gender == "All") {
+							json.Param += "Gender,";
+							json.Values += "Female-Male,";
+						}
+						if (gender == "Female") {
+							json.Param += "Gender,";
+							json.Values += "Female,";
+						}
+						if (gender == "Male") {
+							json.Param += "Gender,";
+							json.Values += "Male,";
+						}
+					} else {
+						json.Param += "Gender,Gender,";
+						json.Values += "Male,Female,";
 					}
-					if (gender == "Female" || gender == "All") {
-						json.Param += "Gender,";
-						json.Values += "Female,";
-					}
+					if (locationradio == false) {
 
-					if (location == "East" || location == "All") {
-						json.Param += "Location,";
-						json.Values += "East,";
-					}
-					if (location == "West" || location == "All") {
-						json.Param += "Location,";
-						json.Values += "West,";
+						if (location == "All") {
+							json.Param += "Location,";
+							json.Values += "East-West,";
+						}
+						if (location == "West") {
+							json.Param += "Location,";
+							json.Values += "West,";
+						}
+						if (location == "East") {
+							json.Param += "Location,";
+							json.Values += "East,";
+						}
+					}else{
+						json.Param +="Location,Location,";
+						json.Values += "East,West,";
 					}
 
 					if (age == "0-30" || age == "All") {
@@ -281,9 +364,8 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 <body>
 
 	<!-- Logotipo -->
-	<center> <a href="index.html"> <img
-		src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
-		align="top"></a> </center>
+	<center> <img src="../images/Diversity-Logo-120x62.png"
+		alt="Diversity Logo" align="top"></img> </center>
 
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
@@ -293,11 +375,14 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 			<table id="filters">
 				<tr>
 					<th>
-						<!-- <form id="names" align="left" name='test'>
-							<input type="radio" name="field" value="Global" checked>All
-								<input type="radio" name="field" value="Gender">Gender <input
-									type="radio" name="field" value="Location">Location 
-						</form> -->
+						<form id="names" align="left" name='test'>
+							<input type="radio" name="field" id="Global" value="Global"
+								onclick="fixbuttons('Global');" checked>All <input
+								type="radio" name="field" id="Gender" value="Gender"
+								onclick="fixbuttons('Gender');">Gender <input
+									type="radio" name="field" id="Location" value="Location"
+									onclick="fixbuttons('Location');">Location 
+						</form>
 					</th>
 				</tr>
 				<tr>
@@ -354,5 +439,9 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 				</tbody>
 			</table>
 	</div>
+	<form action="index.html">
+		<center> <input id="back" class="btn btn-default"
+			type="submit" value="Back" /></center>
+	</form>
 </body>
 </html>

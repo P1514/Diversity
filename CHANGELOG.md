@@ -6,7 +6,13 @@ All notable changes to this project will be documented in this file.
 - PSS Tags
 - Influence and Reach Page
 
-## [1.0.3] 2016-07-18
+## [1.0.4] 2016-07-21
+### Added/Fixed
+- Globalsentiment fully functional(Missing only Post Table)
+- Opinion Extraction fully functional
+- Updated to work with OpinionSimV230(250 incoming)
+
+## [1.0.3] 2016-07-20
 ### Added
 - Multi-Threading
 - Sentiment Graph and Table
