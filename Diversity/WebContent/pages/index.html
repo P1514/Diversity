@@ -10,14 +10,20 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
   var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+  var json; 
+  
+  ws.onmessage = function (event) {
+		
+		if(json[0].Op == "Error"){
+			alert(json[0].Message);
+		}
+	  
+  }
+  
   function refreshDB(){
-		var json = {
+		json = {
               "Op":"load",
               }
-		
-		/*if(json[0].Op == "Error"){
-			alert(json[0].Message);
-		}*/
 		
         ws.send(JSON.stringify(json));
   };
