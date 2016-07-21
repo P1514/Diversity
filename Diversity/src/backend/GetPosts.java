@@ -36,8 +36,8 @@ public class GetPosts {
 			for (int i = 0; i < params.length; i++) {
 				if (i > 0)
 					insert += "&& ";
-				if (!values[i].contains("-")) {
-					insert += param + "=? ";
+				if (!(values[i].contains("-"))) {
+					insert += params[i] + "=? ";
 				} else {
 					insert += params[i] + ">=? && " + params[i] + "<=? ";
 				}

@@ -49,7 +49,7 @@
 
 				ws.onmessage = function(event) {
 					json = JSON.parse(event.data);
-					console.log(json[0]);
+					console.log(json);
 
 					if (json[0].Op == "Error") {
 						alert(json[0].Message);
@@ -74,10 +74,10 @@
 						}
 					}
 					if (json[0].Op == "graph") {
-						jsonData = json;
+						jsonData = JSON.parse(JSON.stringify(json));
 						drawChart();
 					}
-					
+
 				};
 			}
 
@@ -88,36 +88,24 @@
 
 			function drawChart() {
 				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Age Range');//0
-				//data.addColumn('number', 'Male');//1
-				//data.addColumn('number', 'Female');//2
-				//data.addColumn('number', 'East');//3
-				//data.addColumn('number', 'West');//4
-				data.addColumn('number', 'Global');//5
+				for(var i=2;jsonData[i].Age==jsonData[i-1].Age;i++);
+				var paramcount=i-1;
 				
-				for(var i = 0; i<3; i++)data.addRow();
-
-				var j = 1
-				for (var i = 0; j < jsonData.length; i++) {
-					var counter = jsonData[j];
-					
-					console.log(counter.Param + " " + counter.Value);
-					var age = counter.Age;
-					data.setCell(i, 0, age);
-					/*data.setCell(i, 1, 0);
-					data.setCell(i, 2, 0);
-					data.setCell(i, 3, 0);
-					data.setCell(i, 4, 0);*/
-					/*
-					Ciclo
-					todos ifs
-					 */
-					// counter.Global == counter["Global"];
-					for (; (j < (jsonData.length)) && (jsonData[j].Age == age); j++) {
-						if (counter.Param == "Global")	
-							data.setCell(i, 1, counter.Value);
+				data.addColumn('string', 'Age Range');// Adds Age to X axis
+				
+				for(var i=1;i<=paramcount;i++){
+					data.addColumn('number', jsonData[i].Param); // Adds all parameters that come from server
+				}
+				var j=1;
+				for(var i=0;j<jsonData.length;i++){
+					data.addRow();
+					data.setCell(i,0, jsonData[j].Age);
+					for(var ii=1;ii<=paramcount;ii++){
+						data.setCell(i,ii, jsonData[j].Value);
+						j++;
 					}
 				}
+
 				console.log(data);
 
 				// chart colors
@@ -210,49 +198,52 @@
 				var age = document.getElementById("agefilt").value;
 
 				var json = {
-					"Op" : "getposts",
+					"Op" : "chartrequest",
 					"Param" : "",
-					"Value" : ""
+					"Values" : ""
 				};
 
-				if (gender == "All") {
-					json.Param += "Global,";
-				} else if (gender == "Male") {
-					json.Param += "Gender,";
-					json.Value += "Male,";
-				} else if (gender == "Female") {
-					json.Param += "Gender,";
-					json.Value += "Female,";
-				}
+				if (gender == "All" && location == "All" && age == "All") {
+					json.Param += "Global";
+				} else {
+					if (gender == "Male" || gender =="All") {
+						json.Param += "Gender,";
+						json.Values += "Male,";
+					}
+					if (gender == "Female" || gender =="All") {
+						json.Param += "Gender,";
+						json.Values += "Female,";
+					}
 
-				if (location == "All") {
-					json.Param += "Global,";
-				} else if (location == "East") {
-					json.Param += "Location,";
-					json.Value += "East,";
-				} else if (location == "West") {
-					json.Param += "Location,";
-					json.Value += "West,";
-				}
+					if (location == "East" || location =="All") {
+						json.Param += "Location,";
+						json.Values += "East,";
+					}
+					if (location == "West" || location =="All") {
+						json.Param += "Location,";
+						json.Values += "West,";
+					}
 
-				if (age == "All") {
-					json.Param += "Global,";
-				} else if (age == "0-30") {
-					json.Param += "Age,";
-					json.Value += "0-30,";
-				} else if (age == "31-60") {
-					json.Param += "Age,";
-					json.Value += "31-60,";
-				} else if (age == "61-90") {
-					json.Param += "Age,";
-					json.Value += "61-90,";
+					if (age == "0-30" || age =="All") {
+						json.Param += "Age,";
+						json.Values += "0-30,";
+					}
+					if (age == "31-60" || age =="All") {
+						json.Param += "Age,";
+						json.Values += "31-60,";
+					}
+					if (age == "61-90" || age =="All") {
+						json.Param += "Age,";
+						json.Values += "61-90,";
+					}
 				}
+				console.log(json);
 				ws.send(JSON.stringify(json));
 			}
 		</script>
 		<style>
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
-	):not (.sorttable_nosort ):after {
+	 ):not (.sorttable_nosort ):after {
 	content: " \25B4\25BE"
 }
 
