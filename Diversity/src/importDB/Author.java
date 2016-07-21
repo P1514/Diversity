@@ -85,6 +85,7 @@ public class Author {
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
 		this.influence = dbc.aWcomments * ((this.comments/this.posts) / avgcom) + dbc.aWlikes * ((this.likes/this.posts) / avglike)
 				+ dbc.aWviews * ((this.views/this.posts) / avgview);
+		System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 
 }

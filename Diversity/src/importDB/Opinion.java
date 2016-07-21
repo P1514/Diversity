@@ -99,4 +99,9 @@ public class Opinion {
 		output.add(main);
 		return output;
 	}
+	//TODO FIX THIS ERROR
+	// Description: TOP ONE adds main TWICE because it's called twice
+	public ArrayList<Post> getPosts2(){
+		return comments;
+	}
 }
