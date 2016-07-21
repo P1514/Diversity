@@ -215,37 +215,37 @@
 					"Value" : ""
 				};
 
-				if (gender = "All") {
-					json.Param += "Global";
-				} else if (gender = "Male") {
-					json.Param += "Gender";
-					json.Value += "Male";
-				} else if (gender = "Female") {
+				if (gender == "All") {
+					json.Param += "Global,";
+				} else if (gender == "Male") {
+					json.Param += "Gender,";
+					json.Value += "Male,";
+				} else if (gender == "Female") {
 					json.Param += "Gender,";
 					json.Value += "Female,";
 				}
 
-				if (location = "All") {
-					json.Param += "Global";
-				} else if (location = "East") {
-					json.Param += "Location";
-					json.Value += "East";
-				} else if (location = "West") {
-					json.Param += "Location";
-					json.Value += "West";
+				if (location == "All") {
+					json.Param += "Global,";
+				} else if (location == "East") {
+					json.Param += "Location,";
+					json.Value += "East,";
+				} else if (location == "West") {
+					json.Param += "Location,";
+					json.Value += "West,";
 				}
 
 				if (age == "All") {
-					json.Param += "Global";
+					json.Param += "Global,";
 				} else if (age == "0-30") {
-					json.Param += "Age";
-					json.Value += "0-30";
+					json.Param += "Age,";
+					json.Value += "0-30,";
 				} else if (age == "31-60") {
-					json.Param += "Age";
-					json.Value += "31-60";
+					json.Param += "Age,";
+					json.Value += "31-60,";
 				} else if (age == "61-90") {
-					json.Param += "Age";
-					json.Value += "61-90";
+					json.Param += "Age,";
+					json.Value += "61-90,";
 				}
 				ws.send(JSON.stringify(json));
 			}
