@@ -11,7 +11,6 @@ All notable changes to this project will be documented in this file.
 
 
 ### Upcoming Next Release
-- Influence and Reach Page
 - Change East,West to Asia,Europe
 - Replace "Post" with "Top 5"
 - Change "Chart" to Product 
