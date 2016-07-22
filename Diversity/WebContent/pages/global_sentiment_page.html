@@ -15,22 +15,74 @@
 <script type="text/javascript">
 	var ws;
 	var jsonData;
+	function getCookie(name) {
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2)
+			return parts.pop().split(";").shift();
+	}
+	
+	//create trigger to resizeEnd event     
+	$(window).resize(function() {
+		if (this.resizeTO)
+			clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function() {
+			$(this).trigger('resizeEnd');
+		}, 500);
+	});
+
+	//redraw graph when window resize is completed  
+	$(window).on('resizeEnd', function() {
+		if (jsonData != 0)
+			drawGlobal();
+	});
+
 	function connect() {
+		document.getElementById("Cookie").innerHTML = "Product: "
+				+ getCookie("Product");
+
 		ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
 		ws.onopen = function() {
 			var json = {
 				"Op" : "globalsentiment",
 			}
 			ws.send(JSON.stringify(json));
+
+			json = {
+				"Op" : "getposts",
+			}
+
+			ws.send(JSON.stringify(json));
 		};
-
 		ws.onmessage = function(event) {
-			jsonData = JSON.parse(event.data);
+			json = JSON.parse(event.data);
 
-			if (jsonData[0].Op == "Error") {
+			if (json[0].Op == "table") {
+				//populate table
+				var tr;
+				for (var i = 1; i < json.length; i++) {
+					tr = $('<tr/>');
+					tr.append("<td>" + json[i].Name + "</td>");
+					tr.append("<td>" + json[i].Message + "</td>");
+					tr.append("<td>" + json[i].Comments + "</td>");
+					tr.append("<td>" + json[i].Date + "</td>");
+					tr.append("<td>" + json[i].Polarity + "</td>");
+					tr.append("<td>" + json[i].Reach + "</td>");
+					tr.append("<td>" + json[i].Influence + "</td>");
+					tr.append("<td>" + json[i].Location + "</td>");
+					tr.append("<td>" + json[i].Gender + "</td>");
+					tr.append("<td>" + json[i].Age + "</td>");
+					$('#posts tbody').append(tr);
+				}
+			}
+
+			if (json[0].Op == "Error") {
 				alert(jsonData[0].Message);
 			}
-			drawGlobal();
+			if (json[0].Op == "graph") {
+				jsonData = json;
+				drawGlobal();
+			}
 		};
 	}
 
@@ -48,9 +100,8 @@
 		globaldata.addColumn('string', 'Month');
 		globaldata.addColumn('number', 'Global');
 
-		for (var i = 0; i < jsonData.length; i++) {
+		for (var i = 1; i < jsonData.length; i++) {
 			var counter = jsonData[i];
-			console.log(counter.Month + " " + counter.Sentiment);
 			globaldata.addRows([ [ counter.Month, counter.Sentiment ] ]);
 		}
 
@@ -281,6 +332,30 @@ input[type=radio] {
 			<div id='chart_div'></div>
 	</center>
 
+	</div>
+	<!-- Tabela Posts-->
+	<div class="container">
+		<h2>Posts</h2>
+		<div id="Cookie">Error no product to display</div>
+		<hr>
+		<table id="posts" class="table sortable">
+			<thead>
+				<tr>
+					<th>Original Author</th>
+					<th>Post</th>
+					<th># Comments</th>
+					<th>Date</th>
+					<th>Polarity</th>
+					<th>Reach</th>
+					<th>Influence</th>
+					<th>Location</th>
+					<th>Gender</th>
+					<th>Age</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
 	</div>
 	<form action="index.html">
 		<center>

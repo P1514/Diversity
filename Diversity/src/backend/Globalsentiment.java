@@ -19,10 +19,12 @@ public class Globalsentiment {
 	public Globalsentiment() {
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, String param, String values) {
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values) throws JSONException {
 		JSONArray result = new JSONArray();
-		JSONObject obj;
+		JSONObject obj = new JSONObject();
 		String[] words;
+		obj.put("Op", "graph");
+		result.put(obj);
 
 		String[] time = new String[12];
 		time[0] = "JANUARY";

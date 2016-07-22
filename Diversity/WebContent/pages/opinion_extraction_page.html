@@ -18,6 +18,13 @@
 			var json;
 			var jsonData;
 			var ws;
+			
+			function getCookie(name) {
+				  var value = "; " + document.cookie;
+				  var parts = value.split("; " + name + "=");
+				  if (parts.length == 2) return parts.pop().split(";").shift();
+				}
+			
 
 			//create trigger to resizeEnd event     
 			$(window).resize(function() {
@@ -51,6 +58,7 @@
 				}
 			}
 			function connect() {
+				document.getElementById("Cookie").innerHTML = "Product: " + getCookie("Product");
 
 				ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
 
@@ -82,7 +90,6 @@
 
 				ws.onmessage = function(event) {
 					json = JSON.parse(event.data);
-					console.log(json);
 
 					if (json[0].Op == "Error") {
 						alert(json[0].Message);
@@ -418,7 +425,7 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 
 	<!-- Tabela Posts-->
 	<div class="container">
-		<h2>Posts</h2>
+		<h2>Posts </h2><div id="Cookie"> Error no product to display</div>
 		<hr>
 			<table id="posts" class="table sortable">
 				<thead>
