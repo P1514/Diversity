@@ -50,8 +50,8 @@ public class SentimentChart {
 		if (nlocs == 2 && ngenders == 2) {
 			outparams[0] = "Male";
 			outparams[1] = "Female";
-			outparams[2] = "Asia";
-			outparams[3] = "Europe";
+			outparams[2] = "East";
+			outparams[3] = "West";
 			try {
 				obj = new JSONObject();
 				obj.put("Op", "graph");
@@ -90,8 +90,8 @@ public class SentimentChart {
 				outparams[1] = "Female";
 			} else {
 				if (nlocs == 2 && ngenders == 1) {
-					outparams[0] = "Asia";
-					outparams[1] = "Europe";
+					outparams[0] = "East";
+					outparams[1] = "West";
 				} else {
 					if (nlocs == 1 && ngenders == 1) {
 						outparams[0] = "Global";

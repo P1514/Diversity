@@ -48,6 +48,7 @@ public class Globalsentiment {
 		}
 
 		Calendar data = Calendar.getInstance();
+		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
 
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {

@@ -67,7 +67,7 @@
 					json = {
 						"Op" : "chartrequest",
 						"Param" : "Global",
-						"Pss": getCookie("Product")
+						"Pss" : getCookie("Product")
 					/*"Param":"Age,Male,Female",
 					"Value":"0-30, 50, 50",*/
 					}
@@ -76,7 +76,7 @@
 
 					json = {
 						"Op" : "getposts",
-						"Pss": getCookie("Product")
+						"Pss" : getCookie("Product")
 					}
 
 					ws.send(JSON.stringify(json));
@@ -173,13 +173,13 @@
 
 				//chart options
 				var options = {
-					title : 'Average Sentiment',
+					title : 'Average Polarity',
 					colors : colors,
 					hAxis : {
 						title : 'Age Range'
 					},
 					vAxis : {
-						title : 'Sentiment',
+						title : 'Polarity',
 						viewWindow : {
 							max : 0,
 							min : 100
@@ -260,9 +260,9 @@
 					return "#00617F";
 				case "Female":
 					return "#0093C8";
-				case "Asia":
+				case "East":
 					return "#FF3C14";
-				case "Europe":
+				case "West":
 					return "#A60202";
 				case "0-30":
 					return "#BFD730";
@@ -285,7 +285,7 @@
 					"Op" : "chartrequest",
 					"Param" : "",
 					"Values" : "",
-					"Pss": getCookie("Product")
+					"Pss" : getCookie("Product")
 				};
 
 				if (gender == "All" && location == "All" && age == "All"
@@ -314,19 +314,19 @@
 
 						if (location == "All") {
 							json.Param += "Location,";
-							json.Values += "Asia-Europe,";
+							json.Values += "East-West,";
 						}
-						if (location == "Europe") {
+						if (location == "West") {
 							json.Param += "Location,";
-							json.Values += "Europe,";
+							json.Values += "West,";
 						}
-						if (location == "Asia") {
+						if (location == "East") {
 							json.Param += "Location,";
-							json.Values += "Asia,";
+							json.Values += "East,";
 						}
 					} else {
 						json.Param += "Location,Location,";
-						json.Values += "Asia,Europe,";
+						json.Values += "East,West,";
 					}
 
 					if (age == "0-30" || age == "All") {
@@ -360,25 +360,34 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 }
 
 #locationfilt {
-	margin-left: 100px;
+	margin-top: 25px;
+	margin-left: 25%;
 }
 
 input[type=radio] {
+	margin-left: 25%;
 	margin-top: 25px;
-	margin-left:100px;
 }
 
 #agefilt {
-	margin-left: 100px;
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+#genderfilt {
+	margin-top: 25px;
+	margin-left: 25%;
 }
 
 #refresh {
-	margin-left: 100px;
+	margin-top:25px;
 }
-
-input[type=radio] {
-	margin-top: 25px;
-    margin-left: 100px;
+#segmentation{
+	width: 70%;
+	align:center;
+}
+#home{
+	position:absolute; top:0; right:0;
 }
 </style>
 </head>
@@ -387,50 +396,55 @@ input[type=radio] {
 	<!-- Logotipo -->
 	<center> <img src="../images/Diversity-Logo-120x62.png"
 		alt="Diversity Logo" align="top"></img> </center>
-
+<form action="index.html">
+		<input id="home" class="btn btn-default"
+			type="submit" value="Home"/>
+	</form>
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
-		<h2>Chart</h2>
+		<h2>
+			<i><div id="Cookie">Error no product to display</div></i>
+		</h2>
 		<hr>
 			<center>
-			<table id="filters">
+			<table id="segmentation">
 				<tr>
-					<th>
-						<form id="names" align="left" name='test'>
-							<input type="radio" name="field" id="Global" value="Global"
-								onclick="fixbuttons('Global');" checked>All <input
-								type="radio" name="field" id="Gender" value="Gender"
-								onclick="fixbuttons('Gender');">Gender <input
-									type="radio" name="field" id="Location" value="Location"
-									onclick="fixbuttons('Location');">Location 
-						</form>
-					</th>
+					<th><input type="radio" name="field" id="Gender"
+						value="Gender" onclick="fixbuttons('Gender');"> &nbsp
+							Gender</th>
+					<th><input type="radio" name="field" id="Location"
+						value="Location" onclick="fixbuttons('Location');"> &nbsp
+							Location </th>
+					<th><input type="radio" name="field" id="Global"
+						value="Global" onclick="fixbuttons('Global');" checked>
+							&nbsp All </th>
 				</tr>
 				<tr>
-					<select id="genderfilt">
-						<option value="All">All Genders
-							<option value="Male">Male
-								<option value="Female">Female
+					<th><select id="genderfilt">
+							<option value="All">All Genders
+								<option value="Male">Male
+									<option value="Female">Female
+					</select></th>
+					<th><select id="locationfilt">
+							<option value="All">All Locations
+								<option value="East">East
+									<option value="West">West
+					</select></th>
+					<th><select id="agefilt">
+							<option value="All">All Ages
+								<option value="0-30">0-30
+									<option value="31-60">31-60
+										<option value="61-90">61-90
 					</select>
 				</tr>
-				<tr>
-					<select id="locationfilt">
-						<option value="All">All Locations
-							<option value="Asia">Asia
-								<option value="Europe">Europe
-					</select>
-				</tr>
-				<tr>
-					<select id="agefilt">
-						<option value="All">All Ages
-							<option value="0-30">0-30
-								<option value="31-60">31-60
-									<option value="61-90">61-90
-					</select>
-				</tr>
-				<tr>
-					<button class="btn btn-default" id="refresh"
-						onclick="changeRequest()">Update</button>
+			</table>
+			<table>
+				<tr><th></th><th>
+
+						<button class="btn btn-default" id="refresh"
+							onclick="changeRequest()">Update</button>
+							</th><th></th>
+
 				</tr>
 			</table>
 			<div id="chart_div"></div>
@@ -439,8 +453,8 @@ input[type=radio] {
 
 	<!-- Tabela Posts-->
 	<div class="container">
-		<h2>Posts</h2>
-		<i><div id="Cookie">Error no product to display</div></i>
+		<h2>Top 5</h2>
+
 		<hr>
 			<table id="posts" class="table sortable">
 				<thead>
@@ -461,9 +475,5 @@ input[type=radio] {
 				</tbody>
 			</table>
 	</div>
-	<form action="index.html">
-		<center> <input id="back" class="btn btn-default"
-			type="submit" value="Back" /></center>
-	</form>
 </body>
 </html>

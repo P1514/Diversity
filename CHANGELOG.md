@@ -4,14 +4,16 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Upcoming Later Release
-- Click to see associated comments(Both Pages)
-- Click to see Opinions at that time(Global Sentiment)
-- Add filter info to graph label
+- Add filter info to graph label(Confirm necessity because it requires graph redesign)
 - Influence Reach page with last post and only opinion authors
 
-
 ### Upcoming Next Release
-- Change East,West to Asia,Europe
+- Click to see associated comments(Both Pages POP-UP)
+- Click to see Opinions at that time(Global Sentiment)
+
+## [1.0.5.1] 2016-07-22
+### Fixed
+- Change East,West to Asia,Europe Waiting for Sim to Test
 - Replace "Post" with "Top 5"
 - Change "Chart" to Product 
 - Delete Product Label
