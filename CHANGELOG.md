@@ -2,8 +2,25 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-### Upcoming
+
+### Upcoming Later Release
+- Click to see associated comments(Both Pages)
+- Click to see Opinions at that time(Global Sentiment)
+- Add filter info to graph label
+- Influence Reach page with last post and only opinion authors
+
+
+### Upcoming Next Release
 - Influence and Reach Page
+- Change East,West to Asia,Europe
+- Replace "Post" with "Top 5"
+- Change "Chart" to Product 
+- Delete Product Label
+- Change "Sentiment" to "Polarity" (get opinion page)
+- Set global sentiment graph to one month ahead
+- Change name and location of "Back" button to "Home" and top left corner
+- Keep product info when going back to main page
+- Change and reformat radio buttons on get opinion page
 
 ## [1.0.5] 2016-07-22
 ### Added

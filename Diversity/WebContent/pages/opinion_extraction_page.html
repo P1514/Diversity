@@ -260,9 +260,9 @@
 					return "#00617F";
 				case "Female":
 					return "#0093C8";
-				case "East":
+				case "Asia":
 					return "#FF3C14";
-				case "West":
+				case "Europe":
 					return "#A60202";
 				case "0-30":
 					return "#BFD730";
@@ -314,19 +314,19 @@
 
 						if (location == "All") {
 							json.Param += "Location,";
-							json.Values += "East-West,";
+							json.Values += "Asia-Europe,";
 						}
-						if (location == "West") {
+						if (location == "Europe") {
 							json.Param += "Location,";
-							json.Values += "West,";
+							json.Values += "Europe,";
 						}
-						if (location == "East") {
+						if (location == "Asia") {
 							json.Param += "Location,";
-							json.Values += "East,";
+							json.Values += "Asia,";
 						}
 					} else {
 						json.Param += "Location,Location,";
-						json.Values += "East,West,";
+						json.Values += "Asia,Europe,";
 					}
 
 					if (age == "0-30" || age == "All") {
@@ -416,8 +416,8 @@ input[type=radio] {
 				<tr>
 					<select id="locationfilt">
 						<option value="All">All Locations
-							<option value="East">East
-								<option value="West">West
+							<option value="Asia">Asia
+								<option value="Europe">Europe
 					</select>
 				</tr>
 				<tr>
