@@ -21,7 +21,7 @@
 		if (parts.length == 2)
 			return parts.pop().split(";").shift();
 	}
-	
+
 	//create trigger to resizeEnd event     
 	$(window).resize(function() {
 		if (this.resizeTO)
@@ -45,11 +45,13 @@
 		ws.onopen = function() {
 			var json = {
 				"Op" : "globalsentiment",
+				"Pss": getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 
 			json = {
 				"Op" : "getposts",
+				"Pss": getCookie("Product")
 			}
 
 			ws.send(JSON.stringify(json));
@@ -107,9 +109,10 @@
 
 		var options = {
 			title : 'Average Global Sentiment Over Time',
-			colors : [ '#000000' ],
+			colors : [ '#604460' ],
 			hAxis : {
-				title : 'Month'
+				title : 'Month',
+				showTextEvery : 1
 			},
 			vAxis : {
 				title : 'Sentiment',
@@ -235,6 +238,7 @@
 		case "Global":
 			var json = {
 				"Op" : "globalsentiment",
+				"Pss": getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -245,6 +249,7 @@
 				"Op" : "globalsentiment",
 				"Param" : "gender",
 				"Values" : "Male,Female",
+				"Pss": getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -255,6 +260,7 @@
 				"Op" : "globalsentiment",
 				"Param" : "location",
 				"Values" : "East,West",
+				"Pss": getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -264,7 +270,8 @@
 			var json = {
 				"Op" : "globalsentiment",
 				"Param" : "age",
-				"Values" : "0-30,31-60,61-90"
+				"Values" : "0-30,31-60,61-90",
+				"Pss": getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -335,7 +342,7 @@ input[type=radio] {
 	<!-- Tabela Posts-->
 	<div class="container">
 		<h2>Posts</h2>
-		<div id="Cookie">Error no product to display</div>
+		<i><div id="Cookie">Error no product to display</div></i>
 		<hr>
 		<table id="posts" class="table sortable">
 			<thead>

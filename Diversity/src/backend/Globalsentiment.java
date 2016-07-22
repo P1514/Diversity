@@ -19,7 +19,8 @@ public class Globalsentiment {
 	public Globalsentiment() {
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, String param, String values) throws JSONException {
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values, int pss)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] words;
@@ -45,17 +46,17 @@ public class Globalsentiment {
 			words = new String[1];
 			words[0] = "Sentiment";
 		}
-		
+
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.YEAR, -1);
-		
 
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				for (int ii = 0; ii < words.length; ii++)
-					obj.put(words[ii], globalsentimentby(month%12,data.get(Calendar.YEAR)+month/12, param, words[ii]));
+					obj.put(words[ii],
+							globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, words[ii], pss));
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -67,24 +68,22 @@ public class Globalsentiment {
 		return result;
 	}
 
-	private double globalsentimentby(int month, int year, String param, String value) {
+	private double globalsentimentby(int month, int year, String param, String value, int pss) {
 
 		double result = (double) 0;
 		String insert;
 		String[] values = new String[2];
 		PreparedStatement query1 = null;
-		if (param == null) {
-			insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? ";
-		} else {
+		insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && tag_id=?";
+		if (param != null) {
 			if (!value.contains("-")) {
-				insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
-						+ " authors_id in (Select id from authors where " + param + "=?)";
+				insert += " && authors_id in (Select id from authors where " + param + "=?)";
 			} else {
 				values = value.split("-");
-				insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? &&"
-						+ " authors_id in (Select id from authors where " + param + ">=? && " + param + "<=?)";
+				insert += " && authors_id in (Select id from authors where " + param + ">=? && " + param + "<=?)";
 			}
 		}
+
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		month -= 1;
@@ -96,17 +95,18 @@ public class Globalsentiment {
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
+			query1.setInt(3, pss);
 			if (param != null) {
 				if (!value.contains("-")) {
-					query1.setString(3, value);
+					query1.setString(4, value);
 				} else {
-					query1.setString(3, values[0]);
-					query1.setString(4, values[1]);
+					query1.setString(4, values[0]);
+					query1.setString(5, values[1]);
 				}
 			}
+			System.out.println(query1);
 			rs = query1.executeQuery();
 
-			
 			while (rs.next()) {
 				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
 				totalreach += rs.getDouble("reach");
@@ -147,7 +147,7 @@ public class Globalsentiment {
 
 	}
 
-	private void dbconnect() throws ClassNotFoundException, SQLException{
-			cnlocal = dbc.connlocal();
+	private void dbconnect() throws ClassNotFoundException, SQLException {
+		cnlocal = dbc.connlocal();
 	}
 }

@@ -9,47 +9,51 @@ import com.mysql.jdbc.Connection;
 
 public class Settings {
 	// To be replaced by properties file
-	public Date LastUpdated;
+	public Date LastUpdated = null;
 	// Data Origin DB Specs
-	public String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
-	public String user = "diversity";
-	public String pass = "diversity";
+	public static final String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
+	public static final String user = "diversity";
+	public static final String pass = "diversity";
 
 	// Post Table
-	public String posttn = "post"; // Table Name
-	public String rpost_id = "post_id"; // Reference Post Id
-	public String post_id = "id"; // Actual Post Id
-	public String puser_id = "user_id"; // Poster Id
-	public String pdate = "timestamp"; // timestamp
-	public String plikes = "likes"; // Number of Likes
-	public String pviews = "views"; // Number of views
-	public String pmessage = "message"; // Message
+	public static final String posttn = "post"; // Table Name
+	public static final String rpost_id = "post_id"; // Reference Post Id
+	public static final String post_id = "id"; // Actual Post Id
+	public static final String puser_id = "user_id"; // Poster Id
+	public static final String pdate = "timestamp"; // timestamp
+	public static final String plikes = "likes"; // Number of Likes
+	public static final String pviews = "views"; // Number of views
+	public static final String pmessage = "message"; // Message
 
 	// User Table
-	public String usertn = "user"; // Table name
-	public String user_id = "id"; // Id
-	public String uname = "name"; // Name
-	public String uage = "age"; // Age
-	public String ugender = "gender"; // Gender
-	public String uloc = "location"; // Location
+	public static final String usertn = "user"; // Table name
+	public static final String user_id = "id"; // Id
+	public static final String uname = "name"; // Name
+	public static final String uage = "age"; // Age
+	public static final String ugender = "gender"; // Gender
+	public static final String uloc = "location"; // Location
 
 	// Posts Table
-	public String ptime = "timestamp";
+	public static final String ptime = "timestamp";
 
 	// Computing Variables
 	// Reach
-	public double pWviews = 0.3333;
-	public double pWlikes = 0.3333;
-	public double pWcomments = 0.3334;
+	public static final double pWviews = 0.3333;
+	public static final double pWlikes = 0.3333;
+	public static final double pWcomments = 0.3334;
 	// Influence
-	public double aWviews = 0.3333;
-	public double aWlikes = 0.3333;
-	public double aWcomments = 0.3334;
+	public static final double aWviews = 0.3333;
+	public static final double aWlikes = 0.3333;
+	public static final double aWcomments = 0.3334;
 
 	// Local DB Specs
-	public String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
-	public String user2 = "diversity";
-	public String pass2 = "diversity";
+	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
+	public static final String user2 = "diversity";
+	public static final String pass2 = "diversity";
+	
+	// PSS File
+	public static final String DATA_FOLDER = "data";
+	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 

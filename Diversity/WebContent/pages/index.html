@@ -15,16 +15,36 @@
   function setCookie()
   {
 	 // document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
-	  document.cookie="Product="+document.getElementById("PSS").value;
+	  document.cookie="Product="+document.getElementById("Products").value;
   }
   
+  ws.onopen = function(){
+	  var jsonData = {
+				"Op" : "getproducts",
+			}
+			ws.send(JSON.stringify(jsonData));
+  }
   ws.onmessage = function (event) {
 	  json = JSON.parse(event.data);
 		
 		if(json[0].Op == "Error"){
 			alert(json[0].Message);
 		}
+		if(json[0].Op == "products"){
+			populatePSS();
+		}
 	  
+  }
+  
+  function populatePSS(){
+	  var x = document.getElementById("Products");	  
+	  for(var i=1;i<json.length;i++){
+		  console.log(json[i].Name);
+	  var option = document.createElement('option');
+	  option.text = json[i].Name;
+	  option.value = option.text;
+	  x.add(option);
+	  }
   }
   
   function refreshDB(){
@@ -67,12 +87,8 @@
 
 <!--Lista de PSS-->
 <div id="pss">
-<label>Choose PSS:</label>
-<select id="PSS">
-  <option value="PSS1">PSS1</option>
-  <option value="PSS2">PSS2</option>
-  <option value="PSS3">PSS3</option>
-  <option value="PSS4">PSS4</option>
+<label>Choose Product:</label>
+<select id="Products">
 </select>
 </div>
 

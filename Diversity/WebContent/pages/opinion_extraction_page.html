@@ -18,13 +18,13 @@
 			var json;
 			var jsonData;
 			var ws;
-			
+
 			function getCookie(name) {
-				  var value = "; " + document.cookie;
-				  var parts = value.split("; " + name + "=");
-				  if (parts.length == 2) return parts.pop().split(";").shift();
-				}
-			
+				var value = "; " + document.cookie;
+				var parts = value.split("; " + name + "=");
+				if (parts.length == 2)
+					return parts.pop().split(";").shift();
+			}
 
 			//create trigger to resizeEnd event     
 			$(window).resize(function() {
@@ -47,25 +47,27 @@
 					document.getElementById("locationfilt").disabled = false;
 				}
 				if (data == "Gender") {
-					document.getElementById('genderfilt').selectedIndex=0;
+					document.getElementById('genderfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = true;
 					document.getElementById("locationfilt").disabled = false;
 				}
 				if (data == "Location") {
-					document.getElementById('locationfilt').selectedIndex=0;
+					document.getElementById('locationfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = false;
 					document.getElementById("locationfilt").disabled = true;
 				}
 			}
 			function connect() {
-				document.getElementById("Cookie").innerHTML = "Product: " + getCookie("Product");
+				document.getElementById("Cookie").innerHTML = "Product: "
+						+ getCookie("Product");
 
 				ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
 
 				ws.onopen = function() {
 					json = {
 						"Op" : "chartrequest",
-						"Param" : "Global"
+						"Param" : "Global",
+						"Pss": getCookie("Product")
 					/*"Param":"Age,Male,Female",
 					"Value":"0-30, 50, 50",*/
 					}
@@ -74,6 +76,7 @@
 
 					json = {
 						"Op" : "getposts",
+						"Pss": getCookie("Product")
 					}
 
 					ws.send(JSON.stringify(json));
@@ -160,10 +163,10 @@
 				// End of it
 
 				// chart colors
-				
+
 				var colors = new Array();
 				//colors[0]=chartcolor(data.getColumnLabel(0));
-				for(var i = 1; i<paramcount+1;i++){
+				for (var i = 1; i < paramcount + 1; i++) {
 					colors.push(chartcolor(data.getColumnLabel(i)));
 				}
 				console.log(colors);
@@ -248,13 +251,12 @@
 					chart.draw();
 				}*/
 			}
-			
-			function chartcolor(data){
-				switch (data)
-				{
+
+			function chartcolor(data) {
+				switch (data) {
 				case "Global":
 					return "#604460";
-				case "Male": 
+				case "Male":
 					return "#00617F";
 				case "Female":
 					return "#0093C8";
@@ -267,7 +269,7 @@
 				case "31-60":
 					return "#8CA122";
 				case "60-90":
-					return "#5C6EoE";			
+					return "#5C6EoE";
 				}
 			}
 
@@ -282,10 +284,12 @@
 				var json = {
 					"Op" : "chartrequest",
 					"Param" : "",
-					"Values" : ""
+					"Values" : "",
+					"Pss": getCookie("Product")
 				};
 
-				if (gender == "All" && location == "All" && age == "All" && globalradio) {
+				if (gender == "All" && location == "All" && age == "All"
+						&& globalradio) {
 					json.Param += "Global";
 					json.Values += "Global";
 				} else {
@@ -320,8 +324,8 @@
 							json.Param += "Location,";
 							json.Values += "East,";
 						}
-					}else{
-						json.Param +="Location,Location,";
+					} else {
+						json.Param += "Location,Location,";
 						json.Values += "East,West,";
 					}
 
@@ -357,6 +361,11 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 
 #locationfilt {
 	margin-left: 100px;
+}
+
+input[type=radio] {
+	margin-top: 25px;
+	margin-left:100px;
 }
 
 #agefilt {
@@ -430,7 +439,8 @@ input[type=radio] {
 
 	<!-- Tabela Posts-->
 	<div class="container">
-		<h2>Posts </h2><div id="Cookie"> Error no product to display</div>
+		<h2>Posts</h2>
+		<i><div id="Cookie">Error no product to display</div></i>
 		<hr>
 			<table id="posts" class="table sortable">
 				<thead>

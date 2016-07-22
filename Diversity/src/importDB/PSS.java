@@ -1,45 +1,71 @@
 package importDB;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Vector;
 
-import backend.Settings;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 //Post individual Object
 public class PSS {
-	private HashMap<String,Integer> tags = new HashMap<String,Integer>();
+	private HashMap<String, Integer> tags = new HashMap<String, Integer>();
+	private int tag_id = 0;
+	JSONArray result = new JSONArray();
+	JSONObject obj = new JSONObject();
 
 	public PSS() {
+		tags.put("Nike Air Force 1", 1);
+		tags.put("Adidas Stan Smith", 2);
+		tags.put("Adidas Copa Mundial", 3);
 	}
 
-	public boolean tagexists(String word){
+	public boolean tagexists(String word) {
 		return tags.containsKey(word);
 	}
-	
-	public int getTag(String word){
-		return tags.get(word);
+
+	public int getTag(String word) {
+
+		tags.forEach((k, v) -> {
+			if (word.contains(k))
+				tag_id = v;
+		});
+		return tag_id;
+	}
+
+	public HashMap<String, Integer> importPSS() throws IOException {
+		return tags;
+
 	}
 	
-	public void importPSS(){
-		BufferedReader inputFile = null;
-		Vector<String> names = new Vector<String>();
+	public int getID(String key){
+		return tags.get(key);
+	}
+
+	public String getProducts() {
 		try {
-        	inputFile = new BufferedReader( new FileReader( Settings.DATA_FOLDER + "/" + AppConst.FILENAME_PRODUCTS ) );
-            String line = "";
-            do {
-                line = this.inputFile.readLine();
-                if (line != null) {
-                	names.add( line );
-                }
-            } while( line != null );
-        }
-        catch(IOException ex){
-            System.out.println("File IO Exception: " + ex.getMessage());
-        }
-		this.closeInputFile();
-		
+			obj.put("Op", "products");
+			result.put(obj);
+
+			tags.forEach((k, v) -> {
+				try {
+					obj = new JSONObject();
+
+					obj.put("Name", k);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				result.put(obj);
+
+			});
+			System.out.println(result.toString());
+
+			return result.toString();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "[{\"Op\":\"Error\"},{\"Message\":\"ERROR getting products\"}]";
+		}
 	}
 }

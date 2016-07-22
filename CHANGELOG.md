@@ -3,8 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Upcoming
-- PSS Tags
 - Influence and Reach Page
+
+## [1.0.5] 2016-07-22
+### Added
+- Globalsentiment Table
+- Filter By Products
+- Tested with OpinionSimV250
 
 ## [1.0.4] 2016-07-21
 ### Added/Fixed

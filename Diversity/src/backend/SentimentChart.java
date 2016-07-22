@@ -17,7 +17,7 @@ public class SentimentChart {
 
 	}
 
-	public JSONArray chartrequest(String param, String value) {
+	public JSONArray chartrequest(String param, String value, int pss) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;
@@ -63,7 +63,7 @@ public class SentimentChart {
 
 					obj.put("Age", agerange[0]);
 					obj.put("Param", outparams[temp]);
-					obj.put("Value", sentimentby(agerange[0], genders[gender], null));
+					obj.put("Value", sentimentby(agerange[0], genders[gender], null, pss));
 					result.put(obj);
 					temp++;
 
@@ -73,7 +73,7 @@ public class SentimentChart {
 
 					obj.put("Age", agerange[0]);
 					obj.put("Param", outparams[temp]);
-					obj.put("Value", sentimentby(agerange[0], null, locs[loc]));
+					obj.put("Value", sentimentby(agerange[0], null, locs[loc], pss));
 					result.put(obj);
 					temp++;
 
@@ -125,7 +125,7 @@ public class SentimentChart {
 						obj = new JSONObject();
 						obj.put("Age", agerange[age]);
 						obj.put("Param", outparams[temp]);
-						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc]));
+						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc],pss));
 						result.put(obj);
 						temp++;
 
@@ -141,12 +141,13 @@ public class SentimentChart {
 
 	}
 
-	private double sentimentby(String age, String gender, String location) {
+	private double sentimentby(String age, String gender, String location, int pss) {
 		String[] agerange = age.split("-");
 		int minage = Integer.parseInt(agerange[0]);
 		int maxage = Integer.parseInt(agerange[1]);
 		double result = (double) 0;
-		String insert = "Select polarity FROM posts WHERE authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
+		String insert = "Select polarity FROM posts WHERE opinions_id in ("
+				+ "Select id from opinions where tag_id=?) && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
 		if (gender != null) {
 			if (!gender.contains("-")) {
 				insert += " AND (GENDER = ?)";
@@ -167,12 +168,13 @@ public class SentimentChart {
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i = 3;
+		int i = 4;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setInt(1, minage);
-			query1.setInt(2, maxage);
+			query1.setInt(1, pss);
+			query1.setInt(2, minage);
+			query1.setInt(3, maxage);
 			if (gender != null) {
 				if (gender.contains("-")) {
 					String[] genders = gender.split("-");

@@ -3,6 +3,7 @@ package backend;
 import org.json.*;
 
 import importDB.Data;
+import importDB.PSS;
 
 public class Backend {
 	private int op = 0;
@@ -18,25 +19,34 @@ public class Backend {
 		String param;
 		String values;
 		String tmp;
+		int pss=0;;
+		PSS ps = new PSS();
 		try {
+			if (msg.has("Pss")) {
+
+				pss = ps.getID(msg.getString("Pss"));
+			}
+
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
-			
+
 			switch (op) {
 			case 1:
 				SentimentChart sc = new SentimentChart();
-				return sc.chartrequest(param,values).toString();
+				return sc.chartrequest(param, values, pss).toString();
 			case 2:
 				Data dat = new Data();
 				return dat.load();
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
-				tmp = gs.globalsentiment(1, param, values).toString();
+				tmp = gs.globalsentiment(1, param, values, pss).toString();
 				return tmp;
 			case 4:
 				GetPosts gp = new GetPosts();
-				tmp = gp.getTop(param, values).toString();
+				tmp = gp.getTop(param, values, pss).toString();
 				return tmp;
+			case 5:
+				return ps.getProducts();
 			default:
 
 			}

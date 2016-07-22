@@ -17,7 +17,7 @@ public class GetPosts {
 	public GetPosts() {
 	}
 
-	public JSONArray getTop(String param, String value) throws JSONException {
+	public JSONArray getTop(String param, String value, int pss) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -29,9 +29,9 @@ public class GetPosts {
 		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
 		int n_tops = 0;
-		insert = "Select id FROM opinions";
+		insert = "Select id FROM opinions where tag_id=?";
 		if (param != null) {
-			insert += " where authors_id in (Select id from authors where ";
+			insert += " && authors_id in (Select id from authors where ";
 
 			for (int i = 0; i < params.length; i++) {
 				if (i > 0)
@@ -50,8 +50,9 @@ public class GetPosts {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			int rangeindex = 0;
+			int rangeindex = 1;
 			int i = 0;
+			query1.setInt(1, pss);
 			for (i = 1; value != null && i <= values.length; i++) {
 
 				if (!values[i - 1].contains("-")) {

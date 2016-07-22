@@ -1,5 +1,6 @@
 package importDB;
 
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -13,6 +14,7 @@ import backend.Settings;
 public class Data {
 	private HashMap<Integer, Author> authordb = new HashMap<Integer, Author>();
 	private HashMap<Integer, Opinion> opiniondb = new HashMap<Integer, Opinion>();
+	private HashMap<String,Integer> pss = new HashMap<String, Integer>();
 	private int totalposts;
 	private int totalviews;
 	private int totalcomments;
@@ -32,6 +34,18 @@ public class Data {
 	public String load() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		
+		try {
+			pss = new PSS().importPSS();
+		} catch (IOException e2) {
+			System.out.println("FILE IO EXCEPTION" + e2.getMessage());
+			 obj.put("Op", "Error").toString();
+			 obj.put("Message", "Problem reading from Product File");
+			 result.put(obj);
+			 return result.toString();
+		}
+		
+		pss.forEach((k,v) -> System.out.println("key: " + k + "value: " + v));
 
 		String query;
 
@@ -86,67 +100,61 @@ public class Data {
 		// Load Posts
 		try {
 			cndata = dbc.conndata();
-			query = ("Select * from " + dbc.posttn + " Where " + dbc.ptime + " < \'" + dbc.LastUpdated + "\'");
+			query = ("Select * from " + Settings.posttn + " Where " + Settings.ptime + " < \'" + dbc.LastUpdated + "\' ORDER BY ID ASC");
 			System.out.println(query);
 			dbc.setLastUpdated();
 			stmt = cndata.createStatement();
 			rs = stmt.executeQuery(query);
 
 			List<Integer> users = new ArrayList<Integer>();
+			if(!rs.next()){
+				obj.put("Op", "ERROR");
+				obj.put("Message", "ERROR (2): Remote Database Error\r\n Please check if populated");
+				result.put(obj);
+				return result.toString();
+			}
 
-			while (rs.next()) {
+			do{
 
-				int post_id = rs.getInt(dbc.rpost_id);
-				int id = rs.getInt(dbc.post_id);
-				int user_id = rs.getInt(dbc.puser_id);
-				Date time = rs.getDate(dbc.pdate);
-				int likes = rs.getInt(dbc.plikes);
-				int views = rs.getInt(dbc.pviews);
-				String message = rs.getString(dbc.pmessage);
+				int post_id = rs.getInt(Settings.rpost_id);
+				int id = rs.getInt(Settings.post_id);
+				int user_id = rs.getInt(Settings.puser_id);
+				Date time = rs.getDate(Settings.pdate);
+				int likes = rs.getInt(Settings.plikes);
+				int views = rs.getInt(Settings.pviews);
+				String message = rs.getString(Settings.pmessage);
 				Post _post = new Post(id, user_id, time, likes, views, message);
 				if (!(users.contains(user_id))) {
 					users.add(user_id);
 				}
 				if (post_id == 0) {
-
-					String[] words = message.split("[^\\w'-]+");
-
 					PSS pss = new PSS();
-					int tag = 0;
-					for (int i = 0; i < words.length; i++) {
-
-						String currentWord = words[i];
-
-						if (pss.tagexists(currentWord)) {
-							tag = pss.getTag(currentWord);
-						}
-					}
-
+					int tag = pss.getTag(message);
 					opiniondb.put(id, new Opinion(_post, tag));
 				} else {
 					Opinion _opin = opiniondb.get(post_id);
 					_opin.addcomment(_post);
 					opiniondb.put(post_id, _opin);
 				}
-			}
+			}while (rs.next());
 			rs.close();
 			String querycond = users.toString();
 			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 			// Load users
-			query = ("Select * from " + dbc.usertn + " where " + dbc.user_id + " in " + querycond);
-			// System.out.println(query);
+			query = ("Select * from " + Settings.usertn + " where " + Settings.user_id + " in " + querycond);
 			stmt = cndata.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt(dbc.user_id))) {
+				if (authordb.containsKey(rs.getInt(Settings.user_id))) {
 				} else {
-					authordb.put(rs.getInt(dbc.user_id), new Author(rs.getInt(dbc.user_id), rs.getString(dbc.uname),
-							rs.getInt(dbc.uage), rs.getString(dbc.ugender), rs.getString(dbc.uloc)));
+					authordb.put(rs.getInt(Settings.user_id), new Author(rs.getInt(Settings.user_id), rs.getString(Settings.uname),
+							rs.getInt(Settings.uage), rs.getString(Settings.ugender), rs.getString(Settings.uloc)));
 				}
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.print(e.getMessage());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "ERROR");
@@ -244,7 +252,6 @@ public class Data {
 
 		opiniondb.forEach((k, opinion) -> {
 			String update = "INSERT INTO opinions " + "Values (?,?,?,?,?,?,?,?)";
-			// System.out.println(query);
 
 			PreparedStatement query1 = null;
 			try {
@@ -258,7 +265,6 @@ public class Data {
 				query1.setDate(6, sqlDate);
 				query1.setInt(7, opinion.getTag());
 				query1.setInt(8, opinion.ncomments());
-				System.out.println(query1);
 				query1.executeUpdate();
 
 				opinion.getPosts().forEach((post) -> {
@@ -272,7 +278,6 @@ public class Data {
 						query2.setInt(4, k);
 						query2.setInt(5, post.getUID());
 
-						System.out.println(query2);
 						query2.executeUpdate();
 						if (query2 != null)
 							query2.close();
