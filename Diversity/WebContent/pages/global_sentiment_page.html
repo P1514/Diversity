@@ -1,6 +1,11 @@
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>Global Sentiment</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,6 +21,7 @@
 <script type="text/javascript">
 	var ws;
 	var jsonData;
+	var json;
 
 	function getCookie(name) {
 		var value = "; " + document.cookie;
@@ -46,7 +52,7 @@
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
 		ws.onopen = function() {
-			var json = {
+			json = {
 				"Op" : "globalsentiment",
 				"Pss" : getCookie("Product")
 			}
@@ -87,13 +93,13 @@
 					$('#posts tbody').append(tr);
 				}
 				// Detect table click
-				/*$('.table > tbody > tr').click(function(e) {
-					var json = {
+				$('.table > tbody > tr').click(function(e) {
+					json = {
 						"Op" : "getcomments",
-						"Oid" : $(this).find('input[name="id"]').val()
+						"Values" : $(this).find('input[name="id"]').val()
 					}
 					ws.send(JSON.stringify(json));
-				});*/
+				});
 			}
 
 			if (json[0].Op == "graph") {
@@ -101,7 +107,8 @@
 				drawGlobal();
 			}
 			if (json[0].Op == "comments") {
-				var w = window.open("/comments.html");
+				console.log("test");
+				var w = window.open("comments.html", "Comments", "width=700,height=800");
 			}
 		};
 	}

@@ -5,13 +5,18 @@ All notable changes to this project will be documented in this file.
 
 ### Upcoming Later Release
 - Add filter info to graph label(Confirm necessity because it requires graph redesign)
-- Influence Reach page with last post and only opinion authors
+- Chart for the population distribution
 
 ### Upcoming Next Release
-Click to see associated comments(Both Pages POP-UP)
+- Influence Reach page with last post and only opinion authors
+
+## [1.0.6] 2016-07-27
+### Added/Fixed
+- Click to see associated comments(Both Pages POP-UP)
 - Click to see Opinions at that time(Global Sentiment)
 - Home button redesign
 - Some font changes
+- Now allows different TomCat Ports because of Compatibility issues
 
 ## [1.0.5.2] 2016-07-27
 ### Added

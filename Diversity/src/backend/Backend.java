@@ -49,6 +49,10 @@ public class Backend {
 				return tmp;
 			case 5:
 				return ps.getProducts();
+			case 6:
+				GetComments gc = new GetComments();
+				tmp = gc.getAll(param, values).toString();
+				return tmp;
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");

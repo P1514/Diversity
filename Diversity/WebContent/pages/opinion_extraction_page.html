@@ -2,6 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>Opinion Extraction</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
@@ -81,15 +84,6 @@
 					}
 
 					ws.send(JSON.stringify(json));
-
-					/*json = {
-					        "Op":"getposts",
-					        "Param":"gender,gender,age"
-					        "Values":"female,male,0-30"
-					        }
-						
-					    ws.send(JSON.stringify(json));*/
-
 				};
 
 				ws.onmessage = function(event) {
@@ -114,12 +108,25 @@
 							tr.append("<td>" + json[i].Location + "</td>");
 							tr.append("<td>" + json[i].Gender + "</td>");
 							tr.append("<td>" + json[i].Age + "</td>");
+							tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 							$('#posts tbody').append(tr);
 						}
+						
+						$('.table > tbody > tr').click(function(e) {
+							json = {
+								"Op" : "getcomments",
+								"Values" : $(this).find('input[name="id"]').val()
+							}
+							ws.send(JSON.stringify(json));
+						});
 					}
 					if (json[0].Op == "graph") {
 						jsonData = JSON.parse(JSON.stringify(json));
 						drawChart();
+					}
+					if (json[0].Op == "comments") {
+						console.log("test");
+						var w = window.open("comments.html", "Comments", "width=700,height=800");
 					}
 
 				};

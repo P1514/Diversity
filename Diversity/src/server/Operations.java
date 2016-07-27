@@ -13,6 +13,7 @@ public class Operations {
 		op.put("globalsentiment", 3);
 		op.put("getposts", 4);
 		op.put("getproducts",5);
+		op.put("getcomments", 6);
 		
 		
 	}
