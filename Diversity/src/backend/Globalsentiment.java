@@ -95,6 +95,7 @@ public class Globalsentiment {
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
 			data.add(Calendar.MONTH, 1);
+			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
 			query1.setInt(3, pss);
 			if (param != null) {

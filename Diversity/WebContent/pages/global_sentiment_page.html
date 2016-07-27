@@ -15,6 +15,7 @@
 <script type="text/javascript">
 	var ws;
 	var jsonData;
+
 	function getCookie(name) {
 		var value = "; " + document.cookie;
 		var parts = value.split("; " + name + "=");
@@ -41,17 +42,17 @@
 		document.getElementById("Cookie").innerHTML = "Product: "
 				+ getCookie("Product");
 
-		ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+		ws = new WebSocket('ws://' + window.location.hostname + ":" + window.location.port + '/Diversity/server');
 		ws.onopen = function() {
 			var json = {
 				"Op" : "globalsentiment",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 
 			json = {
 				"Op" : "getposts",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 
 			ws.send(JSON.stringify(json));
@@ -62,6 +63,7 @@
 			if (json[0].Op == "table") {
 				//populate table
 				var tr;
+				$('#posts tbody').empty();
 				for (var i = 1; i < json.length; i++) {
 					tr = $('<tr/>');
 					tr.append("<td>" + json[i].Name + "</td>");
@@ -109,6 +111,7 @@
 
 		var options = {
 			title : 'Average Global Sentiment Over Time',
+
 			colors : [ '#604460' ],
 			hAxis : {
 				title : 'Month',
@@ -129,6 +132,24 @@
 				.getElementById('chart_div'));
 
 		chart.draw(globaldata, options);
+		google.visualization.events.addListener(chart, 'select', function() {
+			var selection = chart.getSelection();
+			if (selection != "") {
+				var row = selection[0].row;
+				var col = selection[0].column;
+				var month = globaldata.getValue(row, 0);
+
+				json = {
+					"Op" : "getposts",
+					"Pss" : getCookie("Product"),
+					"Param" : "Month",
+					"Values" : month,
+				}
+
+				ws.send(JSON.stringify(json));
+
+			}
+		})
 	}
 
 	//sentiment over time according to gender graph
@@ -238,7 +259,7 @@
 		case "Global":
 			var json = {
 				"Op" : "globalsentiment",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -249,7 +270,7 @@
 				"Op" : "globalsentiment",
 				"Param" : "gender",
 				"Values" : "Male,Female",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -260,7 +281,7 @@
 				"Op" : "globalsentiment",
 				"Param" : "location",
 				"Values" : "East,West",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -271,7 +292,7 @@
 				"Op" : "globalsentiment",
 				"Param" : "age",
 				"Values" : "0-30,31-60,61-90",
-				"Pss": getCookie("Product")
+				"Pss" : getCookie("Product")
 			}
 			ws.send(JSON.stringify(json));
 			break;
@@ -281,20 +302,13 @@
 
 
 <style>
-#global {
-	width: 70%;
-	height: 88.5%;
-	max-height: 1800px;
-	padding-left: 0.75%;
-	padding-right: 0.75%;
-	margin: auto;
-	clear: none;
-	float: none;
-	margin-left: auto;
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
 }
 
-#chart_div {
-	margin-top: 5%;
+#dashboard {
+	position: relative;
 }
 
 #buttons {
@@ -305,8 +319,20 @@
 	display: inline-block;
 }
 
+product {
+	display: block;
+	font-size: 20px;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+	margin-left: 0;
+	margin-right: 0;
+	font-weight: normal;
+}
+
 #home {
-	position:absolute; top:0; right:0;
+	position: absolute;
+	right: 10px;
+	top: 20px;
 }
 </style>
 </head>
@@ -316,16 +342,20 @@
 	<center>
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
 			align="top">
-				<form action="index.html">
-			<input id="home" class="btn btn-default" type="submit" value="Home" />
-	</form>
-		<!-- Charts -->
-		<div id="global" class="container">
-			<h2 align="left"><i><div id="Cookie">Error no product to display</div></i></h2>
-			<div id='chart_div'></div>
-	</center>
 
-	
+		<!-- Charts -->
+		<div class="container" id="dashboard">
+			<product align="left">
+			<div id="Cookie">Error no product to display</div>
+			</product>
+			<button onclick="location.href = 'index.html';" id="home"
+				class="btn btn-default">Home</button>
+
+			<hr>
+			<div id='chart_div'></div>
+			</center>
+
+
 	<!-- Tabela Posts-->
 	<div class="container">
 		<h2>Top 5</h2>
@@ -349,5 +379,5 @@
 			</tbody>
 		</table>
 	</div>
-	</div>
 </body>
+</html>

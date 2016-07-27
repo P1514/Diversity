@@ -3,6 +3,10 @@ package backend;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +25,7 @@ public class GetPosts {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
+		Calendar inputdate = Calendar.getInstance();;
 		obj.put("Op", "table");
 		result.put(obj);
 		String insert = new String();
@@ -29,43 +34,43 @@ public class GetPosts {
 		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
 		int n_tops = 0;
-		insert = "Select id FROM opinions where tag_id=?";
+		insert = "Select id FROM opinions where (tag_id=?";
 		if (param != null) {
-			insert += " && authors_id in (Select id from authors where ";
-
-			for (int i = 0; i < params.length; i++) {
-				if (i > 0)
-					insert += "&& ";
-				if (!(values[i].contains("-"))) {
-					insert += params[i] + "=? ";
-				} else {
-					insert += params[i] + ">=? && " + params[i] + "<=? ";
-				}
+			insert += " && timestamp >= ? && timestamp <= ?";
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
+			try {
+				inputdate.setTime(sdf.parse("1 " + 
+			inputdate.get(Calendar.YEAR) + " " + value));
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			insert += ")";
 		}
+		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
 		ResultSet rs = null;
+
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			int rangeindex = 1;
+			int rangeindex = 2;
 			int i = 0;
 			query1.setInt(1, pss);
-			for (i = 1; value != null && i <= values.length; i++) {
-
-				if (!values[i - 1].contains("-")) {
-					query1.setString(i + rangeindex, values[i - 1]);
-				} else {
-					String[] range = values[i - 1].split("-");
-					query1.setString(i + rangeindex, range[0]);
-					rangeindex++;
-					query1.setString(i + rangeindex, range[1]);
-				}
+			if (param != null) {
+				Calendar date = Calendar.getInstance();
+				if (!date.after(inputdate))
+					inputdate.add(Calendar.YEAR, -1);
+				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				inputdate.add(Calendar.MONTH, 1);
+				rangeindex++;
+				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				rangeindex++;
 
 			}
-			query1.setInt(i + rangeindex, MAXTOP);
+			System.out.print(query1);
+			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {

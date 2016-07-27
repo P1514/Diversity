@@ -8,8 +8,17 @@ All notable changes to this project will be documented in this file.
 - Influence Reach page with last post and only opinion authors
 
 ### Upcoming Next Release
-- Click to see associated comments(Both Pages POP-UP)
+Click to see associated comments(Both Pages POP-UP)
 - Click to see Opinions at that time(Global Sentiment)
+- Home button redesign
+- Some font changes
+
+## [1.0.5.2] 2016-07-27
+### Added
+- Click to see Opinions at that time(Global Sentiment)
+- Home button redesign
+- Some font changes
+- Now allows different TomCat Ports because of Compatibility issues
 
 ## [1.0.5.1] 2016-07-22
 ### Fixed

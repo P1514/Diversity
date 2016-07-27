@@ -61,7 +61,7 @@
 				document.getElementById("Cookie").innerHTML = "Product: "
 						+ getCookie("Product");
 
-				ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+				ws = new WebSocket('ws://' + window.location.hostname + ":" + window.location.port + '/Diversity/server');
 
 				ws.onopen = function() {
 					json = {
@@ -260,9 +260,9 @@
 					return "#00617F";
 				case "Female":
 					return "#0093C8";
-				case "East":
+				case "Asia":
 					return "#FF3C14";
-				case "West":
+				case "Europe":
 					return "#A60202";
 				case "0-30":
 					return "#BFD730";
@@ -314,19 +314,19 @@
 
 						if (location == "All") {
 							json.Param += "Location,";
-							json.Values += "East-West,";
+							json.Values += "Asia-Europe,";
 						}
-						if (location == "West") {
+						if (location == "Europe") {
 							json.Param += "Location,";
-							json.Values += "West,";
+							json.Values += "Europe,";
 						}
-						if (location == "East") {
+						if (location == "Asia") {
 							json.Param += "Location,";
-							json.Values += "East,";
+							json.Values += "Asia,";
 						}
 					} else {
 						json.Param += "Location,Location,";
-						json.Values += "East,West,";
+						json.Values += "Asia,Europe,";
 					}
 
 					if (age == "0-30" || age == "All") {
@@ -352,11 +352,15 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	content: " \25B4\25BE"
 }
 
+#dashboard {
+	position: relative;
+}
+
 #chart {
 	height: 100%;
 	top: 0;
 	left: 0;
-	width: 60%;
+	width: 100%;
 }
 
 #locationfilt {
@@ -380,31 +384,44 @@ input[type=radio] {
 }
 
 #refresh {
-	margin-top:25px;
+	margin-top: 25px;
 }
-#segmentation{
+
+#segmentation {
 	width: 70%;
-	align:center;
+	align: center;
 }
-#home{
-	position:absolute; top:0; right:0;
+
+#home {
+	position: absolute;
+	right: 10px;
+	top: 20px;
+}
+
+product {
+	display: block;
+	font-size: 20px;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+	margin-left: 0;
+	margin-right: 0;
+	font-weight: normal;
 }
 </style>
 </head>
 <body>
 
 	<!-- Logotipo -->
+
 	<center> <img src="../images/Diversity-Logo-120x62.png"
 		alt="Diversity Logo" align="top"></img> </center>
-<form action="index.html">
-		<input id="home" class="btn btn-default"
-			type="submit" value="Home"/>
-	</form>
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
-		<h2>
-			<i><div id="Cookie">Error no product to display</div></i>
-		</h2>
+		<product>
+		<div id="Cookie">Error no product to display</div>
+		</product>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
 		<hr>
 			<center>
 			<table id="segmentation">
@@ -427,8 +444,8 @@ input[type=radio] {
 					</select></th>
 					<th><select id="locationfilt">
 							<option value="All">All Locations
-								<option value="East">East
-									<option value="West">West
+								<option value="Asia">Asia
+									<option value="Europe">Europe
 					</select></th>
 					<th><select id="agefilt">
 							<option value="All">All Ages
@@ -439,11 +456,14 @@ input[type=radio] {
 				</tr>
 			</table>
 			<table>
-				<tr><th></th><th>
+				<tr>
+					<th></th>
+					<th>
 
 						<button class="btn btn-default" id="refresh"
 							onclick="changeRequest()">Update</button>
-							</th><th></th>
+					</th>
+					<th></th>
 
 				</tr>
 			</table>
@@ -454,7 +474,6 @@ input[type=radio] {
 	<!-- Tabela Posts-->
 	<div class="container">
 		<h2>Top 5</h2>
-
 		<hr>
 			<table id="posts" class="table sortable">
 				<thead>
