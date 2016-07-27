@@ -85,7 +85,7 @@ public class GetPosts {
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] = rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
+				pre_result[i] = topid[i] + ",," + rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
 						+ rs.getString("location") + ",," + rs.getString("gender") + ",," + rs.getInt("age") + ",,";
 				rs.close();
 				query1.close();
@@ -143,16 +143,17 @@ public class GetPosts {
 		for (int i = 0; i < n_tops; i++) {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
-			obj.put("Name", pre_results[0]);
-			obj.put("Influence", trunc(pre_results[1]));
-			obj.put("Location", pre_results[2]);
-			obj.put("Gender", pre_results[3]);
-			obj.put("Age", pre_results[4]);
-			obj.put("Date", pre_results[5]);
-			obj.put("Polarity", trunc(pre_results[6]));
-			obj.put("Reach", trunc(pre_results[7]));
-			obj.put("Comments", pre_results[8]);
-			obj.put("Message", pre_results[9]);
+			obj.put("Id", pre_results[0]);
+			obj.put("Name", pre_results[1]);
+			obj.put("Influence", trunc(pre_results[2]));
+			obj.put("Location", pre_results[3]);
+			obj.put("Gender", pre_results[4]);
+			obj.put("Age", pre_results[5]);
+			obj.put("Date", pre_results[6]);
+			obj.put("Polarity", trunc(pre_results[7]));
+			obj.put("Reach", trunc(pre_results[8]));
+			obj.put("Comments", pre_results[9]);
+			obj.put("Message", pre_results[10]);
 			result.put(obj);
 
 		}

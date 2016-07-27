@@ -28,18 +28,18 @@ public class Globalsentiment {
 		result.put(obj);
 
 		String[] time = new String[12];
-		time[0] = "JANUARY";
-		time[1] = "FEBRUARY";
-		time[2] = "MARCH";
-		time[3] = "APRIL";
+		time[0] = "JAN";
+		time[1] = "FEB";
+		time[2] = "MAR";
+		time[3] = "APR";
 		time[4] = "MAY";
-		time[5] = "JUNE";
-		time[6] = "JULY";
-		time[7] = "AUGUST";
-		time[8] = "SEPTEMBER";
-		time[9] = "OCTOBER";
-		time[10] = "NOVEMBER";
-		time[11] = "DECEMBER";
+		time[5] = "JUN";
+		time[6] = "JUL";
+		time[7] = "AUG";
+		time[8] = "SEP";
+		time[9] = "OCT";
+		time[10] = "NOV";
+		time[11] = "DEC";
 		if (param != null) {
 			words = values.split(",");
 		} else {

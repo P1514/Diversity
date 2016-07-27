@@ -12,6 +12,7 @@
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="sorttable.js"></script>
 <script type="text/javascript">
 	var ws;
 	var jsonData;
@@ -42,7 +43,8 @@
 		document.getElementById("Cookie").innerHTML = "Product: "
 				+ getCookie("Product");
 
-		ws = new WebSocket('ws://' + window.location.hostname + ":" + window.location.port + '/Diversity/server');
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
 		ws.onopen = function() {
 			var json = {
 				"Op" : "globalsentiment",
@@ -59,6 +61,11 @@
 		};
 		ws.onmessage = function(event) {
 			json = JSON.parse(event.data);
+			
+			if (json.Op == "Error") {
+				alert(json.Message);
+				return;
+			}
 
 			if (json[0].Op == "table") {
 				//populate table
@@ -69,23 +76,32 @@
 					tr.append("<td>" + json[i].Name + "</td>");
 					tr.append("<td>" + json[i].Message + "</td>");
 					tr.append("<td>" + json[i].Comments + "</td>");
-					tr.append("<td>" + json[i].Date + "</td>");
+					tr.append("<td width=\"100px\">" + json[i].Date + "</td>");
 					tr.append("<td>" + json[i].Polarity + "</td>");
 					tr.append("<td>" + json[i].Reach + "</td>");
 					tr.append("<td>" + json[i].Influence + "</td>");
 					tr.append("<td>" + json[i].Location + "</td>");
 					tr.append("<td>" + json[i].Gender + "</td>");
 					tr.append("<td>" + json[i].Age + "</td>");
+					tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 					$('#posts tbody').append(tr);
 				}
+				// Detect table click
+				/*$('.table > tbody > tr').click(function(e) {
+					var json = {
+						"Op" : "getcomments",
+						"Oid" : $(this).find('input[name="id"]').val()
+					}
+					ws.send(JSON.stringify(json));
+				});*/
 			}
 
-			if (json[0].Op == "Error") {
-				alert(jsonData[0].Message);
-			}
 			if (json[0].Op == "graph") {
 				jsonData = json;
 				drawGlobal();
+			}
+			if (json[0].Op == "comments") {
+				var w = window.open("/comments.html");
 			}
 		};
 	}
@@ -124,6 +140,7 @@
 					min : 100
 				}
 			},
+			legend: {position: 'none'},
 			width : '100%',
 			height : '100%'
 		};
@@ -148,6 +165,13 @@
 
 				ws.send(JSON.stringify(json));
 
+			} else {
+				json = {
+					"Op" : "getposts",
+					"Pss" : getCookie("Product")
+				}
+
+				ws.send(JSON.stringify(json));
 			}
 		})
 	}
@@ -342,42 +366,44 @@ product {
 	<center>
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
 			align="top">
+	</center>
 
-		<!-- Charts -->
-		<div class="container" id="dashboard">
-			<product align="left">
-			<div id="Cookie">Error no product to display</div>
-			</product>
-			<button onclick="location.href = 'index.html';" id="home"
-				class="btn btn-default">Home</button>
+	<!-- Charts -->
+	<div class="container" id="dashboard">
+		<product align="left">
+		<div id="Cookie">Error no product to display</div>
+		</product>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
 
-			<hr>
-			<div id='chart_div'></div>
-			</center>
-
-
-	<!-- Tabela Posts-->
-	<div class="container">
-		<h2>Top 5</h2>
 		<hr>
-		<table id="posts" class="table sortable">
-			<thead>
-				<tr>
-					<th>Original Author</th>
-					<th>Post</th>
-					<th># Comments</th>
-					<th>Date</th>
-					<th>Polarity</th>
-					<th>Reach</th>
-					<th>Influence</th>
-					<th>Location</th>
-					<th>Gender</th>
-					<th>Age</th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
+		<div id='chart_div'></div>
+
+
+
+		<!-- Tabela Posts-->
+		<div class="container">
+			<h2>Top 5</h2>
+			<hr>
+			<table id="posts" class="table sortable">
+				<thead>
+					<tr>
+						<th>Original Author</th>
+						<th>Post</th>
+						<th># Comments</th>
+						<th>Date</th>
+						<th>Polarity</th>
+						<th>Reach</th>
+						<th>Influence</th>
+						<th>Location</th>
+						<th>Gender</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </body>
 </html>

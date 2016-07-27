@@ -19,7 +19,8 @@ public class Backend {
 		String param;
 		String values;
 		String tmp;
-		int pss=0;;
+		int pss = 0;
+		;
 		PSS ps = new PSS();
 		try {
 			if (msg.has("Pss")) {
@@ -49,13 +50,17 @@ public class Backend {
 			case 5:
 				return ps.getProducts();
 			default:
+				msg = new JSONObject();
+				msg.put("Op", "Error");
+				msg.put("Message", "NOT A VALID OPERATION");
 
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return "Mistake";
+
+		return msg.toString();
 	}
 
 }

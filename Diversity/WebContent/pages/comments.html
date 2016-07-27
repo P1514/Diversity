@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Comments</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="sorttable.js"></script>
+<script type="text/javascript">
+
+var comments = window.opener.jsonData;
+comments=comments.clone();
+
+var tr;
+$('#posts tbody').empty();
+for (var i = 1; i < json.length; i++) {
+	tr = $('<tr/>');
+	tr.append("<td>" + json[i].Name + "</td>");
+	tr.append("<td>" + json[i].Message + "</td>");
+	tr.append("<td>" + json[i].Comments + "</td>");
+	tr.append("<td>" + json[i].Date + "</td>");
+	tr.append("<td>" + json[i].Polarity + "</td>");
+	tr.append("<td>" + json[i].Reach + "</td>");
+	tr.append("<td>" + json[i].Influence + "</td>");
+	tr.append("<td>" + json[i].Location + "</td>");
+	tr.append("<td>" + json[i].Gender + "</td>");
+	tr.append("<td>" + json[i].Age + "</td>");
+	$('#posts tbody').append(tr);
+}
+
+</script>
+<style>
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
+}
+</style>
+</head>
+<body>
+<!-- Tabela Posts-->
+		<div class="container">
+			<h2>Top 5</h2>
+			<hr>
+			<table id="posts" class="table sortable">
+				<thead>
+					<tr>
+						<th>Original Author</th>
+						<th>Post</th>
+						<th># Comments</th>
+						<th>Date</th>
+						<th>Polarity</th>
+						<th>Reach</th>
+						<th>Influence</th>
+						<th>Location</th>
+						<th>Gender</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+</body>
+</html>
