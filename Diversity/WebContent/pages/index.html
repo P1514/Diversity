@@ -9,7 +9,7 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-  var ws = new WebSocket('ws://127.0.0.1:8080/Diversity/server');
+  ws = new WebSocket('ws://' + window.location.hostname + ":" + window.location.port + '/Diversity/server');
   var json; 
   function getCookie(name) {
 		var value = "; " + document.cookie;
