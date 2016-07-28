@@ -19,8 +19,8 @@ public class Data {
 	private int totalviews;
 	private int totalcomments;
 	private int totallikes;
-	private Date LastUpdated = null;
-	private Date LastUpdated2 = null;
+	private java.sql.Date LastUpdated = null;
+	private java.sql.Date LastUpdated2 = null;
 	private Calendar cal = Calendar.getInstance();
 
 	Settings dbc = new Settings();
@@ -131,7 +131,7 @@ public class Data {
 				System.out.println(post_id+ " BLA");
 				int id = rs.getInt(Settings.post_id);
 				int user_id = rs.getInt(Settings.puser_id);
-				Date time = rs.getDate(Settings.pdate);
+				java.sql.Date time = rs.getDate(Settings.pdate);
 				int likes = rs.getInt(Settings.plikes);
 				int views = rs.getInt(Settings.pviews);
 				String message = rs.getString(Settings.pmessage);
@@ -356,8 +356,7 @@ public class Data {
 				query1.setDouble(3, opinion.getPolarity());
 				query1.setDouble(4, opinion.getTotalInf());
 				query1.setInt(5, opinion.getUID());
-				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime());
-				query1.setDate(6, sqlDate);
+				query1.setDate(6, opinion.getTime());
 				query1.setInt(7, opinion.getTag());
 				query1.setInt(8, opinion.ncomments());
 				query1.setDouble(9, opinion.getReach());

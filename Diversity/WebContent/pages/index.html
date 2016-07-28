@@ -84,11 +84,12 @@
 
 			ws.send(JSON.stringify(json));
 		}
-		json = {
+		setTimeout(function(){json = {
 			"Op" : "load",
 		}
 
-		ws.send(JSON.stringify(json));
+		ws.send(JSON.stringify(json));}, 3000);
+		
 	};
 </script>
 <style>
