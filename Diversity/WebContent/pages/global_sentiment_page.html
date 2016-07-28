@@ -3,7 +3,8 @@
 
 <html lang="en">
 <head>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Global Sentiment</title>
@@ -67,7 +68,7 @@
 		};
 		ws.onmessage = function(event) {
 			json = JSON.parse(event.data);
-			
+
 			if (json.Op == "Error") {
 				alert(json.Message);
 				return;
@@ -89,16 +90,18 @@
 					tr.append("<td>" + json[i].Location + "</td>");
 					tr.append("<td>" + json[i].Gender + "</td>");
 					tr.append("<td>" + json[i].Age + "</td>");
-					tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+					tr
+							.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 					$('#posts tbody').append(tr);
 				}
 				// Detect table click
 				$('.table > tbody > tr').click(function(e) {
-					json = {
+					/*json = {
 						"Op" : "getcomments",
 						"Values" : $(this).find('input[name="id"]').val()
 					}
-					ws.send(JSON.stringify(json));
+					ws.send(JSON.stringify(json));*/
+					clicker($(this).find('input[name="id"]').val());
 				});
 			}
 
@@ -108,7 +111,8 @@
 			}
 			if (json[0].Op == "comments") {
 				console.log("test");
-				var w = window.open("comments.html", "Comments", "width=700,height=800");
+				clicker();
+				//var w = window.open("comments.html", "Comments", "width=700,height=800");
 			}
 		};
 	}
@@ -147,7 +151,9 @@
 					min : 100
 				}
 			},
-			legend: {position: 'none'},
+			legend : {
+				position : 'none'
+			},
 			width : '100%',
 			height : '100%'
 		};
@@ -329,10 +335,43 @@
 			break;
 		}
 	}
+
+	function clicker(hidden) {
+		var thediv = document.getElementById('displaybox');
+		var embedCode='<iframe width="50%" height="50%" src="comments.html?id='+hidden+' frameborder="0" allowfullscreen="no"></iframe>';
+		if (thediv.style.display == "none") {
+			thediv.style.display = "";
+			thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='middle' width='80%' height='80%'>"+
+			"<param name='bgcolor' value='#000000'>"+embedCode+
+			"</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+			//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
+		} else {
+			thediv.style.display = "none";
+			thediv.innerHTML = '';
+		}
+		return false;
+	}
 </script>
 
 
 <style>
+#displaybox {
+	z-index: 10000;
+	filter: alpha(opacity = 50); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50); /* IE */
+	-moz-opacity: .50; /*older Mozilla*/
+	-khtml-opacity: 0.5; /*older Safari*/
+	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
+	background-color: #000000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: middle;
+}
+
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	 ):not (.sorttable_nosort ):after {
 	content: " \25B4\25BE"
@@ -374,6 +413,9 @@ product {
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
 			align="top">
 	</center>
+
+	<!-- POPUP -->
+	<div id="displaybox" style="display: none;"></div>
 
 	<!-- Charts -->
 	<div class="container" id="dashboard">

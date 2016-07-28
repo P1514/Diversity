@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Upcoming Next Release
 - Influence Reach page with last post and only opinion authors
 
-## [1.0.6] 2016-07-27
+## [1.0.6] 2016-07-27 Minor Fix on 2016-07-28
 ### Added/Fixed
 - Click to see associated comments(Both Pages POP-UP)
 - Click to see Opinions at that time(Global Sentiment)

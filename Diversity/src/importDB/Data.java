@@ -74,8 +74,8 @@ public class Data {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			obj.put("Op", "ERROR");
-			obj.put("Message", "ERROR (1): Missing Local Database");
+			obj.put("Op", "Error");
+			obj.put("Message", "Error (1): Missing Local Database");
 			result.put(obj);
 			return result.toString();
 		} finally {
@@ -108,8 +108,8 @@ public class Data {
 
 			List<Integer> users = new ArrayList<Integer>();
 			if(!rs.next()){
-				obj.put("Op", "ERROR");
-				obj.put("Message", "ERROR (2): Remote Database Error\r\n Please check if populated");
+				obj.put("Op", "Error");
+				obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
 				result.put(obj);
 				return result.toString();
 			}
@@ -157,8 +157,8 @@ public class Data {
 			System.out.print(e.getMessage());
 		} catch (SQLException e) {
 			e.printStackTrace();
-			obj.put("Op", "ERROR");
-			obj.put("Message", "ERROR (2): Remote Database Error\r\n Please check if populated");
+			obj.put("Op", "Error");
+			obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
 			result.put(obj);
 			return result.toString();
 		} finally {

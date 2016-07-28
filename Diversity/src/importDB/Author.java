@@ -60,11 +60,11 @@ public class Author {
 	}
 
 	public void addViews(int number) {
-		this.views = +number;
+		this.views += number;
 	}
 
 	public void addLikes(int number) {
-		this.likes = +number;
+		this.likes += number;
 	}
 
 	public void addPosts(){

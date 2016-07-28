@@ -81,7 +81,7 @@ public class Opinion {
 	public int nlikes() {
 		int num = this.main.getLikes();
 		for (Post i : comments) {
-			num = +i.getLikes();
+			num += i.getLikes();
 		}
 		return num;
 	}
@@ -89,7 +89,7 @@ public class Opinion {
 	public int nviews() {
 		int num = main.getViews();
 		for (Post i : comments) {
-			num = +i.getViews();
+			num += i.getViews();
 		}
 		return num;
 	}
