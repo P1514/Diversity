@@ -40,7 +40,7 @@ public class GetLastPost {
 			obj = new JSONObject();
 			obj.put("Id", rs.getInt("id"));
 			int id = rs.getInt("id");
-			obj.put("Reach", rs.getDouble("reach"));
+			obj.put("Reach", trunc(String.valueOf(rs.getDouble("reach"))));
 			obj.put("Date", rs.getDate("timestamp"));
 			rs.close();
 			query1.close();
@@ -85,6 +85,22 @@ public class GetLastPost {
 		}
 
 		return result;
+
+	}
+	private String trunc(String number) {
+		double result = 0;
+		try {
+
+			result = Double.valueOf(number);
+			number = String.format("%.2f", result);
+			result = Double.parseDouble(number);
+
+		} catch (Exception e) {
+			number = number.replaceAll(",", ".");
+			result = Double.parseDouble(number);
+
+		}
+		return Double.toString(result);
 
 	}
 

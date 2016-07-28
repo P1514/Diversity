@@ -67,12 +67,12 @@
 						"Values" : $(this).find('input[name="id"]').val()
 					}
 					ws.send(JSON.stringify(json));*//*
-									clicker($(this).find('input[name="id"]').val());
-								});*/
+													clicker($(this).find('input[name="id"]').val());
+												});*/
 			}
 
 			if (json[0].Op == "graph") {
-				jsonData = JSON.parse(JSON.stringify(json)	);
+				jsonData = JSON.parse(JSON.stringify(json));
 				drawBasic();
 			}
 			if (json[0].Op == "posttable") {
@@ -105,18 +105,26 @@
 		data.addColumn('date', 'Date');
 		data.addColumn('number', 'Influence');
 
-		data.addRows([ [ new Date(2016, 1, 31), 15 ],
-				[ new Date(2016, 2, 28), 30 ], [ new Date(2016, 3, 31), 75 ],
-				[ new Date(2016, 4, 30), 55 ], [ new Date(2016, 5, 31), 60 ],
-				[ new Date(2016, 6, 30), 65 ], [ new Date(2016, 7, 31), 45 ],
-				[ new Date(2016, 8, 31), 75 ], [ new Date(2016, 9, 30), 80 ] ]);
+		for(var i=1;i<jsonData.length;i++){
+			var counter = jsonData[i];
+			data.addRows([ [ new Date(counter.Date), counter.Value ] ]);
+		}
 
 		var options = {
 			hAxis : {
 				title : 'Time'
 			},
+			legend : {
+				position : 'none'
+			},
 			vAxis : {
-				title : 'Influence'
+				title : 'Influence',
+				viewWindowMode:'explicit',
+	            viewWindow: {
+	              max:4,
+	              min:0
+	            }
+				
 			}
 		};
 
@@ -125,18 +133,24 @@
 
 		chart.draw(data, options);
 	}
-	
-	function UpdatePost(sel){
-		 var value = sel.options[sel.selectedIndex].value;
-		 if(value != ""){
-		var json2 = {
+
+	function UpdatePost(sel) {
+		var value = sel.options[sel.selectedIndex].value;
+		if (value != "") {
+			var json2 = {
 				"Op" : "getlastpost",
 				"Author" : value
-				}
-				ws.send(JSON.stringify(json2));}else{
-					$('#posttable tbody').empty();
-					
-				}
+			}
+			ws.send(JSON.stringify(json2));
+			json2 = {
+				"Op" : "getinfgraph",
+				"Author" : value
+			}
+			ws.send(JSON.stringify(json2));
+		} else {
+			$('#posttable tbody').empty();
+
+		}
 	}
 </script>
 <style>

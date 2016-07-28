@@ -1,7 +1,7 @@
 package importDB;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.HashMap;
 
 import backend.Settings;
@@ -65,7 +65,7 @@ public class Opinion {
 		return total_inf;
 	}
 
-	public java.util.Date getTime() {
+	public java.sql.Date getTime() {
 		return timestamp;
 	}
 

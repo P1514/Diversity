@@ -66,6 +66,10 @@ public class Backend {
 				GetLastPost glp = new GetLastPost();
 				tmp = glp.get(msg.getString("Author")).toString();
 				return tmp;
+			case 10:
+				GetInfGraph gig = new GetInfGraph();
+				tmp = gig.getAll(msg.getString("Author")).toString();
+				return tmp;
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");

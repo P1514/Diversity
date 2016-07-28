@@ -51,6 +51,7 @@
 			if (json[0].Message != "Loaded Successfully") {
 				i == 0 ? alert(json[0].Message) : alert("Loaded Successfully "
 						+ i + " times");
+				i=0;
 				return;
 			}
 			i++;

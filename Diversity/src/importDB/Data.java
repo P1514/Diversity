@@ -128,6 +128,7 @@ public class Data {
 			do {
 
 				int post_id = rs.getInt(Settings.rpost_id);
+				System.out.println(post_id+ " BLA");
 				int id = rs.getInt(Settings.post_id);
 				int user_id = rs.getInt(Settings.puser_id);
 				Date time = rs.getDate(Settings.pdate);
@@ -145,7 +146,7 @@ public class Data {
 				} else {// Checks if opinion is new if not loads it from the
 						// local db
 
-					if (opiniondb.containsKey(post_id)) {
+					if (post_id != 0 && opiniondb.containsKey(post_id)) {
 						Opinion _opin = opiniondb.get(post_id);
 						_opin.addcomment(_post);
 						opiniondb.put(post_id, _opin);
@@ -154,7 +155,7 @@ public class Data {
 						cnlocal = dbc.connlocal();
 						// DONE finish this
 						insert2 = "Select * from posts where opinions_id = " + post_id + " ORDER BY ID ASC";
-						System.out.println(query);
+						System.out.println(insert2);
 						Statement stmt2 = cnlocal.createStatement();
 						ResultSet rs2 = stmt2.executeQuery(insert2);
 						if (!rs2.next()) {
@@ -355,7 +356,7 @@ public class Data {
 				query1.setDouble(3, opinion.getPolarity());
 				query1.setDouble(4, opinion.getTotalInf());
 				query1.setInt(5, opinion.getUID());
-				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime().getTime());
+				java.sql.Date sqlDate = new java.sql.Date(opinion.getTime());
 				query1.setDate(6, sqlDate);
 				query1.setInt(7, opinion.getTag());
 				query1.setInt(8, opinion.ncomments());

@@ -17,6 +17,7 @@ public class Operations {
 		op.put("clean", 7);
 		op.put("getauthors", 8);
 		op.put("getlastpost", 9);
+		op.put("getinfgraph", 10);
 		
 		
 	}
