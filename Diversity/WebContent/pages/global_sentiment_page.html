@@ -90,12 +90,12 @@
 					tr.append("<td>" + json[i].Location + "</td>");
 					tr.append("<td>" + json[i].Gender + "</td>");
 					tr.append("<td>" + json[i].Age + "</td>");
-					tr
-							.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+					tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 					$('#posts tbody').append(tr);
 				}
 				// Detect table click
 				$('.table > tbody > tr').click(function(e) {
+					console.log("HELLO");
 					/*json = {
 						"Op" : "getcomments",
 						"Values" : $(this).find('input[name="id"]').val()

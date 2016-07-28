@@ -2,6 +2,7 @@ package backend;
 
 import org.json.*;
 
+import importDB.CleanDB;
 import importDB.Data;
 import importDB.PSS;
 
@@ -52,6 +53,18 @@ public class Backend {
 			case 6:
 				GetComments gc = new GetComments();
 				tmp = gc.getAll(param, values).toString();
+				return tmp;
+			case 7:
+				CleanDB cdb = new CleanDB();
+				tmp = cdb.clean();
+				return tmp;
+			case 8:
+				GetAuthors ga = new GetAuthors();
+				tmp = ga.getAll().toString();
+				return tmp;
+			case 9:
+				GetLastPost glp = new GetLastPost();
+				tmp = glp.get(msg.getString("Author")).toString();
 				return tmp;
 			default:
 				msg = new JSONObject();

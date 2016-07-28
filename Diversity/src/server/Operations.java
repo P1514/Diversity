@@ -14,6 +14,9 @@ public class Operations {
 		op.put("getposts", 4);
 		op.put("getproducts",5);
 		op.put("getcomments", 6);
+		op.put("clean", 7);
+		op.put("getauthors", 8);
+		op.put("getlastpost", 9);
 		
 		
 	}

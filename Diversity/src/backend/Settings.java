@@ -3,13 +3,11 @@ package backend;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.Date;
 
 import com.mysql.jdbc.Connection;
 
 public class Settings {
 	// To be replaced by properties file
-	public Date LastUpdated = null;
 	// Data Origin DB Specs
 	public static final String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	public static final String user = "diversity";
@@ -59,8 +57,6 @@ public class Settings {
 
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, 2);
-		// DateFormat newDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-		this.LastUpdated = cal.getTime();
 		Class.forName("com.mysql.jdbc.Driver");
 		return (Connection) DriverManager.getConnection(url, user, pass);
 	}
@@ -80,9 +76,5 @@ public class Settings {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public void setLastUpdated() {
-		this.LastUpdated = Calendar.getInstance().getTime();
 	}
 }

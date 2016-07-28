@@ -12,19 +12,18 @@ public class Opinion {
 	private Post main;
 	private int author_id; // String
 	private ArrayList<Post> comments = new ArrayList<Post>();
-	private double reach=0;
+	private double reach = 0;
 	private double polarity = 0;
 	private Settings dbc = new Settings();
-	private double total_inf=0;
+	private double total_inf = 0;
 	private Date timestamp;
 	private int tag;
 
 	public Opinion(Post _main, int _tag) {
-		this.main=_main;
+		this.main = _main;
 		this.author_id = main.getUID();
 		timestamp = main.getTime();
-		tag=_tag;
-		
+		tag = _tag;
 
 	}
 
@@ -33,17 +32,17 @@ public class Opinion {
 				+ dbc.pWviews * (nviews() / avgViews);
 	}
 
-	public void evalPolarity( HashMap<Integer, Author> authordb) {
+	public void evalPolarity(HashMap<Integer, Author> authordb) {
 		total_inf = authordb.get(author_id).getInfluence();
-		polarity=total_inf*main.getPolarity();
-		
+		polarity = total_inf * main.getPolarity();
+
 		comments.forEach((v) -> {
-			total_inf+=authordb.get(v.getUID()).getInfluence();
-			polarity+=v.getPolarity()*authordb.get(v.getUID()).getInfluence();
-			
+			total_inf += authordb.get(v.getUID()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
+
 		});
-		
-		polarity=polarity/total_inf;
+
+		polarity = polarity / total_inf;
 	}
 
 	public void addcomment(Post _comment) {
@@ -62,40 +61,79 @@ public class Opinion {
 		return author_id;
 	}
 
-	public double getTotalInf(){
+	public double getTotalInf() {
 		return total_inf;
 	}
-	
-	public java.util.Date getTime(){
+
+	public java.util.Date getTime() {
 		return timestamp;
 	}
-	
-	public int getTag(){
+
+	public int getTag() {
 		return tag;
 	}
+
 	public int ncomments() {
-		
+
 		return (comments.isEmpty() ? 0 : comments.size());
 	}
 
+	public int newcomments() {
+		int newcomm = 0;
+
+		for (Post i : comments) {
+			if (i.getTime() != null)
+				newcomm++;
+		}
+
+		return newcomm;
+
+	}
+
 	public int nlikes() {
-		int num = this.main.getLikes();
+		int num = 0;
 		for (Post i : comments) {
 			num += i.getLikes();
 		}
 		return num;
 	}
 
+	public int newlikes() {
+
+		int newlike = 0;
+
+		for (Post i : comments) {
+			if (i.getTime() != null)
+				newlike+=i.getLikes();
+		}
+
+		return newlike;
+
+	}
+
 	public int nviews() {
-		int num = main.getViews();
+		int num = 0;
 		for (Post i : comments) {
 			num += i.getViews();
 		}
 		return num;
 	}
-	
-	public ArrayList<Post> getPosts(){
-		if(!comments.contains(this.main))comments.add(this.main);
+
+	public int newviews() {
+
+		int newview = 0;
+
+		for (Post i : comments) {
+			if (i.getTime() != null)
+				newview+=i.getViews();
+		}
+
+		return newview;
+	}
+
+	public ArrayList<Post> getPosts() {
+		if (!comments.contains(this.main))
+			comments.add(this.main);
 		return comments;
 	}
 }

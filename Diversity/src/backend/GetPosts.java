@@ -25,7 +25,7 @@ public class GetPosts {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
-		Calendar inputdate = Calendar.getInstance();;
+		Calendar inputdate = Calendar.getInstance();
 		obj.put("Op", "table");
 		result.put(obj);
 		String insert = new String();

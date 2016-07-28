@@ -2,22 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Opinion Extraction</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<link rel="stylesheet"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script
-	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script type="text/javascript"
-	src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="sorttable.js"></script>
-<script type="text/javascript">
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<link rel="stylesheet"
+		href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script
+			src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script type="text/javascript"
+			src="https://www.gstatic.com/charts/loader.js"></script>
+		<script src="sorttable.js"></script>
+		<script type="text/javascript">
 			var json;
 			var jsonData;
 			var ws;
@@ -108,16 +109,18 @@
 							tr.append("<td>" + json[i].Location + "</td>");
 							tr.append("<td>" + json[i].Gender + "</td>");
 							tr.append("<td>" + json[i].Age + "</td>");
-							tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+							tr
+									.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 							$('#posts tbody').append(tr);
 						}
-						
 						$('.table > tbody > tr').click(function(e) {
-							json = {
+							console.log("HELLO");
+							/*json = {
 								"Op" : "getcomments",
 								"Values" : $(this).find('input[name="id"]').val()
 							}
-							ws.send(JSON.stringify(json));
+							ws.send(JSON.stringify(json));*/
+							clicker($(this).find('input[name="id"]').val());
 						});
 					}
 					if (json[0].Op == "graph") {
@@ -126,9 +129,9 @@
 					}
 					if (json[0].Op == "comments") {
 						console.log("test");
-						var w = window.open("comments.html", "Comments", "width=700,height=800");
+						clicker();
+						//var w = window.open("comments.html", "Comments", "width=700,height=800");
 					}
-
 				};
 			}
 
@@ -136,6 +139,26 @@
 				packages : [ 'corechart', 'bar' ]
 			});
 			google.charts.setOnLoadCallback(connect);
+			// Detect table click
+
+			function clicker(hidden) {
+				var thediv = document.getElementById('displaybox');
+				var embedCode = '<iframe width="50%" height="50%" src="comments.html?id='
+						+ hidden
+						+ ' frameborder="0" allowfullscreen="no"></iframe>';
+				if (thediv.style.display == "none") {
+					thediv.style.display = "";
+					thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='middle' width='80%' height='80%'>"
+							+ "<param name='bgcolor' value='#000000'>"
+							+ embedCode
+							+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+					//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
+				} else {
+					thediv.style.display = "none";
+					thediv.innerHTML = '';
+				}
+				return false;
+			}
 
 			function drawChart() {
 				var data = new google.visualization.DataTable();
@@ -355,6 +378,23 @@
 			}
 		</script>
 		<style>
+#displaybox {
+	z-index: 10000;
+	filter: alpha(opacity = 50); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50); /* IE */
+	-moz-opacity: .50; /*older Mozilla*/
+	-khtml-opacity: 0.5; /*older Safari*/
+	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
+	background-color: #000000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: middle;
+}
+
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	 ):not (.sorttable_nosort ):after {
 	content: " \25B4\25BE"
@@ -418,11 +458,14 @@ product {
 </style>
 </head>
 <body>
-
+<!-- POPUP -->
+	<div id="displaybox" style="display: none;"></div>
 	<!-- Logotipo -->
 
 	<center> <img src="../images/Diversity-Logo-120x62.png"
 		alt="Diversity Logo" align="top"></img> </center>
+
+	
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
 		<product>

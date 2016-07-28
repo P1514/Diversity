@@ -54,6 +54,10 @@ public class Author {
 	public int getID() {
 		return id;
 	}
+	
+	public int getPosts(){
+		return posts;
+	}
 
 	public void addComments(int number) {
 		this.comments += number;
@@ -69,6 +73,18 @@ public class Author {
 
 	public void addPosts(){
 		this.posts += 1;
+	}
+	public void setComments(int number){
+		this.comments=number;
+	}
+	public void setViews(int number){
+		this.views=number;
+	}
+	public void setLikes(int number){
+		this.likes=number;
+	}
+	public void setPosts(int number){
+		this.posts=number;
 	}
 	public int getComments() {
 		return this.comments;

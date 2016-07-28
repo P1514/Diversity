@@ -34,6 +34,7 @@ CREATE TABLE `authors` (
   `comments` int(11) DEFAULT NULL,
   `likes` int(11) DEFAULT NULL,
   `views` int(11) DEFAULT NULL,
+  `posts` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -46,6 +47,26 @@ LOCK TABLES `authors` WRITE;
 /*!40000 ALTER TABLE `authors` DISABLE KEYS */;
 /*!40000 ALTER TABLE `authors` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `diversitydb`.`authors_BEFORE_UPDATE` BEFORE UPDATE ON `authors` FOR EACH ROW
+BEGIN
+
+Insert into `diversitydb`.`influences`(authors_id,timestamp,value) values(OLD.id,(Select lastupdated from general where id=1),OLD.influence);
+
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `general`
@@ -59,7 +80,10 @@ CREATE TABLE `general` (
   `totallikes` int(11) DEFAULT NULL,
   `totalcomments` int(11) DEFAULT NULL,
   `totalviews` int(11) DEFAULT NULL,
-  `lastupdated` date DEFAULT NULL
+  `lastupdated` date DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -69,7 +93,31 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `influences`
+--
+
+DROP TABLE IF EXISTS `influences`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `influences` (
+  `authors_id` int(11) DEFAULT NULL,
+  `timestamp` date DEFAULT NULL,
+  `value` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `influences`
+--
+
+LOCK TABLES `influences` WRITE;
+/*!40000 ALTER TABLE `influences` DISABLE KEYS */;
+/*!40000 ALTER TABLE `influences` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -115,6 +163,8 @@ CREATE TABLE `posts` (
   `id` int(11) NOT NULL,
   `polarity` double DEFAULT NULL,
   `message` longtext,
+  `likes` int(11) DEFAULT NULL,
+  `views` varchar(45) DEFAULT NULL,
   `opinions_id` int(11) NOT NULL,
   `authors_id` int(11) NOT NULL,
   PRIMARY KEY (`id`,`opinions_id`),
@@ -131,6 +181,14 @@ LOCK TABLES `posts` WRITE;
 /*!40000 ALTER TABLE `posts` DISABLE KEYS */;
 /*!40000 ALTER TABLE `posts` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'diversitydb'
+--
+
+--
+-- Dumping routines for database 'diversitydb'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -141,4 +199,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-19 18:13:59
+-- Dump completed on 2016-08-28 15:11:14

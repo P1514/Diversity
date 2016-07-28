@@ -1,129 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-  <title>Sentiment Home Page</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
-  ws = new WebSocket('ws://' + window.location.hostname + ":" + window.location.port + '/Diversity/server');
-  var json; 
-  function getCookie(name) {
+<title>Sentiment Home Page</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+	var json;
+	var i = 0;
+	function getCookie(name) {
 		var value = "; " + document.cookie;
 		var parts = value.split("; " + name + "=");
 		if (parts.length == 2)
 			return parts.pop().split(";").shift();
 	}
-  
-  function setCookie()
-  {
-	 // document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
-	  document.cookie="Product="+document.getElementById("Products").value;
-  }
-  
-  ws.onopen = function(){
-	  var jsonData = {
-				"Op" : "getproducts",
-			}
-			ws.send(JSON.stringify(jsonData));
-  }
-  ws.onmessage = function (event) {
-	  json = JSON.parse(event.data);
-		
-		if(json[0].Op == "Error"){
-			alert(json[0].Message);
+
+	function setCookie() {
+		// document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
+		document.cookie = "Product="
+				+ document.getElementById("Products").value;
+	}
+
+	ws.onopen = function() {
+		var jsonData = {
+			"Op" : "getproducts",
 		}
-		if(json[0].Op == "products"){
+		ws.send(JSON.stringify(jsonData));
+	}
+	ws.onmessage = function(event) {
+		json = JSON.parse(event.data);
+
+		if (json[0].Op == "Error") {
+			if (i != 0
+					&& json[0].Message == "Close this Message and wait for the next one to confirm Database loading") {
+				return;
+			}
+			if (json[0].Message != "Loaded Successfully") {
+				i == 0 ? alert(json[0].Message) : alert("Loaded Successfully "
+						+ i + " times");
+				return;
+			}
+			i++;
+			refreshDB(0);
+
+		}
+		if (json[0].Op == "products") {
 			populatePSS();
 		}
-	  
-  }
-  
-  function populatePSS(){
-	  var x = document.getElementById("Products");	  
-	  for(var i=1;i<json.length;i++){
-		  console.log(json[i].Name);
-	  var option = document.createElement('option');
-	  option.text = json[i].Name;
-	  option.value = option.text;
-	  x.add(option);
-	  }
-	  $("#Products").val(getCookie("Product"));
-  }
-  
-  function refreshDB(){
+
+	}
+
+	function populatePSS() {
+		var x = document.getElementById("Products");
+		for (var i = 1; i < json.length; i++) {
+			console.log(json[i].Name);
+			var option = document.createElement('option');
+			option.text = json[i].Name;
+			option.value = option.text;
+			x.add(option);
+		}
+		$("#Products").val(getCookie("Product"));
+	}
+
+	function refreshDB(clean) {
+		if (clean == 1) {
+			json = {
+				"Op" : "clean",
+			}
+
+			ws.send(JSON.stringify(json));
+		}
 		json = {
-              "Op":"load",
-              }
-		
-        ws.send(JSON.stringify(json));
-  };
-  </script>
-  <style>
-	#pss{
-		margin-top: 150px;
-	}
-	
-	#buttons{
-		margin-top: 150px;
-	}
-	
-	#opinion{
-		display:inline-block;
-	}
-	
-	#global{
-		display:inline-block;
-		margin-left:100px;
-	}
-	
-	#refresh{
-		display:inline-block;
-		margin-left:100px;
-	}
-	
-  </style>
+			"Op" : "load",
+		}
+
+		ws.send(JSON.stringify(json));
+	};
+</script>
+<style>
+#pss {
+	margin-top: 150px;
+}
+
+#buttons {
+	margin-top: 150px;
+}
+
+#opinion {
+	display: inline-block;
+}
+
+#global {
+	display: inline-block;
+	margin-left: 100px;
+}
+
+#refresh {
+	display: inline-block;
+	margin-left: 100px;
+}
+</style>
 </head>
 <body>
 
-<center>
-<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
 
-<!--Lista de PSS-->
-<div id="pss">
-<label>Choose Product:</label>
-<select id="Products">
-</select>
-</div>
+		<!--Lista de PSS-->
+		<div id="pss">
+			<label>Choose Product:</label> <select id="Products">
+			</select>
+		</div>
 
-<!-- Botões opcionais -->
-<table id="buttons">
-	<td>
-		<form action="opinion_extraction_page.html">
-			<input id="opinion" class="btn btn-default" onclick="setCookie();" type="submit" value="Get Opinion"/>
-		</form>
-	</td>
-	<td>
-	<form action="global_sentiment_page.html">
-			<input id="global" class="btn btn-default" onclick="setCookie();" type="submit" value="Get Global Sentiment"/>
-	</form>	
-	</td>
-	<td>
-		<form>
-			<input id="refresh" class = "btn btn-default" type=button value="Refresh" onClick="refreshDB()">
-		</form>
-	</td>
-</table>
+		<!-- Botões opcionais -->
+		<table id="buttons">
+			<td>
+				<form action="opinion_extraction_page.html">
+					<input id="opinion" class="btn btn-default" onclick="setCookie();"
+						type="submit" value="Get Opinion" />
+				</form>
+			</td>
+			<td>
+				<form action="global_sentiment_page.html">
+					<input id="global" class="btn btn-default" onclick="setCookie();"
+						type="submit" value="Get Global Sentiment" />
+				</form>
+			</td>
+			<td>
+				<form>
+					<input id="refresh" class="btn btn-default" type=button
+						value="Refresh" onClick="refreshDB(1)">
+				</form>
+			</td>
+		</table>
 
 
 
 
 
-</center>
+	</center>
 </body>

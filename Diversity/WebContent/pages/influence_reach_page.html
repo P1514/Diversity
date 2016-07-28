@@ -1,227 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Influence and Reach</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<title>Influence and Reach</title>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
-  google.charts.load('current', {packages: ['corechart', 'line']});
-	google.charts.setOnLoadCallback(drawBasic);
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+	var ws;
+	var json;
+	var jsonData;
+	function connect() {
+		$('#posttable tbody').empty();
+		/*document.getElementById("Cookie").innerHTML = "Product: "
+				+ getCookie("Product");
+		 */
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+		ws.onopen = function() {
+			json = {
+				"Op" : "getauthors",
+			/*"Pss" : getCookie("Product")*/
+			}
+			ws.send(JSON.stringify(json));
+		};
+		ws.onmessage = function(event) {
+			json = JSON.parse(event.data);
+
+			if (json.Op == "Error") {
+				alert(json.Message);
+				return;
+			}
+
+			if (json[0].Op == "authtable") {
+				//populate table
+				var tr;
+				$('#authtable tbody').empty();
+				for (var i = 1; i < json.length; i++) {
+					tr = $('<tr/>');
+					tr.append("<td>" + json[i].Name + "</td>");
+					tr.append("<td>" + json[i].Gender + "</td>");
+					tr.append("<td>" + json[i].Age + "</td>");
+					tr.append("<td>" + json[i].Location + "</td>");
+					tr.append("<td>" + json[i].Nposts + "</td>");
+					tr.append("<td>" + json[i].Avgcomms + "</td>");
+					tr.append("<td>" + json[i].Avglikes + "</td>");
+					tr.append("<td>" + json[i].Avgviews + "</td>");
+					tr.append("<td>" + json[i].Influence + "</td>");
+					$('#authtable tbody').append(tr);
+				}
+				// Detect table click
+				/*$('.table > tbody > tr').click(function(e) {
+					console.log("HELLO");
+					/*json = {
+						"Op" : "getcomments",
+						"Values" : $(this).find('input[name="id"]').val()
+					}
+					ws.send(JSON.stringify(json));*//*
+									clicker($(this).find('input[name="id"]').val());
+								});*/
+			}
+
+			if (json[0].Op == "graph") {
+				jsonData = JSON.parse(JSON.stringify(json)	);
+				drawBasic();
+			}
+			if (json[0].Op == "posttable") {
+				//populate table
+				var tr;
+				$('#posttable tbody').empty();
+				for (var i = 1; i < json.length; i++) {
+					tr = $('<tr/>');
+					tr.append("<td>" + json[i].Message + "</td>");
+					tr.append("<td>" + json[i].Date + "</td>");
+					tr.append("<td>" + json[i].Ncomms + "</td>");
+					tr.append("<td>" + json[i].Nlikes + "</td>");
+					tr.append("<td>" + json[i].Nviews + "</td>");
+					tr.append("<td>" + json[i].Reach + "</td>");
+					$('#posttable tbody').append(tr);
+				}
+			}
+			;
+		}
+	}
+
+	google.charts.load('current', {
+		packages : [ 'corechart', 'line' ]
+	});
+	google.charts.setOnLoadCallback(connect);
 
 	function drawBasic() {
 
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', 'Influence');
+		var data = new google.visualization.DataTable();
+		data.addColumn('date', 'Date');
+		data.addColumn('number', 'Influence');
 
-      data.addRows([
-        [new Date(2016, 1, 31), 15],   
-		[new Date(2016, 2, 28), 30],  
-		[new Date(2016, 3, 31), 75],  
-		[new Date(2016, 4, 30), 55],  
-		[new Date(2016, 5, 31), 60],  
-		[new Date(2016, 6, 30), 65],
-        [new Date(2016, 7, 31), 45],  
-		[new Date(2016, 8, 31), 75],  
-		[new Date(2016, 9, 30), 80]
-      ]);
+		data.addRows([ [ new Date(2016, 1, 31), 15 ],
+				[ new Date(2016, 2, 28), 30 ], [ new Date(2016, 3, 31), 75 ],
+				[ new Date(2016, 4, 30), 55 ], [ new Date(2016, 5, 31), 60 ],
+				[ new Date(2016, 6, 30), 65 ], [ new Date(2016, 7, 31), 45 ],
+				[ new Date(2016, 8, 31), 75 ], [ new Date(2016, 9, 30), 80 ] ]);
 
-      var options = {
-        hAxis: {
-          title: 'Time'
-        },
-        vAxis: {
-          title: 'Popularity'
-        }
-      };
+		var options = {
+			hAxis : {
+				title : 'Time'
+			},
+			vAxis : {
+				title : 'Influence'
+			}
+		};
 
-      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
 
-      chart.draw(data, options);
-    }
-  </script>
-  <style>
-  #table1{
-	margin-top:5%;
-  }
-  
-  #chart_div{
-	margin-top:1%;
-  }
-  
-  #authors{
-	margin-left:2%;
-  }
-  
-  #chart_div{
-	margin-top:2%;
-  }
-  
-  #table2{
-	margin-top:2%;
-  }
-  </style>
+		chart.draw(data, options);
+	}
+	
+	function UpdatePost(sel){
+		 var value = sel.options[sel.selectedIndex].value;
+		 if(value != ""){
+		var json2 = {
+				"Op" : "getlastpost",
+				"Author" : value
+				}
+				ws.send(JSON.stringify(json2));}else{
+					$('#posttable tbody').empty();
+					
+				}
+	}
+</script>
+<style>
+#table1 {
+	margin-top: 5%;
+}
+
+#chart_div {
+	margin-top: 1%;
+}
+
+#authors {
+	margin-left: 2%;
+}
+
+#chart_div {
+	margin-top: 2%;
+}
+
+#table2 {
+	margin-top: 2%;
+}
+</style>
 </head>
 <body>
 
-<!-- Logotipo Diversity-->
-<center>
-	<a href="index.html">
-		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo" align="top">
-	</a>
-</center>
+	<!-- Logotipo Diversity-->
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+	</center>
+	<div class="container" id="dashboard">
 
-<div class="authors">
-  <h2 align="left">Influence and Reach</h2>
-  
-  <table id="table1" class="table">
-    <thead>
-      <tr>
-        <th>Author</th>
-        <th>Gender</th>
-        <th>Age</th>
-		<th>Location</th>
-        <th>#posts</th>
-        <th>Comments/post</th>
-		<th>Likes/post</th>
-        <th>Views/post</th>
-        <th>Influence</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Author 1</td>
-        <td>Female</td>
-        <td>34</td>
-		<td>East</td>
-        <td>354</td>
-        <td>12</td>
-		<td>31</td>
-        <td>67</td>
-        <td>1.2</td>
-      </tr>
-      <tr>
-        <td>Author 2</td>
-        <td>Male</td>
-        <td>29</td>
-		<td>West</td>
-        <td>123</td>
-        <td>8</td>
-		<td>17</td>
-        <td>32</td>
-        <td>0.8</td>
-      </tr>
-      <tr>
-        <td>Author 3</td>
-        <td>Male</td>
-        <td>37</td>
-		<td>East</td>
-        <td>472</td>
-        <td>24</td>
-		<td>35</td>
-        <td>25</td>
-        <td>1.6</td>
-      </tr>
-	  <tr>
-        <td>Author 4</td>
-        <td>Female</td>
-        <td>25</td>
-		<td>West</td>
-        <td>524</td>
-        <td>43</td>
-		<td>45</td>
-        <td>35</td>
-        <td>1.9</td>
-      </tr>
-	  <tr>
-        <td>Author 5</td>
-        <td>Male</td>
-        <td>45</td>
-		<td>East</td>
-        <td>523</td>
-        <td>35</td>
-		<td>46</td>
-        <td>24</td>
-        <td>1.4</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+		<div class="authors">
+			<h2 align="left">Influence</h2>
 
-<div class="selectedauthor">
-  <select id="authors" align="left">
-            <option value="">Author Name</option>
-            <option value="a1">Author 1</option>
-            <option value="a2">Author 2</option>
-            <option value="a3">Author 3</option>
-            <option value="a4">Author 4</option>
-			<option value="a5">Author 5</option>
-         </select>
-		 
-  <div id="chart_div"></div>
-  
-  <table id="table2" class="table">
-	<thead>
-      <tr>
-        <th>Post</th>
-        <th>Date</th>
-        <th>#comments</th>
-		<th>#likes</th>
-        <th>#views</th>
-        <th>Reach</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Author 1</td>
-        <td>Female</td>
-        <td>34</td>
-		<td>East</td>
-        <td>354</td>
-        <td>12</td>
-      </tr>
-      <tr>
-        <td>Author 2</td>
-        <td>Male</td>
-        <td>29</td>
-		<td>West</td>
-        <td>123</td>
-        <td>8</td>
-      </tr>
-      <tr>
-        <td>Author 3</td>
-        <td>Male</td>
-        <td>37</td>
-		<td>East</td>
-        <td>472</td>
-        <td>24</td>
-      </tr>
-	  <tr>
-        <td>Author 4</td>
-        <td>Female</td>
-        <td>25</td>
-		<td>West</td>
-        <td>524</td>
-        <td>43</td>
-      </tr>
-	  <tr>
-        <td>Author 5</td>
-        <td>Male</td>
-        <td>45</td>
-		<td>East</td>
-        <td>523</td>
-        <td>35</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+			<table id="authtable" class="table">
+				<thead>
+					<tr>
+						<th>Author</th>
+						<th>Gender</th>
+						<th>Age</th>
+						<th>Location</th>
+						<th>#posts</th>
+						<th>Comments/post</th>
+						<th>Likes/post</th>
+						<th>Views/post</th>
+						<th>Influence</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="selectedauthor">
+			<select id="authors" align="left" onchange="UpdatePost(this)">
+				<option value="">Author Name</option>
+				<option value="Sandra Goodrich">Sandra Goodrich</option>
+				<option value="Noel Scott Engel">Noel Scott Engel</option>
+				<option value="David Jones">David Jones</option>
+				<option value="Eunice Waymoon">Eunice Waymoon</option>
+				<option value="Christa Paffgen">Christa Paffgen</option>
+				<option value="Jimmy Plant">Jimmy Plant</option>
+			</select>
+
+			<div id="chart_div"></div>
+
+			<table id="posttable" class="table">
+				<thead>
+					<tr>
+						<th>Post</th>
+						<th>Date</th>
+						<th>#comments</th>
+						<th>#likes</th>
+						<th>#views</th>
+						<th>Reach</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Author 1</td>
+						<td>Female</td>
+						<td>34</td>
+						<td>East</td>
+						<td>354</td>
+						<td>12</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
 </body>
 </html>
