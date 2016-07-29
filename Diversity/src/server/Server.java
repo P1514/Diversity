@@ -2,10 +2,11 @@
 package server;
 
 import java.io.IOException;
-
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.json.*;
@@ -14,7 +15,13 @@ import backend.Backend;
 @ServerEndpoint("/server")
 public class Server {
 	public static boolean isloading = false;
-
+	private Session session;
+	private Operations op = new Operations();
+	
+	@OnOpen
+	public void open(Session session){
+		this.session=session;
+	}
 	@OnMessage
 	public void receivedMessage(Session session, String msg, boolean last) {
 
@@ -25,9 +32,9 @@ public class Server {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Assistant a = new Assistant(session, resolve);
-		Thread assist = new Thread(a);
-		assist.start();
+		//Assistant a = new Assistant(session, resolve);
+		//Thread assist = new Thread(a);
+		runn(resolve);
 
 	}
 
@@ -41,6 +48,12 @@ public class Server {
 		}
 
 	}
+	
+	public void send_message(String msg) {
+			Async as = session.getAsyncRemote();
+			as.sendText(msg);
+			return;
+	}
 
 	@OnError
 	public void onError(Session session, Throwable thr) {
@@ -52,50 +65,55 @@ public class Server {
 		}
 	}
 
-	public class Assistant  implements Runnable  {
+	/*public void Assistantimplements Runnable {
 		private Session session;
 		private JSONObject msg;
 		private Operations op;
 		private Backend be;
 
-		public Assistant(Session _session, JSONObject _msg) {
+		public void Assistant(Session _session, JSONObject _msg) {
 			session = _session;
 			msg = _msg;
 			op = new Operations();
 		}
 
-		// @Override
-		public void run() {
+		// @Override*/
+		public void runn(JSONObject msg) {
 			JSONArray result = new JSONArray();
 			JSONObject obj = new JSONObject();
-			//System.out.println(msg);
+			// System.out.println(msg);
+			Backend be;
 
 			try {
 				if (session.isOpen()) {
 					try {
 						while (true) {
 							if (Server.isloading == true) {
-								if (op.getOP(msg.getString("Op")) == 2){
+								if (op.getOP(msg.getString("Op")) == 2) {
 									obj.put("Op", "Error");
-								obj.put("Message", "Loading in Progress please wait a few minutes and try again");
-								result.put(obj);
-								session.getBasicRemote().sendText(result.toString());
-									return;}
+									obj.put("Message", "Loading in Progress please wait a few minutes and try again");
+									result.put(obj);
+									session.getBasicRemote().sendText(result.toString());
+									return;
+								}
 								Thread.sleep(1000);
 
-							}else{break;}
+							} else {
+								break;
+							}
 						}
 						if (op.getOP(msg.getString("Op")) == 2) {
 							Server.isloading = true;
 							obj.put("Op", "Error");
-							obj.put("Message", "Close this Message and wait for the next one to confirm Database loading");
+							obj.put("Message",
+									"Close this Message and wait for the next one to confirm Database loading");
 							result.put(obj);
 							session.getBasicRemote().sendText(result.toString());
 						}
 						be = new Backend(op.getOP(msg.getString("Op")), msg);
 						if (op.getOP(msg.getString("Op")) == 2)
-							Server.isloading=false;
-						session.getBasicRemote().sendText(be.resolve());
+							Server.isloading = false;
+						send_message(be.resolve());
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -111,7 +129,7 @@ public class Server {
 					// Ignore
 				}
 			}
-			//System.out.println(result.toString());
-			}
-	}
+			// System.out.println(result.toString());
+		}
+	//}
 }

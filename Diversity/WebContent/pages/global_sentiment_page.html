@@ -23,6 +23,10 @@
 	var ws;
 	var jsonData;
 	var json;
+	var global_data;
+	var gendata;
+	var agedata;
+	var locdata;
 
 	function getCookie(name) {
 		var value = "; " + document.cookie;
@@ -44,6 +48,12 @@
 	$(window).on('resizeEnd', function() {
 		if (jsonData != 0)
 			drawGlobal();
+		if (gendata != 0)
+			drawColumn("genchart_div", "Gender", gendata);
+		if (locdata != 0)
+			drawColumn("locchart_div", "Location", locdata);
+		if (agedata != 0)
+			drawColumn("agechart_div", "Age", agedata);
 	});
 
 	function connect() {
@@ -64,6 +74,24 @@
 				"Pss" : getCookie("Product")
 			}
 
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Pss" : getCookie("Product"),
+				"Param" : "gender"
+			}
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Pss" : getCookie("Product"),
+				"Param" : "age"
+			}
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Pss" : getCookie("Product"),
+				"Param" : "location"
+			}
 			ws.send(JSON.stringify(json));
 		};
 		ws.onmessage = function(event) {
@@ -107,12 +135,23 @@
 			}
 
 			if (json[0].Op == "graph") {
-				jsonData = json;
+				global_data = JSON.parse(JSON.stringify(json));
 				drawGlobal();
+			}
+			if (json[0].Op == "gengraph") {
+				gendata = JSON.parse(JSON.stringify(json));
+				drawColumn("genchart_div", "Gender", gendata);
+			}
+			if (json[0].Op == "agegraph") {
+				agedata = JSON.parse(JSON.stringify(json));
+				drawColumn("agechart_div", "Age",agedata);
+			}
+			if (json[0].Op == "locgraph") {
+				locdata = JSON.parse(JSON.stringify(json));
+				drawColumn("locchart_div", "Location",locdata);
 			}
 			//if 
 			if (json[0].Op == "comments") {
-				console.log("test");
 				clicker();
 				//var w = window.open("comments.html", "Comments", "width=700,height=800");
 			}
@@ -128,8 +167,8 @@
 
 	//global sentiment graph
 	function drawGlobal() {
-		
-		var data = JSON.parse(JSON.stringify(jsonData));
+
+		var data = JSON.parse(JSON.stringify(global_data));
 		globaldata = new google.visualization.DataTable();
 		globaldata.addColumn('string', 'Month');
 		globaldata.addColumn('number', 'Global');
@@ -191,103 +230,68 @@
 		})
 	}
 
-	//sentiment over time according to gender graph
-	function drawPop() {
-		var data = globaldata.clone();
-		data.addColumn('number', 'Male');
-		data.addColumn('number', 'Female');
-
-		for (var i = 1; i < jsonData.length; i++) {
-			var counter = jsonData[i];
-			console.log(counter.month + " " + counter.Male + " "
-					+ counter.Female + " " + counter.sentiment);
-			data.setCell(i, 2, counter.Male);
-			data.setCell(i, 3, counter.Female);
+	// Population Graphs
+	function drawColumn(graph, title, data) {
+		var localdata = new google.visualization.DataTable();
+		var paramcount = 0;
+		localdata.addColumn('string', data[0].Param);
+		for (var i= 1;i<data.length;i++)
+		localdata.addColumn('number', data[i].Param);
+		var values = new Array();
+		values.push(data[0].param);
+		for (var i = 1; i < data.length; i++) {
+			values.push(data[i].Value);
+			paramcount++;
 		}
+		localdata.addRow(values);
+		var colors = new Array();
+		for (var i = 1; i < paramcount+1; i++) {
+			colors.push(chartcolor(localdata.getColumnLabel(i)));
+		}
+		console.log(colors);
 
 		var options = {
-			title : 'Average Sentiment Over Time By Gender',
-			hAxis : {
-				title : 'Month'
+			title : title,
+			colors : colors,
+			legend : {
+				position : 'none'
+			},
+			bar : {
+				groupWidth : '50%'
 			},
 			vAxis : {
-				title : 'Sentiment'
+				viewWindow : {
+					min : 0,
+				},
 			},
-			colors : [ '#000000', '#00617F', '#0093C8' ],
 			width : '100%',
 			height : '100%'
 		};
 
-		var chart = new google.visualization.LineChart(document
-				.getElementById('popchart_div'));
-		chart.draw(data, options);
-	}
+		var chart = new google.visualization.ColumnChart(document
+				.getElementById(graph));
+		chart.draw(localdata, options);
 
-	//sentiment over time according to location graph
-	function drawLoc() {
-
-		var data = JSON.parse(JSON.stringify(jsonData));
-		data.addColumn('number', 'East');
-		data.addColumn('number', 'West');
-
-		for (var i = 1; i < jsonData.length; i++) {
-			var counter = jsonData[i];
-			console.log(counter.month + " " + counter.East + " " + counter.West
-					+ " " + counter.sentiment);
-			data.setCell(i, 2, counter.East);
-			data.setCell(i, 3, counter.West);
+		function chartcolor(data) {
+			switch (data) {
+			case "Global":
+				return "#604460";
+			case "Male":
+				return "#00617F";
+			case "Female":
+				return "#0093C8";
+			case "Asia":
+				return "#FF3C14";
+			case "Europe":
+				return "#A60202";
+			case "0-30":
+				return "#BFD730";
+			case "31-60":
+				return "#8CA122";
+			case "61-90":
+				return "#5C6E0E";
+			}
 		}
-
-		var options = {
-			title : 'Average Sentiment Over Time By Location',
-			hAxis : {
-				title : 'Month'
-			},
-			vAxis : {
-				title : 'Sentiment'
-			},
-			colors : [ '#000000', '#FA1414', '#A60202' ],
-			width : '100%',
-			height : '100%'
-		};
-
-		var chart = new google.visualization.LineChart(document
-				.getElementById('locchart_div'));
-		chart.draw(data, options);
-	}
-
-	//sentiment over time according to age ranges chart
-	function drawAge() {
-
-		var data = JSON.parse(JSON.stringify(jsonData));
-		data.addColumn('number', '0-30');
-		data.addColumn('number', '31-60');
-		data.addColumn('number', '61-90');
-
-		for (var i = 1; i < jsonData.length; i++) {
-			var counter = jsonData[i];
-			console.log(counter.month + " " + counter.sentiment);
-			data.setCell(i, 2, counter["0-30"]);
-			data.setCell(i, 3, counter["31-60"]);
-			data.setCell(i, 4, counter["61-90"]);
-		}
-
-		var options = {
-			title : 'Average Sentiment Over Time By Age Range',
-			hAxis : {
-				title : 'Month'
-			},
-			vAxis : {
-				title : 'Sentiment'
-			},
-			colors : [ '#000000', '#BFD730', '#8CA122', '#5C6E0E' ],
-			width : '100%',
-			height : '100%'
-		};
-
-		var chart = new google.visualization.LineChart(document
-				.getElementById('agechart_div'));
-		chart.draw(data, options);
 	}
 
 	//draws chart according to selected radio button
@@ -407,18 +411,7 @@ product {
 	right: 10px;
 	top: 20px;
 }
-#popchart_div {
-    width: 30%;
-    margin-left: 0;
-}
-#locchart_div{
-    width: 30%;
-    margin-left: 0;
-}
-#agechart_div{
-    width: 30%;
-    margin-right: 0;
-}
+#graphst {width:100%; table-layout: fixed;}
 </style>
 </head>
 
@@ -443,16 +436,16 @@ product {
 		<hr>
 		<div id='chart_div'></div>
 		<div class="container">
-		<table class="columns">
-		<h2>Population</h2>
-      <tr>
-        <td><div id='popchart_div'></div></td>
-        <td><div id='locchart_div'></div></td>
-        <td><div id='agechart_div'></div></td>
-      </tr>
-    </table>
-    </div>
-		
+			<table class="container" id="graphst">
+				<h2>Population</h2>
+				<tr>
+					<td><div id='genchart_div'></div></td>
+					<td><div id='locchart_div'></div></td>
+					<td><div id='agechart_div'></div></td>
+				</tr>
+			</table>
+		</div>
+
 		<!-- Tabela Posts-->
 		<div class="container">
 			<h2>Top 5</h2>

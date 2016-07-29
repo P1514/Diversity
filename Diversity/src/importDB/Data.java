@@ -501,7 +501,7 @@ public class Data {
 	public int getTotalPosts() {
 		return this.totalposts;
 	}
-	
+	/*
 	class TAuthors extends Thread { 
 		private Author a;
 
@@ -562,6 +562,6 @@ public class Data {
 		  public void run() { 
 		    System.out.println("Run: "+ getName()); 
 		  } 
-		}
+		}*/
 
 }

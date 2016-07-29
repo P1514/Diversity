@@ -31,7 +31,7 @@ public class Backend {
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
-			//System.out.println(msg);
+			System.out.println(msg);
 
 			switch (op) {
 			case 1:
@@ -69,6 +69,10 @@ public class Backend {
 			case 10:
 				GetInfGraph gig = new GetInfGraph();
 				tmp = gig.getAll(msg.getString("Author")).toString();
+				return tmp;
+			case 11:
+				GetPopulation gpo = new GetPopulation();
+				tmp=gpo.getAll(param,pss).toString();
 				return tmp;
 			default:
 				msg = new JSONObject();

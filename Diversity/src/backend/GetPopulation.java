@@ -16,38 +16,78 @@ public class GetPopulation {
 	public GetPopulation() {
 	}
 
-	public JSONArray getAll() throws JSONException {
+	public JSONArray getAll(String param, int pss) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		obj.put("Op", "authtable");
+		String insert = "";
+		String params = "";
+		if (param.equals("gender")) {
+			obj.put("Op", "gengraph");
+			obj.put("Param", "Gender");
+			insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender ASC";
+		} else if (param.equals("age")) {
+			obj.put("Op", "agegraph");
+			obj.put("Param", "Age");
+			params = "0-30,31-60,61-90";
+		} else if (param.equals("location")) {
+			obj.put("Op", "locgraph");
+			obj.put("Param", "Location");
+			insert = "Select distinct location FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY location ASC";
+		}
 		result.put(obj);
-		String insert = new String();
 		PreparedStatement query1 = null;
-		insert = "Select * FROM authors where id in (Select authors_id from opinions)";
 		ResultSet rs = null;
-
 		try {
 			dbconnect();
-			query1 = cnlocal.prepareStatement(insert);
-			rs = query1.executeQuery();
-			for(;rs.next();){
-				obj= new JSONObject();
-				obj.put("Name", rs.getString("name"));
-				obj.put("Gender", rs.getString("gender"));
-				obj.put("Age", rs.getInt("age"));
-				obj.put("Location", rs.getString("location"));
-				int nposts=rs.getInt("posts");
-				obj.put("Nposts", nposts);
-				double tmp=rs.getInt("comments")/nposts;
-				obj.put("Avgcomms", trunc(String.valueOf(tmp)));
-				tmp=rs.getInt("likes")/nposts;
-				obj.put("Avglikes", trunc(String.valueOf(tmp)));
-				tmp = rs.getInt("views")/nposts;
-				obj.put("Avgviews", trunc(String.valueOf(tmp)));
-				obj.put("Influence", trunc(String.valueOf(rs.getDouble("influence"))));
-				result.put(obj);
+			if (insert != "") {
+				query1 = cnlocal.prepareStatement(insert);
+				query1.setInt(1, pss);
+				rs = query1.executeQuery();
+				for (; rs.next();) {
+					params += rs.getString(param) + ",";
+				}
+				rs.close();
+				query1.close();
+				String[] out_params = params.split(",");
+				insert = "Select count(*) from authors where " + param + "=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
+				for (int i = 0; i < out_params.length; i++) {
+					query1 = cnlocal.prepareStatement(insert);
+					query1.setString(1, out_params[i]);
+					query1.setInt(2, pss);
+					rs = query1.executeQuery();
+					rs.next();
+					obj = new JSONObject();
+					obj.put("Param", out_params[i]);
+					obj.put("Value", rs.getInt("count(*)"));
+					result.put(obj);
+					rs.close();
+					query1.close();
+				}
+				return result;
+			}else{
+				String[] out_params = params.split(",|-");
+				insert = "Select count(*) from authors where " + param + ">=? && "+param+"<=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
+				for (int i = 0; i < out_params.length; i++) {
+					System.out.println(out_params[i]);
+					query1 = cnlocal.prepareStatement(insert);
+					query1.setString(1, out_params[i]);
+					i++;
+					query1.setString(2, out_params[i]);
+					query1.setInt(3, pss);
+					rs = query1.executeQuery();
+					rs.next();
+					obj = new JSONObject();
+					obj.put("Param", out_params[i-1]+"-"+out_params[i]);
+					obj.put("Value", rs.getInt("count(*)"));
+					result.put(obj);
+					rs.close();
+					query1.close();
+				}
+				return result;
+				
+				
+				
 			}
-
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -74,23 +114,6 @@ public class GetPopulation {
 		}
 
 		return result;
-
-	}
-
-	private String trunc(String number) {
-		double result = 0;
-		try {
-
-			result = Double.valueOf(number);
-			number = String.format("%.2f", result);
-			result = Double.parseDouble(number);
-
-		} catch (Exception e) {
-			number = number.replaceAll(",", ".");
-			result = Double.parseDouble(number);
-
-		}
-		return Double.toString(result);
 
 	}
 

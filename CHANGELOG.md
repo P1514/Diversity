@@ -2,9 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+-Optimization of loading code and implementing multi-threading
 
-### Upcoming Later Release
-- Add filter info to graph label(Confirm necessity because it requires graph redesign)
+## [1.1] 2016-08-29
+## Added
+- Add filter info to graph label
 - Chart for the population distribution
 
 ## [1.0.9] 2016-07-28

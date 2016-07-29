@@ -196,7 +196,6 @@
 				// chart colors
 
 				var colors = new Array();
-				//colors[0]=chartcolor(data.getColumnLabel(0));
 				for (var i = 1; i < paramcount + 1; i++) {
 					colors.push(chartcolor(data.getColumnLabel(i)));
 				}
@@ -305,7 +304,7 @@
 					return "#BFD730";
 				case "31-60":
 					return "#8CA122";
-				case "60-90":
+				case "61-90":
 					return "#5C6EoE";
 				}
 			}
@@ -464,14 +463,14 @@ product {
 </style>
 </head>
 <body>
-<!-- POPUP -->
+	<!-- POPUP -->
 	<div id="displaybox" style="display: none;"></div>
 	<!-- Logotipo -->
 
 	<center> <img src="../images/Diversity-Logo-120x62.png"
 		alt="Diversity Logo" align="top"></img> </center>
 
-	
+
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
 		<product>
