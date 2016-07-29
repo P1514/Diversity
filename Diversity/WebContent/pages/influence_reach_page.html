@@ -98,6 +98,21 @@
 		packages : [ 'corechart', 'line' ]
 	});
 	google.charts.setOnLoadCallback(connect);
+	
+	//create trigger to resizeEnd event     
+	$(window).resize(function() {
+		if (this.resizeTO)
+			clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function() {
+			$(this).trigger('resizeEnd');
+		}, 500);
+	});
+
+	//redraw graph when window resize is completed  
+	$(window).on('resizeEnd', function() {
+		if (jsonData != 0)
+			drawBasic();
+	});
 
 	function drawBasic() {
 
@@ -105,7 +120,7 @@
 		data.addColumn('date', 'Date');
 		data.addColumn('number', 'Influence');
 
-		for(var i=1;i<jsonData.length;i++){
+		for(var i=1;jsonData!=null && i<jsonData.length;i++){
 			var counter = jsonData[i];
 			data.addRows([ [ new Date(counter.Date), counter.Value ] ]);
 		}
@@ -137,6 +152,7 @@
 	function UpdatePost(sel) {
 		var value = sel.options[sel.selectedIndex].value;
 		if (value != "") {
+			$('#chart_div').show();
 			var json2 = {
 				"Op" : "getlastpost",
 				"Author" : value
@@ -148,6 +164,8 @@
 			}
 			ws.send(JSON.stringify(json2));
 		} else {
+			jsonData = null;
+			$('#chart_div').hide();
 			$('#posttable tbody').empty();
 
 		}

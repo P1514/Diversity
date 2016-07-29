@@ -1,6 +1,5 @@
 package importDB;
 
-import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -14,7 +13,6 @@ import backend.Settings;
 public class Data {
 	private HashMap<Integer, Author> authordb = new HashMap<Integer, Author>();
 	private HashMap<Integer, Opinion> opiniondb = new HashMap<Integer, Opinion>();
-	private HashMap<String, Integer> pss = new HashMap<String, Integer>();
 	private int totalposts;
 	private int totalviews;
 	private int totalcomments;
@@ -33,7 +31,9 @@ public class Data {
 	public String load() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
+		long stime= System.nanoTime();
+		System.out.println(" Beginning " + stime);
+		
 		// DONE FAZER LOAD DAS VARIAVEIS NO GENERAL
 		String select = "Select * from general WHERE id=1";
 		Statement stmt = null;
@@ -72,24 +72,15 @@ public class Data {
 			}
 		}
 
-		try {
-			pss = new PSS().importPSS();
-		} catch (IOException e2) {
-			System.out.println("FILE IO EXCEPTION" + e2.getMessage());
-			obj.put("Op", "Error").toString();
-			obj.put("Message", "Problem reading from Product File");
-			result.put(obj);
-			return result.toString();
-		}
-
-		pss.forEach((k, v) -> System.out.println("key: " + k + "value: " + v));
-
 		String query, insert2;
 
 		stmt = null;
 		rs = null;
 
 		// Load PSS
+		
+		System.out.println(" Variable Init " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		// Load Posts
 		try {
@@ -101,7 +92,7 @@ public class Data {
 				LastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
 				query = ("Select * from " + Settings.posttn + " Where " + Settings.ptime + " > \'" + LastUpdated
 						+ "\' && " + Settings.ptime + " <= \'" + LastUpdated2 + "\' ORDER BY ID ASC");
-				System.out.println(query);
+				//System.out.println(query);
 
 				stmt = cndata.createStatement();
 				rs = stmt.executeQuery(query);
@@ -128,7 +119,7 @@ public class Data {
 			do {
 
 				int post_id = rs.getInt(Settings.rpost_id);
-				System.out.println(post_id+ " BLA");
+				//System.out.println(post_id+ " BLA");
 				int id = rs.getInt(Settings.post_id);
 				int user_id = rs.getInt(Settings.puser_id);
 				java.sql.Date time = rs.getDate(Settings.pdate);
@@ -155,7 +146,7 @@ public class Data {
 						cnlocal = dbc.connlocal();
 						// DONE finish this
 						insert2 = "Select * from posts where opinions_id = " + post_id + " ORDER BY ID ASC";
-						System.out.println(insert2);
+						//System.out.println(insert2);
 						Statement stmt2 = cnlocal.createStatement();
 						ResultSet rs2 = stmt2.executeQuery(insert2);
 						if (!rs2.next()) {
@@ -201,6 +192,8 @@ public class Data {
 				}
 			} while (rs.next());
 			rs.close();
+			System.out.println(" Load posts from remote " + (System.nanoTime()-stime));
+			stime= System.nanoTime();
 
 			// TODO ir buscar primeiro à DB LOCAL os users
 			cnlocal = dbc.connlocal();
@@ -209,7 +202,7 @@ public class Data {
 			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 			// Load users from local DB
 			query = ("Select * from authors where id in " + querycond);
-			System.out.println(query);
+			//System.out.println(query);
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
@@ -227,6 +220,8 @@ public class Data {
 			rs.close();
 			stmt.close();
 			cnlocal.close();
+			System.out.println(" Load users local " + (System.nanoTime()-stime));
+			stime= System.nanoTime();
 
 			// Load users from foreign DB
 			query = ("Select * from " + Settings.usertn + " where " + Settings.user_id + " in " + querycond);
@@ -270,6 +265,9 @@ public class Data {
 					e.printStackTrace();
 				}
 		}
+		
+		System.out.println(" Load users remote " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		opiniondb.forEach((k, v) -> {
 			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
@@ -279,7 +277,7 @@ public class Data {
 					uniqueauthors.add(v2.getUID());
 			});
 			uniqueauthors.forEach((v3) -> {
-				System.out.println(authordb.containsKey(v3) + " " + v3);
+				//System.out.println(authordb.containsKey(v3) + " " + v3);
 				Author temp_author = authordb.get(v3);
 				temp_author.addComments(v.newcomments());
 				temp_author.addLikes(v.newlikes());
@@ -292,6 +290,9 @@ public class Data {
 			totallikes += v.newlikes();
 			totalviews += v.newviews();
 		});
+		
+		System.out.println(" update opinions " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		this.totalposts += opiniondb.size();// Modificado
 		authordb.forEach((k, v) -> {
@@ -303,6 +304,8 @@ public class Data {
 					totalviews / ((double) totalposts));
 			v.evalPolarity(authordb);
 		});
+		System.out.println(" calc eval and reach " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		try {
 			cnlocal = dbc.connlocal();
@@ -330,7 +333,7 @@ public class Data {
 				query1.setInt(13, author.getLikes());
 				query1.setInt(14, author.getViews());
 				query1.setInt(15, author.getPosts());
-				System.out.println(query1);
+				//System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -343,6 +346,9 @@ public class Data {
 				}
 			}
 		});
+		
+		System.out.println(" insert authors " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		opiniondb.forEach((k, opinion) -> {
 			String update = "INSERT INTO opinions "
@@ -392,14 +398,19 @@ public class Data {
 					}
 				});
 			} catch (Exception e) {
+				e.printStackTrace();
 			} finally {
 				try {
 					if (query1 != null)
 						query1.close();
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});
+		
+		System.out.println(" insert opinions and posts " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		String update = "UPDATE general SET totalposts=?,totallikes=?,totalcomments=?,totalviews=?,lastupdated=? WHERE id=1";
 
@@ -420,8 +431,12 @@ public class Data {
 			if (cnlocal != null)
 				cnlocal.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		;
+		
+		System.out.println(" update general " + (System.nanoTime()-stime));
+		stime= System.nanoTime();
 
 		obj.put("Op", "Error");
 		obj.put("Message", "Loaded Successfully");
@@ -486,5 +501,67 @@ public class Data {
 	public int getTotalPosts() {
 		return this.totalposts;
 	}
+	
+	class TAuthors extends Thread { 
+		private Author a;
+
+		  public TAuthors (Author _a) { 
+		    a=_a; 
+		  }
+
+		  public void run() { 
+			  try {
+					cnlocal = dbc.connlocal();
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			  
+			  String insert = "INSERT INTO authors "
+						+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE influence=?,comments=?,likes=?,views=?,posts=?";
+				PreparedStatement query1 = null;
+				try {
+					query1 = cnlocal.prepareStatement(insert);
+					query1.setInt(1, a.getID());
+					query1.setInt(2, a.getAge());
+					query1.setString(3, a.getName());
+					query1.setString(4, a.getGender());
+					query1.setString(5, a.getLocation());
+					query1.setDouble(6, a.getInfluence());
+					query1.setInt(7, a.getComments());
+					query1.setInt(8, a.getLikes());
+					query1.setInt(9, a.getViews());
+					query1.setInt(10, a.getPosts());
+					query1.setDouble(11, a.getInfluence());
+					query1.setInt(12, a.getComments());
+					query1.setInt(13, a.getLikes());
+					query1.setInt(14, a.getViews());
+					query1.setInt(15, a.getPosts());
+					//System.out.println(query1);
+					query1.executeUpdate();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return;
+				} finally {
+					try {
+						if (query1 != null)
+							query1.close();
+					} catch (Exception e) {
+					}
+				}
+			  
+			  
+		  } 
+		}
+	
+	class MyThread extends Thread { 
+
+		  public MyThread (String s) { 
+		    super(s); 
+		  }
+
+		  public void run() { 
+		    System.out.println("Run: "+ getName()); 
+		  } 
+		}
 
 }

@@ -143,12 +143,12 @@
 
 			function clicker(hidden) {
 				var thediv = document.getElementById('displaybox');
-				var embedCode = '<iframe width="50%" height="50%" src="comments.html?id='
+				var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
 						+ hidden
 						+ ' frameborder="0" allowfullscreen="no"></iframe>';
 				if (thediv.style.display == "none") {
 					thediv.style.display = "";
-					thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='middle' width='80%' height='80%'>"
+					thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 							+ "<param name='bgcolor' value='#000000'>"
 							+ embedCode
 							+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
@@ -201,10 +201,16 @@
 					colors.push(chartcolor(data.getColumnLabel(i)));
 				}
 				console.log(colors);
+				
+				var info = "";
+				var gender = document.getElementById("genderfilt").value;
+				var location = document.getElementById("locationfilt").value;
+				if(gender != "All") info +=gender + " ";
+				if(location != "All") info += location;
 
 				//chart options
 				var options = {
-					title : 'Average Polarity',
+					title : "Average Polarity" +  ((info != "" )? " - " + info : ""),
 					colors : colors,
 					hAxis : {
 						title : 'Age Range'
@@ -380,10 +386,10 @@
 		<style>
 #displaybox {
 	z-index: 10000;
-	filter: alpha(opacity = 50); /*older IE*/
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50); /* IE */
-	-moz-opacity: .50; /*older Mozilla*/
-	-khtml-opacity: 0.5; /*older Safari*/
+	filter: alpha(opacity = 90); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90); /* IE */
+	-moz-opacity: .9; /*older Mozilla*/
+	-khtml-opacity: 0.9; /*older Safari*/
 	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
 	background-color: #000000;
 	position: fixed;
@@ -392,7 +398,7 @@
 	width: 100%;
 	height: 100%;
 	text-align: center;
-	vertical-align: middle;
+	vertical-align: bottom;
 }
 
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse

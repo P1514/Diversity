@@ -106,7 +106,7 @@ public class Globalsentiment {
 					query1.setString(5, values[1]);
 				}
 			}
-			System.out.println(query1);
+			//System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

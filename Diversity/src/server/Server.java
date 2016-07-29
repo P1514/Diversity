@@ -68,7 +68,7 @@ public class Server {
 		public void run() {
 			JSONArray result = new JSONArray();
 			JSONObject obj = new JSONObject();
-			System.out.print(msg);
+			//System.out.println(msg);
 
 			try {
 				if (session.isOpen()) {
@@ -111,6 +111,7 @@ public class Server {
 					// Ignore
 				}
 			}
-			System.out.println(result.toString());}
+			//System.out.println(result.toString());
+			}
 	}
 }

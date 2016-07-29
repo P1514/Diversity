@@ -15,7 +15,6 @@ public class Author {
 	private int posts;
 	private int likes;
 	private int views;
-	private Settings dbc;
 
 	public Author(int _id, String _name, int _age, String _gender, String _location) {
 		this.id = _id;
@@ -27,7 +26,6 @@ public class Author {
 		this.comments = 0;
 		this.likes = 0;
 		this.views = 0;
-		dbc = new Settings();
 
 	}
 
@@ -99,9 +97,9 @@ public class Author {
 	}
 	
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
-		this.influence = dbc.aWcomments * ((this.comments/this.posts) / avgcom) + dbc.aWlikes * ((this.likes/this.posts) / avglike)
-				+ dbc.aWviews * ((this.views/this.posts) / avgview);
-		System.out.println(avgcom + " / " + avglike + " / " + avgview);
+		this.influence = Settings.aWcomments * ((this.comments/this.posts) / avgcom) + Settings.aWlikes * ((this.likes/this.posts) / avglike)
+				+ Settings.aWviews * ((this.views/this.posts) / avgview);
+		//System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 
 }

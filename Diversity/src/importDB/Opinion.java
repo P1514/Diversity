@@ -14,7 +14,6 @@ public class Opinion {
 	private ArrayList<Post> comments = new ArrayList<Post>();
 	private double reach = 0;
 	private double polarity = 0;
-	private Settings dbc = new Settings();
 	private double total_inf = 0;
 	private Date timestamp;
 	private int tag;
@@ -28,8 +27,8 @@ public class Opinion {
 	}
 
 	public void evalReach(double avgPost, double avgLikes, double avgViews) {
-		this.reach = dbc.pWcomments * (ncomments() / avgPost) + dbc.pWlikes * (nlikes() / avgLikes)
-				+ dbc.pWviews * (nviews() / avgViews);
+		this.reach = Settings.pWcomments * (ncomments() / avgPost) + Settings.pWlikes * (nlikes() / avgLikes)
+				+ Settings.pWviews * (nviews() / avgViews);
 	}
 
 	public void evalPolarity(HashMap<Integer, Author> authordb) {

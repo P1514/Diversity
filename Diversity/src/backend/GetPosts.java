@@ -30,8 +30,6 @@ public class GetPosts {
 		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[MAXTOP];
-		String[] params = (param != null) ? param.split(",") : null;
-		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
 		int n_tops = 0;
 		insert = "Select id FROM opinions where (tag_id=?";
@@ -69,7 +67,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			System.out.print(query1);
+			//System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 

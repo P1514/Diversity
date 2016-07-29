@@ -7,11 +7,12 @@ All notable changes to this project will be documented in this file.
 - Add filter info to graph label(Confirm necessity because it requires graph redesign)
 - Chart for the population distribution
 
-## [1.1] 2016-07-28
+## [1.0.9] 2016-07-28
 ### Added New DB.sql Import needed
 - Loading ready for over-time import
 - Loading set to month to month to help with influence calc
-Influence Reach page with last post and only opinion authors
+- Influence Reach page with last post and only opinion authors
+- Bug fixes
 
 ## [1.0.6] 2016-07-27 Minor Fix on 2016-07-28
 ### Added/Fixed

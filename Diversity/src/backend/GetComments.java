@@ -24,7 +24,6 @@ public class GetComments {
 		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[50];
-		String[] params = (param != null) ? param.split(",") : null;
 		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
 		int n_tops = 0;

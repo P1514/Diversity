@@ -3,10 +3,6 @@ package backend;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,7 +12,6 @@ public class GetAuthors {
 
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
-	private int MAXTOP = 5;
 
 	public GetAuthors() {
 	}

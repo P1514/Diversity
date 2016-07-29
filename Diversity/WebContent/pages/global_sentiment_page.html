@@ -90,7 +90,8 @@
 					tr.append("<td>" + json[i].Location + "</td>");
 					tr.append("<td>" + json[i].Gender + "</td>");
 					tr.append("<td>" + json[i].Age + "</td>");
-					tr.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+					tr
+							.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
 					$('#posts tbody').append(tr);
 				}
 				// Detect table click
@@ -109,6 +110,7 @@
 				jsonData = json;
 				drawGlobal();
 			}
+			//if 
 			if (json[0].Op == "comments") {
 				console.log("test");
 				clicker();
@@ -126,13 +128,14 @@
 
 	//global sentiment graph
 	function drawGlobal() {
-
+		
+		var data = JSON.parse(JSON.stringify(jsonData));
 		globaldata = new google.visualization.DataTable();
 		globaldata.addColumn('string', 'Month');
 		globaldata.addColumn('number', 'Global');
 
-		for (var i = 1; i < jsonData.length; i++) {
-			var counter = jsonData[i];
+		for (var i = 1; i < data.length; i++) {
+			var counter = data[i];
 			globaldata.addRows([ [ counter.Month, counter.Sentiment ] ]);
 		}
 
@@ -160,7 +163,6 @@
 
 		var chart = new google.visualization.LineChart(document
 				.getElementById('chart_div'));
-
 		chart.draw(globaldata, options);
 		google.visualization.events.addListener(chart, 'select', function() {
 			var selection = chart.getSelection();
@@ -190,13 +192,12 @@
 	}
 
 	//sentiment over time according to gender graph
-	function drawBasic() {
-
+	function drawPop() {
 		var data = globaldata.clone();
 		data.addColumn('number', 'Male');
 		data.addColumn('number', 'Female');
 
-		for (var i = 0; i < jsonData.length; i++) {
+		for (var i = 1; i < jsonData.length; i++) {
 			var counter = jsonData[i];
 			console.log(counter.month + " " + counter.Male + " "
 					+ counter.Female + " " + counter.sentiment);
@@ -218,18 +219,18 @@
 		};
 
 		var chart = new google.visualization.LineChart(document
-				.getElementById('chart_div'));
+				.getElementById('popchart_div'));
 		chart.draw(data, options);
 	}
 
 	//sentiment over time according to location graph
-	function drawBasic2() {
+	function drawLoc() {
 
-		var data = globaldata.clone();
+		var data = JSON.parse(JSON.stringify(jsonData));
 		data.addColumn('number', 'East');
 		data.addColumn('number', 'West');
 
-		for (var i = 0; i < jsonData.length; i++) {
+		for (var i = 1; i < jsonData.length; i++) {
 			var counter = jsonData[i];
 			console.log(counter.month + " " + counter.East + " " + counter.West
 					+ " " + counter.sentiment);
@@ -251,19 +252,19 @@
 		};
 
 		var chart = new google.visualization.LineChart(document
-				.getElementById('chart_div'));
+				.getElementById('locchart_div'));
 		chart.draw(data, options);
 	}
 
 	//sentiment over time according to age ranges chart
-	function drawBasic3() {
+	function drawAge() {
 
-		var data = globaldata.clone();
+		var data = JSON.parse(JSON.stringify(jsonData));
 		data.addColumn('number', '0-30');
 		data.addColumn('number', '31-60');
 		data.addColumn('number', '61-90');
 
-		for (var i = 0; i < jsonData.length; i++) {
+		for (var i = 1; i < jsonData.length; i++) {
 			var counter = jsonData[i];
 			console.log(counter.month + " " + counter.sentiment);
 			data.setCell(i, 2, counter["0-30"]);
@@ -285,7 +286,7 @@
 		};
 
 		var chart = new google.visualization.LineChart(document
-				.getElementById('chart_div'));
+				.getElementById('agechart_div'));
 		chart.draw(data, options);
 	}
 
@@ -338,12 +339,14 @@
 
 	function clicker(hidden) {
 		var thediv = document.getElementById('displaybox');
-		var embedCode='<iframe width="50%" height="50%" src="comments.html?id='+hidden+' frameborder="0" allowfullscreen="no"></iframe>';
+		var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
+				+ hidden + ' frameborder="0" allowfullscreen="no"></iframe>';
 		if (thediv.style.display == "none") {
 			thediv.style.display = "";
-			thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='middle' width='80%' height='80%'>"+
-			"<param name='bgcolor' value='#000000'>"+embedCode+
-			"</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+			thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+					+ "<param name='bgcolor' value='#000000'>"
+					+ embedCode
+					+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
 			//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
 		} else {
 			thediv.style.display = "none";
@@ -357,10 +360,10 @@
 <style>
 #displaybox {
 	z-index: 10000;
-	filter: alpha(opacity = 50); /*older IE*/
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50); /* IE */
-	-moz-opacity: .50; /*older Mozilla*/
-	-khtml-opacity: 0.5; /*older Safari*/
+	filter: alpha(opacity = 90); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90); /* IE */
+	-moz-opacity: .9; /*older Mozilla*/
+	-khtml-opacity: 0.9; /*older Safari*/
 	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
 	background-color: #000000;
 	position: fixed;
@@ -369,7 +372,7 @@
 	width: 100%;
 	height: 100%;
 	text-align: center;
-	vertical-align: middle;
+	vertical-align: bottom;
 }
 
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
@@ -404,6 +407,18 @@ product {
 	right: 10px;
 	top: 20px;
 }
+#popchart_div {
+    width: 30%;
+    margin-left: 0;
+}
+#locchart_div{
+    width: 30%;
+    margin-left: 0;
+}
+#agechart_div{
+    width: 30%;
+    margin-right: 0;
+}
 </style>
 </head>
 
@@ -427,9 +442,17 @@ product {
 
 		<hr>
 		<div id='chart_div'></div>
-
-
-
+		<div class="container">
+		<table class="columns">
+		<h2>Population</h2>
+      <tr>
+        <td><div id='popchart_div'></div></td>
+        <td><div id='locchart_div'></div></td>
+        <td><div id='agechart_div'></div></td>
+      </tr>
+    </table>
+    </div>
+		
 		<!-- Tabela Posts-->
 		<div class="container">
 			<h2>Top 5</h2>

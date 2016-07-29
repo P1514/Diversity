@@ -36,13 +36,13 @@ public class Settings {
 
 	// Computing Variables
 	// Reach
-	public static final double pWviews = 0.3333;
-	public static final double pWlikes = 0.3333;
-	public static final double pWcomments = 0.3334;
+	public static final double pWviews = (double) 1/3;
+	public static final double pWlikes = (double) 1/3;
+	public static final double pWcomments = (double) 1/3;
 	// Influence
-	public static final double aWviews = 0.3333;
-	public static final double aWlikes = 0.3333;
-	public static final double aWcomments = 0.3334;
+	public static final double aWviews = (double) 1/3;
+	public static final double aWlikes = (double) 1/3;
+	public static final double aWcomments = (double) 1/3;
 
 	// Local DB Specs
 	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";

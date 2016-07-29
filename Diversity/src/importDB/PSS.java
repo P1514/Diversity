@@ -59,7 +59,7 @@ public class PSS {
 				result.put(obj);
 
 			});
-			System.out.println(result.toString());
+			//System.out.println(result.toString());
 
 			return result.toString();
 		} catch (JSONException e) {
