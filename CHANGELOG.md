@@ -4,15 +4,19 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 -Optimization of loading code and implementing multi-threading
 
+## [1.1.1] 2016-08-03
+### Added
+- PSS info on all pages
+
 ## [1.1] 2016-08-29
-## Added
+### Added
 - Add filter info to graph label
 - Chart for the population distribution
 
 ## [1.0.9] 2016-07-28
 ### Added New DB.sql Import needed
 - Loading ready for over-time import
-- Loading set to month to month to help with influence calc
+- Loading set to month to month to help with influence calculations
 - Influence Reach page with last post and only opinion authors
 - Bug fixes
 

@@ -58,7 +58,7 @@
 
 	function connect() {
 		document.getElementById("Cookie").innerHTML = "Product: "
-				+ getCookie("Product");
+				+ getCookie("Product") + "; PSS: "+getCookie("PSS");;
 
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');

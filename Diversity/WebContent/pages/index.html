@@ -31,7 +31,8 @@
 	function setCookie() {
 		// document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
 		document.cookie = "Product="
-				+ document.getElementById("Products").value;
+				+ $("#Products :selected").text();
+		document.cookie = "PSS=" + document.getElementById("Products").value;
 	}
 
 	ws.onopen = function() {
@@ -66,14 +67,18 @@
 
 	function populatePSS() {
 		var x = document.getElementById("Products");
-		for (var i = 1; i < json.length; i++) {
-			console.log(json[i].Name);
+		var products = JSON.parse(JSON.stringify(json));
+		for (var i = 1; i < products.length; i++) {
 			var option = document.createElement('option');
-			option.text = json[i].Name;
-			option.value = option.text;
+			option.text = products[i].Name;
+			option.value = products[i].Pss;
 			x.add(option);
 		}
-		$("#Products").val(getCookie("Product"));
+		if(getCookie("Products") != null){
+		$("#Products").text(getCookie("Product"));
+		$("#Products").val(getCookie("PSS"))
+		}
+		
 	}
 
 	function refreshDB(clean) {
