@@ -1,13 +1,13 @@
 package importDB;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Adjectives {
 
-	static HashMap<String, Double> adjectives;
+	static ConcurrentHashMap<String, Double> adjectives;
 
 	public Adjectives() {
-		adjectives = new HashMap<String, Double>();
+		adjectives = new ConcurrentHashMap<String, Double>();
 		adjectives.put("phenomenal", 97.0);
 		adjectives.put("world-class", 95.0);
 		adjectives.put("incredible", 92.0);
@@ -67,6 +67,7 @@ public class Adjectives {
 	}
 
 	public double getSentiment(String adj) {
-		return adjectives.get(adj);
+		//System.out.println(adj);
+		return adjectives.get(adj) == null ? 50:adjectives.get(adj);
 	}
 }

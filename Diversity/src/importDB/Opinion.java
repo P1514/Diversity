@@ -3,6 +3,7 @@ package importDB;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import backend.Settings;
 
@@ -31,7 +32,7 @@ public class Opinion {
 				+ Settings.pWviews * (nviews() / avgViews);
 	}
 
-	public void evalPolarity(HashMap<Integer, Author> authordb) {
+	public void evalPolarity(ConcurrentHashMap<Integer, Author> authordb) {
 		total_inf = authordb.get(author_id).getInfluence();
 		polarity = total_inf * main.getPolarity();
 

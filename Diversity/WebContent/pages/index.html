@@ -82,7 +82,7 @@
 	function refreshDB(clean) {
 		if (clean == 1) {
 			json = {
-				"Op" : "clean",
+				"Op" : "clean",	
 			}
 
 			ws.send(JSON.stringify(json));
