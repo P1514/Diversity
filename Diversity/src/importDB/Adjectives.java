@@ -4,8 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Adjectives {
 
-	static ConcurrentHashMap<String, Double> adjectives;
-
+	private final ConcurrentHashMap<String, Double> adjectives;
 	public Adjectives() {
 		adjectives = new ConcurrentHashMap<String, Double>();
 		adjectives.put("phenomenal", 97.0);
@@ -66,8 +65,7 @@ public class Adjectives {
 		return adjectives.containsKey(adj);
 	}
 
-	public double getSentiment(String adj) {
-		//System.out.println(adj);
-		return adjectives.get(adj) == null ? 50:adjectives.get(adj);
+	public double getSentiment(String adj1) {
+		return adjectives.get(adj1);
 	}
 }

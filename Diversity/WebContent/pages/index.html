@@ -86,13 +86,18 @@
 			}
 
 			ws.send(JSON.stringify(json));
-		}
+			setTimeout(function(){json = {
+					"Op" : "load",
+				}
+
+				ws.send(JSON.stringify(json));}, 3000);
+		}else{
 		setTimeout(function(){json = {
 			"Op" : "load",
 		}
 
-		ws.send(JSON.stringify(json));}, 3000);
-		
+		ws.send(JSON.stringify(json));}, 0);
+		}
 	};
 </script>
 <style>

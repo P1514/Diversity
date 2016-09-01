@@ -101,7 +101,7 @@ public class Data {
 						+ Settings.posttn + " Where " + Settings.ptime + " > \'" + LastUpdated + "\' && "
 						+ Settings.ptime + " <= \'" + LastUpdated2 + "\' ORDER BY ID ASC");
 				stmt = cndata.createStatement();
-				//System.out.println(query);
+				// System.out.println(query);
 				rs = stmt.executeQuery(query);
 
 				// TODO refactor after this read post
@@ -131,7 +131,7 @@ public class Data {
 				break;
 			} while (true);
 			rs.beforeFirst();
-			ExecutorService es = Executors.newFixedThreadPool(20);
+			ExecutorService es = Executors.newCachedThreadPool();
 			while (rs.next())
 				es.execute(new Topinions(rs.getInt(1)));
 			es.shutdown();
@@ -141,10 +141,9 @@ public class Data {
 				System.out.println("ERROR THREAD OP");
 				e.printStackTrace();
 			}
-			es.shutdownNow();
 			rs.beforeFirst();
-			//System.out.println("HELLO");
-			es = Executors.newFixedThreadPool(20);
+			// System.out.println("HELLO");
+			es = Executors.newCachedThreadPool();
 			while (rs.next())
 				es.execute(new Tposts(rs.getInt(1)));
 			es.shutdown();
@@ -317,65 +316,79 @@ public class Data {
 		System.out.println(" insert authors " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
-		opiniondb.forEach((k, opinion) -> {
-			String update = "INSERT INTO opinions "
-					+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE reach=?,polarity=?,total_inf=?,comments=?";
+		ExecutorService es = Executors.newCachedThreadPool();
 
-			PreparedStatement query1 = null;
-			try {
-				query1 = cnlocal.prepareStatement(update);
-				query1.setInt(1, k);
-				query1.setDouble(2, opinion.getReach());
-				query1.setDouble(3, opinion.getPolarity());
-				query1.setDouble(4, opinion.getTotalInf());
-				query1.setInt(5, opinion.getUID());
-				query1.setDate(6, opinion.getTime());
-				query1.setInt(7, opinion.getTag());
-				query1.setInt(8, opinion.ncomments());
-				query1.setDouble(9, opinion.getReach());
-				query1.setDouble(10, opinion.getPolarity());
-				query1.setDouble(11, opinion.getTotalInf());
-				query1.setInt(12, opinion.ncomments());
-				query1.executeUpdate();
-
-				opinion.getPosts().forEach((post) -> {
-					PreparedStatement query2 = null;
+		opiniondb.forEach((k, opinion) -> {	
+			es.execute(new Runnable() {
+				@Override
+				public void run() {
+					String update = "INSERT INTO opinions "
+							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE reach=?,polarity=?,total_inf=?,comments=?";
+					PreparedStatement query1 = null;
 					try {
-						String update1 = "REPLACE INTO posts " + "Values (?,?,?,?,?,?,?)";
-						query2 = cnlocal.prepareStatement(update1);
-						query2.setInt(1, post.getID());
-						query2.setDouble(2, post.getPolarity());
-						query2.setString(3, post.getComment());
-						query2.setInt(4, post.getLikes());
-						query2.setInt(5, post.getViews());
-						query2.setInt(6, k);
-						query2.setInt(7, post.getUID());
+						query1 = cnlocal.prepareStatement(update);
+						query1.setInt(1, k);
+						query1.setDouble(2, opinion.getReach());
+						query1.setDouble(3, opinion.getPolarity());
+						query1.setDouble(4, opinion.getTotalInf());
+						query1.setInt(5, opinion.getUID());
+						query1.setDate(6, opinion.getTime());
+						query1.setInt(7, opinion.getTag());
+						query1.setInt(8, opinion.ncomments());
+						query1.setDouble(9, opinion.getReach());
+						query1.setDouble(10, opinion.getPolarity());
+						query1.setDouble(11, opinion.getTotalInf());
+						query1.setInt(12, opinion.ncomments());
+						query1.executeUpdate();
 
-						query2.executeUpdate();
-						if (query2 != null)
-							query2.close();
+						opinion.getPosts().forEach((post) -> {
+							PreparedStatement query2 = null;
+							try {
+								String update1 = "REPLACE INTO posts " + "Values (?,?,?,?,?,?,?)";
+								query2 = cnlocal.prepareStatement(update1);
+								query2.setInt(1, post.getID());
+								query2.setDouble(2, post.getPolarity());
+								query2.setString(3, post.getComment());
+								query2.setInt(4, post.getLikes());
+								query2.setInt(5, post.getViews());
+								query2.setInt(6, k);
+								query2.setInt(7, post.getUID());
+
+								query2.executeUpdate();
+								if (query2 != null)
+									query2.close();
+							} catch (Exception e) {
+								e.printStackTrace();
+							} finally {
+								try {
+									if (query2 != null)
+										query2.close();
+								} catch (Exception e) {
+								}
+							}
+						});
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
 						try {
-							if (query2 != null)
-								query2.close();
+							if (query1 != null)
+								query1.close();
 						} catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
-				});
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (query1 != null)
-						query1.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
 
+				}
+			});
+
+		});
+		es.shutdown();
+		try {
+			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} catch (InterruptedException e) {
+			System.out.println("ERROR THREAD OP");
+			e.printStackTrace();
+		}
 		System.out.println(" insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
@@ -505,7 +518,7 @@ public class Data {
 				query1.setInt(13, a.getLikes());
 				query1.setInt(14, a.getViews());
 				query1.setInt(15, a.getPosts());
-				//System.out.println(query1);
+				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -545,17 +558,17 @@ public class Data {
 					rs = stmt.executeQuery(query);
 					remoto = false;
 					totalposts--;
-					if (!rs.next()){
+					if (!rs.next()) {
 						rs.close();
 						stmt.close();
 						condata.close();
 						conlocal.close();
 						return;
-						}
+					}
 				}
-				//System.out.println(id);
+				// System.out.println(id);
 				int postid = remoto ? rs.getInt(Settings.post_id) : rs.getInt(Settings.post_id);
-				//System.out.println(id);
+				// System.out.println(id);
 				int user_id = remoto ? rs.getInt(Settings.puser_id) : rs.getInt("authors_id");
 				java.sql.Date time = remoto ? rs.getDate(Settings.pdate) : null;
 				int likes = remoto ? rs.getInt(Settings.plikes) : rs.getInt("likes");
@@ -600,16 +613,16 @@ public class Data {
 
 		public void run() {
 			try {
-				//System.out.println("HELLO1");
+				// System.out.println("HELLO1");
 				condata = dbc.conndata();
 				conlocal = dbc.connlocal();
 				String query = ("Select * from " + Settings.posttn + " Where " + Settings.rpost_id + " = " + id);
 				Statement stmt = condata.createStatement();
-				//System.out.println(query);
+				// System.out.println(query);
 				ResultSet rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
-						//System.out.println("HELLO2");
+						// System.out.println("HELLO2");
 						int postid = rs.getInt(Settings.post_id);
 						int user_id = rs.getInt(Settings.puser_id);
 						java.sql.Date time = rs.getDate(Settings.pdate);
@@ -628,10 +641,10 @@ public class Data {
 				query = ("Select * from posts Where opinions_id = " + id);
 				stmt = conlocal.createStatement();
 				rs = stmt.executeQuery(query);
-				//System.out.println(query);
+				// System.out.println(query);
 				if (rs.next()) {
 					do {
-						//System.out.println("HELLO3");
+						// System.out.println("HELLO3");
 						int postid = rs.getInt("id");
 						int user_id = rs.getInt("authors_id");
 						int likes = rs.getInt("likes");

@@ -2,12 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- Local Calculation Multi-Threading
-- Save Locally Multi-Threading
+- Local Calculation Multi-Threading ( minimal impact to performance)
 
-## [1.1.2] 2016-09-01 Still Under Development
+## [1.1.2] 2016-09-01
 ### Optimization
-- Added data loading multi-threading
+- Multi-Threading implementeded
 
 ## [1.1.1] 2016-08-03
 ### Added
