@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 - Local Calculation Multi-Threading ( minimal impact to performance)
+
+
 ## [1.1.3] 2016-09-02
 ### Fixed
 - Coerent graphic display
 - Product Names
+
 ## [1.1.2] 2016-09-01
 ### Optimization
 - Multi-Threading implementeded
