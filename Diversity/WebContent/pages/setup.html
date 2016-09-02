@@ -22,8 +22,7 @@
 <script>
 
 
-	ws = new WebSocket('ws://' + window.location.hostname + ":"
-			+ window.location.port + '/Diversity/server');
+	
 	var json;
 	var i = 0;
 	function getCookie(name) {
@@ -39,6 +38,8 @@
 		document.cookie = "Product=" + $("#Products :selected").text();
 		document.cookie = "PSS=" + document.getElementById("Products").value;
 	}
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
 
 	ws.onopen = function() {
 		var jsonData = {
@@ -116,7 +117,7 @@ bottom:   0;
 		<tr>
 			<td>Age Range:</td>
 			<td><input type="number" id="firstage1" onKeyUp="checknumber(this);"> - <input type="number"
-				id="firstage2" value="" onKeyUp="checknumber(this);"></td>
+				id="firstage2" value="" onKeyUp="checknumber(this);"> <span class="glyphicon glyphicon-remove"></span></td>
 		</tr>
 		<tr>
 			<td>Age Range:</td>
@@ -130,6 +131,7 @@ bottom:   0;
 				onKeyUp="checknumber(this);"> - <input type="number"
 				id="thirdage2" value="" onKeyUp="checknumber(this);"></td>
 		</tr>
+		<tr><td><span class="glyphicon glyphicon-plus"></span></td></tr>
 		</table>
 		<table id="gender" class="inlineTable">
 		<tr>
@@ -140,6 +142,7 @@ bottom:   0;
 			<td>Second Gender:</td>
 			<td><input type="text" id="gender2" value=""></td>
 		</tr>
+		<tr><td><span class="glyphicon glyphicon-plus"></span></td></tr>
 		</table>
 		<table id="location" class="inlineTable">
 		<tr>
@@ -150,6 +153,7 @@ bottom:   0;
 			<td>Second Location:</td>
 			<td><input type="text" id="location2" value=""></td>
 		</tr>
+		<tr><td><span class="glyphicon glyphicon-plus"></span></td></tr>
 
 	</table>
 

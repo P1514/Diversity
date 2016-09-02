@@ -16,9 +16,9 @@ public class PSS {
 	JSONObject obj = new JSONObject();
 
 	public PSS() {
-		tags.put("Super Sneaker 1", 1);
-		tags.put("Best Sneaker 1", 2);
-		tags.put("Best Sneaker 2", 3);
+		tags.put("Morris Ground 1", 1);
+		tags.put("Austin Basket", 2);
+		tags.put("Austin Soccer", 3);
 		psss.put(1,"D522-1 PSS");
 		psss.put(2, "D522-2 PSS");
 		psss.put(3,"D522-2 PSS");
