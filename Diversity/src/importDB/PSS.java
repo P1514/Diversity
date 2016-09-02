@@ -2,6 +2,8 @@ package importDB;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +16,7 @@ public class PSS {
 	private int tag_id = 0;
 	JSONArray result = new JSONArray();
 	JSONObject obj = new JSONObject();
+	String out;
 
 	public PSS() {
 		tags.put("Morris Ground 1", 1);
@@ -45,13 +48,37 @@ public class PSS {
 	public int getID(String key){
 		return tags.get(key);
 	}
+	
+	public String getKeysByValue(Integer value) {
+		tags.forEach((k, v) -> {
+			System.out.println("HELLO" + v + " " + value);
+			if(v==value){
+				System.out.println("HELLO" + v + " " + value);
+				out=new String();
+				out=k;
+			}
+		});
+		return out;
+	}
 
 	public String getProducts() {
 		try {
 			obj.put("Op", "products");
 			result.put(obj);
+			obj = new JSONObject();
+			obj.put("Name", getKeysByValue(1));
+			obj.put("Pss", psss.get(1));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("Name", getKeysByValue(2));
+			obj.put("Pss", psss.get(2));
+			result.put(obj);
+			obj = new JSONObject();
+			obj.put("Name", getKeysByValue(3));
+			obj.put("Pss", psss.get(3));
+			result.put(obj);
 
-			tags.forEach((k, v) -> {
+			/*tags.forEach((k, v) -> {
 				try {
 					obj = new JSONObject();
 
@@ -63,7 +90,7 @@ public class PSS {
 				}
 				result.put(obj);
 
-			});
+			});*/
 			System.out.println(result.toString());
 
 			return result.toString();

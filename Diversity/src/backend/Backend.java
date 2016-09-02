@@ -74,6 +74,10 @@ public class Backend {
 				GetPopulation gpo = new GetPopulation();
 				tmp=gpo.getAll(param,pss).toString();
 				return tmp;
+			case 12:
+				Settings conf = new Settings();
+				tmp=conf.getConf().toString();
+				return tmp;
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");

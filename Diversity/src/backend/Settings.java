@@ -4,6 +4,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Calendar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.mysql.jdbc.Connection;
 
 public class Settings {
@@ -52,6 +56,11 @@ public class Settings {
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
+	
+	// Graph Settings
+	public String ages = "0-30,,31-60,,61-90";
+	public String genders = "Female,,Male";
+	public String locations = "Asia,,Europe";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 
@@ -76,5 +85,45 @@ public class Settings {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public JSONArray getConf() throws JSONException{
+		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
+		obj.put("Op", "Configs");
+		result.put(obj);
+		obj = new JSONObject();
+		String[] values = ages.split(",,");
+		obj.put("Size", values.length);
+		result.put(obj);
+		for(int i = 0; i<values.length;i++){
+			obj = new JSONObject();
+			String[] range = values[i].split("-");
+			obj.put("Min", range[0]);
+			obj.put("Max", range[1]);
+			result.put(obj);	
+		}
+		obj = new JSONObject();
+		String[] values2 = genders.split(",,");
+		obj.put("Size", values2.length);
+		result.put(obj);
+		for(int i = 0; i<values2.length;i++){
+			obj = new JSONObject();
+			obj.put("Gender", values2[i]);
+			result.put(obj);	
+		}
+		obj = new JSONObject();
+		String[] values3 = locations.split(",,");
+		obj.put("Size", values3.length);
+		result.put(obj);
+		for(int i = 0; i<values3.length;i++){
+			obj = new JSONObject();
+			obj.put("Location", values3[i]);
+			result.put(obj);	
+		}
+		
+		System.out.print(result.toString());
+		return result;
+		
 	}
 }
