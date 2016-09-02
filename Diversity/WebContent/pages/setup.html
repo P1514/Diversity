@@ -1,6 +1,9 @@
+
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
+
 <meta http-equiv="Cache-Control"
 	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -17,6 +20,8 @@
 <script type="text/javascript"
 	src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
+
+
 	ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
 	var json;
@@ -27,6 +32,8 @@
 		if (parts.length == 2)
 			return parts.pop().split(";").shift();
 	}
+	if(getCookie("developer") != "Guilherme")
+		window.location.href="http://localhost:20000/Diversity/pages/index.html";
 
 	function setCookie() {
 		document.cookie = "Product=" + $("#Products :selected").text();
