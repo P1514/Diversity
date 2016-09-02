@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Chart Configuration</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+	var json;
+	var i = 0;
+	function getCookie(name) {
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2)
+			return parts.pop().split(";").shift();
+	}
+
+	function setCookie() {
+		document.cookie = "Product=" + $("#Products :selected").text();
+		document.cookie = "PSS=" + document.getElementById("Products").value;
+	}
+
+	ws.onopen = function() {
+		var jsonData = {
+			"Op" : "getconfig",
+		}
+		ws.send(JSON.stringify(jsonData));
+	}
+	ws.onmessage = function(event) {
+		json = JSON.parse(event.data);
+
+		if (json.Op == "Error") {
+			alert(json.Message);
+			return;
+		}
+		if (json[0].Op == "configs") {
+			setConfig();
+		}
+
+	}
+	function send_config(){
+		var jsonData ={
+				"Op":"setconfig",
+				"Gen1":document.getElementById("gender1").value,
+				"Gen2":document.getElementById("gender2").value,
+				"Age1":document.getElementById("firstage1").value + "-" + document.getElementById("firstage2").value,
+				"Age2":document.getElementById("secondage1").value + "-" + document.getElementById("secondage2").value,
+				"Age3":document.getElementById("thirdage1").value + "-" + document.getElementById("thirdage2").value,
+				"Loc1":document.getElementById("location1").value,
+				"Loc2":document.getElementById("location2").value,
+		}
+		
+		console.log(jsonData);
+		
+		
+	}
+	function checknumber(field) {
+		field.value = field.value.replace(/[^0-9]/g, '');
+		if (field.value > 99) {
+			field.value = '99';
+		} else if (field.value < 0) {
+			field.value = '0';
+		}
+
+	}
+</script>
+<style>
+input[type="number"] {
+	width: 50px;
+}
+#tables{
+position: relative;
+width:60%;
+margin-left:20%;
+height: 50vh;
+}
+.inlineTable {
+            display: inline-block;
+            vertical-align: top
+        }
+#setup {
+	position: absolute;
+bottom:   0;
+right: 45%;
+	}
+</style>
+</head>
+<body>
+
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+	</center>
+	<!-- Botões opcionais -->
+	<div id="tables" align="center">
+	<table id="age" class="inlineTable" >
+		<tr>
+			<td>Age Range:</td>
+			<td><input type="number" id="firstage1" onKeyUp="checknumber(this);"> - <input type="number"
+				id="firstage2" value="" onKeyUp="checknumber(this);"></td>
+		</tr>
+		<tr>
+			<td>Age Range:</td>
+			<td><input type="number" id="secondage1" value=""
+				onKeyUp="checknumber(this);"> - <input type="number"
+				id="secondage2" value="" onKeyUp="checknumber(this);"></td>
+		</tr>
+		<tr>
+			<td>Age Range:</td>
+			<td><input type="number" id="thirdage1" value=""
+				onKeyUp="checknumber(this);"> - <input type="number"
+				id="thirdage2" value="" onKeyUp="checknumber(this);"></td>
+		</tr>
+		</table>
+		<table id="gender" class="inlineTable">
+		<tr>
+			<td>First Gender:</td>
+			<td><input type="text" id="gender1" value=""></td>
+		</tr>
+		<tr>
+			<td>Second Gender:</td>
+			<td><input type="text" id="gender2" value=""></td>
+		</tr>
+		</table>
+		<table id="location" class="inlineTable">
+		<tr>
+			<td>First Location:</td>
+			<td><input type="text" id="location1" value=""></td>
+		</tr>
+		<tr>
+			<td>Second Location:</td>
+			<td><input type="text" id="location2" value=""></td>
+		</tr>
+
+	</table>
+
+		<input id="setup" class="btn btn-default" onclick="send_config();"
+			type="submit" value="Set up" />
+</div>
+
+</body>

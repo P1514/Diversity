@@ -24,7 +24,7 @@ public class GetPopulation {
 		if (param.equals("gender")) {
 			obj.put("Op", "gengraph");
 			obj.put("Param", "Gender");
-			insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender ASC";
+			insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender DESC";
 		} else if (param.equals("age")) {
 			obj.put("Op", "agegraph");
 			obj.put("Param", "Age");

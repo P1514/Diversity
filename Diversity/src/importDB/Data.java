@@ -126,6 +126,10 @@ public class Data {
 							cndata.close();
 						return result.toString();
 					}
+					if (rs != null)
+						rs.close();
+					if (stmt != null)
+						stmt.close();
 					continue;
 				}
 				break;
