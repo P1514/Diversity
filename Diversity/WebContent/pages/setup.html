@@ -28,9 +28,6 @@
 		if (parts.length == 2)
 			return parts.pop().split(";").shift();
 	}
-	if (getCookie("developer") != "Guilherme")
-		window.location.href = "http://localhost:20000/Diversity/pages/index.html";
-
 	function setCookie() {
 		document.cookie = "Product=" + $("#Products :selected").text();
 		document.cookie = "PSS=" + document.getElementById("Products").value;
@@ -50,37 +47,176 @@
 
 		if (json.Op == "Error") {
 			alert(json.Message);
+			if(json.Message.indexOf("updated") !== -1){
+				var jsonData = {
+						"Op" : "getconfig",
+					}
+					ws.send(JSON.stringify(jsonData));
+			}
+				
 			return;
 		}
 		if (json[0].Op == "Configs") {
+			json = JSON.parse(event.data);
 			setConfig();
 		}
 
 	}
 	function send_config() {
+		var gstring="", astring="",lstring="";
+		
+		for(var i=1;;i++){
+			if(document.getElementById("gender"+i) == null)break;
+			gstring+=document.getElementById("gender"+i).value+",,";
+		}
+		for(var i=1;;i++){
+			if(document.getElementById("1age"+i) == null)break;
+			astring+=document.getElementById("1age"+i).value+"-"+document.getElementById("2age"+i).value+",,";
+		}
+		for(var i=1;;i++){
+			if(document.getElementById("location"+i) == null)break;
+			lstring+=document.getElementById("location"+i).value+",,";
+		}
 		var jsonData = {
 			"Op" : "setconfig",
-			"Gen1" : document.getElementById("gender1").value,
-			"Gen2" : document.getElementById("gender2").value,
-			"Age1" : document.getElementById("firstage1").value + "-"
-					+ document.getElementById("firstage2").value,
-			"Age2" : document.getElementById("secondage1").value + "-"
-					+ document.getElementById("secondage2").value,
-			"Age3" : document.getElementById("thirdage1").value + "-"
-					+ document.getElementById("thirdage2").value,
-			"Loc1" : document.getElementById("location1").value,
-			"Loc2" : document.getElementById("location2").value,
+			"Gender" : gstring,
+			"Age" : astring,
+			"Location" : lstring,
 		}
 
 		console.log(jsonData);
+		ws.send(JSON.stringify(jsonData));
 
+	}
+	function addline(table){
+		var jsonData = new Array();
+		var ii=0;
+		if(table=="age"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Min":"0","Max":"99"
+					}
+					ii++;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="gender"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Gender"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Gender":"",
+					}
+					ii++;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="location"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Location"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Location":"",
+					}
+					ii++;
+					break;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		console.log(jsonData);
+		json=jsonData;
+		setConfig();
+		
+	}
+	
+	function delline(table, id){
+		var jsonData = new Array();
+		var ii=0;
+		if(table=="age"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Age" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="gender"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Gender" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="location"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Location" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+					break;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		console.log(jsonData);
+		json=jsonData;
+		setConfig();
+		
+		
+		
+		
 	}
 	function setConfig() {
 		var i=1;
 		$('#age tbody').empty();
 		$('#gender tbody').empty();
 		$('#location tbody').empty();
-		
 			var tsize = json[i].Size;
 			i++;
 			for (var ii = 1; ii < 1+tsize; i++, ii++) {
@@ -89,21 +225,19 @@
 						.append("<tr><td>Range "
 								+ ii
 								+ "</td><td><input type=\"number\" id=\""
-								+ ii
-								+ "age1\" value=\""
+								+ "1age" + ii + "\" value=\""
 								+ json[i].Min
 								+ "\" onKeyUp=\"checknumber(this);\">"
 								+ " - <input type=\"number\"id=\""
-								+ ii
-								+ "age2\" value=\""
+								+ "2age" + ii + "\" value=\""
 								+ json[i].Max
 								+ "\" onKeyUp=\"checknumber(this);\">"
-								+ " <span class=\"glyphicon glyphicon-remove\"></span></td></tr>");
+								+ " <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('age',"+ii+");\"></button></td></tr>");
 				$('#age tbody').append(tr);
 			}
 			tr = $('<tr/>');
 			tr
-					.append("<td><span class=\"glyphicon glyphicon-plus\"></span></td>");
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('age');\"></button></td>");
 			$('#age tbody').append(tr);
 			var tsize = json[i].Size;
 			i++;
@@ -113,15 +247,14 @@
 						.append("<tr><td>Gender "
 								+ ii
 								+ "</td><td><input type=\"text\" id=\""
-								+ ii
-								+ "gender\" value=\""
+								+ "gender" + ii +"\" value=\""
 								+ json[i].Gender
-								+ "\"> <span class=\"glyphicon glyphicon-remove\"></span></td></tr>");
+								+ "\"> <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('gender',"+ii+");\"></button></td></tr>");
 				$('#gender tbody').append(tr);
 			}
 			tr = $('<tr/>');
 			tr
-					.append("<td><span class=\"glyphicon glyphicon-plus\"></span></td>");
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('gender');\"></button></td>");
 			$('#gender	 tbody').append(tr);
 			var tsize = json[i].Size;
 			i++;
@@ -131,15 +264,14 @@
 						.append("<tr><td>Location "
 								+ ii
 								+ "</td><td><input type=\"text\" id=\""
-								+ ii
-								+ "gender\" value=\""
+								+ "location" + ii + "\" value=\""
 								+ json[i].Location
-								+ "\"> <span class=\"glyphicon glyphicon-remove\"></span></td></tr>");
+								+ "\"> <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('location',"+ii+");\"></button></td></tr>");
 				$('#location tbody').append(tr);
 			}
 			tr = $('<tr/>');
 			tr
-					.append("<td><span class=\"glyphicon glyphicon-plus\"></span></td>");
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('location');\"></button></td>");
 			$('#location tbody').append(tr);
 	}
 	function checknumber(field) {
@@ -194,7 +326,7 @@ input[type="number"] {
 		<table id="gender" class="inlineTable">
 			<thead>
 				<tr>
-					<th>Gender</th>
+					<th>Gender (A-Z)</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -202,7 +334,7 @@ input[type="number"] {
 		<table id="location" class="inlineTable">
 			<thead>
 				<tr>
-					<th>Location</th>
+					<th>Location (A-Z)</th>
 				</tr>
 			</thead>
 			<tbody></tbody>

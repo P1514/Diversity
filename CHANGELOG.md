@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- Local Calculation Multi-Threading ( minimal impact to performance)
+- Local Calculation Multi-Threading (minimal impact to performance)
 
+## [1.1.4] 2016-09-06
+### Added
+- Chart Setup page as long as button on home screen to direct to that page
+- Compatiblity of the new Setup capabilities with the current pages implemented (Opinion  and Global Sentiment) 
 
 ## [1.1.3] 2016-09-02
 ### Fixed

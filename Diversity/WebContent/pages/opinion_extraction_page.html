@@ -63,20 +63,15 @@
 			}
 			function connect() {
 				document.getElementById("Cookie").innerHTML = "Product: "
-						+ getCookie("Product") + "; PSS: "+getCookie("PSS");
+						+ getCookie("Product") + "; PSS: " + getCookie("PSS");
 
 				ws = new WebSocket('ws://' + window.location.hostname + ":"
 						+ window.location.port + '/Diversity/server');
 
 				ws.onopen = function() {
-					json = {
-						"Op" : "chartrequest",
-						"Param" : "Global",
-						"Pss" : getCookie("Product")
-					/*"Param":"Age,Male,Female",
-					"Value":"0-30, 50, 50",*/
+					var json = {
+						"Op" : "getconfig",
 					}
-
 					ws.send(JSON.stringify(json));
 
 					json = {
@@ -92,6 +87,49 @@
 
 					if (json[0].Op == "Error") {
 						alert(json[0].Message);
+						return;
+					}
+
+					if (json[0].Op == "Configs") {
+						var jsonData1 = JSON.parse(JSON.stringify(json));
+
+						for (var i = 1; i < jsonData1.length;) {
+							switch (jsonData1[i].Param) {
+							case "Age":
+								var x = document.getElementById("agefilt");
+								break;
+							case "Gender":
+								var x = document.getElementById("genderfilt");
+								break;
+							case "Location":
+								var x = document.getElementById("locationfilt");
+								break;
+							}
+							var tsize = jsonData1[i].Size;
+							console.log(tsize);
+							i++;
+							for (var ii = 0; ii < tsize; ii++, i++) {
+								var option = document.createElement('option');
+								if (jsonData1[i].hasOwnProperty("Min")) {
+									option.text = jsonData1[i].Min + "-"
+											+ jsonData1[i].Max;
+								} else {
+									option.text = (!(jsonData1[i]
+											.hasOwnProperty("Gender"))) ? jsonData1[i].Location
+											: jsonData1[i].Gender;
+								}
+								x.add(option);
+							}
+						}
+						json = {
+							"Op" : "chartrequest",
+							"Param" : "Global",
+							"Pss" : getCookie("Product")
+						}
+
+						ws.send(JSON.stringify(json));
+						return;
+
 					}
 
 					if (json[0].Op == "table") {
@@ -114,23 +152,18 @@
 							$('#posts tbody').append(tr);
 						}
 						$('.table > tbody > tr').click(function(e) {
-							console.log("HELLO");
-							/*json = {
-								"Op" : "getcomments",
-								"Values" : $(this).find('input[name="id"]').val()
-							}
-							ws.send(JSON.stringify(json));*/
 							clicker($(this).find('input[name="id"]').val());
 						});
+						return;
 					}
 					if (json[0].Op == "graph") {
 						jsonData = JSON.parse(JSON.stringify(json));
 						drawChart();
+						return;
 					}
 					if (json[0].Op == "comments") {
-						console.log("test");
 						clicker();
-						//var w = window.open("comments.html", "Comments", "width=700,height=800");
+						return;
 					}
 				};
 			}
@@ -171,7 +204,6 @@
 				data.addColumn('string', 'Age Range');// Adds Age to X axis
 
 				for (var i = 1; i <= paramcount; i++) {
-					console.log(jsonData[i].Param);
 					data.addColumn('number', jsonData[i].Param); // Adds all parameters that come from server
 				}
 				var j = 1;
@@ -199,17 +231,19 @@
 				for (var i = 1; i < paramcount + 1; i++) {
 					colors.push(chartcolor(data.getColumnLabel(i)));
 				}
-				console.log(colors);
-				
+
 				var info = "";
 				var gender = document.getElementById("genderfilt").value;
 				var location = document.getElementById("locationfilt").value;
-				if(gender != "All") info +=gender + " ";
-				if(location != "All") info += location;
+				if (gender != "All")
+					info += gender + " ";
+				if (location != "All")
+					info += location;
 
 				//chart options
 				var options = {
-					title : "Average Polarity" +  ((info != "" )? " - " + info : ""),
+					title : "Average Polarity"
+							+ ((info != "") ? " - " + info : ""),
 					colors : colors,
 					hAxis : {
 						title : 'Age Range'
@@ -220,7 +254,11 @@
 							max : 0,
 							min : 100
 						}
-					}
+					},
+					legend: {position: 'none'},
+					'tooltip' : {
+						  trigger: 'none'
+						}
 				};
 
 				//chart definition
@@ -234,58 +272,6 @@
 				//draws chart
 				chart.draw();
 
-				/*
-				$('#genderfilt').change(setColumnsRows);
-				$('#locationfilt').change(setColumnsRows);
-				$('#agefilt').change(setColumnsRows);
-				$('input:radio[name=field]').change(setColumnsRows);
-
-				function setColumnsRows() { Not needed
-					var gender = document.getElementById("genderfilt").value;
-					var location = document.getElementById("locationfilt").value;
-					var age = document.getElementById("agefilt").value;
-					var segment = $('input:radio[name=field]:checked').val();
-
-					var rows = [];
-					for (var i = 0; i < data.getNumberOfRows(); i++) {
-						if ((data.getValue(i, 0) === age) || (age === 'All')) {
-							rows.push(i);
-						}
-					}
-
-					var columns = [ 0 ];
-					if ((segment === 'gender') || (segment === '')) {
-						for (var i = 1; i <= 2; i++) {
-							if ((data.getColumnLabel(i) === gender)
-									|| (gender === 'All')) {
-								columns.push(i);
-							}
-						}
-					}
-					if ((segment === 'location') || (segment === '')) {
-						for (var i = 3; i <= 4; i++) {
-							if ((data.getColumnLabel(i) === location)
-									|| (location === 'All')) {
-								columns.push(i);
-							}
-						}
-					}
-					if (segment === '') {
-						columns.push(5);
-					}
-
-					var newColors = [];
-					for (var i = 1; i < columns.length; i++) {
-						newColors.push(colors[columns[i - 1]]);
-					}
-
-					chart.setOption('colors', newColors);
-					chart.setView({
-						'columns' : columns,
-						'rows' : rows
-					});
-					chart.draw();
-				}*/
 			}
 
 			function chartcolor(data) {
@@ -330,55 +316,70 @@
 					json.Values += "Global";
 				} else {
 					if (genderradio == false) {
+
 						if (gender == "All") {
+							var select = document
+									.getElementById('genderfilt');
+							json.Param += "Gender,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
 							json.Param += "Gender,";
-							json.Values += "Female-Male,";
-						}
-						if (gender == "Female") {
-							json.Param += "Gender,";
-							json.Values += "Female,";
-						}
-						if (gender == "Male") {
-							json.Param += "Gender,";
-							json.Values += "Male,";
+							var select = document
+									.getElementById('genderfilt');
+							json.Values += gender + ",";
 						}
 					} else {
-						json.Param += "Gender,Gender,";
-						json.Values += "Male,Female,";
+						var select = document
+						.getElementById('genderfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Gender,";
+							json.Values += select.options[i].value + ",";
+						}
 					}
 					if (locationradio == false) {
 
 						if (location == "All") {
+							var select = document
+									.getElementById('locationfilt');
+							json.Param += "Location,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
 							json.Param += "Location,";
-							json.Values += "Asia-Europe,";
-						}
-						if (location == "Europe") {
-							json.Param += "Location,";
-							json.Values += "Europe,";
-						}
-						if (location == "Asia") {
-							json.Param += "Location,";
-							json.Values += "Asia,";
+							var select = document
+									.getElementById('locationfilt');
+							json.Values += location + ",";
 						}
 					} else {
-						json.Param += "Location,Location,";
-						json.Values += "Asia,Europe,";
+						var select = document
+						.getElementById('locationfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Location,";
+							json.Values += select.options[i].value + ",";
+						}
 					}
 
-					if (age == "0-30" || age == "All") {
+					if (age == "All") {
+
+						var select = document.getElementById('agefilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Age,";
+
+							json.Values += select.options[i].value + ",";
+						}
+					} else {
 						json.Param += "Age,";
-						json.Values += "0-30,";
-					}
-					if (age == "31-60" || age == "All") {
-						json.Param += "Age,";
-						json.Values += "31-60,";
-					}
-					if (age == "61-90" || age == "All") {
-						json.Param += "Age,";
-						json.Values += "61-90,";
+						var select = document.getElementById('agefilt');
+						json.Values += age + ",";
 					}
 				}
-				console.log(json);
 				ws.send(JSON.stringify(json));
 			}
 		</script>
@@ -495,20 +496,12 @@ product {
 				<tr>
 					<th><select id="genderfilt">
 							<option value="All">All Genders
-								<option value="Male">Male
-									<option value="Female">Female
 					</select></th>
 					<th><select id="locationfilt">
 							<option value="All">All Locations
-								<option value="Asia">Asia
-									<option value="Europe">Europe
 					</select></th>
 					<th><select id="agefilt">
 							<option value="All">All Ages
-							<div role="separator" class="dropdown-divider"></div>
-								<option value="0-30">0-30
-									<option value="31-60">31-60
-										<option value="61-90">61-90
 					</select>
 				</tr>
 			</table>

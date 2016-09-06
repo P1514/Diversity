@@ -58,7 +58,8 @@
 
 	function connect() {
 		document.getElementById("Cookie").innerHTML = "Product: "
-				+ getCookie("Product") + "; PSS: "+getCookie("PSS");;
+				+ getCookie("Product") + "; PSS: " + getCookie("PSS");
+		;
 
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
@@ -144,11 +145,11 @@
 			}
 			if (json[0].Op == "agegraph") {
 				agedata = JSON.parse(JSON.stringify(json));
-				drawColumn("agechart_div", "Age",agedata);
+				drawColumn("agechart_div", "Age", agedata);
 			}
 			if (json[0].Op == "locgraph") {
 				locdata = JSON.parse(JSON.stringify(json));
-				drawColumn("locchart_div", "Location",locdata);
+				drawColumn("locchart_div", "Location", locdata);
 			}
 			//if 
 			if (json[0].Op == "comments") {
@@ -235,8 +236,8 @@
 		var localdata = new google.visualization.DataTable();
 		var paramcount = 0;
 		localdata.addColumn('string', data[0].Param);
-		for (var i= 1;i<data.length;i++)
-		localdata.addColumn('number', data[i].Param);
+		for (var i = 1; i < data.length; i++)
+			localdata.addColumn('number', data[i].Param);
 		var values = new Array();
 		values.push(data[0].param);
 		for (var i = 1; i < data.length; i++) {
@@ -245,8 +246,8 @@
 		}
 		localdata.addRow(values);
 		var colors = new Array();
-		for (var i = 1; i < paramcount+1; i++) {
-			colors.push(chartcolor(localdata.getColumnLabel(i)));
+		for (var i = 1; i < paramcount + 1; i++) {
+			colors.push(chartcolor(data[0].Param, i));
 		}
 		console.log(colors);
 
@@ -272,30 +273,48 @@
 				.getElementById(graph));
 		chart.draw(localdata, options);
 
-		function chartcolor(data) {
+		function chartcolor(data, i) {
 			switch (data) {
 			case "Global":
 				return "#604460";
-			case "Male":
-				return "#00617F";
-			case "Female":
-				return "#0093C8";
-			case "Asia":
-				return "#FF3C14";
-			case "Europe":
-				return "#A60202";
-			case "0-30":
-				return "#BFD730";
-			case "31-60":
-				return "#8CA122";
-			case "61-90":
-				return "#5C6E0E";
+			case "Gender":
+				switch (i) {
+				case 1:
+					return "#00617F";
+				case 2:
+					return "#0093C8";
+				default:
+					return "#0CC5FC";
+				}
+			case "Location":
+				switch (i) {
+				case 1:
+					return "#FF3C14";
+				case 2:
+					return "#A60202";
+				default:
+					return "#540001";
+
+				}
+			case "Age":
+				switch (i) {
+				case 1:
+					return "#BFD730";
+				case 2:
+					return "#8CA122";
+				case 3:
+					return "#5C6E0E";
+				case 4:
+					return "#405008";
+				default:
+					return "#202D02";
+				}
 			}
 		}
 	}
 
 	//draws chart according to selected radio button
-	function checkValue() {
+	/*function checkValue() {
 		switch (document.test.field.value) {
 
 		case "Global":
@@ -339,7 +358,7 @@
 			ws.send(JSON.stringify(json));
 			break;
 		}
-	}
+	}*/
 
 	function clicker(hidden) {
 		var thediv = document.getElementById('displaybox');
@@ -411,7 +430,11 @@ product {
 	right: 10px;
 	top: 20px;
 }
-#graphst {width:100%; table-layout: fixed;}
+
+#graphst {
+	width: 100%;
+	table-layout: fixed;
+}
 </style>
 </head>
 

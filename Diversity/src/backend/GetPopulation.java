@@ -24,31 +24,33 @@ public class GetPopulation {
 		if (param.equals("gender")) {
 			obj.put("Op", "gengraph");
 			obj.put("Param", "Gender");
-			insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender DESC";
+			params = Settings.genders;
+			//insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender DESC";
 		} else if (param.equals("age")) {
 			obj.put("Op", "agegraph");
 			obj.put("Param", "Age");
-			params = "0-30,31-60,61-90";
+			params = Settings.ages;
 		} else if (param.equals("location")) {
 			obj.put("Op", "locgraph");
 			obj.put("Param", "Location");
-			insert = "Select distinct location FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY location ASC";
+			params= Settings.locations;
+			//insert = "Select distinct location FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY location ASC";
 		}
 		result.put(obj);
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		try {
 			dbconnect();
-			if (insert != "") {
-				query1 = cnlocal.prepareStatement(insert);
+			if (!params.contains("-")) {
+				/*query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, pss);
 				rs = query1.executeQuery();
 				for (; rs.next();) {
-					params += rs.getString(param) + ",";
+					params += rs.getString(param) + ",,";
 				}
 				rs.close();
-				query1.close();
-				String[] out_params = params.split(",");
+				query1.close();*/
+				String[] out_params = params.split(",,");
 				insert = "Select count(*) from authors where " + param + "=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
@@ -65,7 +67,7 @@ public class GetPopulation {
 				}
 				return result;
 			}else{
-				String[] out_params = params.split(",|-");
+				String[] out_params = params.split(",,|-");
 				insert = "Select count(*) from authors where " + param + ">=? && "+param+"<=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
 				for (int i = 0; i < out_params.length; i++) {
 					System.out.println(out_params[i]);

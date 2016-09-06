@@ -40,27 +40,27 @@ public class Settings {
 
 	// Computing Variables
 	// Reach
-	public static final double pWviews = (double) 1/3;
-	public static final double pWlikes = (double) 1/3;
-	public static final double pWcomments = (double) 1/3;
+	public static final double pWviews = (double) 1 / 3;
+	public static final double pWlikes = (double) 1 / 3;
+	public static final double pWcomments = (double) 1 / 3;
 	// Influence
-	public static final double aWviews = (double) 1/3;
-	public static final double aWlikes = (double) 1/3;
-	public static final double aWcomments = (double) 1/3;
+	public static final double aWviews = (double) 1 / 3;
+	public static final double aWlikes = (double) 1 / 3;
+	public static final double aWcomments = (double) 1 / 3;
 
 	// Local DB Specs
 	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	
+
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
-	
+
 	// Graph Settings
-	public String ages = "0-30,,31-60,,61-90";
-	public String genders = "Female,,Male";
-	public String locations = "Asia,,Europe";
+	public static String ages = "0-30,,31-60,,61-90";
+	public static String genders = "Female,,Male";
+	public static String locations = "Asia,,Europe";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 
@@ -86,8 +86,8 @@ public class Settings {
 			}
 		}
 	}
-	
-	public JSONArray getConf() throws JSONException{
+
+	public JSONArray getConf() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Configs");
@@ -95,35 +95,61 @@ public class Settings {
 		obj = new JSONObject();
 		String[] values = ages.split(",,");
 		obj.put("Size", values.length);
+		obj.put("Param", "Age");
 		result.put(obj);
-		for(int i = 0; i<values.length;i++){
+		for (int i = 0; i < values.length; i++) {
 			obj = new JSONObject();
 			String[] range = values[i].split("-");
 			obj.put("Min", range[0]);
 			obj.put("Max", range[1]);
-			result.put(obj);	
+			result.put(obj);
 		}
 		obj = new JSONObject();
 		String[] values2 = genders.split(",,");
 		obj.put("Size", values2.length);
+		obj.put("Param", "Gender");
 		result.put(obj);
-		for(int i = 0; i<values2.length;i++){
+		for (int i = 0; i < values2.length; i++) {
 			obj = new JSONObject();
 			obj.put("Gender", values2[i]);
-			result.put(obj);	
+			result.put(obj);
 		}
 		obj = new JSONObject();
 		String[] values3 = locations.split(",,");
 		obj.put("Size", values3.length);
+		obj.put("Param", "Location");
 		result.put(obj);
-		for(int i = 0; i<values3.length;i++){
+		for (int i = 0; i < values3.length; i++) {
 			obj = new JSONObject();
 			obj.put("Location", values3[i]);
-			result.put(obj);	
+			result.put(obj);
 		}
-		
 		System.out.print(result.toString());
 		return result;
-		
+
+	}
+
+	public JSONObject setConf(JSONObject msg) throws JSONException {
+		String edited = new String();
+		if (msg.has("Gender")) {
+			Settings.genders = msg.getString("Gender");
+			edited += "Gender ";
+		}
+		if (msg.has("Age")) {
+			Settings.ages = msg.getString("Age");
+			edited += "Age ";
+		}
+		if (msg.has("Location")) {
+			Settings.locations = msg.getString("Location");
+			edited += "Location ";
+		}
+		msg = new JSONObject();
+		msg.put("Op", "Error");
+		if (edited != "") {
+			msg.put("Message", edited + "configuration updated");
+		} else {
+			msg.put("Message", "Nothing Changed");
+		}
+		return msg;
 	}
 }

@@ -3,6 +3,7 @@ package backend;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.stream.Stream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,10 +23,11 @@ public class SentimentChart {
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;
 		String[] values = (value != null) ? value.split(",") : null;
-		String[] agerange = new String[3];
-		String[] locs = new String[3];
-		String[] genders = new String[3];
-		String[] outparams = new String[4];
+		String[] agerange = new String[Settings.ages.split(",,").length];
+		String[] locs = new String[Settings.locations.split(",,").length];
+		String[] genders = new String[Settings.genders.split(",,").length];
+		String[] outparams = Stream.of(Settings.genders.split(",,"), Settings.locations.split(",,")).flatMap(Stream::of)
+                .toArray(String[]::new);
 		int nages = 0, ngenders = 0, nlocs = 0;
 		for (int i = 0; i < params.length; i++) {
 
@@ -48,10 +50,6 @@ public class SentimentChart {
 		// TODO find a cleaner way to process ALL this this Class need an Overhaul
 		// OVERHAUL java needs a OVERHAUL tag
 		if (nlocs == 2 && ngenders == 2) {
-			outparams[0] = "Male";
-			outparams[1] = "Female";
-			outparams[2] = "Asia";
-			outparams[3] = "Europe";
 			try {
 				obj = new JSONObject();
 				obj.put("Op", "graph");
@@ -93,12 +91,12 @@ public class SentimentChart {
 					outparams[0] = "Asia";
 					outparams[1] = "Europe";
 				} else {
-					if (nlocs == 1 && ngenders == 1) {
+					if ((nlocs == 1 && ngenders == 1)) {
 						outparams[0] = "Global";
-					} else {
+					} /*else {
 						outparams[0] = "Global";
 
-					}
+					}*/
 				}
 			}
 		}
@@ -108,10 +106,9 @@ public class SentimentChart {
 			result.put(obj);
 
 			if (params[0].contains("Global")) {
-				agerange[0] = "0-30";
-				agerange[1] = "31-60";
-				agerange[2] = "61-90";
-				nages = 3;
+				outparams[0] = "Global";
+				agerange = Settings.ages.split(",,");
+				nages = agerange.length;
 				ngenders = 1;
 				nlocs = 1;
 				genders[0] = null;
@@ -128,7 +125,6 @@ public class SentimentChart {
 						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc],pss));
 						result.put(obj);
 						temp++;
-
 					}
 				}
 			}

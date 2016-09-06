@@ -20,6 +20,7 @@ public class Operations {
 		op.put("getinfgraph", 10);
 		op.put("getpopulation", 11);
 		op.put("getconfig", 12);
+		op.put("setconfig", 13);
 		
 		
 	}

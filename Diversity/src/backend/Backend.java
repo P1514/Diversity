@@ -20,6 +20,7 @@ public class Backend {
 		String param;
 		String values;
 		String tmp;
+		Settings conf;
 		int pss = 0;
 		;
 		PSS ps = new PSS();
@@ -75,10 +76,14 @@ public class Backend {
 				tmp=gpo.getAll(param,pss).toString();
 				return tmp;
 			case 12:
-				Settings conf = new Settings();
+				conf = new Settings();
 				tmp=conf.getConf().toString();
 				return tmp;
-			default:
+			case 13: 
+				conf = new Settings();
+				tmp=conf.setConf(msg).toString();
+				return tmp;
+				default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");
 				msg.put("Message", "NOT A VALID OPERATION");
