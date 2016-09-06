@@ -52,6 +52,35 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
+	
+	// Author Table
+	public static final String atable = "author";
+	public static final String atable_name = "username";
+	public static final String atable_age = "age";
+	public static final String atable_gen = "gender";
+	public static final String atable_loc = "location";
+	public static final String atable_user = "user_id";
+	public static final String atable_posts = "no_posts";
+	public static final String atable_comments = "no_comments";
+	public static final String atable_likes = "no_likes";
+	public static final String atable_views = "no_views";
+	public static final String atable_influence = "influence";
+	public static final String atable_id = "id";
+	
+	// Post Table
+	public static final String ptable= "post";
+	public static final String ptable_id= "id";
+	public static final String ptable_title = "title";
+	public static final String ptable_msg="message";
+	public static final String ptable_authid="author_id";
+	public static final String ptable_likes="no_likes";
+	public static final String ptable_views="no_views";
+	public static final String ptable_comments="no_comments";
+	public static final String ptable_
+	public static final String ptable
+	
+	
+	
 
 	// PSS File
 	public static final String DATA_FOLDER = "data";

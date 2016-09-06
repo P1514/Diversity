@@ -54,9 +54,29 @@ public class Data {
 			totallikes = rs.getInt("totallikes");
 			totalposts = rs.getInt("totalposts");
 			LastUpdated = rs.getDate("lastupdated");
+			if (rs.getInt("Version") != 1)
+				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
-			System.out.println("ERROR ACCESSING LOCAL DB");
+			obj.put("Op", "Error");
+			obj.put("Message",
+					"Error (1): Local Database Error\r\n Please check if populated and Updated to latest version");
+			result.put(obj);
+			try {
+				if (rs != null)
+
+					rs.close();
+
+				if (stmt != null)
+					stmt.close();
+				if (cndata != null)
+					cndata.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			e1.printStackTrace();
+			return result.toString();
+
 		} finally {
 			try {
 				if (stmt != null)
@@ -322,7 +342,7 @@ public class Data {
 
 		ExecutorService es = Executors.newCachedThreadPool();
 
-		opiniondb.forEach((k, opinion) -> {	
+		opiniondb.forEach((k, opinion) -> {
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
