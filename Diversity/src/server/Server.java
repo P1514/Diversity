@@ -51,7 +51,7 @@ public class Server {
 	
 	public void send_message(String msg) {
 			Async as = session.getAsyncRemote();
-			System.out.println("OUT: "+ msg);
+			System.out.println("\r\nOUT: "+ msg);
 			as.sendText(msg);
 			return;
 	}

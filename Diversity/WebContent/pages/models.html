@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Chart Configuration</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/bootstrap-slider.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.css" />
+<script>
+	var json;
+	var edit = false;
+	var i = 0;
+	function getCookie(name) {
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2)
+			return parts.pop().split(";").shift();
+	}
+	if (getCookie("developer") != "Guilherme") {
+		window.location.href = "http://localhost:20000/Diversity/pages/index.html";
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		$('#age').slider();
+		if (getCookie("model") != null) {
+			document.getElementById("fcheckbox").style.display = "block";
+			document.getElementById("submit").value = "Edit";
+			edit = true;
+			document.cookie = 'model=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+		}
+	}, false);
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+
+	ws.onopen = function() {
+	}
+	ws.onmessage = function(event) {
+		json = JSON.parse(event.data);
+		console.log(json);
+
+		if (json.Op == "Error") {
+			alert(json.Message);
+			return;
+		}
+	}
+
+	function addline() {
+		var name = document.getElementById("new_name").value;
+		var value = document.getElementById("new_URI").value;
+		if (name == "" || value == "")
+			return;
+		value = value.replace("http://", "");
+		value = "http://" + value;
+		$('#left_menu').append(
+				'<div class="checkbox"><label><input type="checkbox" value="'+value+'"">'
+						+ name + '</label></div>');
+		document.getElementById("new_name").value = "";
+		document.getElementById("new_URI").value = "";
+	}
+</script>
+<style>
+input[type="number"] {
+	width: 50px;
+}
+
+#global {
+	position: relative;
+	width: 80%;
+	margin-left: 10%;
+	height: 50vh;
+}
+
+#menu {
+	position: relative;
+	width: 80%;
+	height: 80%;
+	margin-top:4%;
+}
+
+.inlineTable {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: "10%";
+	margin-rigth: "10%";
+}
+
+.inlineTop {
+	vertical-align: top;
+}
+.checkbox{
+vertical-align: top;}
+
+.left_menu{
+vertical-align: top;}
+
+#setup {
+	position: absolute;
+	bottom: 0;
+}
+</style>
+</head>
+<body>
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+	</center>
+	<!-- Botões opcionais -->
+	<div id="global" align="center">
+		<table id="menu">
+			<tr>
+				<td style="vertical-align:top">
+					<div id="left_menu" class="inlineTop">
+						<input type="text" id="new_name" placeholder="Name"><input
+							type="text" id="new_URI" placeholder="URI">
+						<button class="glyphicon glyphicon-plus" onclick="addline();"></button>
+						<div class="checkbox">
+							<label for="test"><input id="test" type="checkbox"
+								value="http://www.google.pt">Google</label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox"
+								value="http://www.twitter.com">Twitter</label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox"
+								value="http://www.facebook.com">Facebook</label>
+						</div>
+					</div>
+				</td>
+				<td style="vertical-align:top">
+					<table id="right_menu" class="inlineTable">
+						<tr>
+							<td><div class="form-group">
+									<label for="frequency">Update Frequency(hours):</label> <input
+										type="number" class="form-control" id="frequency"> <label
+										for="pss">PSS:</label> <input type="text" class="form-control"
+										id="pss">
+								</div>
+								<div id="fcheckbox" style="display: none;" class="checkbox">
+									<label><input id="Archive" type="checkbox" value=""
+										disabled>Archive</label>
+								</div></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>
+
+								<div class="form-group">
+									<label for="age">Age Range:</label> <b>0 &nbsp</b> <input
+										id="age" type="text" class="span2" value=""
+										data-slider-min="0" data-slider-max="99" data-slider-step="1"
+										data-slider-value="[5,99]" /> <b>&nbsp 99</b>
+							</td>
+						</tr>
+						<tr>
+							<td><label for="gender">Genders(";" separator)</label> <input
+								type="text" class="form-control" id="gender" value="All">
+								<label for="pss">PSS:</label> <input type="text"
+								class="form-control" id="pss">
+								</div>
+								<div class="checkbox">
+									<label><input id="final" type="checkbox" value="">Include
+										Final Products</label>
+								</div></td>
+							<td></td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
+			</tr>
+
+		</table>
+		<input id="submit" class="btn btn-default btn-block"
+			onclick="send_config();" type="submit" value="Create" />
+	</div>
+	</div>
+</body>

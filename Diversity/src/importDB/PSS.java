@@ -2,9 +2,6 @@ package importDB;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Objects;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,9 +48,7 @@ public class PSS {
 	
 	public String getKeysByValue(Integer value) {
 		tags.forEach((k, v) -> {
-			System.out.println("HELLO" + v + " " + value);
 			if(v==value){
-				System.out.println("HELLO" + v + " " + value);
 				out=new String();
 				out=k;
 			}

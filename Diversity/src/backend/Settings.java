@@ -13,27 +13,27 @@ import com.mysql.jdbc.Connection;
 public class Settings {
 	// To be replaced by properties file
 	// Data Origin DB Specs
-	public static final String url = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
-	public static final String user = "diversity";
-	public static final String pass = "diversity";
+	public static final String rurl = "jdbc:mysql://localhost:3306/sentimentposts?autoReconnect=true&useSSL=false";
+	public static final String ruser = "diversity";
+	public static final String rpass = "diversity";
 
 	// Post Table
-	public static final String posttn = "post"; // Table Name
-	public static final String rpost_id = "post_id"; // Reference Post Id
-	public static final String post_id = "id"; // Actual Post Id
-	public static final String puser_id = "user_id"; // Poster Id
-	public static final String pdate = "timestamp"; // timestamp
-	public static final String plikes = "likes"; // Number of Likes
-	public static final String pviews = "views"; // Number of views
-	public static final String pmessage = "message"; // Message
+	public static final String rptable = "post"; // Table Name
+	public static final String rptable_rpostid = "post_id"; // Reference Post Id
+	public static final String rptable_postid = "id"; // Actual Post Id
+	public static final String rptable_userid = "user_id"; // Poster Id
+	public static final String rptable_date = "timestamp"; // timestamp
+	public static final String rptable_likes = "likes"; // Number of Likes
+	public static final String rptable_views = "views"; // Number of views
+	public static final String rptable_message = "message"; // Message
 
 	// User Table
-	public static final String usertn = "user"; // Table name
-	public static final String user_id = "id"; // Id
-	public static final String uname = "name"; // Name
-	public static final String uage = "age"; // Age
-	public static final String ugender = "gender"; // Gender
-	public static final String uloc = "location"; // Location
+	public static final String rutable = "user"; // Table name
+	public static final String rutable_userid = "id"; // Id
+	public static final String rutable_name = "name"; // Name
+	public static final String rutable_age = "age"; // Age
+	public static final String rutable_gender = "gender"; // Gender
+	public static final String rutable_loc = "location"; // Location
 
 	// Posts Table
 	public static final String ptime = "timestamp";
@@ -52,36 +52,43 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	
-	// Author Table
-	public static final String atable = "author";
-	public static final String atable_name = "username";
-	public static final String atable_age = "age";
-	public static final String atable_gen = "gender";
-	public static final String atable_loc = "location";
-	public static final String atable_user = "user_id";
-	public static final String atable_posts = "no_posts";
-	public static final String atable_comments = "no_comments";
-	public static final String atable_likes = "no_likes";
-	public static final String atable_views = "no_views";
-	public static final String atable_influence = "influence";
-	public static final String atable_id = "id";
-	
-	// Post Table
-	public static final String ptable= "post";
-	public static final String ptable_id= "id";
-	public static final String ptable_title = "title";
-	public static final String ptable_msg="message";
-	public static final String ptable_authid="author_id";
-	public static final String ptable_likes="no_likes";
-	public static final String ptable_views="no_views";
-	public static final String ptable_comments="no_comments";
-	public static final String ptable_
-	public static final String ptable
-	
-	
-	
+	public static final Integer dbversion = 1;
 
+	// Author Table
+	public static final String latable = "authors";
+	public static final String latable_name = "name";
+	public static final String latable_age = "age";
+	public static final String latable_gender = "gender";
+	public static final String latable_location = "location";
+	public static final String latable_posts = "posts";
+	public static final String latable_comments = "comments";
+	public static final String latable_likes = "likes";
+	public static final String latable_views = "views";
+	public static final String latable_influence = "influence";
+	public static final String latable_id = "id";
+
+	// Post Table
+	public static final String lptable = "posts";
+	public static final String lptable_id = "id";
+	public static final String lptable_message= "message";
+	public static final String lptable_authorid = "authors_id";
+	public static final String lptable_likes = "likes";
+	public static final String lptable_views = "views";
+	public static final String lptable_comments = "comments";
+	public static final String lptable_opinion = "opinions_id";
+	public static final String lptable_polarity = "polarity";
+
+	// Opinion table
+	public static final String lotable= "opinions";
+	public static final String lotable_id="id";
+	public static final String lotable_reach="reach";
+	public static final String lotable_polarity="polarity";
+	public static final String lotable_influence="total_inf";
+	public static final String lotable_author="authors_id";
+	public static final String lotable_timestamp="timestamp";
+	public static final String lotable_pss="tag_id";
+	public static final String lotable_comments="comments";
+	
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
@@ -96,7 +103,7 @@ public class Settings {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, 2);
 		Class.forName("com.mysql.jdbc.Driver");
-		return (Connection) DriverManager.getConnection(url, user, pass);
+		return (Connection) DriverManager.getConnection(rurl, ruser, rpass);
 	}
 
 	public Connection connlocal() throws ClassNotFoundException {

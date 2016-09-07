@@ -54,7 +54,7 @@ public class Data {
 			totallikes = rs.getInt("totallikes");
 			totalposts = rs.getInt("totalposts");
 			LastUpdated = rs.getDate("lastupdated");
-			if (rs.getInt("Version") != 1)
+			if (rs.getInt("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
 			obj.put("Op", "Error");
@@ -116,9 +116,9 @@ public class Data {
 				cal.setTime(LastUpdated);
 				cal.add(Calendar.MONTH, 1);
 				LastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
-				query = ("Select distinct case \r\n when " + Settings.rpost_id + " is null then " + Settings.post_id
-						+ "\r\n when " + Settings.rpost_id + " is not null then " + Settings.rpost_id + " end from "
-						+ Settings.posttn + " Where " + Settings.ptime + " > \'" + LastUpdated + "\' && "
+				query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then " + Settings.rptable_postid
+						+ "\r\n when " + Settings.rptable_rpostid + " is not null then " + Settings.rptable_rpostid + " end from "
+						+ Settings.rptable + " Where " + Settings.ptime + " > \'" + LastUpdated + "\' && "
 						+ Settings.ptime + " <= \'" + LastUpdated2 + "\' ORDER BY ID ASC");
 				stmt = cndata.createStatement();
 				// System.out.println(query);
@@ -190,20 +190,20 @@ public class Data {
 			System.out.println(querycond);
 			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 			// Load users from local DB
-			query = ("Select * from authors where id in " + querycond);
+			query = ("Select * from "+ Settings.latable +" where "+Settings.latable_id+" in " + querycond);
 			// System.out.println(query);
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				if (authordb.containsKey(rs.getInt("id"))) {
 				} else {
-					Author auth = new Author(rs.getInt("id"), rs.getString("name"), rs.getInt("age"),
-							rs.getString("gender"), rs.getString("location"));
-					auth.setComments(rs.getInt("comments"));
-					auth.setLikes(rs.getInt("likes"));
-					auth.setPosts(rs.getInt("posts") - 1);
-					auth.setViews(rs.getInt("views"));
-					authordb.put(rs.getInt("id"), auth);
+					Author auth = new Author(rs.getInt(Settings.latable_id), rs.getString(Settings.latable_name), rs.getInt(Settings.latable_age),
+							rs.getString(Settings.latable_gender), rs.getString(Settings.latable_location));
+					auth.setComments(rs.getInt(Settings.latable_comments));
+					auth.setLikes(rs.getInt(Settings.latable_likes));
+					auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
+					auth.setViews(rs.getInt(Settings.latable_views));
+					authordb.put(rs.getInt(Settings.latable_id), auth);
 				}
 			}
 			rs.close();
@@ -213,17 +213,17 @@ public class Data {
 			stime = System.nanoTime();
 
 			// Load users from foreign DB
-			query = ("Select * from " + Settings.usertn + " where " + Settings.user_id + " in " + querycond);
+			query = ("Select * from " + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
 			cndata = dbc.conndata();
 			stmt = cndata.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt(Settings.user_id))) {
+				if (authordb.containsKey(rs.getInt(Settings.rutable_userid))) {
 				} else {
-					authordb.put(rs.getInt(Settings.user_id),
-							new Author(rs.getInt(Settings.user_id), rs.getString(Settings.uname),
-									rs.getInt(Settings.uage), rs.getString(Settings.ugender),
-									rs.getString(Settings.uloc)));
+					authordb.put(rs.getInt(Settings.rutable_userid),
+							new Author(rs.getInt(Settings.rutable_userid), rs.getString(Settings.rutable_name),
+									rs.getInt(Settings.rutable_age), rs.getString(Settings.rutable_gender),
+									rs.getString(Settings.rutable_loc)));
 				}
 			}
 		} catch (ClassNotFoundException e) {
@@ -303,8 +303,9 @@ public class Data {
 			e1.printStackTrace();
 		}
 		authordb.forEach((k, author) -> {
-			String insert = "INSERT INTO authors "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE influence=?,comments=?,likes=?,views=?,posts=?";
+			String insert = "INSERT INTO "+ Settings.latable+" "
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.latable_influence+"=?,"
+					+Settings.latable_comments+"=?,"+Settings.latable_likes+"=?,"+Settings.latable_views+"=?,"+Settings.latable_posts+"=?";
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
@@ -337,7 +338,7 @@ public class Data {
 			}
 		});
 
-		System.out.println(" insert authors " + (System.nanoTime() - stime));
+		System.out.println(" insert "+Settings.latable+" " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
 		ExecutorService es = Executors.newCachedThreadPool();
@@ -346,8 +347,9 @@ public class Data {
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
-					String update = "INSERT INTO opinions "
-							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE reach=?,polarity=?,total_inf=?,comments=?";
+					String update = "INSERT INTO "+Settings.lotable+" "
+							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.lotable_reach+"=?,"+Settings.lotable_polarity+
+							"=?,"+Settings.lotable_influence+"=?,"+Settings.lotable_comments+"=?";
 					PreparedStatement query1 = null;
 					try {
 						query1 = cnlocal.prepareStatement(update);
@@ -368,7 +370,7 @@ public class Data {
 						opinion.getPosts().forEach((post) -> {
 							PreparedStatement query2 = null;
 							try {
-								String update1 = "REPLACE INTO posts " + "Values (?,?,?,?,?,?,?)";
+								String update1 = "REPLACE INTO "+Settings.lptable+" " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
 								query2.setInt(1, post.getID());
 								query2.setDouble(2, post.getPolarity());
@@ -522,8 +524,9 @@ public class Data {
 				e1.printStackTrace();
 			}
 
-			String insert = "INSERT INTO authors "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE influence=?,comments=?,likes=?,views=?,posts=?";
+			String insert = "INSERT INTO "+Settings.latable+" "
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.latable_influence+"=?,"+Settings.latable_comments+"=?,"
+					+Settings.latable_likes+"=?,"+Settings.latable_views+"=?,"+Settings.latable_posts+"=?";
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
@@ -573,11 +576,11 @@ public class Data {
 				condata = dbc.conndata();
 				conlocal = dbc.connlocal();
 				boolean remoto = true;
-				String query = ("Select * from " + Settings.posttn + " Where " + Settings.post_id + " = " + id);
+				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_postid + " = " + id);
 				Statement stmt = condata.createStatement();
 				ResultSet rs = stmt.executeQuery(query);
 				if (!rs.next()) {
-					query = ("Select * from posts Where id = " + id);
+					query = ("Select * from "+Settings.lptable+" Where "+Settings.lptable_id+" = " + id);
 					stmt = conlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					remoto = false;
@@ -591,14 +594,14 @@ public class Data {
 					}
 				}
 				// System.out.println(id);
-				int postid = remoto ? rs.getInt(Settings.post_id) : rs.getInt(Settings.post_id);
+				int postid = remoto ? rs.getInt(Settings.rptable_postid) : rs.getInt(Settings.lptable_opinion);
 				// System.out.println(id);
-				int user_id = remoto ? rs.getInt(Settings.puser_id) : rs.getInt("authors_id");
-				java.sql.Date time = remoto ? rs.getDate(Settings.pdate) : null;
-				int likes = remoto ? rs.getInt(Settings.plikes) : rs.getInt("likes");
-				int views = remoto ? rs.getInt(Settings.pviews) : rs.getInt("views");
+				int user_id = remoto ? rs.getInt(Settings.rptable_userid) : rs.getInt(Settings.lptable_authorid);
+				java.sql.Date time = remoto ? rs.getDate(Settings.rptable_date) : null;
+				int likes = remoto ? rs.getInt(Settings.rptable_likes) : rs.getInt(Settings.lptable_likes);
+				int views = remoto ? rs.getInt(Settings.rptable_views) : rs.getInt(Settings.lptable_views);
 				;
-				String message = remoto ? rs.getString(Settings.pmessage) : rs.getString("message");
+				String message = remoto ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
 				Post _post = remoto ? new Post(postid, user_id, time, likes, views, message)
 						: new Post(postid, user_id, null, likes, views, message);
 				if (!(users.contains(user_id))) {
@@ -640,19 +643,19 @@ public class Data {
 				// System.out.println("HELLO1");
 				condata = dbc.conndata();
 				conlocal = dbc.connlocal();
-				String query = ("Select * from " + Settings.posttn + " Where " + Settings.rpost_id + " = " + id);
+				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = " + id);
 				Statement stmt = condata.createStatement();
 				// System.out.println(query);
 				ResultSet rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
 						// System.out.println("HELLO2");
-						int postid = rs.getInt(Settings.post_id);
-						int user_id = rs.getInt(Settings.puser_id);
-						java.sql.Date time = rs.getDate(Settings.pdate);
-						int likes = rs.getInt(Settings.plikes);
-						int views = rs.getInt(Settings.pviews);
-						String message = rs.getString(Settings.pmessage);
+						int postid = rs.getInt(Settings.rptable_postid);
+						int user_id = rs.getInt(Settings.rptable_userid);
+						java.sql.Date time = rs.getDate(Settings.rptable_date);
+						int likes = rs.getInt(Settings.rptable_likes);
+						int views = rs.getInt(Settings.rptable_views);
+						String message = rs.getString(Settings.rptable_message);
 						Post _post = new Post(postid, user_id, time, likes, views, message);
 						if (!(users.contains(user_id))) {
 							users.add(user_id);
@@ -662,18 +665,18 @@ public class Data {
 				}
 				rs.close();
 				stmt.close();
-				query = ("Select * from posts Where opinions_id = " + id);
+				query = ("Select * from "+Settings.lptable+" Where "+Settings.lptable_opinion+" = " + id);
 				stmt = conlocal.createStatement();
 				rs = stmt.executeQuery(query);
 				// System.out.println(query);
 				if (rs.next()) {
 					do {
 						// System.out.println("HELLO3");
-						int postid = rs.getInt("id");
-						int user_id = rs.getInt("authors_id");
-						int likes = rs.getInt("likes");
-						int views = rs.getInt("views");
-						String message = rs.getString("message");
+						int postid = rs.getInt(Settings.lptable_id);
+						int user_id = rs.getInt(Settings.lptable_authorid);
+						int likes = rs.getInt(Settings.lptable_likes);
+						int views = rs.getInt(Settings.lptable_views);
+						String message = rs.getString(Settings.lptable_message);
 						Post _post = new Post(postid, user_id, null, likes, views, message);
 						if (!(users.contains(user_id)))
 							users.add(user_id);

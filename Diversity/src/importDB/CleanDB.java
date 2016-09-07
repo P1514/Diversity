@@ -27,15 +27,15 @@ public class CleanDB {
 		// Clean local DB
 		try {
 			cnlocal = dbc.connlocal();
-			query = "DELETE from post";
+			query = "DELETE from "+Settings.lptable;
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
-			query = "delete from opinion";
+			query = "delete from "+Settings.lotable;
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
-			query = "delete from author";
+			query = "delete from "+Settings.latable;
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
