@@ -26,7 +26,7 @@ public class CleanDB {
 
 		// Clean local DB
 		try {
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 			query = "DELETE from "+Settings.lptable;
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);

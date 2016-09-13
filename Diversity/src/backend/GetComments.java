@@ -141,7 +141,7 @@ public class GetComments {
 
 	private void dbconnect() {
 		try {
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - Local Calculation Multi-Threading (minimal impact to performance)
 
+## [1.1.5] 2016-09-13
+### Added
+- Models Page new model Working
+- Waiting for development of Update and Delete to add link in main page
+
 ## [1.1.4] 2016-09-06
 ### Added
 - Chart Setup page as long as button on home screen to direct to that page

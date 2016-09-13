@@ -9,6 +9,7 @@ import importDB.PSS;
 public class Backend {
 	private int op = 0;
 	private JSONObject msg;
+	private JSONArray result;
 
 	public Backend(int _op, JSONObject _msg) {
 		op = _op;
@@ -21,6 +22,7 @@ public class Backend {
 		String values;
 		String tmp;
 		Settings conf;
+		Models model;
 		int pss = 0;
 		;
 		PSS ps = new PSS();
@@ -73,20 +75,30 @@ public class Backend {
 				return tmp;
 			case 11:
 				GetPopulation gpo = new GetPopulation();
-				tmp=gpo.getAll(param,pss).toString();
+				tmp = gpo.getAll(param, pss).toString();
 				return tmp;
 			case 12:
 				conf = new Settings();
-				tmp=conf.getConf().toString();
+				tmp = conf.getConf().toString();
 				return tmp;
-			case 13: 
+			case 13:
 				conf = new Settings();
-				tmp=conf.setConf(msg).toString();
+				tmp = conf.setConf(msg).toString();
 				return tmp;
-				default:
+			case 14:
+				model = new Models();
+				tmp = model.create_model(msg).toString();
+				return tmp;
+			case 15: 
+				model = new Models();
+				tmp = model.get_model(msg).toString();
+				return tmp;
+			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");
 				msg.put("Message", "NOT A VALID OPERATION");
+				result = new JSONArray();
+				result.put(msg);
 
 			}
 		} catch (JSONException e) {
@@ -94,7 +106,7 @@ public class Backend {
 			e.printStackTrace();
 		}
 
-		return msg.toString();
+		return result.toString();
 	}
 
 }

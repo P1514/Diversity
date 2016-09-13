@@ -44,7 +44,7 @@ public class Data {
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
@@ -184,7 +184,7 @@ public class Data {
 			stime = System.nanoTime();
 
 			// TODO ir buscar primeiro à DB LOCAL os users
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 
 			String querycond = users.toString();
 			System.out.println(querycond);
@@ -298,7 +298,7 @@ public class Data {
 		stime = System.nanoTime();
 
 		try {
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -519,7 +519,7 @@ public class Data {
 
 		public void run() {
 			try {
-				cnlocal = dbc.connlocal();
+				cnlocal = Settings.connlocal();
 			} catch (ClassNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -574,7 +574,7 @@ public class Data {
 		public void run() {
 			try {
 				condata = dbc.conndata();
-				conlocal = dbc.connlocal();
+				conlocal = Settings.connlocal();
 				boolean remoto = true;
 				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_postid + " = " + id);
 				Statement stmt = condata.createStatement();
@@ -642,7 +642,7 @@ public class Data {
 			try {
 				// System.out.println("HELLO1");
 				condata = dbc.conndata();
-				conlocal = dbc.connlocal();
+				conlocal = Settings.connlocal();
 				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = " + id);
 				Statement stmt = condata.createStatement();
 				// System.out.println(query);

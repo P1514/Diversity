@@ -150,6 +150,6 @@ public class Globalsentiment {
 	}
 
 	private void dbconnect() throws ClassNotFoundException, SQLException {
-		cnlocal = dbc.connlocal();
+		cnlocal = Settings.connlocal();
 	}
 }

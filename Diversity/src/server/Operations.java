@@ -21,6 +21,8 @@ public class Operations {
 		op.put("getpopulation", 11);
 		op.put("getconfig", 12);
 		op.put("setconfig", 13);
+		op.put("create_model", 14);
+		op.put("get_model", 15);
 		
 		
 	}

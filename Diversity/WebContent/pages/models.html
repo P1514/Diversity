@@ -7,7 +7,7 @@
 	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Chart Configuration</title>
+<title>Model Configuration</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -24,7 +24,7 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.css" />
 <script>
-	var json;
+	var json = "";
 	var edit = false;
 	var i = 0;
 	function getCookie(name) {
@@ -37,34 +37,62 @@
 		window.location.href = "http://localhost:20000/Diversity/pages/index.html";
 	}
 
-	document.addEventListener('DOMContentLoaded', function() {
-		$('#age').slider();
-		if (getCookie("model") != null) {
-			document.getElementById("fcheckbox").style.display = "block";
-			document.getElementById("submit").value = "Edit";
-			edit = true;
-			document.cookie = 'model=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-
-		}
-	}, false);
 	ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
 
+	document.addEventListener('DOMContentLoaded', function() {
+		$('#age').slider();
+	}, false);
+
 	ws.onopen = function() {
+		if (getCookie("model") != null) {
+			json = {
+				"Op" : "get_model",
+				"Model" : getCookie("model"),
+			}
+			ws.send(JSON.stringify(json));
+		}
 	}
 	ws.onmessage = function(event) {
-		json = JSON.parse(event.data);
+		var json = JSON.parse(event.data);
 		console.log(json);
 
-		if (json.Op == "Error") {
-			alert(json.Message);
+		if (json[0].Op == "Error") {
+			alert(json[0].Message);
+			if(json[0].hasOwnProperty('id')){
+			document.cookie="model="+json[0].id;
+			location.reload();			
+			}
 			return;
 		}
+		if(json[0].Op=="Model"){
+		console.log(json[0]);
+			
+			document.getElementById("model_name").value=json[0].Name;
+			document.getElementById("frequency").value=json[0].Update;
+			document.getElementById("pss").value=json[0].PSS;
+			document.getElementById("gender").value=json[0].Gender;
+			document.getElementById("final").checked=json[0].Final_products;
+			document.getElementById("Archive").checked=json[0].Archive==1;
+			$("#age").data("slider-value")=json[0].Age;
+			
+			document.getElementById("fcheckbox").style.display = "block";
+			document.getElementById("Archive").disabled = false;
+			document.getElementById("submit").value = "Edit";
+			edit = true;
+		}
+	}
+	function escapeHtml(html)
+	{
+	    var text = document.createTextNode(html);
+	    var div = document.createElement('div');
+	    div.appendChild(text);
+	    return div.innerHTML;
 	}
 
 	function addline() {
-		var name = document.getElementById("new_name").value;
-		var value = document.getElementById("new_URI").value;
+		var name = escapeHtml(document.getElementById("new_name").value);
+		var value = escapeHtml(document.getElementById("new_URI").value);
 		if (name == "" || value == "")
 			return;
 		value = value.replace("http://", "");
@@ -74,6 +102,52 @@
 						+ name + '</label></div>');
 		document.getElementById("new_name").value = "";
 		document.getElementById("new_URI").value = "";
+	}
+
+	function send_config() {
+		var configs = "";
+		$('#left_menu').find('input[type=checkbox]').each(function() {
+			if (this.checked == true) {
+				configs += this.value + ";";
+			}
+		});
+		var erro = false;
+		var jsonData = {
+			"Op" : "create_model",
+			"URI" : configs != "" ? configs : erro = true,
+			"Update" : document.getElementById('frequency').value != "" ? document
+					.getElementById('frequency').value
+					: erro = true,
+			"PSS" : document.getElementById('pss').value != "" ? document
+					.getElementById('pss').value : erro = true,
+			"Age" : document.getElementById('age').value != "" ? document
+					.getElementById('age').value : erro = true,
+			"Gender" : document.getElementById('gender').value != "" ? document
+					.getElementById('gender').value : erro = true,
+			"Final_Product" : document.getElementById('final').checked,
+			"Archive" : document.getElementById('Archive').checked,
+			"Name" : document.getElementById('model_name').value != "" ? document
+					.getElementById('model_name').value
+					: erro = true,
+			"User" : 1,//TODO find this field
+
+		}
+		if (erro == true) {
+			alert("All Fields must be filled");
+			return;
+		}
+		console.log(jsonData);
+		ws.send(JSON.stringify(jsonData));
+
+	}
+	function checknumber(field) {
+		field.value = field.value.replace(/[^0-9]/g, '');
+		if (field.value > 99) {
+			field.value = '99';
+		} else if (field.value < 0) {
+			field.value = '0';
+		}
+
 	}
 </script>
 <style>
@@ -92,7 +166,7 @@ input[type="number"] {
 	position: relative;
 	width: 80%;
 	height: 80%;
-	margin-top:4%;
+	margin-top: 4%;
 }
 
 .inlineTable {
@@ -105,11 +179,14 @@ input[type="number"] {
 .inlineTop {
 	vertical-align: top;
 }
-.checkbox{
-vertical-align: top;}
 
-.left_menu{
-vertical-align: top;}
+.checkbox {
+	vertical-align: top;
+}
+
+.left_menu {
+	vertical-align: top;
+}
 
 #setup {
 	position: absolute;
@@ -126,7 +203,7 @@ vertical-align: top;}
 	<div id="global" align="center">
 		<table id="menu">
 			<tr>
-				<td style="vertical-align:top">
+				<td style="vertical-align: top">
 					<div id="left_menu" class="inlineTop">
 						<input type="text" id="new_name" placeholder="Name"><input
 							type="text" id="new_URI" placeholder="URI">
@@ -145,14 +222,17 @@ vertical-align: top;}
 						</div>
 					</div>
 				</td>
-				<td style="vertical-align:top">
+				<td style="vertical-align: top">
 					<table id="right_menu" class="inlineTable">
 						<tr>
 							<td><div class="form-group">
-									<label for="frequency">Update Frequency(hours):</label> <input
-										type="number" class="form-control" id="frequency"> <label
-										for="pss">PSS:</label> <input type="text" class="form-control"
-										id="pss">
+									<label for="model_name">Model Name:</label> <input type="text"
+										class="form-control" id="model_name"> <label
+										for="frequency">Update Frequency(Days):</label> <input
+										type="number" class="form-control" id="frequency"
+										style="width: 75px;" onKeyUp="checknumber(this)" min="0">
+									<label for="pss">PSS:</label> <input type="text"
+										class="form-control" id="pss">
 								</div>
 								<div id="fcheckbox" style="display: none;" class="checkbox">
 									<label><input id="Archive" type="checkbox" value=""
@@ -171,10 +251,11 @@ vertical-align: top;}
 							</td>
 						</tr>
 						<tr>
-							<td><label for="gender">Genders(";" separator)</label> <input
-								type="text" class="form-control" id="gender" value="All">
-								<label for="pss">PSS:</label> <input type="text"
-								class="form-control" id="pss">
+							<td><label for="gender">Genders</label> <select id="gender">
+									<option value="All" selected>All</option>
+									<option value="Male">Male</option>
+									<option value="Female">Female</option>
+							</select>
 								</div>
 								<div class="checkbox">
 									<label><input id="final" type="checkbox" value="">Include

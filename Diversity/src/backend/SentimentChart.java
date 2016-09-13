@@ -11,8 +11,8 @@ import org.json.JSONObject;
 
 public class SentimentChart {
 
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
+	private Settings dbc = new Settings();
 
 	public SentimentChart() {
 
@@ -238,7 +238,7 @@ public class SentimentChart {
 
 	private void dbconnect() {
 		try {
-			cnlocal = dbc.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

@@ -89,6 +89,20 @@ public class Settings {
 	public static final String lotable_pss="tag_id";
 	public static final String lotable_comments="comments";
 	
+	// Models table
+	
+	public static final String lmtable="models";
+	public static final String lmtable_id="id";
+	public static final String lmtable_name="name";
+	public static final String lmtable_uri="uri";
+	public static final String lmtable_pss="pss";
+	public static final String lmtable_update="update_frequency";
+	public static final String lmtable_archived="archived";
+	public static final String lmtable_monitorfinal="monitor_final_products";
+	public static final String lmtable_creator="created_by_user";
+	public static final String lmtable_age="age_range";
+	public static final String lmtable_gender="gender";
+	
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
@@ -106,7 +120,7 @@ public class Settings {
 		return (Connection) DriverManager.getConnection(rurl, ruser, rpass);
 	}
 
-	public Connection connlocal() throws ClassNotFoundException {
+	public static Connection connlocal() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
 		while (true) {
 			try {
