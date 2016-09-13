@@ -74,7 +74,7 @@
 			document.getElementById("gender").value=json[0].Gender;
 			document.getElementById("final").checked=json[0].Final_products;
 			document.getElementById("Archive").checked=json[0].Archive==1;
-			$("#age").data("slider-value")=json[0].Age;
+			$('#age').slider('setValue', json[0].Age); // Fazer split pela virgula e adicionar [val1, val2]
 			
 			document.getElementById("fcheckbox").style.display = "block";
 			document.getElementById("Archive").disabled = false;
