@@ -30,14 +30,16 @@
 
 	function setCookie() {
 		// document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
-		document.cookie = "Product="
-				+ $("#Products :selected").text();
-		document.cookie = "PSS=" + document.getElementById("Products").value;
+		document.cookie = "Model="
+				+ $("#Models :selected").text();
+				var cookiemonster = document.getElementById("Models").value.split(";");
+		document.cookie = "Id=" + cookiemonster[0];
+		document.cookie = "PSS=" + cookiemonster[1];
 	}
 
 	ws.onopen = function() {
 		var jsonData = {
-			"Op" : "getproducts",
+			"Op" : "getmodels",
 		}
 		ws.send(JSON.stringify(jsonData));
 	}
@@ -59,19 +61,19 @@
 			refreshDB(0);
 
 		}
-		if (json[0].Op == "products") {
+		if (json[0].Op == "Models") {
 			populatePSS();
 		}
 
 	}
 
 	function populatePSS() {
-		var x = document.getElementById("Products");
-		var products = JSON.parse(JSON.stringify(json));
-		for (var i = 1; i < products.length; i++) {
+		var x = document.getElementById("Models");
+		var Models = JSON.parse(JSON.stringify(json));
+		for (var i = 1; i < Models.length; i++) {
 			var option = document.createElement('option');
-			option.text = products[i].Name;
-			option.value = products[i].Pss;
+			option.text = Models[i].Name;
+			option.value = Models[i].Id+";"+Models[i].PSS;
 			if(getCookie("Product") == option.text)
 				option.selected=true;
 			x.add(option);
@@ -132,7 +134,7 @@
 
 		<!--Lista de PSS-->
 		<div id="pss">
-			<label>Choose Product:</label> <select id="Products">
+			<label>Choose Model:</label> <select id="Models">
 			</select>
 		</div>
 

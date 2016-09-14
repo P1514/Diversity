@@ -12,7 +12,7 @@ public class Operations {
 		op.put("load", 2);
 		op.put("globalsentiment", 3);
 		op.put("getposts", 4);
-		op.put("getproducts",5);
+		op.put("getmodels",5);
 		op.put("getcomments", 6);
 		op.put("clean", 7);
 		op.put("getauthors", 8);
@@ -23,6 +23,8 @@ public class Operations {
 		op.put("setconfig", 13);
 		op.put("create_model", 14);
 		op.put("get_model", 15);
+		op.put("update_model",16);
+		op.put("getpss", 17);
 		
 		
 	}

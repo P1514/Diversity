@@ -52,7 +52,8 @@ public class Backend {
 				tmp = gp.getTop(param, values, pss).toString();
 				return tmp;
 			case 5:
-				return ps.getProducts();
+				model = new Models();
+				return model.get_models().toString();
 			case 6:
 				GetComments gc = new GetComments();
 				tmp = gc.getAll(param, values).toString();
@@ -93,6 +94,11 @@ public class Backend {
 				model = new Models();
 				tmp = model.get_model(msg).toString();
 				return tmp;
+			case 16:
+				model = new Models();
+				tmp = model.update_model(msg).toString();
+				return tmp;
+			case 17: return ps.getPss();
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");
