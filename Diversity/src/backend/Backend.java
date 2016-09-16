@@ -23,13 +23,13 @@ public class Backend {
 		String tmp;
 		Settings conf;
 		Models model;
-		int pss = 0;
+		String pss = "";
 		;
 		PSS ps = new PSS();
 		try {
 			if (msg.has("Pss")) {
 
-				pss = ps.getID(msg.getString("Pss"));
+				pss = msg.getString("Pss");
 			}
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;

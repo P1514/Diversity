@@ -18,7 +18,7 @@ public class SentimentChart {
 
 	}
 
-	public JSONArray chartrequest(String param, String value, int pss) {
+	public JSONArray chartrequest(String param, String value, String pss) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;
@@ -137,7 +137,7 @@ public class SentimentChart {
 
 	}
 
-	private double sentimentby(String age, String gender, String location, int pss) {
+	private double sentimentby(String age, String gender, String location, String pss) {
 		String[] agerange = age.split("-");
 		int minage = Integer.parseInt(agerange[0]);
 		int maxage = Integer.parseInt(agerange[1]);
@@ -168,7 +168,7 @@ public class SentimentChart {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setInt(1, pss);
+			query1.setString(1, pss);
 			query1.setInt(2, minage);
 			query1.setInt(3, maxage);
 			if (gender != null) {

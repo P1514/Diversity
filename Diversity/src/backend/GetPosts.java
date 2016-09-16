@@ -21,7 +21,7 @@ public class GetPosts {
 	public GetPosts() {
 	}
 
-	public JSONArray getTop(String param, String value, int pss) throws JSONException {
+	public JSONArray getTop(String param, String value, String pss) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -55,7 +55,7 @@ public class GetPosts {
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
 			int i = 0;
-			query1.setInt(1, pss);
+			query1.setString(1, pss);
 			if (param != null) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))

@@ -8,17 +8,17 @@ import org.json.JSONObject;
 
 //Post individual Object
 public class PSS {
-	private HashMap<String, Integer> tags = new HashMap<String, Integer>();
+	private HashMap<String, String> tags = new HashMap<String, String>();
 	private HashMap<Integer, String> psss = new HashMap<Integer, String>();
-	private int tag_id = 0;
+	private String tag_id = null;
 	JSONArray result = new JSONArray();
 	JSONObject obj = new JSONObject();
 	String out;
 
 	public PSS() {
-		tags.put("Morris Ground 1", 1);
-		tags.put("Austin Basket", 2);
-		tags.put("Austin Soccer", 2);
+		tags.put("Morris Ground 1", "D522-1 PSS");
+		tags.put("Austin Basket", "D522-2 PSS");
+		tags.put("Austin Soccer", "D522-2 PSS");
 		psss.put(1,"D522-1 PSS");
 		psss.put(2, "D522-2 PSS");
 	}
@@ -27,7 +27,7 @@ public class PSS {
 		return tags.containsKey(word);
 	}
 
-	public int getTag(String word) {
+	public String getTag(String word) {
 
 		tags.forEach((k, v) -> {
 			if (word.contains(k))
@@ -36,16 +36,16 @@ public class PSS {
 		return tag_id;
 	}
 
-	public HashMap<String, Integer> importPSS() throws IOException {
+	public HashMap<String, String> importPSS() throws IOException {
 		return tags;
 
 	}
 	
-	public int getID(String key){
+	public String getID(String key){
 		return tags.get(key);
 	}
 	
-	public String getKeysByValue(Integer value) {
+	public String getKeysByValue(String value) {
 		tags.forEach((k, v) -> {
 			if(v==value){
 				out=new String();
@@ -70,7 +70,8 @@ public class PSS {
 		return result.toString();
 	}
 
-	public String getProducts() {
+	/*Not used anymore 
+	 * public String getProducts() {
 		try {
 			obj.put("Op", "products");
 			result.put(obj);
@@ -99,7 +100,7 @@ public class PSS {
 				}
 				result.put(obj);
 
-			});*/
+			});
 			System.out.println(result.toString());
 
 			return result.toString();
@@ -108,5 +109,5 @@ public class PSS {
 			e.printStackTrace();
 			return "[{\"Op\":\"Error\"},{\"Message\":\"ERROR getting products\"}]";
 		}
-	}
+	}*/
 }

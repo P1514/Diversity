@@ -359,7 +359,7 @@ public class Data {
 						query1.setDouble(4, opinion.getTotalInf());
 						query1.setInt(5, opinion.getUID());
 						query1.setDate(6, opinion.getTime());
-						query1.setInt(7, opinion.getTag());
+						query1.setString(7, opinion.getTag());
 						query1.setInt(8, opinion.ncomments());
 						query1.setDouble(9, opinion.getReach());
 						query1.setDouble(10, opinion.getPolarity());
@@ -608,7 +608,7 @@ public class Data {
 					users.add(user_id);
 				}
 				PSS pss = new PSS();
-				int tag = pss.getTag(message);
+				String tag = pss.getTag(message);
 
 				opiniondb.put(postid, new Opinion(_post, tag));
 				if (rs != null)

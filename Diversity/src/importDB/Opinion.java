@@ -17,9 +17,9 @@ public class Opinion {
 	private double polarity = 0;
 	private double total_inf = 0;
 	private Date timestamp;
-	private int tag;
+	private String tag;
 
-	public Opinion(Post _main, int _tag) {
+	public Opinion(Post _main, String _tag) {
 		this.main = _main;
 		this.author_id = main.getUID();
 		timestamp = main.getTime();
@@ -69,7 +69,7 @@ public class Opinion {
 		return timestamp;
 	}
 
-	public int getTag() {
+	public String getTag() {
 		return tag;
 	}
 

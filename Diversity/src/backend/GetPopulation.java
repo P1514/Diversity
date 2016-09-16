@@ -16,7 +16,7 @@ public class GetPopulation {
 	public GetPopulation() {
 	}
 
-	public JSONArray getAll(String param, int pss) throws JSONException {
+	public JSONArray getAll(String param, String pss) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String insert = "";
@@ -55,7 +55,7 @@ public class GetPopulation {
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
-					query1.setInt(2, pss);
+					query1.setString(2, pss);
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();
@@ -75,7 +75,7 @@ public class GetPopulation {
 					query1.setString(1, out_params[i]);
 					i++;
 					query1.setString(2, out_params[i]);
-					query1.setInt(3, pss);
+					query1.setString(3, pss);
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();

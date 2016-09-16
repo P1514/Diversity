@@ -19,7 +19,7 @@ public class Globalsentiment {
 	public Globalsentiment() {
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, String param, String values, int pss)
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values, String pss)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -69,7 +69,7 @@ public class Globalsentiment {
 		return result;
 	}
 
-	private double globalsentimentby(int month, int year, String param, String value, int pss) {
+	private double globalsentimentby(int month, int year, String param, String value, String pss) {
 
 		double result = (double) 0;
 		String insert;
@@ -97,7 +97,7 @@ public class Globalsentiment {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setInt(3, pss);
+			query1.setString(3, pss);
 			if (param != null) {
 				if (!value.contains("-")) {
 					query1.setString(4, value);

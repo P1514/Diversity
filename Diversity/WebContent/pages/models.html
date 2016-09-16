@@ -44,19 +44,19 @@
 	}, false);
 
 	ws.onopen = function() {
-		if (getCookie("model") != null) {
-			json = {
-				"Op" : "get_model",
-				"Model" : getCookie("model"),
-			}
-			id=getCookie("model");
-			document.cookie="model=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-			ws.send(JSON.stringify(json));
-		}
-		json = {
+	json = {
 			"Op" : "getpss",
 		}
 		ws.send(JSON.stringify(json));
+		if (getCookie("Id") != null) {
+			json = {
+				"Op" : "get_model",
+				"Model" : getCookie("Id"),
+			}
+			id=getCookie("Id");
+			document.cookie="model=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+			ws.send(JSON.stringify(json));
+		}
 	}
 	function populatePSS() {
 		var products = JSON.parse(JSON.stringify(jsonData));
@@ -88,8 +88,9 @@
 			document.getElementById("model_name").value=json[0].Name;
 			document.getElementById("model_name").readOnly = true;
 			document.getElementById("frequency").value=json[0].Update;
-			document.getElementById("pss").value=json[0].PSS;
-			document.getElementById("pss").readOnly = true;
+			document.getElementById('pss').value=json[0].PSS;
+			document.getElementById('pss').text=json[0].PSS;
+			document.getElementById("pss").disabled = true;
 			document.getElementById("gender").value=json[0].Gender;
 			document.getElementById("final").checked=json[0].Final_products;
 			console.log(json[0].Archive);

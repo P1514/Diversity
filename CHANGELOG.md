@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - Local Calculation Multi-Threading (minimal impact to performance)
 
+## [1.1.6] 2016-06-16
+### Added
+- Model Page should now be fully supported
+- Include final products option still unimplemented waiting for clarification on how it should be worked.
+- This Version Requires DB Upate (Also added field to return Error in case DB version mismatch)
 ## [1.1.5] 2016-09-13
 ### Added
 - Models Page new model Working

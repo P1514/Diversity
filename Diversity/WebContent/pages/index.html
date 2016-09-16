@@ -67,6 +67,14 @@
 
 	}
 
+	function new_model(){
+	
+	document.cookie="Model=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
+	document.cookie="Id=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
+	document.cookie="PSS=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
+	
+	}
+	
 	function populatePSS() {
 		var x = document.getElementById("Models");
 		var Models = JSON.parse(JSON.stringify(json));
@@ -135,7 +143,12 @@
 		<!--Lista de PSS-->
 		<div id="pss">
 			<label>Choose Model:</label> <select id="Models">
-			</select>
+			</select><form action="models.html">
+					<input id="create_model" class="btn btn-default" onclick="new_model();"
+						type="submit" value="Create Model" />
+					<input id="edit_model" class="btn btn-default" onclick="setCookie();"
+						type="submit" value="Edit Model" />
+				</form>
 		</div>
 
 		<!-- Botões opcionais -->

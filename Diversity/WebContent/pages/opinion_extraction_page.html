@@ -62,8 +62,8 @@
 				}
 			}
 			function connect() {
-				document.getElementById("Cookie").innerHTML = "Product: "
-						+ getCookie("Product") + "; PSS: " + getCookie("PSS");
+				document.getElementById("Cookie").innerHTML = "Model: "
+						+ getCookie("Model") + "; PSS: " + getCookie("PSS");
 
 				ws = new WebSocket('ws://' + window.location.hostname + ":"
 						+ window.location.port + '/Diversity/server');
@@ -76,7 +76,7 @@
 
 					json = {
 						"Op" : "getposts",
-						"Pss" : getCookie("Product")
+						"Pss" : getCookie("PSS")
 					}
 
 					ws.send(JSON.stringify(json));
@@ -124,7 +124,7 @@
 						json = {
 							"Op" : "chartrequest",
 							"Param" : "Global",
-							"Pss" : getCookie("Product")
+							"Pss" : getCookie("PSS")
 						}
 
 						ws.send(JSON.stringify(json));
@@ -307,7 +307,7 @@
 					"Op" : "chartrequest",
 					"Param" : "",
 					"Values" : "",
-					"Pss" : getCookie("Product")
+					"Pss" : getCookie("PSS")
 				};
 
 				if (gender == "All" && location == "All" && age == "All"

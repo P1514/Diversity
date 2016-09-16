@@ -82,6 +82,7 @@ CREATE TABLE `general` (
   `totalviews` int(11) DEFAULT NULL,
   `lastupdated` date DEFAULT NULL,
   `id` int(11) NOT NULL,
+  `version` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -93,7 +94,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1);
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,1);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,6 +119,39 @@ CREATE TABLE `influences` (
 LOCK TABLES `influences` WRITE;
 /*!40000 ALTER TABLE `influences` DISABLE KEYS */;
 /*!40000 ALTER TABLE `influences` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `models`
+--
+
+DROP TABLE IF EXISTS `models`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `models` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `uri` longtext NOT NULL,
+  `pss` varchar(45) NOT NULL,
+  `update_frequency` int(11) DEFAULT NULL,
+  `archived` tinyint(4) DEFAULT NULL,
+  `monitor_final_products` tinyint(4) DEFAULT NULL,
+  `created_by_user` int(11) DEFAULT NULL,
+  `age_range` varchar(45) DEFAULT NULL,
+  `gender` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `models`
+--
+
+LOCK TABLES `models` WRITE;
+/*!40000 ALTER TABLE `models` DISABLE KEYS */;
+INSERT INTO `models` VALUES (1,'Teste','http://www.twitter.com;http://www.facebook.com;','D522-2 PSS',3,0,1,1,'30,84','Male');
+/*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -199,4 +233,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-08-28 15:11:14
+-- Dump completed on 2016-09-16 10:24:26
