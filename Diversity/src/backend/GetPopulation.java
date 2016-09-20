@@ -56,10 +56,14 @@ public class GetPopulation {
 				 * += rs.getString(param) + ",,"; } rs.close(); query1.close();
 				 */
 				String[] out_params = params.split(",,");
-				insert = "Select count(*) from authors where " + param
-						+ "=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where "
-						+ Settings.lotable_pss + "=? AND " + Settings.lotable_product
-						+ (model.getProducts() ? "!=0" : "=0") + "))";
+				insert = "Select count(*) from " + Settings.latable + " where ( " + Settings.latable_age + "<="
+						+ model.getAge().split(",")[1] + " AND " + Settings.latable_age + ">="
+						+ model.getAge().split(",")[0] + " AND " + param + "=? && " + Settings.latable_id
+						+ " in (Select " + Settings.lptable_authorid + " from " + Settings.lptable + " where "
+						+ Settings.lptable_opinion + " in (Select " + Settings.lotable_id + " from " + Settings.lotable
+						+ " where " + Settings.lotable_pss + "=? AND " + Settings.lotable_product
+						+ (model.getProducts() ? "!=0" : "=0") + ")))";
+				//System.out.println(insert);
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
@@ -76,17 +80,21 @@ public class GetPopulation {
 				return result;
 			} else {
 				String[] out_params = params.split(",,|-");
-				insert = "Select count(*) from authors where " + param + ">=? && " + param
-						+ "<=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where "
-						+ Settings.lotable_pss + "=? AND " + Settings.lotable_product
-						+ (model.getProducts() ? "!=0" : "=0") + "))";
+				insert = "Select count(*) from " + Settings.latable + " where ( " + Settings.latable_age + "<="
+						+ model.getAge().split(",")[1] + " AND " + Settings.latable_age + ">="
+						+ model.getAge().split(",")[0] + " AND " + param + ">=? && " + param + "<=? && "
+						+ Settings.latable_id + " in (Select " + Settings.lptable_authorid + " from " + Settings.lptable
+						+ " where " + Settings.lptable_opinion + " in (Select " + Settings.lotable_id + " from "
+						+ Settings.lotable + " where " + Settings.lotable_pss + "=? AND "
+						+ Settings.lotable_product + (model.getProducts() ? "!=0" : "=0") + ")))";
 				for (int i = 0; i < out_params.length; i++) {
-					System.out.println(out_params[i]);
+					//System.out.println(out_params[i]);
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
 					i++;
 					query1.setString(2, out_params[i]);
 					query1.setString(3, model.getPSS());
+					System.out.println(query1);
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();

@@ -23,7 +23,7 @@ public class GetAuthors {
 		result.put(obj);
 		String insert = new String();
 		PreparedStatement query1 = null;
-		insert = "Select * FROM authors where id in (Select authors_id from opinions)";
+		insert = "Select * FROM "+Settings.latable+" where id in (Select authors_id from opinions)";
 		ResultSet rs = null;
 
 		try {

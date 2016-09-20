@@ -57,40 +57,38 @@
 	});
 
 	function connect() {
-		document.getElementById("Cookie").innerHTML = "Model: "
-				+ getCookie("Model") + "; PSS: " + getCookie("PSS");
-		;
+		document.getElementById("Cookie").innerHTML = "Model: " +sessionStorage.model + "; PSS: " + sessionStorage.pss;
 
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
 		ws.onopen = function() {
 			json = {
 				"Op" : "globalsentiment",
-				"Id" : getCookie("Id")
+				"Id" : sessionStorage.id
 			}
 			ws.send(JSON.stringify(json));
 
 			json = {
 				"Op" : "getposts",
-				"Id" : getCookie("Id")
+				"Id" : sessionStorage.id
 			}
 
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Id" : getCookie("Id"),
+				"Id" : sessionStorage.id
 				"Param" : "gender"
 			}
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Id" : getCookie("Id"),
+				"Id" : sessionStorage.id
 				"Param" : "age"
 			}
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Id" : getCookie("Id"),
+				"Id" : sessionStorage.id
 				"Param" : "location"
 			}
 			ws.send(JSON.stringify(json));
@@ -213,7 +211,7 @@
 
 				json = {
 					"Op" : "getposts",
-					"Pss" : getCookie("Product"),
+					"Pss" : sessionStorage.pss,
 					"Param" : "Month",
 					"Values" : month,
 				}
@@ -223,7 +221,7 @@
 			} else {
 				json = {
 					"Op" : "getposts",
-					"Pss" : getCookie("Product")
+					"Pss" : sessionStorage.pss
 				}
 
 				ws.send(JSON.stringify(json));

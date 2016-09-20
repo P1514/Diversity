@@ -35,6 +35,9 @@
 				var cookiemonster = document.getElementById("Models").value.split(";");
 		document.cookie = "Id=" + cookiemonster[0];
 		document.cookie = "PSS=" + cookiemonster[1];
+		sessionStorage.model=$("#Models :selected").text();
+		sessionStorage.id=cookiemonster[0];
+		sessionStorage.pss=cookiemonster[1];
 	}
 
 	ws.onopen = function() {
