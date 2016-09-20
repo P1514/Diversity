@@ -124,7 +124,7 @@
 						json = {
 							"Op" : "chartrequest",
 							"Param" : "Global",
-							"Pss" : getCookie("PSS")
+							"Id" : getCookie("Id")
 						}
 
 						ws.send(JSON.stringify(json));
@@ -307,7 +307,7 @@
 					"Op" : "chartrequest",
 					"Param" : "",
 					"Values" : "",
-					"Pss" : getCookie("PSS")
+					"Id" : getCookie("Id")
 				};
 
 				if (gender == "All" && location == "All" && age == "All"

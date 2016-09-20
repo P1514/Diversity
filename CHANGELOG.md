@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Support for booting with models
 - Program now loads everything on startup (no longer required first refresh)
 - Code Optimization for Speed
+- Graphs working with Model view (age range and gender still unimplemented)
 
 ## [1.1.6] 2016-06-16
 ### Added
