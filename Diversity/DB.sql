@@ -94,7 +94,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,1);
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,2);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -139,9 +139,10 @@ CREATE TABLE `models` (
   `created_by_user` int(11) DEFAULT NULL,
   `age_range` varchar(45) DEFAULT NULL,
   `gender` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`,`name`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,7 +151,6 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
-INSERT INTO `models` VALUES (1,'Teste','http://www.twitter.com;http://www.facebook.com;','D522-2 PSS',3,0,1,1,'30,84','Male');
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -233,4 +233,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-09-16 10:24:26
+-- Dump completed on 2016-09-20 11:53:37
