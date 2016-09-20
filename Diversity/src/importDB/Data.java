@@ -156,7 +156,7 @@ public class Data {
 				break;
 			} while (true);
 			rs.beforeFirst();
-			ExecutorService es = Executors.newCachedThreadPool();
+			ExecutorService es = Executors.newFixedThreadPool(100);
 			while (rs.next())
 				es.execute(new Topinions(rs.getInt(1)));
 			es.shutdown();
@@ -168,7 +168,7 @@ public class Data {
 			}
 			rs.beforeFirst();
 			// System.out.println("HELLO");
-			es = Executors.newCachedThreadPool();
+			es = Executors.newFixedThreadPool(100);
 			while (rs.next())
 				es.execute(new Tposts(rs.getInt(1)));
 			es.shutdown();
@@ -344,14 +344,14 @@ public class Data {
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
-		ExecutorService es = Executors.newCachedThreadPool();
+		ExecutorService es = Executors.newFixedThreadPool(100);
 
 		opiniondb.forEach((k, opinion) -> {
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
 					String update = "INSERT INTO " + Settings.lotable + " "
-							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+							+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 							+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
 							+ Settings.lotable_comments + "=?";
 					PreparedStatement query1 = null;
@@ -363,12 +363,13 @@ public class Data {
 						query1.setDouble(4, opinion.getTotalInf());
 						query1.setInt(5, opinion.getUID());
 						query1.setDate(6, opinion.getTime());
-						query1.setString(7, opinion.getTag());
+						query1.setString(7, opinion.getPSS());
 						query1.setInt(8, opinion.ncomments());
-						query1.setDouble(9, opinion.getReach());
-						query1.setDouble(10, opinion.getPolarity());
-						query1.setDouble(11, opinion.getTotalInf());
-						query1.setInt(12, opinion.ncomments());
+						query1.setInt(9, opinion.getProduct());
+						query1.setDouble(10, opinion.getReach());
+						query1.setDouble(11, opinion.getPolarity());
+						query1.setDouble(12, opinion.getTotalInf());
+						query1.setInt(13, opinion.ncomments());
 						query1.executeUpdate();
 
 						opinion.getPosts().forEach((post) -> {
@@ -615,8 +616,9 @@ public class Data {
 				}
 				PSS pss = new PSS();
 				String tag = pss.getTag(message);
+				int product = pss.getProduct(message);
 
-				opiniondb.put(postid, new Opinion(_post, tag));
+				opiniondb.put(postid, new Opinion(_post, tag, product));
 				if (rs != null)
 					rs.close();
 				if (stmt != null)

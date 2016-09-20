@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import importDB.Data;
+import importDB.Model;
+
 public class SentimentChart {
 
 	private Connection cnlocal;
@@ -18,7 +21,7 @@ public class SentimentChart {
 
 	}
 
-	public JSONArray chartrequest(String param, String value, String pss) {
+	public JSONArray chartrequest(String param, String value, long id) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;
@@ -61,7 +64,7 @@ public class SentimentChart {
 
 					obj.put("Age", agerange[0]);
 					obj.put("Param", outparams[temp]);
-					obj.put("Value", sentimentby(agerange[0], genders[gender], null, pss));
+					obj.put("Value", sentimentby(agerange[0], genders[gender], null, id));
 					result.put(obj);
 					temp++;
 
@@ -71,7 +74,7 @@ public class SentimentChart {
 
 					obj.put("Age", agerange[0]);
 					obj.put("Param", outparams[temp]);
-					obj.put("Value", sentimentby(agerange[0], null, locs[loc], pss));
+					obj.put("Value", sentimentby(agerange[0], null, locs[loc], id));
 					result.put(obj);
 					temp++;
 
@@ -122,7 +125,7 @@ public class SentimentChart {
 						obj = new JSONObject();
 						obj.put("Age", agerange[age]);
 						obj.put("Param", outparams[temp]);
-						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc],pss));
+						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc],id));
 						result.put(obj);
 						temp++;
 					}
@@ -137,13 +140,15 @@ public class SentimentChart {
 
 	}
 
-	private double sentimentby(String age, String gender, String location, String pss) {
+	private double sentimentby(String age, String gender, String location, long id) {
 		String[] agerange = age.split("-");
 		int minage = Integer.parseInt(agerange[0]);
 		int maxage = Integer.parseInt(agerange[1]);
 		double result = (double) 0;
-		String insert = "Select polarity FROM posts WHERE opinions_id in ("
-				+ "Select id from opinions where tag_id=?) && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
+		Model model = Data.modeldb.get(id);
+		String insert = "Select "+Settings.lptable_polarity+" FROM "+Settings.lptable+" WHERE "+Settings.lptable_opinion+" in ("
+				+ "Select "+Settings.lotable_id+" from opinions where "+Settings.lotable_pss+"=? AND "+Settings.lotable_product+(model.getProducts()? "!=0" : "=0")+") && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
+		System.out.print(insert);
 		if (gender != null) {
 			if (!gender.contains("-")) {
 				insert += " AND (GENDER = ?)";
@@ -168,7 +173,7 @@ public class SentimentChart {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setString(1, pss);
+			query1.setString(1, model.getPSS());
 			query1.setInt(2, minage);
 			query1.setInt(3, maxage);
 			if (gender != null) {

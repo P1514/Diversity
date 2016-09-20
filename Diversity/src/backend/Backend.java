@@ -4,6 +4,7 @@ import org.json.*;
 
 import importDB.CleanDB;
 import importDB.Data;
+import importDB.Model;
 import importDB.PSS;
 
 public class Backend {
@@ -23,13 +24,12 @@ public class Backend {
 		String tmp;
 		Settings conf;
 		GetModels model;
-		String pss = "";
-		;
-		PSS ps = new PSS();
+		PSS pss = new PSS();
+		long id=0;
 		try {
-			if (msg.has("Pss")) {
+			if (msg.has("Id")) {
 
-				pss = msg.getString("Pss");
+				id = msg.getLong("Id");
 			}
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
@@ -39,17 +39,17 @@ public class Backend {
 			switch (op) {
 			case 1:
 				SentimentChart sc = new SentimentChart();
-				return sc.chartrequest(param, values, pss).toString();
+				return sc.chartrequest(param, values, id).toString();
 			case 2:
 				Data dat = new Data();
 				return dat.load();
 			case 3:
 				Globalsentiment gs = new Globalsentiment();
-				tmp = gs.globalsentiment(1, param, values, pss).toString();
+				tmp = gs.globalsentiment(1, param, values, id).toString();
 				return tmp;
 			case 4:
 				GetPosts gp = new GetPosts();
-				tmp = gp.getTop(param, values, pss).toString();
+				tmp = gp.getTop(param, values, id).toString();
 				return tmp;
 			case 5:
 				model = new GetModels();
@@ -76,7 +76,7 @@ public class Backend {
 				return tmp;
 			case 11:
 				GetPopulation gpo = new GetPopulation();
-				tmp = gpo.getAll(param, pss).toString();
+				tmp = gpo.getAll(param, id).toString();
 				return tmp;
 			case 12:
 				conf = new Settings();
@@ -98,7 +98,7 @@ public class Backend {
 				model = new GetModels();
 				tmp = model.update_model(msg).toString();
 				return tmp;
-			case 17: return ps.getPss();
+			case 17: return pss.getPss();
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");

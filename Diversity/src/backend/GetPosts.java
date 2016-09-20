@@ -12,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import importDB.*;
+
 public class GetPosts {
 
 	private Settings dbc = new Settings();
@@ -21,7 +23,7 @@ public class GetPosts {
 	public GetPosts() {
 	}
 
-	public JSONArray getTop(String param, String value, String pss) throws JSONException {
+	public JSONArray getTop(String param, String value, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -32,7 +34,20 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		PreparedStatement query1 = null;
 		int n_tops = 0;
-		insert = "Select id FROM opinions where (tag_id=?";
+		insert = "Select "+Settings.lotable_id+" FROM "+Settings.lotable+" where ("+Settings.lotable_pss+"=? AND "+Settings.lotable_product;
+		Model model = Data.modeldb.get(id);
+		if (model == null){
+			obj=new JSONObject();
+			obj.put("Op", "Error");
+			obj.put("Message", "Requested Model not Found");
+			result.put(obj);
+			return result;
+		}
+		if(model.getProducts()){
+			insert += " !=0";
+		}else{
+			insert += "=0";
+		}
 		if (param != null) {
 			insert += " && timestamp >= ? && timestamp <= ?";
 			
@@ -55,7 +70,7 @@ public class GetPosts {
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
 			int i = 0;
-			query1.setString(1, pss);
+			query1.setString(1, model.getPSS());
 			if (param != null) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))

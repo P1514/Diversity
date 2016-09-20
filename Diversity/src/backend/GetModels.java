@@ -10,9 +10,10 @@ public class GetModels {
 	public GetModels() {
 	}
 
-	public JSONArray get_models() {
+	public JSONArray get_models() throws JSONException {
 
 		JSONArray result = new JSONArray();
+		result.put(new JSONObject().put("Op", "Models"));
 
 		Data.modeldb.forEach((k, v) -> {
 			if (v.getArchived() == false) {
@@ -38,6 +39,8 @@ public class GetModels {
 		result = add.add_model(msg);
 		if (add.getId() != 0) {
 			Data.modeldb.put(add.getId(), add);
+			long id = add.getId();
+			System.out.println(id);
 		}
 		return result;
 

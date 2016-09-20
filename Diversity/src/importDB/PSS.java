@@ -8,9 +8,11 @@ import org.json.JSONObject;
 
 //Post individual Object
 public class PSS {
+	private HashMap<String, Integer> products = new HashMap<String, Integer>();
 	private HashMap<String, String> tags = new HashMap<String, String>();
 	private HashMap<Integer, String> psss = new HashMap<Integer, String>();
 	private String tag_id = null;
+	private Integer id =0;
 	JSONArray result = new JSONArray();
 	JSONObject obj = new JSONObject();
 	String out;
@@ -21,6 +23,9 @@ public class PSS {
 		tags.put("Austin Soccer", "D522-2 PSS");
 		psss.put(1,"D522-1 PSS");
 		psss.put(2, "D522-2 PSS");
+		products.put("Morris Ground 1", 1);
+		products.put("Austin Basket", 2);
+		products.put("Austin Soccer", 3);
 	}
 
 	public boolean tagexists(String word) {
@@ -34,6 +39,17 @@ public class PSS {
 				tag_id = v;
 		});
 		return tag_id;
+	}
+	/*
+	 * 
+	 * 
+	 */
+	public int getProduct(String word){
+		products.forEach((k, v) -> {
+			if (word.contains(k))
+				id = v;
+		});
+		return id;
 	}
 
 	public HashMap<String, String> importPSS() throws IOException {

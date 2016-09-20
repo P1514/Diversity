@@ -66,31 +66,31 @@
 		ws.onopen = function() {
 			json = {
 				"Op" : "globalsentiment",
-				"Pss" : getCookie("PSS")
+				"Id" : getCookie("Id")
 			}
 			ws.send(JSON.stringify(json));
 
 			json = {
 				"Op" : "getposts",
-				"Pss" : getCookie("PSS")
+				"Id" : getCookie("Id")
 			}
 
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Pss" : getCookie("PSS"),
+				"Id" : getCookie("Id"),
 				"Param" : "gender"
 			}
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Pss" : getCookie("PSS"),
+				"Id" : getCookie("Id"),
 				"Param" : "age"
 			}
 			ws.send(JSON.stringify(json));
 			json = {
 				"Op" : "getpopulation",
-				"Pss" : getCookie("PSS"),
+				"Id" : getCookie("Id"),
 				"Param" : "location"
 			}
 			ws.send(JSON.stringify(json));
@@ -98,8 +98,8 @@
 		ws.onmessage = function(event) {
 			json = JSON.parse(event.data);
 
-			if (json.Op == "Error") {
-				alert(json.Message);
+			if (json[0].Op == "Error") {
+				alert(json[0].Message);
 				return;
 			}
 

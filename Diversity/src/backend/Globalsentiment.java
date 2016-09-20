@@ -11,15 +11,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import importDB.Data;
+import importDB.Model;
+
 public class Globalsentiment {
 
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
 	public Globalsentiment() {
 	}
 
-	public JSONArray globalsentiment(int timespan /* years */, String param, String values, String pss)
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -57,7 +59,7 @@ public class Globalsentiment {
 				obj.put("Month", time[month % 12]);
 				for (int ii = 0; ii < words.length; ii++)
 					obj.put(words[ii],
-							globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, words[ii], pss));
+							globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, words[ii], id));
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -69,13 +71,15 @@ public class Globalsentiment {
 		return result;
 	}
 
-	private double globalsentimentby(int month, int year, String param, String value, String pss) {
+	private double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		double result = (double) 0;
+		Model model = Data.modeldb.get(id);
 		String insert;
 		String[] values = new String[2];
 		PreparedStatement query1 = null;
-		insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && tag_id=?";
+		insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + Settings.lotable_pss
+				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0" : "=0");
 		if (param != null) {
 			if (!value.contains("-")) {
 				insert += " && authors_id in (Select id from authors where " + param + "=?)";
@@ -97,7 +101,7 @@ public class Globalsentiment {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setString(3, pss);
+			query1.setString(3, model.getPSS());
 			if (param != null) {
 				if (!value.contains("-")) {
 					query1.setString(4, value);
@@ -106,7 +110,7 @@ public class Globalsentiment {
 					query1.setString(5, values[1]);
 				}
 			}
-			//System.out.println(query1);
+			// System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

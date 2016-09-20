@@ -8,6 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import importDB.Data;
+import importDB.Model;
+
 public class GetPopulation {
 
 	private Settings dbc = new Settings();
@@ -16,7 +19,7 @@ public class GetPopulation {
 	public GetPopulation() {
 	}
 
-	public JSONArray getAll(String param, String pss) throws JSONException {
+	public JSONArray getAll(String param, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String insert = "";
@@ -25,7 +28,9 @@ public class GetPopulation {
 			obj.put("Op", "gengraph");
 			obj.put("Param", "Gender");
 			params = Settings.genders;
-			//insert = "Select distinct gender FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY gender DESC";
+			// insert = "Select distinct gender FROM authors where id in (Select
+			// authors_id from posts where opinions_id in (Select id from
+			// opinions where tag_id=?)) ORDER BY gender DESC";
 		} else if (param.equals("age")) {
 			obj.put("Op", "agegraph");
 			obj.put("Param", "Age");
@@ -33,29 +38,32 @@ public class GetPopulation {
 		} else if (param.equals("location")) {
 			obj.put("Op", "locgraph");
 			obj.put("Param", "Location");
-			params= Settings.locations;
-			//insert = "Select distinct location FROM authors where id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?)) ORDER BY location ASC";
+			params = Settings.locations;
+			// insert = "Select distinct location FROM authors where id in
+			// (Select authors_id from posts where opinions_id in (Select id
+			// from opinions where tag_id=?)) ORDER BY location ASC";
 		}
 		result.put(obj);
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
+		Model model = Data.modeldb.get(id);
 		try {
 			dbconnect();
 			if (!params.contains("-")) {
-				/*query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, pss);
-				rs = query1.executeQuery();
-				for (; rs.next();) {
-					params += rs.getString(param) + ",,";
-				}
-				rs.close();
-				query1.close();*/
+				/*
+				 * query1 = cnlocal.prepareStatement(insert); query1.setInt(1,
+				 * pss); rs = query1.executeQuery(); for (; rs.next();) { params
+				 * += rs.getString(param) + ",,"; } rs.close(); query1.close();
+				 */
 				String[] out_params = params.split(",,");
-				insert = "Select count(*) from authors where " + param + "=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
+				insert = "Select count(*) from authors where " + param
+						+ "=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where "
+						+ Settings.lotable_pss + "=? AND " + Settings.lotable_product
+						+ (model.getProducts() ? "!=0" : "=0") + "))";
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
-					query1.setString(2, pss);
+					query1.setString(2, model.getPSS());
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();
@@ -66,29 +74,30 @@ public class GetPopulation {
 					query1.close();
 				}
 				return result;
-			}else{
+			} else {
 				String[] out_params = params.split(",,|-");
-				insert = "Select count(*) from authors where " + param + ">=? && "+param+"<=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where tag_id=?))";
+				insert = "Select count(*) from authors where " + param + ">=? && " + param
+						+ "<=? && id in (Select authors_id from posts where opinions_id in (Select id from opinions where "
+						+ Settings.lotable_pss + "=? AND " + Settings.lotable_product
+						+ (model.getProducts() ? "!=0" : "=0") + "))";
 				for (int i = 0; i < out_params.length; i++) {
 					System.out.println(out_params[i]);
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
 					i++;
 					query1.setString(2, out_params[i]);
-					query1.setString(3, pss);
+					query1.setString(3, model.getPSS());
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();
-					obj.put("Param", out_params[i-1]+"-"+out_params[i]);
+					obj.put("Param", out_params[i - 1] + "-" + out_params[i]);
 					obj.put("Value", rs.getInt("count(*)"));
 					result.put(obj);
 					rs.close();
 					query1.close();
 				}
 				return result;
-				
-				
-				
+
 			}
 
 		} catch (Exception e) {

@@ -16,13 +16,15 @@ public class Opinion {
 	private double polarity = 0;
 	private double total_inf = 0;
 	private Date timestamp;
-	private String tag;
+	private String pss;
+	private Integer product;
 
-	public Opinion(Post _main, String _tag) {
+	public Opinion(Post _main, String _pss, int _product) {
 		this.main = _main;
 		this.author_id = main.getUID();
 		timestamp = main.getTime();
-		tag = _tag;
+		pss = _pss;
+		product = _product;
 
 	}
 
@@ -68,8 +70,12 @@ public class Opinion {
 		return timestamp;
 	}
 
-	public String getTag() {
-		return tag;
+	public String getPSS() {
+		return pss;
+	}
+	
+	public Integer getProduct(){
+		return product;
 	}
 
 	public int ncomments() {

@@ -86,7 +86,8 @@ public class Settings {
 	public static final String lotable_influence="total_inf";
 	public static final String lotable_author="authors_id";
 	public static final String lotable_timestamp="timestamp";
-	public static final String lotable_pss="tag_id";
+	public static final String lotable_pss="pss";
+	public static final String lotable_product="product";
 	public static final String lotable_comments="comments";
 	
 	// Models table
