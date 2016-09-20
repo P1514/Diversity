@@ -142,7 +142,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,8 +168,9 @@ CREATE TABLE `opinions` (
   `total_inf` double DEFAULT NULL,
   `authors_id` int(11) NOT NULL,
   `timestamp` date DEFAULT NULL,
-  `tag_id` varchar(45) NOT NULL,
+  `pss` varchar(45) NOT NULL,
   `comments` int(11) DEFAULT NULL,
+  `product` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`,`authors_id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `fk_opinions_authors_idx` (`authors_id`),
@@ -233,4 +234,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-09-20 11:53:37
+-- Dump completed on 2016-09-20 15:04:09
