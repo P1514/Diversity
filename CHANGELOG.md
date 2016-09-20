@@ -2,7 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- Local Calculation Multi-Threading (minimal impact to performance)
+- TBA
+
+## [1.1.7] 2016-06-16
+### Added
+- Support for booting with models
+- Program now loads everything on startup (no longer required first refresh)
+- Code Optimization for Speed
 
 ## [1.1.6] 2016-06-16
 ### Added

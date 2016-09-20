@@ -22,7 +22,7 @@ public class Backend {
 		String values;
 		String tmp;
 		Settings conf;
-		Models model;
+		GetModels model;
 		String pss = "";
 		;
 		PSS ps = new PSS();
@@ -52,7 +52,7 @@ public class Backend {
 				tmp = gp.getTop(param, values, pss).toString();
 				return tmp;
 			case 5:
-				model = new Models();
+				model = new GetModels();
 				return model.get_models().toString();
 			case 6:
 				GetComments gc = new GetComments();
@@ -87,15 +87,15 @@ public class Backend {
 				tmp = conf.setConf(msg).toString();
 				return tmp;
 			case 14:
-				model = new Models();
+				model = new GetModels();
 				tmp = model.create_model(msg).toString();
 				return tmp;
 			case 15: 
-				model = new Models();
+				model = new GetModels();
 				tmp = model.get_model(msg).toString();
 				return tmp;
 			case 16:
-				model = new Models();
+				model = new GetModels();
 				tmp = model.update_model(msg).toString();
 				return tmp;
 			case 17: return ps.getPss();

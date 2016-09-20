@@ -35,6 +35,10 @@ public class CleanDB {
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
+			query = "delete from "+Settings.lmtable;
+			stmt = cnlocal.createStatement();
+			stmt.execute(query);
+			stmt.close();
 			query = "delete from "+Settings.latable;
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);

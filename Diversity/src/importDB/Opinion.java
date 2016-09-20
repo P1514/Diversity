@@ -2,7 +2,6 @@ package importDB;
 
 import java.util.ArrayList;
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import backend.Settings;

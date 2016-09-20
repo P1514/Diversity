@@ -17,6 +17,7 @@ import backend.Settings;
 public class Data {
 	private ConcurrentHashMap<Integer, Author> authordb = new ConcurrentHashMap<Integer, Author>();
 	private ConcurrentHashMap<Integer, Opinion> opiniondb = new ConcurrentHashMap<Integer, Opinion>();
+	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
 	private int totalposts;
 	private int totalviews;
 	private int totalcomments;
@@ -113,13 +114,13 @@ public class Data {
 			cndata = dbc.conndata();
 			do {
 				// Load Opinions id first
-				cal.setTime(LastUpdated);
-				cal.add(Calendar.MONTH, 1);
+				cal = Calendar.getInstance();
 				LastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
-				query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then " + Settings.rptable_postid
-						+ "\r\n when " + Settings.rptable_rpostid + " is not null then " + Settings.rptable_rpostid + " end from "
-						+ Settings.rptable + " Where " + Settings.ptime + " > \'" + LastUpdated + "\' && "
-						+ Settings.ptime + " <= \'" + LastUpdated2 + "\' ORDER BY ID ASC");
+				query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
+						+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
+						+ Settings.rptable_rpostid + " end from " + Settings.rptable + " Where " + Settings.ptime
+						+ " > \'" + LastUpdated + "\' && " + Settings.ptime + " <= \'" + LastUpdated2
+						+ "\' ORDER BY ID ASC");
 				stmt = cndata.createStatement();
 				// System.out.println(query);
 				rs = stmt.executeQuery(query);
@@ -190,15 +191,16 @@ public class Data {
 			System.out.println(querycond);
 			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 			// Load users from local DB
-			query = ("Select * from "+ Settings.latable +" where "+Settings.latable_id+" in " + querycond);
+			query = ("Select * from " + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
 			// System.out.println(query);
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
 				if (authordb.containsKey(rs.getInt("id"))) {
 				} else {
-					Author auth = new Author(rs.getInt(Settings.latable_id), rs.getString(Settings.latable_name), rs.getInt(Settings.latable_age),
-							rs.getString(Settings.latable_gender), rs.getString(Settings.latable_location));
+					Author auth = new Author(rs.getInt(Settings.latable_id), rs.getString(Settings.latable_name),
+							rs.getInt(Settings.latable_age), rs.getString(Settings.latable_gender),
+							rs.getString(Settings.latable_location));
 					auth.setComments(rs.getInt(Settings.latable_comments));
 					auth.setLikes(rs.getInt(Settings.latable_likes));
 					auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
@@ -303,9 +305,10 @@ public class Data {
 			e1.printStackTrace();
 		}
 		authordb.forEach((k, author) -> {
-			String insert = "INSERT INTO "+ Settings.latable+" "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.latable_influence+"=?,"
-					+Settings.latable_comments+"=?,"+Settings.latable_likes+"=?,"+Settings.latable_views+"=?,"+Settings.latable_posts+"=?";
+			String insert = "INSERT INTO " + Settings.latable + " "
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
+					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
+					+ "=?," + Settings.latable_posts + "=?";
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
@@ -338,7 +341,7 @@ public class Data {
 			}
 		});
 
-		System.out.println(" insert "+Settings.latable+" " + (System.nanoTime() - stime));
+		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
 		ExecutorService es = Executors.newCachedThreadPool();
@@ -347,9 +350,10 @@ public class Data {
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
-					String update = "INSERT INTO "+Settings.lotable+" "
-							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.lotable_reach+"=?,"+Settings.lotable_polarity+
-							"=?,"+Settings.lotable_influence+"=?,"+Settings.lotable_comments+"=?";
+					String update = "INSERT INTO " + Settings.lotable + " "
+							+ "Values (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+							+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
+							+ Settings.lotable_comments + "=?";
 					PreparedStatement query1 = null;
 					try {
 						query1 = cnlocal.prepareStatement(update);
@@ -370,7 +374,7 @@ public class Data {
 						opinion.getPosts().forEach((post) -> {
 							PreparedStatement query2 = null;
 							try {
-								String update1 = "REPLACE INTO "+Settings.lptable+" " + "Values (?,?,?,?,?,?,?)";
+								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
 								query2.setInt(1, post.getID());
 								query2.setDouble(2, post.getPolarity());
@@ -524,9 +528,10 @@ public class Data {
 				e1.printStackTrace();
 			}
 
-			String insert = "INSERT INTO "+Settings.latable+" "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE "+Settings.latable_influence+"=?,"+Settings.latable_comments+"=?,"
-					+Settings.latable_likes+"=?,"+Settings.latable_views+"=?,"+Settings.latable_posts+"=?";
+			String insert = "INSERT INTO " + Settings.latable + " "
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
+					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
+					+ "=?," + Settings.latable_posts + "=?";
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
@@ -580,7 +585,7 @@ public class Data {
 				Statement stmt = condata.createStatement();
 				ResultSet rs = stmt.executeQuery(query);
 				if (!rs.next()) {
-					query = ("Select * from "+Settings.lptable+" Where "+Settings.lptable_id+" = " + id);
+					query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
 					stmt = conlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					remoto = false;
@@ -601,7 +606,8 @@ public class Data {
 				int likes = remoto ? rs.getInt(Settings.rptable_likes) : rs.getInt(Settings.lptable_likes);
 				int views = remoto ? rs.getInt(Settings.rptable_views) : rs.getInt(Settings.lptable_views);
 				;
-				String message = remoto ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
+				String message = remoto ? rs.getString(Settings.rptable_message)
+						: rs.getString(Settings.lptable_message);
 				Post _post = remoto ? new Post(postid, user_id, time, likes, views, message)
 						: new Post(postid, user_id, null, likes, views, message);
 				if (!(users.contains(user_id))) {
@@ -643,7 +649,8 @@ public class Data {
 				// System.out.println("HELLO1");
 				condata = dbc.conndata();
 				conlocal = Settings.connlocal();
-				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = " + id);
+				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = "
+						+ id);
 				Statement stmt = condata.createStatement();
 				// System.out.println(query);
 				ResultSet rs = stmt.executeQuery(query);
@@ -665,7 +672,7 @@ public class Data {
 				}
 				rs.close();
 				stmt.close();
-				query = ("Select * from "+Settings.lptable+" Where "+Settings.lptable_opinion+" = " + id);
+				query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_opinion + " = " + id);
 				stmt = conlocal.createStatement();
 				rs = stmt.executeQuery(query);
 				// System.out.println(query);
@@ -702,4 +709,38 @@ public class Data {
 		}
 	}
 
+/*	class Tmodels implements Runnable {
+		private Model model;
+		private Connection conlocal;
+
+		public Tmodels() {
+		}
+*/
+		public void Tmodels() {
+			// System.out.println("HELLO1");
+			try{
+			cnlocal = Settings.connlocal();
+			String query = ("Select * from " + Settings.lmtable);
+			Statement stmt = cnlocal.createStatement();
+			// System.out.println(query);
+			ResultSet rs = stmt.executeQuery(query);
+			if (rs.next()) {
+				do {
+					Model model = new Model(rs.getLong(Settings.latable_id), rs.getInt(Settings.lmtable_update),
+							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
+							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+					Data.modeldb.put(model.getId(), model);
+				} while (rs.next());
+			}
+			rs.close();
+			stmt.close();
+			cnlocal.close();
+			}catch(SQLException | ClassNotFoundException e){
+				e.printStackTrace();
+			}
+		}
+
+	//}
 }
