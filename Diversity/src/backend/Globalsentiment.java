@@ -70,25 +70,42 @@ public class Globalsentiment {
 
 		return result;
 	}
-// TODO change this do open and close opinions and check things inside
+
+	// TODO change this do open and close opinions and check things inside
 	private double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
+		String[] genders = Settings.genders.split(",,");
 		String[] values = new String[2];
 		PreparedStatement query1 = null;
-		insert = "Select polarity,reach FROM opinions WHERE timestamp>? && timestamp<? && " + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0" : "=0");
-		if (param != null) {
-			if (!value.contains("-")) {
-				insert += " && authors_id in (Select id from authors where " + param + "=?)";
-			} else {
-				values = value.split("-");
-				insert += " && authors_id in (Select id from authors where " + param + ">=? && " + param + "<=?)";
+		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
+				+ Settings.lotable_reach + " FROM "+Settings.latable+"," + Settings.lptable + ", " + Settings.lotable + " WHERE  "
+				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
+				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? AND " + Settings.lotable_product
+				+ (model.getProducts() ? "!=0 " : "=0 ") + "AND (" + Settings.lptable + "." + Settings.lptable_authorid
+				+ "=" + Settings.latable + "." + Settings.latable_id + " AND " + Settings.latable + "."
+				+ Settings.latable_age + "<=" + model.getAge().split(",")[1] + ") AND (" + Settings.lptable + "."
+				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id + " AND "
+				+ Settings.latable + "." + Settings.latable_age + ">=" + model.getAge().split(",")[0] + ")";
+		if(model.getGender() == "All"){
+			insert += " AND (";
+			for(int i=0;i<genders.length;i++){
+				insert += (i==0 ? "" : " OR ")+Settings.latable+"."+Settings.latable_gender+"=?";
 			}
+			insert+=")";
+			
+		}else{
+			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
 		}
-
+		/*
+		 * if (param != null) { if (!value.contains("-")) { insert +=
+		 * " && authors_id in (Select id from authors where " + param + "=?)"; }
+		 * else { values = value.split("-"); insert +=
+		 * " && authors_id in (Select id from authors where " + param +
+		 * ">=? && " + param + "<=?)"; } }
+		 */
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		month -= 1;
@@ -102,15 +119,22 @@ public class Globalsentiment {
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
 			query1.setString(3, model.getPSS());
-			if (param != null) {
+			if(model.getGender()=="All"){
+				for(int i=0;i<genders.length;i++){
+					query1.setString(4+i, genders[i]);
+				}
+			}else{
+				query1.setString(4, model.getGender());
+			}
+			/*if (param != null) {
 				if (!value.contains("-")) {
 					query1.setString(4, value);
 				} else {
 					query1.setString(4, values[0]);
 					query1.setString(5, values[1]);
 				}
-			}
-			// System.out.println(query1);
+			}*/
+			System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

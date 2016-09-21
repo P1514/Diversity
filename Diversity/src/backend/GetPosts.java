@@ -91,11 +91,13 @@ public class GetPosts {
 				n_tops++;
 			}
 
-			insert = "Select name,influence,location,gender,age from authors where id in (Select authors_id from opinions where id = ?)";
+			insert = "Select name,influence,location,gender,age from authors where (age>=? AND age <=?) AND id in (Select authors_id from opinions where id = ? )";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, topid[i]);
+				query1.setString(1, model.getAge().split(",")[0]);
+				query1.setString(2, model.getAge().split(",")[1]);
+				query1.setInt(3, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
 				pre_result[i] = topid[i] + ",," + rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
@@ -117,11 +119,13 @@ public class GetPosts {
 				query1.close();
 			}
 
-			insert = "Select message from posts where opinions_id = ?";
+			insert = "Select message from posts where (opinions_id = ? AND authors_id in (Select id from authors where (age>=? AND age <=?)))";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
+				query1.setString(2, model.getAge().split(",")[0]);
+				query1.setString(3, model.getAge().split(",")[1]);
 				rs = query1.executeQuery();
 				rs.next();
 				pre_result[i] += rs.getString("message");
