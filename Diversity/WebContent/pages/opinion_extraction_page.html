@@ -63,7 +63,7 @@
 			}
 			function connect() {
 				document.getElementById("Cookie").innerHTML = "Model: "
-						+ getCookie("Model") + "; PSS: " + getCookie("PSS");
+						+ sessionStorage.model + "; PSS: " + sessionStorage.pss;
 
 				ws = new WebSocket('ws://' + window.location.hostname + ":"
 						+ window.location.port + '/Diversity/server');
@@ -76,7 +76,7 @@
 
 					json = {
 						"Op" : "getposts",
-						"Id" : getCookie("Id")
+						"Id" : sessionStorage.id
 					}
 
 					ws.send(JSON.stringify(json));
@@ -124,7 +124,7 @@
 						json = {
 							"Op" : "chartrequest",
 							"Param" : "Global",
-							"Id" : getCookie("Id")
+							"Id" : sessionStorage.id
 						}
 
 						ws.send(JSON.stringify(json));
@@ -307,7 +307,7 @@
 					"Op" : "chartrequest",
 					"Param" : "",
 					"Values" : "",
-					"Id" : getCookie("Id")
+					"Id" : sessionStorage.id
 				};
 
 				if (gender == "All" && location == "All" && age == "All"

@@ -36,44 +36,30 @@
 			return parts.pop().split(";").shift();
 	}
 
-	ws = new WebSocket('ws://' + window.location.hostname + ":"
-			+ window.location.port + '/Diversity/server');
-
+	var ws;
 	document.addEventListener('DOMContentLoaded', function() {
 		$('#age').slider();
-	}, false);
-
-	ws.onopen = function() {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+			
+			ws.onopen = function() {
 	json = {
 			"Op" : "getpss",
 		}
 		ws.send(JSON.stringify(json));
-		if (getCookie("Id") != null) {
-			json = {
-				"Op" : "get_model",
-				"Model" : getCookie("Id"),
-			}
-			id=getCookie("Id");
-			document.cookie="model=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-			ws.send(JSON.stringify(json));
-		}
 	}
-	function populatePSS() {
-		var products = JSON.parse(JSON.stringify(jsonData));
-		for (var i = 1; i < products.length; i++) {
-		console.log(products[i].Pss);
-		$('#pss').append('<option value="'+products[i].Pss+'">'+products[i].Pss+'</option>');
-		}
-		
-	}
+	
 	ws.onmessage = function(event) {
+	console.log(event.data);
 		var json = JSON.parse(event.data);
+		if(json[0].Op=="Model"){
+		var json2 = JSON.parse(event.data);}
 		console.log(json);
 
 		if (json[0].Op == "Error") {
 			alert(json[0].Message);
 			if(json[0].hasOwnProperty('id')){
-			document.cookie="model="+json[0].id;
+			sessionStorage.Id="model="+json[0].id;
 			location.reload();			
 			}
 			return;
@@ -81,24 +67,33 @@
 		if (json[0].Op == "pss") {
 		jsonData = JSON.parse(JSON.stringify(json));
 			populatePSS();
+			if (sessionStorage.id != null) {
+			var json2 = {
+				"Op" : "get_model",
+				"Id" : sessionStorage.id,
+			}
+			console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
+			ws.send(JSON.stringify(json2));
+			return;
+			}
 		}
-		if(json[0].Op=="Model"){
-		console.log(json[0]);
+		if(json2 != null && json2[0].Op=="Model"){
+		console.log(json2[0]);
 			
-			document.getElementById("model_name").value=json[0].Name;
+			document.getElementById("model_name").value=json2[0].Name;
 			document.getElementById("model_name").readOnly = true;
-			document.getElementById("frequency").value=json[0].Update;
-			document.getElementById('pss').value=json[0].PSS;
-			document.getElementById('pss').text=json[0].PSS;
+			document.getElementById("frequency").value=json2[0].Update;
+			document.getElementById('pss').value=json2[0].PSS;
+			document.getElementById('pss').text=json2[0].PSS;
 			document.getElementById("pss").disabled = true;
-			document.getElementById("gender").value=json[0].Gender;
-			document.getElementById("final").checked=json[0].Final_products;
-			console.log(json[0].Archive);
-			console.log(json[0].Final_products);
-			document.getElementById("Archive").checked=json[0].Archive;
-			var ager=json[0].Age.split(",").map(Number).filter(Boolean);// Converts string from DB to array of ints
+			document.getElementById("gender").value=json2[0].Gender;
+			document.getElementById("final").checked=json2[0].Final_products;
+			console.log(json2[0].Archive);
+			console.log(json2[0].Final_products);
+			document.getElementById("Archive").checked=json2[0].Archive;
+			var ager=json2[0].Age.split(",").map(Number).filter(Boolean);// Converts string from DB to array of ints
 			$('#age').slider('setValue', ager);
-			var uris = json[0].URI.split(";");
+			var uris = json2[0].URI.split(";");
 			for(i=0; i<uris.length-1; i++){
 			console.log("HELLO "+uris[i]+"\r\n");
 			$(':checkbox[value="'+uris[i]+'"]').prop("checked","true");}
@@ -109,6 +104,19 @@
 			edit = true;
 		}
 	}
+
+	}, false);
+
+	
+	function populatePSS() {
+		var products = JSON.parse(JSON.stringify(jsonData));
+		for (var i = 1; i < products.length; i++) {
+		console.log(products[i].Pss);
+		$('#pss').append('<option value="'+products[i].Pss+'">'+products[i].Pss+'</option>');
+		}
+		
+	}
+	
 	function escapeHtml(html)
 	{
 	    var text = document.createTextNode(html);
@@ -157,7 +165,7 @@
 					.getElementById('model_name').value
 					: erro = true,
 			"User" : 1,//TODO find this field
-			"Id":id,
+			"Id":sessionStorage.id,
 
 		}
 		if (erro == true) {

@@ -17,9 +17,11 @@ public class Server {
 	public static boolean isloading = false;
 	private Session session;
 	private Operations op = new Operations();
+	Async as;
 	
 	@OnOpen
 	public void open(Session session){
+		as = session.getAsyncRemote();
 		this.session=session;
 	}
 	@OnMessage
@@ -50,7 +52,6 @@ public class Server {
 	}
 	
 	public void send_message(String msg) {
-			Async as = session.getAsyncRemote();
 			System.out.println("\r\nOUT: "+ msg);
 			as.sendText(msg);
 			return;
@@ -114,7 +115,8 @@ public class Server {
 						be = new Backend(op.getOP(msg.getString("Op")), msg);
 						if (op.getOP(msg.getString("Op")) == 2)
 							Server.isloading = false;
-						send_message(be.resolve());
+						String answer = be.resolve().toString();
+						send_message(answer);
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

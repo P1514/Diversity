@@ -123,7 +123,7 @@ public class Backend {
 				return model.get_models().toString();
 			case 6:
 				GetComments gc = new GetComments();
-				tmp = gc.getAll(param, values).toString();
+				tmp = gc.getAll(msg).toString();
 				return tmp;
 			case 7:
 				CleanDB cdb = new CleanDB();

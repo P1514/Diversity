@@ -51,7 +51,7 @@ public class GetModels {
 		JSONObject obj = new JSONObject();
 		Model model = new Model();
 
-		model=Data.modeldb.get(msg.getLong("Model"));
+		model=Data.modeldb.get(msg.getLong("Id"));
 		if(model!=null){
 		obj.put("Op", "Model");
 		obj.put("Name", model.getName());

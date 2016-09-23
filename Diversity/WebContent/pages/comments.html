@@ -64,8 +64,10 @@ function getParameterByName(name, url) {
 		var id=getParameterByName('id').split(" ");
 		json = {
 			"Op" : "getcomments",
+			"Id" : sessionStorage.id,
 			"Values" : id[0],
 		}
+		console.log(json);
 		ws.send(JSON.stringify(json));
 	}
 	

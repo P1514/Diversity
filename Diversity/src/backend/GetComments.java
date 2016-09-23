@@ -8,6 +8,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import importDB.Data;
+import importDB.Model;
+
 public class GetComments {
 
 	private Settings dbc = new Settings();
@@ -16,67 +19,56 @@ public class GetComments {
 	public GetComments() {
 	}
 
-	public JSONArray getAll(String param, String value) throws JSONException {
+	public JSONArray getAll(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[50];
+		String[] genders = Settings.genders.split(",,");
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "comments");
 		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[50];
-		String[] values = (value != null) ? value.split(",") : null;
 		PreparedStatement query1 = null;
+		Model model = Data.modeldb.get(msg.getLong("Id"));
 		int n_tops = 0;
-		insert = "Select id from posts where opinions_id=? ORDER BY id ASC";
+		insert = "Select name,influence,location,gender,age,polarity,message from posts,authors where ( posts.id=? OR (age>=? AND age<=? ";
 		ResultSet rs = null;
-
+		if (model.getGender() == "All") {
+			insert += "AND (";
+			for (int i = 0; i < genders.length; i++) {
+				insert += i == 0 ? "" : "OR";
+				insert += "gender=? ";
+			}
+			insert += ") ";
+		}else{
+			insert += "AND gender=?) ";
+		}
+		insert += ") AND(opinions_id=? AND posts.authors_id=authors.id) ORDER BY posts.id ASC";
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setString(1, values[0]);
+			int i = 0;
+			query1.setString(1, msg.getString("Values"));
+			query1.setString(2, model.getAge().split(",")[0]);
+			query1.setString(3, model.getAge().split(",")[1]);
+			if (model.getGender() == "All") {
+				for (i = 0; i < genders.length; i++)
+					query1.setString(3 + i + 1, genders[i]);
+			}else{
+				query1.setString(3+1+i, model.getGender());
+				i++;
+			}
+			query1.setInt(3 + i + 1, msg.getInt("Values"));
 			System.out.print(query1);
+
 			rs = query1.executeQuery();
 
-			for (int i = 0; rs.next(); i++) {
-				topid[i] = rs.getInt("id");
+			for (i = 0; rs.next(); i++) {
 				n_tops++;
-			}
-
-			insert = "Select name,influence,location,gender,age from authors where id in (Select authors_id from posts where id = ?)";
-			for (int i = 0; i < n_tops; i++) {
-
-				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, topid[i]);
-				rs = query1.executeQuery();
-				rs.next();
 				pre_result[i] = rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
 						+ rs.getString("location") + ",," + rs.getString("gender") + ",," + rs.getInt("age") + ",,";
-				rs.close();
-				query1.close();
-			}
-
-			insert = "Select polarity from posts where id = ?";
-			for (int i = 0; i < n_tops; i++) {
-
-				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, topid[i]);
-				rs = query1.executeQuery();
-				rs.next();
 				pre_result[i] += rs.getDouble("polarity") + ",,";
-				rs.close();
-				query1.close();
-			}
-
-			insert = "Select message from posts where id = ?";
-			for (int i = 0; i < n_tops; i++) {
-
-				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, topid[i]);
-				rs = query1.executeQuery();
-				rs.next();
 				pre_result[i] += rs.getString("message");
-				rs.close();
-				query1.close();
 			}
 
 		} catch (Exception e) {

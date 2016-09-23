@@ -1,10 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-- Model Integration
-	- Top 5 Comments Posts as is
-	- Opinion Extraction Page
+## [1.1.8] 2016-09-23
+### Fixed
+- Full model compatibility
 
 ## [1.1.7] 2016-06-16
 ### Added

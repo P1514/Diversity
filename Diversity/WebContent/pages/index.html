@@ -30,11 +30,11 @@
 
 	function setCookie() {
 		// document.cookie="Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;";
-		document.cookie = "Model="
+	//	document.cookie = "Model="
 				+ $("#Models :selected").text();
 				var cookiemonster = document.getElementById("Models").value.split(";");
-		document.cookie = "Id=" + cookiemonster[0];
-		document.cookie = "PSS=" + cookiemonster[1];
+		//document.cookie = "Id=" + cookiemonster[0];
+		//document.cookie = "PSS=" + cookiemonster[1];
 		sessionStorage.model=$("#Models :selected").text();
 		sessionStorage.id=cookiemonster[0];
 		sessionStorage.pss=cookiemonster[1];

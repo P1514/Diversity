@@ -30,7 +30,7 @@ public class SentimentChart {
 		String[] locs = new String[Settings.locations.split(",,").length];
 		String[] genders = new String[Settings.genders.split(",,").length];
 		String[] outparams = Stream.of(Settings.genders.split(",,"), Settings.locations.split(",,")).flatMap(Stream::of)
-                .toArray(String[]::new);
+				.toArray(String[]::new);
 		int nages = 0, ngenders = 0, nlocs = 0;
 		for (int i = 0; i < params.length; i++) {
 
@@ -50,7 +50,7 @@ public class SentimentChart {
 				continue;
 			}
 		}
-		// TODO find a cleaner way to process ALL this this Class need an Overhaul
+		// TODO find a cleaner way to process ALL this Class need an Overhaul
 		// OVERHAUL java needs a OVERHAUL tag
 		if (nlocs == 2 && ngenders == 2) {
 			try {
@@ -96,10 +96,11 @@ public class SentimentChart {
 				} else {
 					if ((nlocs == 1 && ngenders == 1)) {
 						outparams[0] = "Global";
-					} /*else {
-						outparams[0] = "Global";
-
-					}*/
+					} /*
+						 * else { outparams[0] = "Global";
+						 * 
+						 * }
+						 */
 				}
 			}
 		}
@@ -125,7 +126,7 @@ public class SentimentChart {
 						obj = new JSONObject();
 						obj.put("Age", agerange[age]);
 						obj.put("Param", outparams[temp]);
-						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc],id));
+						obj.put("Value", sentimentby(agerange[age], genders[gender], locs[loc], id));
 						result.put(obj);
 						temp++;
 					}
@@ -144,11 +145,28 @@ public class SentimentChart {
 		String[] agerange = age.split("-");
 		int minage = Integer.parseInt(agerange[0]);
 		int maxage = Integer.parseInt(agerange[1]);
+		String[] genders = Settings.genders.split(",,");
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
-		String insert = "Select "+Settings.lptable_polarity+" FROM "+Settings.lptable+" WHERE "+Settings.lptable_opinion+" in ("
-				+ "Select "+Settings.lotable_id+" from opinions where "+Settings.lotable_pss+"=? AND "+Settings.lotable_product+(model.getProducts()? "!=0" : "=0")+") && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ?)";
-		System.out.print(insert);
+		String insert = "Select " + Settings.lptable_polarity + " FROM " + Settings.lptable + " WHERE "
+				+ Settings.lptable_opinion + " in (" + "Select " + Settings.lotable_id + " from opinions where "
+				+ Settings.lotable_pss + "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0" : "=0")
+				+ ") && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ? ";
+
+		
+		insert += ") AND (AGE >= ? AND AGE <= ?)";		
+
+		if(model.getGender()=="All"){
+			/*for(int i=0; i<genders.length; i++){
+				insert += i==0 ? "": " OR ";
+				insert += "gender=?";
+				
+			}*/
+			insert+=")";
+		}else{
+			insert+= "AND (gender=?))";
+			
+		}
 		if (gender != null) {
 			if (!gender.contains("-")) {
 				insert += " AND (GENDER = ?)";
@@ -164,21 +182,34 @@ public class SentimentChart {
 			}
 		}
 
-		insert += "))";
+		insert += ")";
 
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		int i = 4;
+		int i = 6;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setString(1, model.getPSS());
 			query1.setInt(2, minage);
 			query1.setInt(3, maxage);
+			query1.setString(4, model.getAge().split(",")[0]);
+			query1.setString(5, model.getAge().split(",")[1]);
+			
+			if(model.getGender()=="All"){
+				/*for(; i<genders.length; i++){
+					query1.setString(i, model.getAge().split(",")[i-6]);
+				}*/
+				//insert+=")";
+			}else{
+				query1.setString(i, model.getGender());
+				i++;				
+			}
+			
 			if (gender != null) {
 				if (gender.contains("-")) {
-					String[] genders = gender.split("-");
+				    genders = gender.split("-");
 					query1.setString(i, genders[0]);
 					i++;
 					query1.setString(i, genders[1]);
@@ -200,6 +231,7 @@ public class SentimentChart {
 					i++;
 				}
 			}
+			System.out.print(query1);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
