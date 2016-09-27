@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Opinion Extraction</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<link rel="stylesheet"
+		href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script
+			src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script type="text/javascript"
+			src="https://www.gstatic.com/charts/loader.js"></script>
+		<script src="sorttable.js"></script>
+		<script type="text/javascript">
+			var json;
+			var jsonData;
+			var ws;
+
+			//create trigger to resizeEnd event     
+			$(window).resize(function() {
+				if (this.resizeTO)
+					clearTimeout(this.resizeTO);
+				this.resizeTO = setTimeout(function() {
+					$(this).trigger('resizeEnd');
+				}, 500);
+			});
+
+			//redraw graph when window resize is completed  
+			$(window).on('resizeEnd', function() {
+				//if (jsonData != 0)
+				drawChart();
+			});
+			function connect() {
+				document.getElementById("Cookie").innerHTML = "Model: "
+						+ window.sessionStorage.model + "; PSS: "
+						+ window.sessionStorage.pss;
+
+				ws = new WebSocket('ws://' + window.location.hostname + ":"
+						+ window.location.port + '/Diversity/server');
+
+				ws.onopen = function() {
+					json = {
+						"Op" : "testing",
+						"Id" : window.sessionStorage.id
+					}
+
+					ws.send(JSON.stringify(json));
+				};
+
+				ws.onmessage = function(event) {
+					json = JSON.parse(event.data);
+
+					if (json[0].Op == "Error") {
+						alert(json[0].Message);
+						return;
+					}
+					if (json[0].Op == "OE_Redone") {
+						jsonData = JSON.parse(JSON.stringify(json));
+						drawChart();
+						return;
+					}
+
+					if (json[0].Op == "table") {
+						//populate table
+						var tr;
+						for (var i = 1; i < json.length; i++) {
+							tr = $('<tr/>');
+							tr.append("<td>" + json[i].Name + "</td>");
+							tr.append("<td>" + json[i].Message + "</td>");
+							tr.append("<td>" + json[i].Comments + "</td>");
+							tr.append("<td>" + json[i].Date + "</td>");
+							tr.append("<td>" + json[i].Polarity + "</td>");
+							tr.append("<td>" + json[i].Reach + "</td>");
+							tr.append("<td>" + json[i].Influence + "</td>");
+							tr.append("<td>" + json[i].Location + "</td>");
+							tr.append("<td>" + json[i].Gender + "</td>");
+							tr.append("<td>" + json[i].Age + "</td>");
+							tr
+									.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+							$('#posts tbody').append(tr);
+						}
+						$('.table > tbody > tr').click(function(e) {
+							clicker($(this).find('input[name="id"]').val());
+						});
+						return;
+					}
+					if (json[0].Op == "graph") {
+						jsonData = JSON.parse(JSON.stringify(json));
+						drawChart();
+						return;
+					}
+					if (json[0].Op == "comments") {
+						clicker();
+						return;
+					}
+				};
+			}
+
+			google.charts.load('current', {
+				packages : [ 'corechart', 'bar', 'gauge' ]
+			});
+			google.charts.setOnLoadCallback(connect);
+			// Detect table click
+
+			function clicker(hidden) {
+				var thediv = document.getElementById('displaybox');
+				var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
+						+ hidden
+						+ ' frameborder="0" allowfullscreen="no"></iframe>';
+				if (thediv.style.display == "none") {
+					thediv.style.display = "";
+					thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+							+ "<param name='bgcolor' value='#000000'>"
+							+ embedCode
+							+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+					//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
+				} else {
+					thediv.style.display = "none";
+					thediv.innerHTML = '';
+				}
+				return false;
+			}
+
+			function drawChart() {
+				// Pie Charts
+				var data = new google.visualization.DataTable();
+				var i=1;
+				var array;
+				data.addColumn('string', 'Gender')
+				data.addColumn('string', 'Value')
+				for(ii = 0;jsonData[i].Graph=="Top_Left"; ii++, i++){
+					data.addRow();
+					data.setCell(0, 0, jsonData[i].Param);
+					data.setCell(0,1, jsonData[i].Value)
+				}
+
+				var options = {
+					title : 'Total Opinions',
+					pieSliceTextStyle: {fontSize : 18},
+					pieSliceText: 'value',
+					legend: {position: 'none'}
+				};
+
+				var chart = new google.visualization.PieChart(document
+						.getElementById('opinionpie'));
+
+				chart.draw(data, options);
+				var chart = new google.visualization.PieChart(document
+						.getElementById('reachpie'));
+				chart.draw(data, options);
+
+				// Column Charts
+
+				var data = new google.visualization.DataTable();
+				data.addColumn('timeofday', 'Time of Day');
+				data.addColumn('number', 'Motivation Level');
+				data.addColumn('number', 'Energy Level');
+
+				data.addRows([ [ {
+					v : [ 8, 0, 0 ],
+					f : '8 am'
+				}, 1, .25 ], [ {
+					v : [ 9, 0, 0 ],
+					f : '9 am'
+				}, 2, .5 ], [ {
+					v : [ 10, 0, 0 ],
+					f : '10 am'
+				}, 3, 1 ], [ {
+					v : [ 11, 0, 0 ],
+					f : '11 am'
+				}, 4, 2.25 ], [ {
+					v : [ 12, 0, 0 ],
+					f : '12 pm'
+				}, 5, 2.25 ], [ {
+					v : [ 13, 0, 0 ],
+					f : '1 pm'
+				}, 6, 3 ], [ {
+					v : [ 14, 0, 0 ],
+					f : '2 pm'
+				}, 7, 4 ], [ {
+					v : [ 15, 0, 0 ],
+					f : '3 pm'
+				}, 8, 5.25 ], [ {
+					v : [ 16, 0, 0 ],
+					f : '4 pm'
+				}, 9, 7.5 ], [ {
+					v : [ 17, 0, 0 ],
+					f : '5 pm'
+				}, 10, 10 ], ]);
+
+				var options = {
+					title : 'Motivation and Energy Level Throughout the Day',
+					colors : [ '#9575cd', '#33ac71' ],
+					hAxis : {
+						title : 'Time of Day',
+						format : 'h:mm a',
+						viewWindow : {
+							min : [ 7, 30, 0 ],
+							max : [ 17, 30, 0 ]
+						}
+					},
+					vAxis : {
+						title : 'Rating (scale of 1-10)'
+					}
+				};
+
+				var chart = new google.visualization.ColumnChart(document
+						.getElementById('polaritybar'));
+				chart.draw(data, options);
+
+				//Line Charts
+				var data = new google.visualization.DataTable();
+				data.addColumn('number', 'X');
+				data.addColumn('number', 'Dogs');
+
+				data.addRows([ [ 0, 0 ], [ 1, 10 ], [ 2, 23 ], [ 3, 17 ],
+						[ 4, 18 ], [ 5, 9 ], [ 6, 11 ], [ 7, 27 ], [ 8, 33 ],
+						[ 9, 40 ], [ 10, 32 ], [ 11, 35 ], [ 12, 30 ],
+						[ 13, 40 ], [ 14, 42 ], [ 15, 47 ], [ 16, 44 ],
+						[ 17, 48 ], [ 18, 52 ], [ 19, 54 ], [ 20, 42 ],
+						[ 21, 55 ], [ 22, 56 ], [ 23, 57 ], [ 24, 60 ],
+						[ 25, 50 ], [ 26, 52 ], [ 27, 51 ], [ 28, 49 ],
+						[ 29, 53 ], [ 30, 55 ], [ 31, 60 ], [ 32, 61 ],
+						[ 33, 59 ], [ 34, 62 ], [ 35, 65 ], [ 36, 62 ],
+						[ 37, 58 ], [ 38, 55 ], [ 39, 61 ], [ 40, 64 ],
+						[ 41, 65 ], [ 42, 63 ], [ 43, 66 ], [ 44, 67 ],
+						[ 45, 69 ], [ 46, 69 ], [ 47, 70 ], [ 48, 72 ],
+						[ 49, 68 ], [ 50, 66 ], [ 51, 65 ], [ 52, 67 ],
+						[ 53, 70 ], [ 54, 71 ], [ 55, 72 ], [ 56, 73 ],
+						[ 57, 75 ], [ 58, 70 ], [ 59, 68 ], [ 60, 64 ],
+						[ 61, 60 ], [ 62, 65 ], [ 63, 67 ], [ 64, 68 ],
+						[ 65, 69 ], [ 66, 70 ], [ 67, 72 ], [ 68, 75 ],
+						[ 69, 80 ] ]);
+
+				var options = {
+					hAxis : {
+						title : 'Time'
+					},
+					vAxis : {
+						title : 'Popularity'
+					}
+				};
+
+				var chart = new google.visualization.LineChart(document
+						.getElementById('reachline'));
+
+				chart.draw(data, options);
+				var chart = new google.visualization.LineChart(document
+						.getElementById('globalline'));
+
+				chart.draw(data, options);
+
+				// Gauge Charts
+
+				var data = google.visualization.arrayToDataTable([
+						[ 'Label', 'Value' ], [ 'Memory', 80 ], [ 'CPU', 55 ],
+						[ 'Network', 68 ] ]);
+
+				var options = {
+					width : 400,
+					height : 120,
+					redFrom : 90,
+					redTo : 100,
+					yellowFrom : 75,
+					yellowTo : 90,
+					minorTicks : 5
+				};
+
+				var chart = new google.visualization.Gauge(document
+						.getElementById('globalgauge'));
+
+				chart.draw(data, options);
+				json = {
+						"Op" : "getposts",
+						"Id" : sessionStorage.id
+					}
+
+					ws.send(JSON.stringify(json));
+
+			}
+
+			function chartcolor(data) {
+				switch (data) {
+				case "Global":
+					return "#604460";
+				case "Male":
+					return "#00617F";
+				case "Female":
+					return "#0093C8";
+				case "Asia":
+					return "#FF3C14";
+				case "Europe":
+					return "#A60202";
+				case "0-30":
+					return "#BFD730";
+				case "31-60":
+					return "#8CA122";
+				case "61-90":
+					return "#5C6EoE";
+				}
+			}
+
+			function changeRequest() {
+
+				var json = {
+					"Op" : "chartrequest",
+					"Param" : "",
+					"Values" : "",
+					"Id" : getCookie("Id")
+				};
+			}
+		</script>
+		<style>
+#displaybox {
+	z-index: 10000;
+	filter: alpha(opacity = 90); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90); /* IE */
+	-moz-opacity: .9; /*older Mozilla*/
+	-khtml-opacity: 0.9; /*older Safari*/
+	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
+	background-color: #000000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: bottom;
+}
+
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
+}
+
+#dashboard {
+	position: relative;
+	width: 80%;
+}
+
+#chart {
+	height: 100%;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+#home {
+	position: absolute;
+	right: 10px;
+	top: 20px;
+}
+
+product {
+	display: block;
+	font-size: 20px;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+	margin-left: 0;
+	margin-right: 0;
+	font-weight: normal;
+}
+
+.inlineTable {
+	display: inline-block;
+	vertical-align: top;
+	text-align: center;
+}
+
+table {
+	width: 100%;
+}
+</style>
+</head>
+<body>
+	<!-- POPUP -->
+	<div id="displaybox" style="display: none;"></div>
+	<!-- Logotipo -->
+
+	<center> <img src="../images/Diversity-Logo-120x62.png"
+		alt="Diversity Logo" align="top"></img> </center>
+
+
+	<!-- Gráfico + filtros-->
+	<div class="container" id="dashboard">
+		<product>
+		<div id="Cookie">Error no product to display</div>
+		</product>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
+		<hr>
+			<center>
+			<table id="global">
+				<tr>
+					<td style="vertical-align: top">
+						<table id="left" class="inlineTable">
+							<tr>
+								<td>
+									<div id="opinionpie"></div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="reachpie"></div>
+								</td>
+							</tr>
+						</table>
+					</td>
+
+					<td style="vertical-align: center">
+						<table id="middle" class="inlineTable">
+							<tr>
+								<td>
+									<div id="polaritybar"></div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="reachline"></div>
+								</td>
+							</tr>
+
+						</table>
+					</td>
+					<td style="vertical-align: center">
+						<table id="right" class="inlineTable">
+							<tr>
+								<td>
+									<div id="globalgauge"></div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div id="globalline"></div>
+								</td>
+							</tr>
+
+						</table>
+					</td>
+				</tr>
+			</table>
+
+			</center>
+	</div>
+
+	<!-- Tabela Posts-->
+	<div class="container" id="dashboard">
+		<h2>Top 5</h2>
+		<hr>
+			<table id="posts" class="table sortable">
+				<thead>
+					<tr>
+						<th>Original Author</th>
+						<th>Post</th>
+						<th># Comments</th>
+						<th>Date</th>
+						<th>Polarity</th>
+						<th>Reach</th>
+						<th>Influence</th>
+						<th>Location</th>
+						<th>Gender</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+	</div>
+</body>
+</html>

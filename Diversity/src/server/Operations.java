@@ -25,6 +25,7 @@ public class Operations {
 		op.put("get_model", 15);
 		op.put("update_model",16);
 		op.put("getpss", 17);
+		op.put("testing", 99);
 		
 		
 	}

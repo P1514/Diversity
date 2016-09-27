@@ -11,7 +11,7 @@ public class PSS {
 	private HashMap<String, Integer> products = new HashMap<String, Integer>();
 	private HashMap<String, String> tags = new HashMap<String, String>();
 	private HashMap<Integer, String> psss = new HashMap<Integer, String>();
-	private String tag_id = null;
+	private String tag_id = "Non Existant";
 	private Integer id =0;
 	JSONArray result = new JSONArray();
 	JSONObject obj = new JSONObject();

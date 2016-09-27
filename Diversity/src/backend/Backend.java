@@ -8,7 +8,7 @@ import importDB.PSS;
 
 public class Backend {
 	private int op = 0;
-	private JSONObject msg;
+	private JSONObject msg, obj;
 	private JSONArray result;
 
 	public Backend(int _op, JSONObject _msg) {
@@ -36,6 +36,74 @@ public class Backend {
 			System.out.println(msg);
 
 			switch (op) {
+			case 99:
+				result=new JSONArray();
+				obj = new JSONObject();
+				obj.put("Op", "OE_Redone");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Left");
+				obj.put("Param", "Global");
+				obj.put("Value", "88");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Middle");
+				obj.put("Param", "-1");
+				obj.put("Value", "6");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Middle");
+				obj.put("Param", "-0.5");
+				obj.put("Value", "13");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Middle");
+				obj.put("Param", "0");
+				obj.put("Value", "9");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Middle");
+				obj.put("Param", "0.5");
+				obj.put("Value", "23");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Middle");
+				obj.put("Param", "1");
+				obj.put("Value", "40");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Top_Right");
+				obj.put("Min", "-1");
+				obj.put("Max", "1");
+				obj.put("Value", "0.4");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Bottom_Left");
+				obj.put("Param","Global");
+				obj.put("Value", "1.3");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Bottom_Middle");
+				obj.put("Month", "03/2016");
+				obj.put("Value", "0.6");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Bottom_Middle");
+				obj.put("Month", "04/2016");
+				obj.put("Value", "1.1");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Bottom_Middle");
+				obj.put("Month", "05/2016");
+				obj.put("Value", "1.8");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Graph", "Bottom_Middle");
+				obj.put("Month", "06/2016");
+				obj.put("Value", "0.9");
+				result.put(obj);
+	
+				return result.toString();
 			case 1:
 				SentimentChart sc = new SentimentChart();
 				return sc.chartrequest(param, values, id).toString();
