@@ -1,3 +1,10 @@
 ## Opinion Monitoring comunication
 
+
+
+
+
 ## Get Post Comunication
+example JSON
+"281185862":{"fullname":"Dionysia","location":"Thessaloniki","screenName":"arvanitousia","firstName":null,"middleName":null,"lastName":null,"gender":null,"postsNum":4,"profileImageURL":"http://pbs.twimg.com/profile_images/712340117277515777/h618p68b_bigger.jpg"}
+

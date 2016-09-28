@@ -71,6 +71,7 @@
 					if (json[0].Op == "table") {
 						//populate table
 						var tr;
+						$('#posts tbody').empty();
 						for (var i = 1; i < json.length; i++) {
 							tr = $('<tr/>');
 							tr.append("<td>" + json[i].Name + "</td>");
@@ -151,7 +152,8 @@
 					title : 'Total Opinions',
 					pieSliceTextStyle: {fontSize : 18},
 					pieSliceText: 'value',
-					legend: {position: 'none'}
+					legend: {position: 'none'},
+					enableInteractivity : false,
 				};
 
 				var chart = new google.visualization.PieChart(document
@@ -182,8 +184,8 @@
 					
 					baselineColor : 'transparent',
 						gridlines: {
-        color: 'transparent'
-    }
+							color: 'transparent'
+					}
 					},
 					legend: { position: 'bottom' }
 				};
@@ -196,16 +198,16 @@
 
 				var data = new google.visualization.DataTable();
 				data.addColumn('string', 'Polarity')
-				data.addColumn('number', 'Global')
+				data.addRow();
+				data.setCell(0, 0, "Sentiment");
 				for(ii = 0;jsonData[i].Graph=="Top_Right"; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, "Sentiment");
-					data.setCell(ii,1, jsonData[i].Value);
+					data.addColumn('number', 'Global')
+					data.setCell(0,1, jsonData[i].Value);
 				}
 
 				var options = {
-					width : 400,
-					height : 120,	
+					width : 600,
+					height : 200,	
 					max : 1,
 					min : -1,
 					redFrom : -1,
@@ -221,52 +223,65 @@
 				chart.draw(data, options);
 				
 				//Bottom Left
-				
-				// Top Left
+
 				var data = new google.visualization.DataTable();
-				var i=1;
-				data.addColumn('string', 'Gender')
-				data.addColumn('number', 'Global')
-				for(ii = 0;jsonData[i].Graph=="Top_Left"; ii++, i++){
+				data.addColumn('string', 'Gender');
+				data.addColumn('number', 'Value');
+				for(ii = 0;jsonData[i].Graph=="Bottom_Left"; ii++, i++){
 					data.addRow();
 					data.setCell(ii, 0, jsonData[i].Param);
 					data.setCell(ii,1, jsonData[i].Value)
 				}
 
 				var options = {
-					title : 'Total Opinions',
+					title : 'Average Reach',
 					pieSliceTextStyle: {fontSize : 18},
 					pieSliceText: 'value',
-					legend: {position: 'none'}
+					legend: {position: 'none'},
+					enableInteractivity : false,
 				};
 
 				var chart = new google.visualization.PieChart(document
 						.getElementById('reachpie'));
 				chart.draw(data, options);
 
-				//Line Charts
+				//Bottom Middle
 				var data = new google.visualization.DataTable();
-				data.addColumn('number', 'X');
-				data.addColumn('number', 'Dogs');
+				data.addColumn('string', 'Month');
+				data.addColumn('number', 'Reach');
+				
+				for(ii = 0;i<jsonData.length && jsonData[i].Graph=='Bottom_Middle'; ii++, i++){
+					data.addRow();
+					data.setCell(ii, 0, jsonData[i].Param);
+					data.setCell(ii,1, jsonData[i].Value)
+				}
 
-				data.addRows([ [ 0, 0 ], [ 1, 10 ], [ 2, 23 ], [ 3, 17 ],
-						[ 4, 18 ], [ 5, 9 ], [ 6, 11 ], [ 7, 27 ], [ 8, 33 ],
-						[ 9, 40 ], [ 10, 32 ], [ 11, 35 ], [ 12, 30 ],
-						[ 13, 40 ], [ 14, 42 ], [ 15, 47 ], [ 16, 44 ],
-						[ 17, 48 ], [ 18, 52 ], [ 19, 54 ], [ 20, 42 ],
-						[ 21, 55 ], [ 22, 56 ], [ 23, 57 ], [ 24, 60 ],
-						[ 25, 50 ], [ 26, 52 ], [ 27, 51 ], [ 28, 49 ],
-						[ 29, 53 ], [ 30, 55 ], [ 31, 60 ], [ 32, 61 ],
-						[ 33, 59 ], [ 34, 62 ], [ 35, 65 ], [ 36, 62 ],
-						[ 37, 58 ], [ 38, 55 ], [ 39, 61 ], [ 40, 64 ],
-						[ 41, 65 ], [ 42, 63 ], [ 43, 66 ], [ 44, 67 ],
-						[ 45, 69 ], [ 46, 69 ], [ 47, 70 ], [ 48, 72 ],
-						[ 49, 68 ], [ 50, 66 ], [ 51, 65 ], [ 52, 67 ],
-						[ 53, 70 ], [ 54, 71 ], [ 55, 72 ], [ 56, 73 ],
-						[ 57, 75 ], [ 58, 70 ], [ 59, 68 ], [ 60, 64 ],
-						[ 61, 60 ], [ 62, 65 ], [ 63, 67 ], [ 64, 68 ],
-						[ 65, 69 ], [ 66, 70 ], [ 67, 72 ], [ 68, 75 ],
-						[ 69, 80 ] ]);
+				var options = {
+					hAxis : {
+						title : 'Time'
+					},
+					vAxis : {
+						title : 'Reach'
+					}
+				};
+
+				var chart = new google.visualization.LineChart(document
+						.getElementById('reachline'));
+
+				chart.draw(data, options);
+				
+				//Bottom Right
+				var data = new google.visualization.DataTable();
+				data.addColumn('string', 'Month');
+				data.addColumn('number', 'Sentiment');
+				console.log(jsonData[i]);
+				console.log(i);
+
+				for(ii = 0;i<jsonData.length && jsonData[i].Graph=='Bottom_Right'; ii++, i++){
+					data.addRow();
+					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii,1, jsonData[i].Sentiment)
+				}
 
 				var options = {
 					hAxis : {
@@ -278,13 +293,35 @@
 				};
 
 				var chart = new google.visualization.LineChart(document
-						.getElementById('reachline'));
-
-				chart.draw(data, options);
-				var chart = new google.visualization.LineChart(document
 						.getElementById('globalline'));
 
 				chart.draw(data, options);
+				google.visualization.events.addListener(chart, 'select', function() {
+				var selection = chart.getSelection();
+				if (selection != "") {
+					var row = selection[0].row;
+					var col = selection[0].column;
+					var month = data.getValue(row,0);
+
+					json = {
+						"Op" : "getposts",
+						"Id" : sessionStorage.id,
+						"Param" : "Month",
+						"Values" : month,
+					}
+					console.log(json);
+
+					ws.send(JSON.stringify(json));
+	
+				} else {
+					json = {
+						"Op" : "getposts",
+						"Pss" : sessionStorage.pss
+					}
+
+					ws.send(JSON.stringify(json));
+				}
+				})
 
 			}
 

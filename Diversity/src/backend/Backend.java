@@ -24,6 +24,7 @@ public class Backend {
 		Settings conf;
 		GetModels model;
 		PSS pss = new PSS();
+		Globalsentiment gs = new Globalsentiment();
 		long id=0;
 		try {
 			if (msg.has("Id")) {
@@ -82,24 +83,39 @@ public class Backend {
 				result.put(obj);
 				obj = new JSONObject();
 				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "03/2016");
+				obj.put("Month", "MAR");
 				obj.put("Value", "0.6");
 				result.put(obj);
 				obj = new JSONObject();
 				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "04/2016");
+				obj.put("Month", "APR");
 				obj.put("Value", "1.1");
 				result.put(obj);
 				obj = new JSONObject();
 				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "05/2016");
+				obj.put("Month", "MAY");
 				obj.put("Value", "1.8");
 				result.put(obj);
 				obj = new JSONObject();
 				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "06/2016");
+				obj.put("Month", "AUG");
 				obj.put("Value", "0.9");
 				result.put(obj);
+				
+				JSONArray convert = gs.globalsentiment(1, param, values, id);
+				
+				for(int i=0; i<convert.length(); i++){
+					obj=new JSONObject();
+					JSONObject helper = convert.getJSONObject(i);
+					obj.put("Graph", "Bottom_Right");
+					for(String key : JSONObject.getNames(helper))
+					{
+					  obj.put(key, helper.get(key));
+					}
+					result.put(obj);
+				}
+				
+				
 	
 				return result.toString();
 			case 1:
@@ -109,7 +125,7 @@ public class Backend {
 				Data dat = new Data();
 				return dat.load();
 			case 3:
-				Globalsentiment gs = new Globalsentiment();
+				gs = new Globalsentiment();
 				tmp = gs.globalsentiment(1, param, values, id).toString();
 				return tmp;
 			case 4:
