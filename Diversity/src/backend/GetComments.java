@@ -13,7 +13,6 @@ import importDB.Model;
 
 public class GetComments {
 
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
 	public GetComments() {
@@ -27,7 +26,6 @@ public class GetComments {
 		obj.put("Op", "comments");
 		result.put(obj);
 		String insert = new String();
-		int[] topid = new int[50];
 		PreparedStatement query1 = null;
 		Model model = Data.modeldb.get(msg.getLong("Id"));
 		int n_tops = 0;

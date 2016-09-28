@@ -34,7 +34,7 @@
 
 			//redraw graph when window resize is completed  
 			$(window).on('resizeEnd', function() {
-				//if (jsonData != 0)
+				if (jsonData != 0)
 				drawChart();
 			});
 			function connect() {
@@ -46,9 +46,10 @@
 						+ window.location.port + '/Diversity/server');
 
 				ws.onopen = function() {
-					json = {
-						"Op" : "testing",
-						"Id" : window.sessionStorage.id
+				
+				json = {
+						"Op" : "getposts",
+						"Id" : sessionStorage.id
 					}
 
 					ws.send(JSON.stringify(json));
@@ -89,6 +90,12 @@
 						$('.table > tbody > tr').click(function(e) {
 							clicker($(this).find('input[name="id"]').val());
 						});
+						json = {
+						"Op" : "testing",
+						"Id" : window.sessionStorage.id
+					}
+
+					ws.send(JSON.stringify(json));
 						return;
 					}
 					if (json[0].Op == "graph") {
@@ -129,16 +136,15 @@
 			}
 
 			function drawChart() {
-				// Pie Charts
+				// Top Left
 				var data = new google.visualization.DataTable();
 				var i=1;
-				var array;
 				data.addColumn('string', 'Gender')
-				data.addColumn('string', 'Value')
+				data.addColumn('number', 'Global')
 				for(ii = 0;jsonData[i].Graph=="Top_Left"; ii++, i++){
 					data.addRow();
-					data.setCell(0, 0, jsonData[i].Param);
-					data.setCell(0,1, jsonData[i].Value)
+					data.setCell(ii, 0, jsonData[i].Param);
+					data.setCell(ii,1, jsonData[i].Value)
 				}
 
 				var options = {
@@ -152,67 +158,90 @@
 						.getElementById('opinionpie'));
 
 				chart.draw(data, options);
-				var chart = new google.visualization.PieChart(document
-						.getElementById('reachpie'));
-				chart.draw(data, options);
 
-				// Column Charts
+				// Top Middle
 
 				var data = new google.visualization.DataTable();
-				data.addColumn('timeofday', 'Time of Day');
-				data.addColumn('number', 'Motivation Level');
-				data.addColumn('number', 'Energy Level');
-
-				data.addRows([ [ {
-					v : [ 8, 0, 0 ],
-					f : '8 am'
-				}, 1, .25 ], [ {
-					v : [ 9, 0, 0 ],
-					f : '9 am'
-				}, 2, .5 ], [ {
-					v : [ 10, 0, 0 ],
-					f : '10 am'
-				}, 3, 1 ], [ {
-					v : [ 11, 0, 0 ],
-					f : '11 am'
-				}, 4, 2.25 ], [ {
-					v : [ 12, 0, 0 ],
-					f : '12 pm'
-				}, 5, 2.25 ], [ {
-					v : [ 13, 0, 0 ],
-					f : '1 pm'
-				}, 6, 3 ], [ {
-					v : [ 14, 0, 0 ],
-					f : '2 pm'
-				}, 7, 4 ], [ {
-					v : [ 15, 0, 0 ],
-					f : '3 pm'
-				}, 8, 5.25 ], [ {
-					v : [ 16, 0, 0 ],
-					f : '4 pm'
-				}, 9, 7.5 ], [ {
-					v : [ 17, 0, 0 ],
-					f : '5 pm'
-				}, 10, 10 ], ]);
-
+				data.addColumn('string', 'Polarity')
+				data.addColumn('number', 'Global')
+				for(ii = 0;jsonData[i].Graph=="Top_Middle"; ii++, i++){
+					data.addRow();
+					data.setCell(ii, 0, jsonData[i].Param);
+					data.setCell(ii,1, jsonData[i].Value);
+				}
 				var options = {
-					title : 'Motivation and Energy Level Throughout the Day',
+					title : 'Polarity',
 					colors : [ '#9575cd', '#33ac71' ],
-					hAxis : {
-						title : 'Time of Day',
-						format : 'h:mm a',
-						viewWindow : {
-							min : [ 7, 30, 0 ],
-							max : [ 17, 30, 0 ]
+					vAxis : {
+						title : 'no. posts',
+						gridlines: {
+							count: 6,
 						}
 					},
-					vAxis : {
-						title : 'Rating (scale of 1-10)'
-					}
+					hAxis : {
+					
+					baselineColor : 'transparent',
+						gridlines: {
+        color: 'transparent'
+    }
+					},
+					legend: { position: 'bottom' }
 				};
 
 				var chart = new google.visualization.ColumnChart(document
 						.getElementById('polaritybar'));
+				chart.draw(data, options);
+				
+				// Top Right
+
+				var data = new google.visualization.DataTable();
+				data.addColumn('string', 'Polarity')
+				data.addColumn('number', 'Global')
+				for(ii = 0;jsonData[i].Graph=="Top_Right"; ii++, i++){
+					data.addRow();
+					data.setCell(ii, 0, "Sentiment");
+					data.setCell(ii,1, jsonData[i].Value);
+				}
+
+				var options = {
+					width : 400,
+					height : 120,	
+					max : 1,
+					min : -1,
+					redFrom : -1,
+					redTo : -0.5,
+					yellowFrom : -0.5,
+					yellowTo : 0,
+					minorTicks : 5
+				};
+
+				var chart = new google.visualization.Gauge(document
+						.getElementById('globalgauge'));
+
+				chart.draw(data, options);
+				
+				//Bottom Left
+				
+				// Top Left
+				var data = new google.visualization.DataTable();
+				var i=1;
+				data.addColumn('string', 'Gender')
+				data.addColumn('number', 'Global')
+				for(ii = 0;jsonData[i].Graph=="Top_Left"; ii++, i++){
+					data.addRow();
+					data.setCell(ii, 0, jsonData[i].Param);
+					data.setCell(ii,1, jsonData[i].Value)
+				}
+
+				var options = {
+					title : 'Total Opinions',
+					pieSliceTextStyle: {fontSize : 18},
+					pieSliceText: 'value',
+					legend: {position: 'none'}
+				};
+
+				var chart = new google.visualization.PieChart(document
+						.getElementById('reachpie'));
 				chart.draw(data, options);
 
 				//Line Charts
@@ -256,33 +285,6 @@
 						.getElementById('globalline'));
 
 				chart.draw(data, options);
-
-				// Gauge Charts
-
-				var data = google.visualization.arrayToDataTable([
-						[ 'Label', 'Value' ], [ 'Memory', 80 ], [ 'CPU', 55 ],
-						[ 'Network', 68 ] ]);
-
-				var options = {
-					width : 400,
-					height : 120,
-					redFrom : 90,
-					redTo : 100,
-					yellowFrom : 75,
-					yellowTo : 90,
-					minorTicks : 5
-				};
-
-				var chart = new google.visualization.Gauge(document
-						.getElementById('globalgauge'));
-
-				chart.draw(data, options);
-				json = {
-						"Op" : "getposts",
-						"Id" : sessionStorage.id
-					}
-
-					ws.send(JSON.stringify(json));
 
 			}
 
@@ -345,13 +347,6 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	width: 80%;
 }
 
-#chart {
-	height: 100%;
-	top: 0;
-	left: 0;
-	width: 100%;
-}
-
 #home {
 	position: absolute;
 	right: 10px;
@@ -376,6 +371,10 @@ product {
 
 table {
 	width: 100%;
+}
+
+.chart{
+	display: inline-block;
 }
 </style>
 </head>
@@ -403,12 +402,12 @@ table {
 						<table id="left" class="inlineTable">
 							<tr>
 								<td>
-									<div id="opinionpie"></div>
+									<div id="opinionpie" class="chart"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="reachpie"></div>
+									<div id="reachpie" class="chart"></div>
 								</td>
 							</tr>
 						</table>
@@ -418,12 +417,12 @@ table {
 						<table id="middle" class="inlineTable">
 							<tr>
 								<td>
-									<div id="polaritybar"></div>
+									<div id="polaritybar" class="chart"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="reachline"></div>
+									<div id="reachline" class="chart"></div>
 								</td>
 							</tr>
 
@@ -433,12 +432,12 @@ table {
 						<table id="right" class="inlineTable">
 							<tr>
 								<td>
-									<div id="globalgauge"></div>
+									<div id="globalgauge" class="chart"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="globalline"></div>
+									<div id="globalline" class="chart"></div>
 								</td>
 							</tr>
 
