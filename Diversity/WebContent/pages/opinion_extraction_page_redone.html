@@ -150,6 +150,7 @@
 
 				var options = {
 					title : 'Total Opinions',
+					titlePosition: 'center',
 					pieSliceTextStyle: {fontSize : 18},
 					pieSliceText: 'value',
 					legend: {position: 'none'},
@@ -206,15 +207,13 @@
 				}
 
 				var options = {
-					width : 600,
-					height : 200,	
-					max : 1,
-					min : -1,
-					redFrom : -1,
-					redTo : -0.5,
-					yellowFrom : -0.5,
-					yellowTo : 0,
-					minorTicks : 5
+					max : 100,
+					min : 0,
+					redFrom : 0,
+					redTo : 25,
+					yellowFrom : 25,
+					yellowTo : 50,
+					minorTicks : 10
 				};
 
 				var chart = new google.visualization.Gauge(document
@@ -244,25 +243,35 @@
 				var chart = new google.visualization.PieChart(document
 						.getElementById('reachpie'));
 				chart.draw(data, options);
+				
+				
 
 				//Bottom Middle
 				var data = new google.visualization.DataTable();
 				data.addColumn('string', 'Month');
-				data.addColumn('number', 'Reach');
+				data.addColumn('number', 'Global');
 				
 				for(ii = 0;i<jsonData.length && jsonData[i].Graph=='Bottom_Middle'; ii++, i++){
 					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Param);
+					data.setCell(ii, 0, jsonData[i].Month);
 					data.setCell(ii,1, jsonData[i].Value)
 				}
 
 				var options = {
 					hAxis : {
-						title : 'Time'
+						showTextEvery : 1,
+						textStyle : {
+							fontSize: 8
+						}
 					},
 					vAxis : {
-						title : 'Reach'
-					}
+						title : 'Reach',
+						viewWindow : {
+							max : 0,
+							min : 2
+						}
+					},
+					legend: { position: 'bottom' }
 				};
 
 				var chart = new google.visualization.LineChart(document
@@ -273,7 +282,7 @@
 				//Bottom Right
 				var data = new google.visualization.DataTable();
 				data.addColumn('string', 'Month');
-				data.addColumn('number', 'Sentiment');
+				data.addColumn('number', 'Global');
 				console.log(jsonData[i]);
 				console.log(i);
 
@@ -285,11 +294,19 @@
 
 				var options = {
 					hAxis : {
-						title : 'Time'
+						showTextEvery : 1,
+						textStyle : {
+							fontSize: 8
+						}
 					},
 					vAxis : {
-						title : 'Popularity'
-					}
+						title : 'Sentiment',
+						viewWindow : {
+							max : 0,
+							min : 100
+						}
+					},
+					legend: { position: 'bottom' }
 				};
 
 				var chart = new google.visualization.LineChart(document
@@ -400,18 +417,20 @@ product {
 	font-weight: normal;
 }
 
-.inlineTable {
-	display: inline-block;
-	vertical-align: top;
-	text-align: center;
-}
-
 table {
 	width: 100%;
 }
 
-.chart{
-	display: inline-block;
+.graph1{
+	width:40%;
+}
+.graph2{
+	width:40%;
+}
+
+.graphst {
+	width: 100%;
+	table-layout: fixed;
 }
 </style>
 </head>
@@ -433,48 +452,48 @@ table {
 			class="btn btn-default">Home</button>
 		<hr>
 			<center>
-			<table id="global">
+			<table id="global" class="graphst">
 				<tr>
-					<td style="vertical-align: top">
-						<table id="left" class="inlineTable">
+					<td>
+						<table id="left">
 							<tr>
 								<td>
-									<div id="opinionpie" class="chart"></div>
+									<div id="opinionpie"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="reachpie" class="chart"></div>
+									<div id="reachpie"></div>
 								</td>
 							</tr>
 						</table>
 					</td>
 
-					<td style="vertical-align: center">
-						<table id="middle" class="inlineTable">
+					<td class="graph1">
+						<table id="middle">
 							<tr>
 								<td>
-									<div id="polaritybar" class="chart"></div>
+									<div id="polaritybar"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="reachline" class="chart"></div>
+									<div id="reachline"></div>
 								</td>
 							</tr>
 
 						</table>
 					</td>
-					<td style="vertical-align: center">
-						<table id="right" class="inlineTable">
+					<td class="graph2">
+						<table id="right">
 							<tr>
 								<td>
-									<div id="globalgauge" class="chart"></div>
+									<div id="globalgauge"></div>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<div id="globalline" class="chart"></div>
+									<div id="globalline"></div>
 								</td>
 							</tr>
 

@@ -72,9 +72,7 @@
 
 	function new_model(){
 	
-	sessionStorage.id="";
-	sessionStorage.model="";
-	sessionStorage.pss="";
+	sessionStorage.clear();
 	
 	}
 	
@@ -164,6 +162,12 @@
 				</form>
 			</td>
 			<td>
+				<form action="opinion_extraction_page_redone.html">
+					<input id="global" class="btn btn-default" onclick="setCookie();"
+						type="submit" value="Get Opinion Extraction" />
+				</form>
+			</td>
+			<!--<td>
 				<form action="opinion_extraction_page.html">
 					<input id="global" class="btn btn-default" onclick="setCookie();"
 						type="submit" value="Get Opinion" />
@@ -174,7 +178,7 @@
 					<input id="global" class="btn btn-default" onclick="setCookie();"
 						type="submit" value="Get Global Sentiment" />
 				</form>
-			</td>
+			</td>-->
 			<td>
 				<form>
 					<input id="refresh" class="btn btn-default" type=button

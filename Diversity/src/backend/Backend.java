@@ -23,8 +23,10 @@ public class Backend {
 		String tmp;
 		Settings conf;
 		GetModels model;
+		GetPosts gp = new GetPosts();
 		PSS pss = new PSS();
 		Globalsentiment gs = new Globalsentiment();
+		GetReach gr = new GetReach();
 		long id=0;
 		try {
 			if (msg.has("Id")) {
@@ -42,11 +44,7 @@ public class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Top_Left");
-				obj.put("Param", "Global");
-				obj.put("Value", "88");
-				result.put(obj);
+				result=convert(result,gp.getAmmount(param, values, id), "Top_Left");
 				obj = new JSONObject();
 				obj.put("Graph", "Top_Middle");
 				obj.put("Param", "--");
@@ -72,48 +70,10 @@ public class Backend {
 				obj.put("Param", "++");
 				obj.put("Value", "40");
 				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Top_Right");
-				obj.put("Value", "0.4");
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Bottom_Left");
-				obj.put("Param","Global");
-				obj.put("Value", "1.3");
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "MAR");
-				obj.put("Value", "0.6");
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "APR");
-				obj.put("Value", "1.1");
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "MAY");
-				obj.put("Value", "1.8");
-				result.put(obj);
-				obj = new JSONObject();
-				obj.put("Graph", "Bottom_Middle");
-				obj.put("Month", "AUG");
-				obj.put("Value", "0.9");
-				result.put(obj);
-				
-				JSONArray convert = gs.globalsentiment(1, param, values, id);
-				
-				for(int i=0; i<convert.length(); i++){
-					obj=new JSONObject();
-					JSONObject helper = convert.getJSONObject(i);
-					obj.put("Graph", "Bottom_Right");
-					for(String key : JSONObject.getNames(helper))
-					{
-					  obj.put(key, helper.get(key));
-					}
-					result.put(obj);
-				}
+				result=convert(result,gs.getAvgSentiment(1, param, values, id), "Top_Right");
+				result=convert(result,gr.getReach(1, param, values, id), "Bottom_Left");
+				result=convert(result,gs.globalreach(1, param, values, id), "Bottom_Middle");
+				result=convert(result,gs.globalsentiment(1, param, values, id), "Bottom_Right");
 				
 				
 	
@@ -129,7 +89,6 @@ public class Backend {
 				tmp = gs.globalsentiment(1, param, values, id).toString();
 				return tmp;
 			case 4:
-				GetPosts gp = new GetPosts();
 				tmp = gp.getTop(param, values, id).toString();
 				return tmp;
 			case 5:
@@ -194,6 +153,21 @@ public class Backend {
 		}
 
 		return result.toString();
+	}
+	
+	private JSONArray convert(JSONArray result, JSONArray to_add, String graph) throws JSONException{
+		for(int i=0; i<to_add.length(); i++){
+			obj=new JSONObject();
+			JSONObject helper = to_add.getJSONObject(i);
+			obj.put("Graph", graph);
+			for(String key : JSONObject.getNames(helper))
+			{
+			  obj.put(key, helper.get(key));
+			}
+			result.put(obj);
+			
+		}
+		return result;
 	}
 
 }

@@ -1,7 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [1.1.8] 2016-09-23
+##[Unreleased]
+### 
+- Filters for new OE page
+- Top Middle Graph working
+- Code refactoring on latest added code (1.1.7+), and disabling old one (1.1.7-)
+
+## [1.1.7.9] 2016-09-30
+### Added
+- New Opinion Extraction Page
+
+## [1.1.7.1] 2016-09-23
 ### Fixed
 - Full model compatibility
 

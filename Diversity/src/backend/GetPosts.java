@@ -174,6 +174,95 @@ public class GetPosts {
 		return result;
 
 	}
+	
+	public JSONArray getAmmount(String param, String value, long id) throws JSONException {
+		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
+		Calendar inputdate = Calendar.getInstance();
+		String insert = new String();
+		PreparedStatement query1 = null;
+		insert = "Select count(*) FROM "+Settings.lotable+" where ("+Settings.lotable_pss+"=? AND "+Settings.lotable_product;
+		Model model = Data.modeldb.get(id);
+		if (model == null){
+			obj=new JSONObject();
+			obj.put("Op", "Error");
+			obj.put("Message", "Requested Model not Found");
+			result.put(obj);
+			return result;
+		}
+		if(model.getProducts()){
+			insert += " !=0";
+		}else{
+			insert += "=0";
+		}
+		if (param != null) {
+			insert += " && timestamp >= ? && timestamp <= ?";
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
+			try {
+				inputdate.setTime(sdf.parse("1 " + 
+			inputdate.get(Calendar.YEAR) + " " + value));
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		insert += ")";
+		ResultSet rs = null;
+
+		try {
+			dbconnect();
+			query1 = cnlocal.prepareStatement(insert);
+			int rangeindex = 2;
+			query1.setString(1, model.getPSS());
+			if (param != null) {
+				Calendar date = Calendar.getInstance();
+				if (!date.after(inputdate))
+					inputdate.add(Calendar.YEAR, -1);
+				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				inputdate.add(Calendar.MONTH, 1);
+				rangeindex++;
+				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				rangeindex++;
+
+			}
+			//System.out.print(query1);
+			rs = query1.executeQuery();
+			rs.next();
+			obj.put("Param", "Global");
+			obj.put("Value", rs.getInt("count(*)"));
+			result.put(obj);
+
+
+			
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (query1 != null)
+					query1.close();
+			} catch (Exception e) {
+			}
+			;
+			try {
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (Exception e) {
+			}
+			;
+		}
+
+		return result;
+
+	}
 
 	private String trunc(String number) {
 		double result = 0;
