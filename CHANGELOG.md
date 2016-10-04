@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - New Opinion Extraction Page Working
 - Archiving Models
+
 ### Deprecated
 - Multiple code pre-version 1.1.7 that is no longer needed
 - In-Model Filtering Options
