@@ -53,8 +53,8 @@ public class Model {
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
-				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator + "," + Settings.lmtable_age + ","
-				+ Settings.lmtable_gender + ") values (?,?,?,?,?,?,?,?,?)";
+				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator /*+ "," + Settings.lmtable_age + ","
+				+ Settings.lmtable_gender */+ ") values (?,?,?,?,?,?,?"/*,?,?*/+")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -65,8 +65,8 @@ public class Model {
 			query1.setBoolean(5, archived);
 			query1.setBoolean(6, products);
 			query1.setInt(7, user);
-			query1.setString(8, age);
-			query1.setString(9, gender);
+			//query1.setString(8, age);
+			//query1.setString(9, gender);
 			query1.executeUpdate();
 			ResultSet generatedKeys = query1.getGeneratedKeys();
 			if (generatedKeys.next())
@@ -116,26 +116,43 @@ public class Model {
 			result.put(obj);
 		}
 
-		String insert = "Update " + Settings.lmtable + " Set " + Settings.lmtable_age + "=?, " + Settings.lmtable_gender
-				+ "=?, " + Settings.lmtable_archived + "=?, " + Settings.lmtable_monitorfinal + "=?, "
+		String insert = "Update " + Settings.lmtable + " Set "/* + Settings.lmtable_age + "=?, " + Settings.lmtable_gender
+				+ "=?, " */+ Settings.lmtable_archived + "=?, " + Settings.lmtable_monitorfinal + "=?, "
 				+ Settings.lmtable_uri + "=?, " + Settings.lmtable_update + "=? Where " + Settings.lmtable_id + "=?";
 		PreparedStatement query1 = null;
 		try {
+			dbconnect();
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
-			query1.setString(5, msg.getString("URI"));
-			query1.setInt(6, msg.getInt("Update"));
-			query1.setBoolean(3, msg.getBoolean("Archive"));
-			query1.setBoolean(4, msg.getBoolean("Final_Product"));
-			query1.setInt(7, msg.getInt("Id"));
-			query1.setString(1, msg.getString("Age"));
-			query1.setString(2, msg.getString("Gender"));
+			query1.setString(3, msg.getString("URI"));
+			query1.setInt(4, msg.getInt("Update"));
+			query1.setBoolean(2, msg.getBoolean("Archive"));
+			query1.setBoolean(1, msg.getBoolean("Final_Product"));
+			query1.setInt(5, msg.getInt("Id"));
+			//query1.setString(1, msg.getString("Age"));
+			//query1.setString(2, msg.getString("Gender"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
+		}finally{
+			try {
+			if(query1!=null)query1.close();
+			if(cnlocal!=null)
+				
+					cnlocal.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	
 		}
+		
+		this.uri=msg.getString("URI");
+		this.frequency=msg.getInt("Update");
+		this.archived=msg.getBoolean("Archive");
+		this.products=msg.getBoolean("Final_Product");
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");

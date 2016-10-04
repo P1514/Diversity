@@ -31,12 +31,8 @@ public class GetComments {
 		int n_tops = 0;
 		insert = "Select name,influence,location,gender,age,polarity,message from posts,authors where ( posts.id=? OR (age>=? AND age<=? ";
 		ResultSet rs = null;
-		if (model.getGender() == "All") {
-			insert += "AND (";
-			for (int i = 0; i < genders.length; i++) {
-				insert += i == 0 ? "" : "OR";
-				insert += "gender=? ";
-			}
+		if (model.getGender().equals("All")) {
+
 			insert += ") ";
 		}else{
 			insert += "AND gender=?) ";
@@ -49,9 +45,7 @@ public class GetComments {
 			query1.setString(1, msg.getString("Values"));
 			query1.setString(2, model.getAge().split(",")[0]);
 			query1.setString(3, model.getAge().split(",")[1]);
-			if (model.getGender() == "All") {
-				for (i = 0; i < genders.length; i++)
-					query1.setString(3 + i + 1, genders[i]);
+			if (model.getGender().equals("All")) {
 			}else{
 				query1.setString(3+1+i, model.getGender());
 				i++;
@@ -117,7 +111,7 @@ public class GetComments {
 		try {
 
 			result = Double.valueOf(number);
-			number = String.format("%.2f", result);
+			number = String.format("%.1f", result);
 			result = Double.parseDouble(number);
 
 		} catch (Exception e) {

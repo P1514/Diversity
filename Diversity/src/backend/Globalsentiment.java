@@ -164,13 +164,13 @@ public class Globalsentiment {
 		return result;
 
 	}
-	
+
 	public JSONArray getAvgSentiment(int timespan /* years */, String param, String values, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] words;
-		double value=0;
+		double value = 0;
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -195,14 +195,14 @@ public class Globalsentiment {
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
-		int avg=0;
+		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value+=globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param,"", id);
+			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, "", id);
 			avg++;
 		}
-		value = value/avg;
+		value = value / avg;
 		String temp;
-		temp = String.format("%.2f", value);
+		temp = String.format("%.0f", value);
 		try {
 			value = Double.valueOf(temp);
 		} catch (Exception e) {
@@ -214,6 +214,88 @@ public class Globalsentiment {
 		result.put(obj);
 
 		return result;
+	}
+
+	public JSONArray getPolarityDistribution(long id, String param) throws JSONException {
+		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
+		PreparedStatement query1 = null;
+		Model model = Data.modeldb.get(id);
+		ResultSet rs = null;
+		if(param.equals("Global")){
+			obj=new JSONObject();
+			obj.put("Param", "Global");
+			result.put(obj);
+		}
+
+		String query = "select sum(case when (" + Settings.lptable_polarity + " <=20) then 1 else 0 end) '--',"
+				+ "	sum(case when (" + Settings.lptable_polarity + " >20 AND " + Settings.lptable_polarity
+				+ "<=40) then 1 else 0 end) '-'," + " sum(case when (" + Settings.lptable_polarity + " >40 AND "
+				+ Settings.lptable_polarity + "<=60) then 1 else 0 end) '0'," + " sum(case when ("
+				+ Settings.lptable_polarity + " >60 AND " + Settings.lptable_polarity + "<=80) then 1 else 0 end) '+',"
+				+ " sum(case when (" + Settings.lptable_polarity + " >80 AND " + Settings.lptable_polarity
+				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
+				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where "
+				+ Settings.lotable_product + (model.getProducts() ? "!=0" : "==0") + " and " + Settings.lotable_pss
+				+ "=?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
+				+ Settings.latable + " where "+Settings.latable_age+"<=? AND "+Settings.latable_age+">=?";
+		if (model.getGender().equals("All")) {
+
+		} else {
+			query += " AND "+ Settings.latable_gender + "=?";
+		}
+		query+=")";
+
+		try {
+			dbconnect();
+			query1 = cnlocal.prepareStatement(query);
+			query1.setString(1,model.getPSS());
+			query1.setString(2, model.getAge().split(",")[1]);
+			query1.setString(3, model.getAge().split(",")[0]);
+			
+			if (model.getGender().equals("All")) {
+
+			} else {
+				query1.setString(4, model.getGender());
+			}
+			
+			System.out.println(query1);
+			
+			rs=query1.executeQuery();
+			rs.next();
+			
+			obj=new JSONObject();
+			obj.put("Param", "--");
+			obj.put("Value", rs.getInt("--"));
+			result.put(obj);
+			obj=new JSONObject();
+			obj.put("Param", "-");
+			obj.put("Value", rs.getInt("-"));
+			result.put(obj);
+			obj=new JSONObject();
+			obj.put("Param", "0");
+			obj.put("Value", rs.getInt("0"));
+			result.put(obj);
+			obj=new JSONObject();
+			obj.put("Param", "+");
+			obj.put("Value", rs.getInt("+"));
+			result.put(obj);
+			obj=new JSONObject();
+			obj.put("Param", "++");
+			obj.put("Value", rs.getInt("++"));
+			result.put(obj);
+			
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+
 	}
 
 	public JSONArray globalreach(int timespan /* years */, String param, String values, long id) throws JSONException {
@@ -348,7 +430,7 @@ public class Globalsentiment {
 		}
 		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
 		String temp;
-		temp = String.format("%.2f", result);
+		temp = String.format("%.1f", result);
 		try {
 			result = Double.valueOf(temp);
 		} catch (Exception e) {

@@ -39,13 +39,25 @@ public class Backend {
 			System.out.println(msg);
 
 			switch (op) {
-			case 99:
+			
+			case 19:
+				
+				
+				
+				return result.toString();
+			
+			
+			
+			case 18:
 				result=new JSONArray();
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
 				result=convert(result,gp.getAmmount(param, values, id), "Top_Left");
-				obj = new JSONObject();
+				result=convert(result, gs.getPolarityDistribution(id, "Global"), "Top_Middle");
+				
+				
+				/*obj = new JSONObject();
 				obj.put("Graph", "Top_Middle");
 				obj.put("Param", "--");
 				obj.put("Value", "6");
@@ -69,25 +81,22 @@ public class Backend {
 				obj.put("Graph", "Top_Middle");
 				obj.put("Param", "++");
 				obj.put("Value", "40");
-				result.put(obj);
+				result.put(obj);*/
 				result=convert(result,gs.getAvgSentiment(1, param, values, id), "Top_Right");
 				result=convert(result,gr.getReach(1, param, values, id), "Bottom_Left");
 				result=convert(result,gs.globalreach(1, param, values, id), "Bottom_Middle");
 				result=convert(result,gs.globalsentiment(1, param, values, id), "Bottom_Right");
-				
-				
-	
 				return result.toString();
-			case 1:
+			/*case 1:
 				SentimentChart sc = new SentimentChart();
-				return sc.chartrequest(param, values, id).toString();
+				return sc.chartrequest(param, values, id).toString();*/
 			case 2:
 				Data dat = new Data();
 				return dat.load();
-			case 3:
+			/*case 3:
 				gs = new Globalsentiment();
 				tmp = gs.globalsentiment(1, param, values, id).toString();
-				return tmp;
+				return tmp;*/
 			case 4:
 				tmp = gp.getTop(param, values, id).toString();
 				return tmp;
@@ -110,14 +119,14 @@ public class Backend {
 				GetLastPost glp = new GetLastPost();
 				tmp = glp.get(msg.getString("Author")).toString();
 				return tmp;
-			case 10:
+			/*case 10:
 				GetInfGraph gig = new GetInfGraph();
 				tmp = gig.getAll(msg.getString("Author")).toString();
 				return tmp;
 			case 11:
 				GetPopulation gpo = new GetPopulation();
 				tmp = gpo.getAll(param, id).toString();
-				return tmp;
+				return tmp;*/
 			case 12:
 				conf = new Settings();
 				tmp = conf.getConf().toString();

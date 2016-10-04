@@ -1,0 +1,548 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Opinion Extraction</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<link rel="stylesheet"
+		href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script
+			src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script type="text/javascript"
+			src="https://www.gstatic.com/charts/loader.js"></script>
+		<script src="sorttable.js"></script>
+		<script type="text/javascript">
+			var json;
+			var jsonData;
+			var ws;
+
+			function getCookie(name) {
+				var value = "; " + document.cookie;
+				var parts = value.split("; " + name + "=");
+				if (parts.length == 2)
+					return parts.pop().split(";").shift();
+			}
+
+			//create trigger to resizeEnd event     
+			$(window).resize(function() {
+				if (this.resizeTO)
+					clearTimeout(this.resizeTO);
+				this.resizeTO = setTimeout(function() {
+					$(this).trigger('resizeEnd');
+				}, 500);
+			});
+
+			//redraw graph when window resize is completed  
+			$(window).on('resizeEnd', function() {
+				if (jsonData != 0)
+					drawChart();
+			});
+			function fixbuttons(data) {
+
+				if (data == "Global") {
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Gender") {
+					document.getElementById('genderfilt').selectedIndex = 0;
+					document.getElementById("genderfilt").disabled = true;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Location") {
+					document.getElementById('locationfilt').selectedIndex = 0;
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = true;
+				}
+			}
+			function connect() {
+				document.getElementById("Cookie").innerHTML = "Model: "
+						+ sessionStorage.model + "; PSS: " + sessionStorage.pss;
+
+				ws = new WebSocket('ws://' + window.location.hostname + ":"
+						+ window.location.port + '/Diversity/server');
+
+				ws.onopen = function() {
+					var json = {
+						"Op" : "getconfig",
+					}
+					ws.send(JSON.stringify(json));
+
+					json = {
+						"Op" : "getposts",
+						"Id" : sessionStorage.id
+					}
+
+					ws.send(JSON.stringify(json));
+				};
+
+				ws.onmessage = function(event) {
+					json = JSON.parse(event.data);
+
+					if (json[0].Op == "Error") {
+						alert(json[0].Message);
+						return;
+					}
+
+					if (json[0].Op == "Configs") {
+						var jsonData1 = JSON.parse(JSON.stringify(json));
+
+						for (var i = 1; i < jsonData1.length;) {
+							switch (jsonData1[i].Param) {
+							case "Age":
+								var x = document.getElementById("agefilt");
+								break;
+							case "Gender":
+								var x = document.getElementById("genderfilt");
+								break;
+							case "Location":
+								var x = document.getElementById("locationfilt");
+								break;
+							}
+							var tsize = jsonData1[i].Size;
+							console.log(tsize);
+							i++;
+							for (var ii = 0; ii < tsize; ii++, i++) {
+								var option = document.createElement('option');
+								if (jsonData1[i].hasOwnProperty("Min")) {
+									option.text = jsonData1[i].Min + "-"
+											+ jsonData1[i].Max;
+								} else {
+									option.text = (!(jsonData1[i]
+											.hasOwnProperty("Gender"))) ? jsonData1[i].Location
+											: jsonData1[i].Gender;
+								}
+								x.add(option);
+							}
+						}
+						json = {
+							"Op" : "chartrequest",
+							"Param" : "Global",
+							"Id" : sessionStorage.id
+						}
+
+						ws.send(JSON.stringify(json));
+						return;
+
+					}
+
+					if (json[0].Op == "table") {
+						//populate table
+						var tr;
+						for (var i = 1; i < json.length; i++) {
+							tr = $('<tr/>');
+							tr.append("<td>" + json[i].Name + "</td>");
+							tr.append("<td>" + json[i].Message + "</td>");
+							tr.append("<td>" + json[i].Comments + "</td>");
+							tr.append("<td>" + json[i].Date + "</td>");
+							tr.append("<td>" + json[i].Polarity + "</td>");
+							tr.append("<td>" + json[i].Reach + "</td>");
+							tr.append("<td>" + json[i].Influence + "</td>");
+							tr.append("<td>" + json[i].Location + "</td>");
+							tr.append("<td>" + json[i].Gender + "</td>");
+							tr.append("<td>" + json[i].Age + "</td>");
+							tr
+									.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+							$('#posts tbody').append(tr);
+						}
+						$('.table > tbody > tr').click(function(e) {
+							clicker($(this).find('input[name="id"]').val());
+						});
+						return;
+					}
+					if (json[0].Op == "graph") {
+						jsonData = JSON.parse(JSON.stringify(json));
+						drawChart();
+						return;
+					}
+					if (json[0].Op == "comments") {
+						clicker();
+						return;
+					}
+				};
+			}
+
+			google.charts.load('current', {
+				packages : [ 'corechart', 'bar' ]
+			});
+			google.charts.setOnLoadCallback(connect);
+			// Detect table click
+
+			function clicker(hidden) {
+				var thediv = document.getElementById('displaybox');
+				var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
+						+ hidden
+						+ ' frameborder="0" allowfullscreen="no"></iframe>';
+				if (thediv.style.display == "none") {
+					thediv.style.display = "";
+					thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+							+ "<param name='bgcolor' value='#000000'>"
+							+ embedCode
+							+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+					//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
+				} else {
+					thediv.style.display = "none";
+					thediv.innerHTML = '';
+				}
+				return false;
+			}
+
+			function drawChart() {
+				var data = new google.visualization.DataTable();
+
+				// Code to convert JSON to chart data
+				for (var i = 2; (i < jsonData.length)
+						&& (jsonData[i].Age == jsonData[i - 1].Age); i++)
+					;
+				var paramcount = i - 1;
+				data.addColumn('string', 'Age Range');// Adds Age to X axis
+
+				for (var i = 1; i <= paramcount; i++) {
+					data.addColumn('number', jsonData[i].Param); // Adds all parameters that come from server
+				}
+				var j = 1;
+				var row_count = 0;
+				data.addRow();
+				data.setCell(0, 0, jsonData[j].Age);
+				row_count++;
+				for (var i = 1; j < jsonData.length; i++) {
+					if (data.getValue(row_count - 1, 0) != jsonData[j].Age) {
+						data.addRow();
+						data.setCell(row_count, 0, jsonData[j].Age);
+						row_count++;
+					}
+
+					for (var ii = 1; ii <= paramcount; ii++) {
+						data.setCell(row_count - 1, ii, jsonData[j].Value);
+						j++;
+					}
+				}
+				// End of it
+
+				// chart colors
+
+				var colors = new Array();
+				for (var i = 1; i < paramcount + 1; i++) {
+					colors.push(chartcolor(data.getColumnLabel(i)));
+				}
+
+				var info = "";
+				var gender = document.getElementById("genderfilt").value;
+				var location = document.getElementById("locationfilt").value;
+				if (gender != "All")
+					info += gender + " ";
+				if (location != "All")
+					info += location;
+
+				//chart options
+				var options = {
+					title : "Average Polarity"
+							+ ((info != "") ? " - " + info : ""),
+					colors : colors,
+					hAxis : {
+						title : 'Age Range'
+					},
+					vAxis : {
+						title : 'Polarity',
+						viewWindow : {
+							max : 0,
+							min : 100
+						}
+					},
+					legend: {position: 'none'},
+					'tooltip' : {
+						  trigger: 'none'
+						}
+				};
+
+				//chart definition
+				var chart = new google.visualization.ChartWrapper({
+					chartType : 'ColumnChart',
+					dataTable : data,
+					options : options,
+					containerId : 'chart_div'
+				});
+
+				//draws chart
+				chart.draw();
+
+			}
+
+			function chartcolor(data) {
+				switch (data) {
+				case "Global":
+					return "#604460";
+				case "Male":
+					return "#00617F";
+				case "Female":
+					return "#0093C8";
+				case "Asia":
+					return "#FF3C14";
+				case "Europe":
+					return "#A60202";
+				case "0-30":
+					return "#BFD730";
+				case "31-60":
+					return "#8CA122";
+				case "61-90":
+					return "#5C6EoE";
+				}
+			}
+
+			function changeRequest() {
+				var gender = document.getElementById("genderfilt").value;
+				var location = document.getElementById("locationfilt").value;
+				var globalradio = document.getElementById('Global').checked;
+				var genderradio = document.getElementById('Gender').checked;
+				var locationradio = document.getElementById('Location').checked;
+				var age = document.getElementById("agefilt").value;
+
+				var json = {
+					"Op" : "chartrequest",
+					"Param" : "",
+					"Values" : "",
+					"Id" : sessionStorage.id
+				};
+
+				if (gender == "All" && location == "All" && age == "All"
+						&& globalradio) {
+					json.Param += "Global";
+					json.Values += "Global";
+				} else {
+					if (genderradio == false) {
+
+						if (gender == "All") {
+							var select = document
+									.getElementById('genderfilt');
+							json.Param += "Gender,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
+							json.Param += "Gender,";
+							var select = document
+									.getElementById('genderfilt');
+							json.Values += gender + ",";
+						}
+					} else {
+						var select = document
+						.getElementById('genderfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Gender,";
+							json.Values += select.options[i].value + ",";
+						}
+					}
+					if (locationradio == false) {
+
+						if (location == "All") {
+							var select = document
+									.getElementById('locationfilt');
+							json.Param += "Location,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
+							json.Param += "Location,";
+							var select = document
+									.getElementById('locationfilt');
+							json.Values += location + ",";
+						}
+					} else {
+						var select = document
+						.getElementById('locationfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Location,";
+							json.Values += select.options[i].value + ",";
+						}
+					}
+
+					if (age == "All") {
+
+						var select = document.getElementById('agefilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Age,";
+
+							json.Values += select.options[i].value + ",";
+						}
+					} else {
+						json.Param += "Age,";
+						var select = document.getElementById('agefilt');
+						json.Values += age + ",";
+					}
+				}
+				ws.send(JSON.stringify(json));
+			}
+		</script>
+		<style>
+#displaybox {
+	z-index: 10000;
+	filter: alpha(opacity = 90); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90); /* IE */
+	-moz-opacity: .9; /*older Mozilla*/
+	-khtml-opacity: 0.9; /*older Safari*/
+	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
+	background-color: #000000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: bottom;
+}
+
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
+}
+
+#dashboard {
+	position: relative;
+}
+
+#chart {
+	height: 100%;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+#locationfilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+input[type=radio] {
+	margin-left: 25%;
+	margin-top: 25px;
+}
+
+#agefilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+#genderfilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+#refresh {
+	margin-top: 25px;
+}
+
+#segmentation {
+	width: 70%;
+	align: center;
+}
+
+#home {
+	position: absolute;
+	right: 10px;
+	top: 20px;
+}
+
+product {
+	display: block;
+	font-size: 20px;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+	margin-left: 0;
+	margin-right: 0;
+	font-weight: normal;
+}
+</style>
+</head>
+<body>
+	<!-- POPUP -->
+	<div id="displaybox" style="display: none;"></div>
+	<!-- Logotipo -->
+
+	<center> <img src="../images/Diversity-Logo-120x62.png"
+		alt="Diversity Logo" align="top"></img> </center>
+
+
+	<!-- Gráfico + filtros-->
+	<div class="container" id="dashboard">
+		<product>
+		<div id="Cookie">Error no product to display</div>
+		</product>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
+		<hr>
+			<center>
+			<table id="segmentation">
+				<tr>
+					<th><input type="radio" name="field" id="Gender"
+						value="Gender" onclick="fixbuttons('Gender');"> &nbsp
+							Gender</th>
+					<th><input type="radio" name="field" id="Location"
+						value="Location" onclick="fixbuttons('Location');"> &nbsp
+							Location </th>
+					<th><input type="radio" name="field" id="Global"
+						value="Global" onclick="fixbuttons('Global');" checked>
+							&nbsp All </th>
+				</tr>
+				<tr>
+					<th><select id="genderfilt">
+							<option value="All">All Genders
+					</select></th>
+					<th><select id="locationfilt">
+							<option value="All">All Locations
+					</select></th>
+					<th><select id="agefilt">
+							<option value="All">All Ages
+					</select>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<th></th>
+					<th>
+
+						<button class="btn btn-default" id="refresh"
+							onclick="changeRequest()">Update</button>
+					</th>
+					<th></th>
+
+				</tr>
+			</table>
+			<div id="chart_div"></div>
+			</center>
+	</div>
+
+	<!-- Tabela Posts-->
+	<div class="container">
+		<h2>Top 5</h2>
+		<hr>
+			<table id="posts" class="table sortable">
+				<thead>
+					<tr>
+						<th>Original Author</th>
+						<th>Post</th>
+						<th># Comments</th>
+						<th>Date</th>
+						<th>Polarity</th>
+						<th>Reach</th>
+						<th>Influence</th>
+						<th>Location</th>
+						<th>Gender</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+	</div>
+</body>
+</html>

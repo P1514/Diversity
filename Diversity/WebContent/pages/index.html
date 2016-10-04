@@ -50,18 +50,7 @@
 		json = JSON.parse(event.data);
 
 		if (json[0].Op == "Error") {
-			if (i != 0
-					&& json[0].Message == "Close this Message and wait for the next one to confirm Database loading") {
-				return;
-			}
-			if (json[0].Message != "Loaded Successfully") {
-				i == 0 ? alert(json[0].Message) : alert("Loaded Successfully "
-						+ i + " times");
-				i=0;
-				return;
-			}
-			i++;
-			refreshDB(0);
+			alert(json[0].Message);
 
 		}
 		if (json[0].Op == "Models") {
@@ -162,7 +151,7 @@
 				</form>
 			</td>
 			<td>
-				<form action="opinion_extraction_page_redone.html">
+				<form action="opinion_extraction_page.html">
 					<input id="global" class="btn btn-default" onclick="setCookie();"
 						type="submit" value="Get Opinion Extraction" />
 				</form>

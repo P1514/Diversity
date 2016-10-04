@@ -72,7 +72,7 @@
 				"Op" : "get_model",
 				"Id" : sessionStorage.id,
 			}
-			console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
+			//console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
 			ws.send(JSON.stringify(json2));
 			return;
 			}
@@ -86,15 +86,15 @@
 			document.getElementById('pss').value=json2[0].PSS;
 			document.getElementById('pss').text=json2[0].PSS;
 			document.getElementById("pss").disabled = true;
-			document.getElementById("gender").value=json2[0].Gender;
+			//document.getElementById("gender").value=json2[0].Gender;
 			document.getElementById("final").checked=json2[0].Final_products;
-			console.log(json2[0].Archive);
-			console.log(json2[0].Final_products);
+			//console.log(json2[0].Archive);
+			//console.log(json2[0].Final_products);
 			document.getElementById("Archive").checked=json2[0].Archive;
-			var ager=json2[0].Age.split(",").map(Number).filter(Boolean);// Converts string from DB to array of ints
-			$('#age').slider('setValue', ager);
+			//var ager=json2[0].Age.split(",").map(Number).filter(Boolean);// Converts string from DB to array of ints
+			//$('#age').slider('setValue', ager);
 			var uris = json2[0].URI.split(";");
-			for(i=0; i<uris.length-1; i++){
+			for(i=0; i<uris.length; i++){
 			console.log("HELLO "+uris[i]+"\r\n");
 			$(':checkbox[value="'+uris[i]+'"]').prop("checked","true");}
 			
@@ -155,10 +155,10 @@
 					: erro = true,
 			"PSS" : document.getElementById('pss').value != "" ? document
 					.getElementById('pss').value : erro = true,
-			"Age" : document.getElementById('age').value != "" ? document
+			/*"Age" : document.getElementById('age').value != "" ? document
 					.getElementById('age').value : erro = true,
 			"Gender" : document.getElementById('gender').value != "" ? document
-					.getElementById('gender').value : erro = true,
+					.getElementById('gender').value : erro = true,*/
 			"Final_Product" : document.getElementById('final').checked,
 			"Archive" : document.getElementById('Archive').checked,
 			"Name" : document.getElementById('model_name').value != "" ? document
@@ -282,7 +282,7 @@ input[type="number"] {
 						<tr>
 							<td>
 
-								<div class="form-group">
+								<!--<div class="form-group">
 									<label for="age">Age Range:</label> <b>0 &nbsp</b> <input
 										id="age" type="text" class="span2" value=""
 										data-slider-min="0" data-slider-max="99" data-slider-handle="round" data-slider-size="100px" data-slider-step="1"
@@ -295,7 +295,7 @@ input[type="number"] {
 									<option value="Male">Male</option>
 									<option value="Female">Female</option>
 							</select>
-								</div>
+								</div>-->
 								<div class="checkbox">
 									<label><input id="final" type="checkbox" value="" checked>Include
 										Final Products</label>

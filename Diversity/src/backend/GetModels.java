@@ -58,8 +58,8 @@ public class GetModels {
 		obj.put("URI", model.getURI());
 		obj.put("Update", model.getFrequency());
 		obj.put("PSS", model.getPSS());
-		obj.put("Age", model.getAge());
-		obj.put("Gender", model.getGender());
+		//obj.put("Age", model.getAge());
+		//obj.put("Gender", model.getGender());
 		obj.put("Final_products", model.getProducts());
 		obj.put("Archive", model.getArchived());
 		result.put(obj);
