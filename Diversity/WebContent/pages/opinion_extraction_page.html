@@ -35,7 +35,7 @@
 				
 				json = {
 						"Op" : "getposts",
-						"Id" : sessionStorage.id
+						"Id" : sessionStorage.id,
 					}
 
 					ws.send(JSON.stringify(json));
@@ -47,6 +47,47 @@
 					if (json[0].Op == "Error") {
 						alert(json[0].Message);
 						return;
+					}
+					
+					if (json[0].Op == "Configs") {
+						var jsonData1 = JSON.parse(JSON.stringify(json));
+
+						for (var i = 1; i < jsonData1.length;) {
+							switch (jsonData1[i].Param) {
+							case "Age":
+								var x = document.getElementById("agefilt");
+								break;
+							case "Gender":
+								var x = document.getElementById("genderfilt");
+								break;
+							case "Location":
+								var x = document.getElementById("locationfilt");
+								break;
+							}
+							var tsize = jsonData1[i].Size;
+							console.log(tsize);
+							i++;
+							for (var ii = 0; ii < tsize; ii++, i++) {
+								var option = document.createElement('option');
+								if (jsonData1[i].hasOwnProperty("Min")) {
+									option.text = jsonData1[i].Min + "-"
+											+ jsonData1[i].Max;
+								} else {
+									option.text = (!(jsonData1[i]
+											.hasOwnProperty("Gender"))) ? jsonData1[i].Location
+											: jsonData1[i].Gender;
+								}
+								x.add(option);
+							}
+						}
+						json = {
+						"Op" : "opinion_extraction",
+						"Id" : window.sessionStorage.id
+					}
+
+					ws.send(JSON.stringify(json));
+						return;
+
 					}
 					if (json[0].Op == "OE_Redone") {
 						jsonData = JSON.parse(JSON.stringify(json));
@@ -77,12 +118,11 @@
 						$('.table > tbody > tr').click(function(e) {
 							clicker($(this).find('input[name="id"]').val());
 						});
-						json = {
-						"Op" : "opinion_extraction",
-						"Id" : window.sessionStorage.id
-					}
-
-					ws.send(JSON.stringify(json));
+						
+						var json = {
+						"Op" : "getconfig",
+						}
+						ws.send(JSON.stringify(json));
 						return;
 					}
 					if (json[0].Op == "graph") {
@@ -366,13 +406,108 @@
 			}
 
 			function changeRequest() {
+				var gender = document.getElementById("genderfilt").value;
+				var location = document.getElementById("locationfilt").value;
+				var globalradio = document.getElementById('Global').checked;
+				var genderradio = document.getElementById('Gender').checked;
+				var locationradio = document.getElementById('Location').checked;
+				var age = document.getElementById("agefilt").value;
 
 				var json = {
 					"Op" : "chartrequest",
 					"Param" : "",
 					"Values" : "",
-					"Id" : getCookie("Id")
+					"Id" : sessionStorage.id
 				};
+
+				if (gender == "All" && location == "All" && age == "All"
+						&& globalradio) {
+					json.Param += "Global";
+					json.Values += "Global";
+				} else {
+					if (genderradio == false) {
+
+						if (gender == "All") {
+							var select = document
+									.getElementById('genderfilt');
+							json.Param += "Gender,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
+							json.Param += "Gender,";
+							var select = document
+									.getElementById('genderfilt');
+							json.Values += gender + ",";
+						}
+					} else {
+						var select = document
+						.getElementById('genderfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Gender,";
+							json.Values += select.options[i].value + ",";
+						}
+					}
+					if (locationradio == false) {
+
+						if (location == "All") {
+							var select = document
+									.getElementById('locationfilt');
+							json.Param += "Location,"
+							for (var i = 1; i < select.options.length; i++) {	
+								json.Values += select.options[i].value + "-";
+							}
+							
+							json.Values+=",";
+						} else {
+							json.Param += "Location,";
+							var select = document
+									.getElementById('locationfilt');
+							json.Values += location + ",";
+						}
+					} else {
+						var select = document
+						.getElementById('locationfilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Location,";
+							json.Values += select.options[i].value + ",";
+						}
+					}
+
+					if (age == "All") {
+
+						var select = document.getElementById('agefilt');
+						for (var i = 1; i < select.options.length; i++) {
+							json.Param += "Age,";
+
+							json.Values += select.options[i].value + ",";
+						}
+					} else {
+						json.Param += "Age,";
+						var select = document.getElementById('agefilt');
+						json.Values += age + ",";
+					}
+				}
+				ws.send(JSON.stringify(json));
+			}
+			function fixbuttons(data) {
+
+				if (data == "Global") {
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Gender") {
+					document.getElementById('genderfilt').selectedIndex = 0;
+					document.getElementById("genderfilt").disabled = true;
+					document.getElementById("locationfilt").disabled = false;
+				}
+				if (data == "Location") {
+					document.getElementById('locationfilt').selectedIndex = 0;
+					document.getElementById("genderfilt").disabled = false;
+					document.getElementById("locationfilt").disabled = true;
+				}
 			}
 		</script>
 		<style>
@@ -429,6 +564,39 @@ table {
 .graph2{
 	width:40%;
 }
+#locationfilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+input[type=radio] {
+	margin-left: 25%;
+	margin-top: 25px;
+}
+
+#agefilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+#genderfilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
+#refresh {
+	margin:auto;
+	margin-top: 25px;
+	display:block;
+}
+
+#segmentation {
+	width: 70%;
+	align: center;
+}
+#refresh_table{
+	width : 20%;
+}
 </style>
 </head>
 <body>
@@ -449,6 +617,42 @@ table {
 			class="btn btn-default">Home</button>
 		<hr>
 			<center>
+			<table id="segmentation">
+				<tr>
+					<th><input type="radio" name="field" id="Gender"
+						value="Gender" onclick="fixbuttons('Gender');"> &nbsp
+							Gender</th>
+					<th><input type="radio" name="field" id="Location"
+						value="Location" onclick="fixbuttons('Location');"> &nbsp
+							Location </th>
+					<th><input type="radio" name="field" id="Global"
+						value="Global" onclick="fixbuttons('Global');" checked>
+							&nbsp All </th>
+				</tr>
+				<tr>
+					<th><select id="genderfilt">
+							<option value="All">All Genders
+					</select></th>
+					<th><select id="locationfilt">
+							<option value="All">All Locations
+					</select></th>
+					<th><select id="agefilt">
+							<option value="All">All Ages
+					</select>
+				</tr>
+			</table>
+			<table id="refresh_table">
+				<tr>
+					<th></th>
+					<th>
+
+						<button class="btn btn-default" id="refresh"
+							onclick="changeRequest()">Update</button>
+					</th>
+					<th></th>
+
+				</tr>
+			</table>
 			<table id="global" class="graphst">
 				<tr>
 					<td>

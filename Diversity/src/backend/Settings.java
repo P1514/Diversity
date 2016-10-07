@@ -108,10 +108,11 @@ public class Settings {
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
 
-	// Graph Settings
+	// General  Settings
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
+	public static String JSON_uri = "";
 
 	public Connection conndata() throws ClassNotFoundException, SQLException {
 

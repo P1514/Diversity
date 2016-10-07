@@ -12,6 +12,7 @@ public class Opinion {
 	private Post main;
 	private int author_id; // String
 	private ArrayList<Post> comments = new ArrayList<Post>();
+	private String URI = "";
 	private double reach = 0;
 	private double polarity = 0;
 	private double total_inf = 0;
@@ -25,6 +26,16 @@ public class Opinion {
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
+
+	}
+	
+	public Opinion(Post _main, String _pss, int _product, String _URI) {
+		this.main = _main;
+		this.author_id = main.getUID();
+		timestamp = main.getTime();
+		pss = _pss;
+		product = _product;
+		URI=_URI;
 
 	}
 
