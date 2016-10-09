@@ -22,12 +22,11 @@ public class GetReach {
 	}
 	// TODO Redo this piece of code
 
-	public JSONArray getReach(int timespan /* years */, String param, String values, long id)
-			throws JSONException {
+	public JSONArray getReach(int timespan /* years */, String param, String values, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] words;
-		double value=0;
+		double value = 0;
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -52,12 +51,12 @@ public class GetReach {
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
-		int avg=0;
+		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value+=globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, id);
+			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param,values, id);
 			avg++;
 		}
-		value = value/avg;
+		value = value / avg;
 		String temp;
 		temp = String.format("%.2f", value);
 		try {
@@ -74,11 +73,38 @@ public class GetReach {
 	}
 
 	// TODO change this do open and close opinions and check things inside
-	private double globalsentimentby(int month, int year, String param, long id) {
+	private double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
+		String gender = null;
+		String location = null;
+		String age = null;
+		String[] params;
+		String[] values;
+		if (param != null) {
+
+			params = param.split(",");
+			values = value.split(",");
+			for (int i = 0; i < params.length; i++) {
+				switch (params[i]) {
+				case "Age":
+					if (!values[i].equals("All"))
+						age = values[i];
+					break;
+
+				case "Gender":
+					if (!values[i].equals("All"))
+						gender = values[i];
+					break;
+				case "Location":
+					if (!values[i].equals("All"))
+						location = values[i];
+					break;
+				}
+			}
+		}
 		PreparedStatement query1 = null;
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
@@ -86,22 +112,15 @@ public class GetReach {
 				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss
 				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0 " : "=0 ") + "AND ("
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
-				+ Settings.latable_id + " AND " + Settings.latable + "." + Settings.latable_age + "<="
-				+ model.getAge().split(",")[1] + ") AND (" + Settings.lptable + "." + Settings.lptable_authorid + "="
-				+ Settings.latable + "." + Settings.latable_id + " AND " + Settings.latable + "." + Settings.latable_age
-				+ ">=" + model.getAge().split(",")[0] + ")";
-		if (model.getGender().equals("All")) {
-
-		} else {
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		}
-		/*
-		 * if (param != null) { if (!value.contains("-")) { insert +=
-		 * " && authors_id in (Select id from authors where " + param + "=?)"; }
-		 * else { values = value.split("-"); insert +=
-		 * " && authors_id in (Select id from authors where " + param +
-		 * ">=? && " + param + "<=?)"; } }
-		 */
+				+ Settings.latable_id;
+		if (age != null)
+			insert += " AND authors.age<=? AND authors.age>?";
+		if (gender != null)
+			insert += " AND authors.gender=?";
+		if (location != null)
+			insert += " AND authors.location=?";
+		insert += ")";
+		// System.out.println(insert);
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		month -= 1;
@@ -115,10 +134,16 @@ public class GetReach {
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
 			query1.setString(3, model.getPSS());
-			if (model.getGender().equals("All")) {
-			} else {
-				query1.setString(4, model.getGender());
+			int rangeindex = 4;
+			if (age != null) {
+				query1.setString(rangeindex++, age.split("-")[1]);
+				query1.setString(rangeindex++, age.split("-")[0]);
 			}
+			if (gender != null)
+				query1.setString(rangeindex++, gender);
+			if (location != null)
+				query1.setString(rangeindex++, location);
+			System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,

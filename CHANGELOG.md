@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 - Filters for new OE page
 - Code refactoring on latest added code (1.1.7+)
 
+## [1.1.8.6] 2016-10-10-04
+## Added
+- 4/6 Graphs showing filtering
+
 ## [1.1.8] 2016-10-04
 ### Added
 - New Opinion Extraction Page Working

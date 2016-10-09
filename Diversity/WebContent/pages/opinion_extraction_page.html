@@ -22,7 +22,7 @@
 			var json;
 			var jsonData;
 			var ws;
-			
+
 			function connect() {
 				document.getElementById("Cookie").innerHTML = "Model: "
 						+ window.sessionStorage.model + "; PSS: "
@@ -32,8 +32,8 @@
 						+ window.location.port + '/Diversity/server');
 
 				ws.onopen = function() {
-				
-				json = {
+
+					json = {
 						"Op" : "getposts",
 						"Id" : sessionStorage.id,
 					}
@@ -48,7 +48,7 @@
 						alert(json[0].Message);
 						return;
 					}
-					
+
 					if (json[0].Op == "Configs") {
 						var jsonData1 = JSON.parse(JSON.stringify(json));
 
@@ -81,11 +81,11 @@
 							}
 						}
 						json = {
-						"Op" : "opinion_extraction",
-						"Id" : window.sessionStorage.id
-					}
+							"Op" : "opinion_extraction",
+							"Id" : window.sessionStorage.id
+						}
 
-					ws.send(JSON.stringify(json));
+						ws.send(JSON.stringify(json));
 						return;
 
 					}
@@ -118,9 +118,9 @@
 						$('.table > tbody > tr').click(function(e) {
 							clicker($(this).find('input[name="id"]').val());
 						});
-						
+
 						var json = {
-						"Op" : "getconfig",
+							"Op" : "getconfig",
 						}
 						ws.send(JSON.stringify(json));
 						return;
@@ -165,211 +165,234 @@
 			function drawChart() {
 				// Top Left
 				var data = new google.visualization.DataTable();
-				var i=1;
+				var i = 1;
 				data.addColumn('string', 'Gender')
 				data.addColumn('number', 'Global')
-				for(ii = 0;jsonData[i].Graph=="Top_Left"; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Param);
-					data.setCell(ii,1, jsonData[i].Value)
+				if (jsonData[i].Graph == "Top_Left") {
+					for (ii = 0; jsonData[i].Graph == "Top_Left"; ii++, i++) {
+						data.addRow();
+						data.setCell(ii, 0, jsonData[i].Param);
+						data.setCell(ii, 1, jsonData[i].Value)
+					}
+
+					var options = {
+						title : 'Total Opinions',
+						titlePosition : 'center',
+						pieSliceTextStyle : {
+							fontSize : 18
+						},
+						pieSliceText : 'value',
+						legend : {
+							position : 'none'
+						},
+						enableInteractivity : false,
+					};
+
+					var chart = new google.visualization.PieChart(document
+							.getElementById('opinionpie'));
+
+					chart.draw(data, options);
 				}
-
-				var options = {
-					title : 'Total Opinions',
-					titlePosition: 'center',
-					pieSliceTextStyle: {fontSize : 18},
-					pieSliceText: 'value',
-					legend: {position: 'none'},
-					enableInteractivity : false,
-				};
-
-				var chart = new google.visualization.PieChart(document
-						.getElementById('opinionpie'));
-
-				chart.draw(data, options);
+				
 
 				// Top Middle
-
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Polarity')
-				data.addColumn('number', jsonData[i].Param)
-				i++;
-				console.log(jsonData);
-				for(ii = 0;jsonData[i].Graph=="Top_Middle"; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Param);
-					data.setCell(ii,1, jsonData[i].Value);
-				}
-				var options = {
-					title : 'Polarity',
-					colors : [ '#9575cd', '#33ac71' ],
-					vAxis : {
-						title : 'no. posts',
-						gridlines: {
-							count: 6,
-						}
-					},
-					hAxis : {
-					
-					baselineColor : 'transparent',
-						gridlines: {
-							color: 'transparent'
+				if (jsonData[i].Graph == "Top_Middle") {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Polarity')
+					data.addColumn('number', jsonData[i].Param)
+					i++;
+					console.log(jsonData);
+					for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Middle"; ii++, i++) {
+						data.addRow();
+						data.setCell(ii, 0, jsonData[i].Param);
+						data.setCell(ii, 1, jsonData[i].Value);
 					}
-					},
-					legend: { position: 'bottom' }
-				};
+					var options = {
+						title : 'Polarity',
+						colors : [ '#9575cd', '#33ac71' ],
+						vAxis : {
+							title : 'no. posts',
+							gridlines : {
+								count : 6,
+							}
+						},
+						hAxis : {
 
-				var chart = new google.visualization.ColumnChart(document
-						.getElementById('polaritybar'));
-				chart.draw(data, options);
-				
+							baselineColor : 'transparent',
+							gridlines : {
+								color : 'transparent'
+							}
+						},
+						legend : {
+							position : 'bottom'
+						}
+					};
+
+					var chart = new google.visualization.ColumnChart(document
+							.getElementById('polaritybar'));
+					chart.draw(data, options);
+				}
 				// Top Right
+				if (jsonData[i].Graph == "Top_Right") {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Polarity')
+					data.addRow();
+					data.setCell(0, 0, "Sentiment");
+					for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Right"; ii++, i++) {
+						data.addColumn('number', 'Global')
+						data.setCell(0, 1, jsonData[i].Value);
+					}
 
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Polarity')
-				data.addRow();
-				data.setCell(0, 0, "Sentiment");
-				for(ii = 0;jsonData[i].Graph=="Top_Right"; ii++, i++){
-					data.addColumn('number', 'Global')
-					data.setCell(0,1, jsonData[i].Value);
+					var options = {
+						max : 100,
+						min : 0,
+						redFrom : 0,
+						redTo : 25,
+						yellowFrom : 25,
+						yellowTo : 50,
+						minorTicks : 10
+					};
+
+					var chart = new google.visualization.Gauge(document
+							.getElementById('globalgauge'));
+
+					chart.draw(data, options);
 				}
 
-				var options = {
-					max : 100,
-					min : 0,
-					redFrom : 0,
-					redTo : 25,
-					yellowFrom : 25,
-					yellowTo : 50,
-					minorTicks : 10
-				};
-
-				var chart = new google.visualization.Gauge(document
-						.getElementById('globalgauge'));
-
-				chart.draw(data, options);
-				
 				//Bottom Left
+				if (jsonData[i].Graph == "Bottom_Left") {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Gender');
+					data.addColumn('number', 'Value');
+					for (ii = 0;i<jsonData.length && jsonData[i].Graph == "Bottom_Left"; ii++, i++) {
+						data.addRow();
+						data.setCell(ii, 0, jsonData[i].Param);
+						data.setCell(ii, 1, jsonData[i].Value)
+					}
 
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Gender');
-				data.addColumn('number', 'Value');
-				for(ii = 0;jsonData[i].Graph=="Bottom_Left"; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Param);
-					data.setCell(ii,1, jsonData[i].Value)
+					var options = {
+						title : 'Average Reach',
+						pieSliceTextStyle : {
+							fontSize : 18
+						},
+						pieSliceText : 'value',
+						legend : {
+							position : 'none'
+						},
+						enableInteractivity : false,
+					};
+
+					var chart = new google.visualization.PieChart(document
+							.getElementById('reachpie'));
+					chart.draw(data, options);
+
 				}
-
-				var options = {
-					title : 'Average Reach',
-					pieSliceTextStyle: {fontSize : 18},
-					pieSliceText: 'value',
-					legend: {position: 'none'},
-					enableInteractivity : false,
-				};
-
-				var chart = new google.visualization.PieChart(document
-						.getElementById('reachpie'));
-				chart.draw(data, options);
-				
-				
-
 				//Bottom Middle
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Month');
-				data.addColumn('number', 'Global');
-				
-				for(ii = 0;i<jsonData.length && jsonData[i].Graph=='Bottom_Middle'; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Month);
-					data.setCell(ii,1, jsonData[i].Value)
+				if (jsonData[i].Graph == "Bottom_Middle") {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Month');
+					data.addColumn('number', 'Global');
+
+					for (ii = 0; i < jsonData.length
+							&& jsonData[i].Graph == 'Bottom_Middle'; ii++, i++) {
+						data.addRow();
+						data.setCell(ii, 0, jsonData[i].Month);
+						data.setCell(ii, 1, jsonData[i].Value)
+					}
+
+					var options = {
+						hAxis : {
+							showTextEvery : 1,
+							textStyle : {
+								fontSize : 8
+							}
+						},
+						vAxis : {
+							title : 'Reach',
+							viewWindow : {
+								max : 0,
+								min : 2
+							}
+						},
+						legend : {
+							position : 'bottom'
+						}
+					};
+
+					var chart = new google.visualization.LineChart(document
+							.getElementById('reachline'));
+
+					chart.draw(data, options);
 				}
-
-				var options = {
-					hAxis : {
-						showTextEvery : 1,
-						textStyle : {
-							fontSize: 8
-						}
-					},
-					vAxis : {
-						title : 'Reach',
-						viewWindow : {
-							max : 0,
-							min : 2
-						}
-					},
-					legend: { position: 'bottom' }
-				};
-
-				var chart = new google.visualization.LineChart(document
-						.getElementById('reachline'));
-
-				chart.draw(data, options);
-				
 				//Bottom Right
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Month');
-				data.addColumn('number', 'Global');
-				console.log(jsonData[i]);
-				console.log(i);
+				if (jsonData[i].Graph == "Bottom_Right") {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Month');
+					data.addColumn('number', 'Global');
+					console.log(jsonData[i]);
+					console.log(i);
 
-				for(ii = 0;i<jsonData.length && jsonData[i].Graph=='Bottom_Right'; ii++, i++){
-					data.addRow();
-					data.setCell(ii, 0, jsonData[i].Month);
-					data.setCell(ii,1, jsonData[i].Sentiment)
-				}
-
-				var options = {
-					hAxis : {
-						showTextEvery : 1,
-						textStyle : {
-							fontSize: 8
-						}
-					},
-					vAxis : {
-						title : 'Sentiment',
-						viewWindow : {
-							max : 0,
-							min : 100
-						}
-					},
-					legend: { position: 'bottom' }
-				};
-
-				var chart = new google.visualization.LineChart(document
-						.getElementById('globalline'));
-
-				chart.draw(data, options);
-				google.visualization.events.addListener(chart, 'select', function() {
-				var selection = chart.getSelection();
-				if (selection != "") {
-					var row = selection[0].row;
-					var col = selection[0].column;
-					var month = data.getValue(row,0);
-
-					json = {
-						"Op" : "getposts",
-						"Id" : sessionStorage.id,
-						"Param" : "Month",
-						"Values" : month,
-					}
-					console.log(json);
-
-					ws.send(JSON.stringify(json));
-	
-				} else {
-					json = {
-						"Op" : "getposts",
-						"Pss" : sessionStorage.pss
+					for (ii = 0; i < jsonData.length
+							&& jsonData[i].Graph == 'Bottom_Right'; ii++, i++) {
+						data.addRow();
+						data.setCell(ii, 0, jsonData[i].Month);
+						data.setCell(ii, 1, jsonData[i].Sentiment)
 					}
 
-					ws.send(JSON.stringify(json));
+					var options = {
+						hAxis : {
+							showTextEvery : 1,
+							textStyle : {
+								fontSize : 8
+							}
+						},
+						vAxis : {
+							title : 'Sentiment',
+							viewWindow : {
+								max : 0,
+								min : 100
+							}
+						},
+						legend : {
+							position : 'bottom'
+						}
+					};
+
+					var chart = new google.visualization.LineChart(document
+							.getElementById('globalline'));
+
+					chart.draw(data, options);
+					google.visualization.events.addListener(chart, 'select',
+							function() {
+								var selection = chart.getSelection();
+								if (selection != "") {
+									var row = selection[0].row;
+									var col = selection[0].column;
+									var month = data.getValue(row, 0);
+
+									json = {
+										"Op" : "getposts",
+										"Id" : sessionStorage.id,
+										"Param" : "Month",
+										"Values" : month,
+									}
+									console.log(json);
+
+									ws.send(JSON.stringify(json));
+
+								} else {
+									json = {
+										"Op" : "getposts",
+										"Pss" : sessionStorage.pss
+									}
+
+									ws.send(JSON.stringify(json));
+								}
+							})
 				}
-				})
 
 			}
-			
+
 			//create trigger to resizeEnd event     
 			$(window).resize(function() {
 				if (this.resizeTO)
@@ -414,7 +437,7 @@
 				var age = document.getElementById("agefilt").value;
 
 				var json = {
-					"Op" : "chartrequest",
+					"Op" : "testing",// OE_Filter
 					"Param" : "",
 					"Values" : "",
 					"Id" : sessionStorage.id
@@ -428,23 +451,16 @@
 					if (genderradio == false) {
 
 						if (gender == "All") {
-							var select = document
-									.getElementById('genderfilt');
-							json.Param += "Gender,"
-							for (var i = 1; i < select.options.length; i++) {	
-								json.Values += select.options[i].value + "-";
-							}
+							json.Param += "Gender,";
+							json.Values += "All,";
 							
-							json.Values+=",";
 						} else {
 							json.Param += "Gender,";
-							var select = document
-									.getElementById('genderfilt');
+							var select = document.getElementById('genderfilt');
 							json.Values += gender + ",";
 						}
 					} else {
-						var select = document
-						.getElementById('genderfilt');
+						var select = document.getElementById('genderfilt');
 						for (var i = 1; i < select.options.length; i++) {
 							json.Param += "Gender,";
 							json.Values += select.options[i].value + ",";
@@ -453,14 +469,8 @@
 					if (locationradio == false) {
 
 						if (location == "All") {
-							var select = document
-									.getElementById('locationfilt');
-							json.Param += "Location,"
-							for (var i = 1; i < select.options.length; i++) {	
-								json.Values += select.options[i].value + "-";
-							}
-							
-							json.Values+=",";
+							json.Param += "Location,";
+							json.Values += "All,";
 						} else {
 							json.Param += "Location,";
 							var select = document
@@ -468,8 +478,7 @@
 							json.Values += location + ",";
 						}
 					} else {
-						var select = document
-						.getElementById('locationfilt');
+						var select = document.getElementById('locationfilt');
 						for (var i = 1; i < select.options.length; i++) {
 							json.Param += "Location,";
 							json.Values += select.options[i].value + ",";
@@ -477,13 +486,9 @@
 					}
 
 					if (age == "All") {
-
-						var select = document.getElementById('agefilt');
-						for (var i = 1; i < select.options.length; i++) {
-							json.Param += "Age,";
-
-							json.Values += select.options[i].value + ",";
-						}
+						
+						json.Param += "Age,";
+						json.Values += "All,";
 					} else {
 						json.Param += "Age,";
 						var select = document.getElementById('agefilt');
@@ -558,12 +563,14 @@ table {
 	width: 100%;
 }
 
-.graph1{
-	width:40%;
+.graph1 {
+	width: 40%;
 }
-.graph2{
-	width:40%;
+
+.graph2 {
+	width: 40%;
 }
+
 #locationfilt {
 	margin-top: 25px;
 	margin-left: 25%;
@@ -585,17 +592,18 @@ input[type=radio] {
 }
 
 #refresh {
-	margin:auto;
+	margin: auto;
 	margin-top: 25px;
-	display:block;
+	display: block;
 }
 
 #segmentation {
 	width: 70%;
 	align: center;
 }
-#refresh_table{
-	width : 20%;
+
+#refresh_table {
+	width: 20%;
 }
 </style>
 </head>

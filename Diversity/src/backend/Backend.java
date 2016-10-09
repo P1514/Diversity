@@ -40,9 +40,17 @@ public class Backend {
 
 			switch (op) {
 			
-			case 19:
+			case 99:
 				
-				
+				result=new JSONArray();
+				obj = new JSONObject();
+				obj.put("Op", "OE_Redone");
+				result.put(obj);
+				result=convert(result, gs.getPolarityDistribution(id, param, values), "Top_Middle");
+				result=convert(result,gs.getAvgSentiment(1, param, values, id), "Top_Right");
+				result=convert(result,gr.getReach(1, param, values, id), "Bottom_Left");
+				//result=convert(result,gs.globalreach(1, param, values, id), "Bottom_Middle");
+				//result=convert(result,gs.globalsentiment(1, param, values, id), "Bottom_Right");				
 				
 				return result.toString();
 			
@@ -54,11 +62,11 @@ public class Backend {
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
 				result=convert(result,gp.getAmmount(param, values, id), "Top_Left");
-				result=convert(result, gs.getPolarityDistribution(id, "Global"), "Top_Middle");
+				result=convert(result, gs.getPolarityDistribution(id, null, null), "Top_Middle");
 				result=convert(result,gs.getAvgSentiment(1, param, values, id), "Top_Right");
 				result=convert(result,gr.getReach(1, param, values, id), "Bottom_Left");
-				result=convert(result,gs.globalreach(1, param, values, id), "Bottom_Middle");
-				result=convert(result,gs.globalsentiment(1, param, values, id), "Bottom_Right");
+				//result=convert(result,gs.globalreach(1, param, values, id), "Bottom_Middle");
+				//result=convert(result,gs.globalsentiment(1, param, values, id), "Bottom_Right");
 				return result.toString();
 			case 1:
 				SentimentChart sc = new SentimentChart();

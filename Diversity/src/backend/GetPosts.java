@@ -15,8 +15,7 @@ import org.json.JSONObject;
 import importDB.*;
 
 public class GetPosts {
-
-	private Settings dbc = new Settings();
+	
 	private Connection cnlocal;
 	private int MAXTOP = 5;
 
@@ -178,6 +177,8 @@ public class GetPosts {
 	public JSONArray getAmmount(String param, String value, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		String[] params;
+		String[] values;
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
 		PreparedStatement query1 = null;
@@ -196,16 +197,14 @@ public class GetPosts {
 			insert += "=0";
 		}
 		if (param != null) {
-			insert += " && timestamp >= ? && timestamp <= ?";
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
-			try {
-				inputdate.setTime(sdf.parse("1 " + 
-			inputdate.get(Calendar.YEAR) + " " + value));
-			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			params = param.split(",");
+			values = value.split(",");
+			for(int i=0;i<params.length;i++){
+				if(!values[i].equals("All"))
+					insert += " && " + params[i]+ " =? ";
 			}
+			
+			insert += " && timestamp >= ? && timestamp <= ?";
 		}
 		insert += ")";
 		ResultSet rs = null;
@@ -216,6 +215,14 @@ public class GetPosts {
 			int rangeindex = 2;
 			query1.setString(1, model.getPSS());
 			if (param != null) {
+				params = param.split(",");
+				values = value.split(",");
+				for(int i=0;i<params.length;i++){
+					if(!values[i].equals("All")){
+						query1.setString(rangeindex, values[i]);
+						rangeindex++;
+					}
+				}
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
 					inputdate.add(Calendar.YEAR, -1);
@@ -226,7 +233,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			//System.out.print(query1);
+			System.out.print(query1);
 			rs = query1.executeQuery();
 			rs.next();
 			obj.put("Param", "Global");

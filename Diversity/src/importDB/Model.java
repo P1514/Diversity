@@ -47,8 +47,8 @@ public class Model {
 		archived = msg.getBoolean("Archive");
 		products = msg.getBoolean("Final_Product");
 		user = msg.getInt("User");
-		age = msg.getString("Age");
-		gender = msg.getString("Gender");
+		//age = msg.getString("Age");
+		//gender = msg.getString("Gender");
 		dbconnect();
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri

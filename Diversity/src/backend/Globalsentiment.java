@@ -75,8 +75,33 @@ public class Globalsentiment {
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
-		String[] genders = Settings.genders.split(",,");
-		String[] values = new String[2];
+		String gender = null;
+		String location = null;
+		String age=null;
+		String[] params;
+		String[] values;
+		if (param != null) {
+			
+			params = param.split(",");
+			values = value.split(",");
+			for(int i=0;i<params.length;i++){
+				switch (params[i]){
+				case "Age":
+					if(!values[i].equals("All"))
+						age=values[i];
+					break;
+					
+				case "Gender":
+					if(!values[i].equals("All"))
+						gender=values[i];
+					break;
+				case "Location":
+				if(!values[i].equals("All"))
+					location=values[i];
+				break;
+				}
+			}
+		}
 		PreparedStatement query1 = null;
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
@@ -84,22 +109,12 @@ public class Globalsentiment {
 				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss
 				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0 " : "=0 ") + "AND ("
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
-				+ Settings.latable_id + " AND " + Settings.latable + "." + Settings.latable_age + "<="
-				+ model.getAge().split(",")[1] + ") AND (" + Settings.lptable + "." + Settings.lptable_authorid + "="
-				+ Settings.latable + "." + Settings.latable_id + " AND " + Settings.latable + "." + Settings.latable_age
-				+ ">=" + model.getAge().split(",")[0] + ")";
-		if (model.getGender().equals("All")) {
-
-		} else {
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		}
-		/*
-		 * if (param != null) { if (!value.contains("-")) { insert +=
-		 * " && authors_id in (Select id from authors where " + param + "=?)"; }
-		 * else { values = value.split("-"); insert +=
-		 * " && authors_id in (Select id from authors where " + param +
-		 * ">=? && " + param + "<=?)"; } }
-		 */
+				+ Settings.latable_id;
+		if (age!=null)insert+=" AND authors.age<=? AND authors.age>?";
+		if (gender!=null)insert+=" AND authors.gender=?";
+		if (location!=null)insert+=" AND authors.location=?";
+		insert+=")";
+		//System.out.println(insert);
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
 		month -= 1;
@@ -113,10 +128,14 @@ public class Globalsentiment {
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
 			query1.setString(3, model.getPSS());
-			if (model.getGender().equals("All")) {
-			} else {
-				query1.setString(4, model.getGender());
+			int rangeindex = 4;
+			if (age!=null){
+				query1.setString(rangeindex++, age.split("-")[1]);
+				query1.setString(rangeindex++, age.split("-")[0]);
 			}
+			if (gender!=null)query1.setString(rangeindex++, gender);
+			if (location!=null)query1.setString(rangeindex++, location);
+			System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
@@ -169,7 +188,6 @@ public class Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		String[] words;
 		double value = 0;
 
 		String[] time = new String[12];
@@ -185,19 +203,13 @@ public class Globalsentiment {
 		time[9] = "OCT";
 		time[10] = "NOV";
 		time[11] = "DEC";
-		if (param != null) {
-			words = values.split(",");
-		} else {
-			words = new String[1];
-			words[0] = "Sentiment";
-		}
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
 		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, "", id);
+			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
 			avg++;
 		}
 		value = value / avg;
@@ -216,17 +228,42 @@ public class Globalsentiment {
 		return result;
 	}
 
-	public JSONArray getPolarityDistribution(long id, String param) throws JSONException {
+	public JSONArray getPolarityDistribution(long id, String param, String value) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		String[] params = null;
+		String[] values = null;
+		String gender = null;
+		String location = null;
+		String age=null;
+		if (param != null) {
+			
+			params = param.split(",");
+			values = value.split(",");
+			for(int i=0;i<params.length;i++){
+				switch (params[i]){
+				case "Age":
+					if(!values[i].equals("All"))
+						age=values[i];
+					break;
+					
+				case "Gender":
+					if(!values[i].equals("All"))
+						gender=values[i];
+					break;
+				case "Location":
+				if(!values[i].equals("All"))
+					location=values[i];
+				break;
+				}
+			}
+		}
 		PreparedStatement query1 = null;
 		Model model = Data.modeldb.get(id);
 		ResultSet rs = null;
-		if(param.equals("Global")){
-			obj=new JSONObject();
-			obj.put("Param", "Global");
-			result.put(obj);
-		}
+		obj = new JSONObject();
+		obj.put("Param", "Global");
+		result.put(obj);
 
 		String query = "select sum(case when (" + Settings.lptable_polarity + " <=20) then 1 else 0 end) '--',"
 				+ "	sum(case when (" + Settings.lptable_polarity + " >20 AND " + Settings.lptable_polarity
@@ -238,53 +275,50 @@ public class Globalsentiment {
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where "
 				+ Settings.lotable_product + (model.getProducts() ? "!=0" : "==0") + " and " + Settings.lotable_pss
 				+ "=?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
-				+ Settings.latable + " where "+Settings.latable_age+"<=? AND "+Settings.latable_age+">=?";
-		if (model.getGender().equals("All")) {
+				+ Settings.latable;
+		if (age!= null || gender!= null || location!=null)query+=" where 1=1 ";
+		if (age!=null)query+=" AND age<=? AND age>?";
+		if (gender!=null)query+=" AND gender=?";
+		if (location!=null)query+=" AND location=?";
 
-		} else {
-			query += " AND "+ Settings.latable_gender + "=?";
-		}
-		query+=")";
+		query += ")";
 
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(query);
-			query1.setString(1,model.getPSS());
-			query1.setString(2, model.getAge().split(",")[1]);
-			query1.setString(3, model.getAge().split(",")[0]);
-			
-			if (model.getGender().equals("All")) {
-
-			} else {
-				query1.setString(4, model.getGender());
+			query1.setString(1, model.getPSS());
+			int rangeindex = 2;
+			if (age!=null){
+				query1.setString(rangeindex++, age.split("-")[1]);
+				query1.setString(rangeindex++, age.split("-")[0]);
 			}
-			
+			if (gender!=null)query1.setString(rangeindex++, gender);
+			if (location!=null)query1.setString(rangeindex++, location);
 			System.out.println(query1);
-			
-			rs=query1.executeQuery();
+
+			rs = query1.executeQuery();
 			rs.next();
-			
-			obj=new JSONObject();
+
+			obj = new JSONObject();
 			obj.put("Param", "--");
 			obj.put("Value", rs.getInt("--"));
 			result.put(obj);
-			obj=new JSONObject();
+			obj = new JSONObject();
 			obj.put("Param", "-");
 			obj.put("Value", rs.getInt("-"));
 			result.put(obj);
-			obj=new JSONObject();
+			obj = new JSONObject();
 			obj.put("Param", "0");
 			obj.put("Value", rs.getInt("0"));
 			result.put(obj);
-			obj=new JSONObject();
+			obj = new JSONObject();
 			obj.put("Param", "+");
 			obj.put("Value", rs.getInt("+"));
 			result.put(obj);
-			obj=new JSONObject();
+			obj = new JSONObject();
 			obj.put("Param", "++");
 			obj.put("Value", rs.getInt("++"));
 			result.put(obj);
-			
 
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
