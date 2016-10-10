@@ -3,11 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ##[Unreleased]
 ### 
-- Filters for new OE page
+- Integration with outside modules
 - Code refactoring on latest added code (1.1.7+)
 
-## [1.1.8.6] 2016-10-10-04
+## [1.1.9] 2016-10-10
 ## Added
+- OE page fully Developed (Requires extensive tests)
+
+## [1.1.8.6] 2016-10-10
+### Added
 - 4/6 Graphs showing filtering
 
 ## [1.1.8] 2016-10-04

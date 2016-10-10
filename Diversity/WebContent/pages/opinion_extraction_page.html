@@ -166,13 +166,14 @@
 				// Top Left
 				var data = new google.visualization.DataTable();
 				var i = 1;
-				data.addColumn('string', 'Gender')
-				data.addColumn('number', 'Global')
+				data.addColumn('string', 'Param')
+				data.addColumn('number', 'Value')
 				if (jsonData[i].Graph == "Top_Left") {
+	
 					for (ii = 0; jsonData[i].Graph == "Top_Left"; ii++, i++) {
 						data.addRow();
 						data.setCell(ii, 0, jsonData[i].Param);
-						data.setCell(ii, 1, jsonData[i].Value)
+						data.setCell(ii, 1, jsonData[i].Value);
 					}
 
 					var options = {
@@ -199,13 +200,15 @@
 				if (jsonData[i].Graph == "Top_Middle") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Polarity')
-					data.addColumn('number', jsonData[i].Param)
-					i++;
 					console.log(jsonData);
-					for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Middle"; ii++, i++) {
-						data.addRow();
+					for(filt=1;i<jsonData.length && jsonData[i].Graph == "Top_Middle"; filt++){
+						data.addColumn('number', jsonData[i].Filter);
+						i++;
+					for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Middle" && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+						if(filt==1)data.addRow();
 						data.setCell(ii, 0, jsonData[i].Param);
-						data.setCell(ii, 1, jsonData[i].Value);
+						data.setCell(ii, filt, jsonData[i].Value);
+					}
 					}
 					var options = {
 						title : 'Polarity',
@@ -291,13 +294,17 @@
 				if (jsonData[i].Graph == "Bottom_Middle") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Month');
-					data.addColumn('number', 'Global');
+					
+					for(filt=1;i<jsonData.length && jsonData[i].Graph == "Bottom_Middle" ; filt++){
+						data.addColumn('number', jsonData[i].Filter);
+						i++;
 
 					for (ii = 0; i < jsonData.length
-							&& jsonData[i].Graph == 'Bottom_Middle'; ii++, i++) {
-						data.addRow();
+							&& jsonData[i].Graph == 'Bottom_Middle' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+						if(filt==1)data.addRow();
 						data.setCell(ii, 0, jsonData[i].Month);
-						data.setCell(ii, 1, jsonData[i].Value)
+						data.setCell(ii, filt, jsonData[i].Value)
+					}
 					}
 
 					var options = {
@@ -328,15 +335,16 @@
 				if (jsonData[i].Graph == "Bottom_Right") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Month');
-					data.addColumn('number', 'Global');
-					console.log(jsonData[i]);
-					console.log(i);
+					for(filt=1;i<jsonData.length && jsonData[i].Graph == "Bottom_Right" ; filt++){
+						data.addColumn('number', jsonData[i].Filter);
+						i++;
 
 					for (ii = 0; i < jsonData.length
-							&& jsonData[i].Graph == 'Bottom_Right'; ii++, i++) {
-						data.addRow();
+							&& jsonData[i].Graph == 'Bottom_Right' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+						if(filt==1)data.addRow();
 						data.setCell(ii, 0, jsonData[i].Month);
-						data.setCell(ii, 1, jsonData[i].Sentiment)
+						data.setCell(ii, filt, jsonData[i].Value)
+					}
 					}
 
 					var options = {
@@ -440,6 +448,7 @@
 					"Op" : "testing",// OE_Filter
 					"Param" : "",
 					"Values" : "",
+					"Filter" : "",
 					"Id" : sessionStorage.id
 				};
 
@@ -460,11 +469,7 @@
 							json.Values += gender + ",";
 						}
 					} else {
-						var select = document.getElementById('genderfilt');
-						for (var i = 1; i < select.options.length; i++) {
-							json.Param += "Gender,";
-							json.Values += select.options[i].value + ",";
-						}
+						json.Filter="Gender";
 					}
 					if (locationradio == false) {
 
@@ -478,11 +483,7 @@
 							json.Values += location + ",";
 						}
 					} else {
-						var select = document.getElementById('locationfilt');
-						for (var i = 1; i < select.options.length; i++) {
-							json.Param += "Location,";
-							json.Values += select.options[i].value + ",";
-						}
+						json.Filter="Location";
 					}
 
 					if (age == "All") {
@@ -491,7 +492,8 @@
 						json.Values += "All,";
 					} else {
 						json.Param += "Age,";
-						var select = document.getElementById('agefilt');
+						var select = document
+								.getElementById('agefilt');
 						json.Values += age + ",";
 					}
 				}

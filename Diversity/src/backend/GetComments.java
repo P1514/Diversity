@@ -29,28 +29,26 @@ public class GetComments {
 		PreparedStatement query1 = null;
 		Model model = Data.modeldb.get(msg.getLong("Id"));
 		int n_tops = 0;
-		insert = "Select name,influence,location,gender,age,polarity,message from posts,authors where ( posts.id=? OR (age>=? AND age<=? ";
+		insert = "Select name,influence,location,gender,age,polarity,message from posts,authors where ( (posts.id=? OR";
 		ResultSet rs = null;
-		if (model.getGender().equals("All")) {
+		/*if (model.getGender().equals("All")) {
 
 			insert += ") ";
 		}else{
 			insert += "AND gender=?) ";
-		}
-		insert += ") AND(opinions_id=? AND posts.authors_id=authors.id) ORDER BY posts.id ASC";
+		}*/
+		insert += " opinions_id=? )AND posts.authors_id=authors.id) ORDER BY posts.id ASC";
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			int i = 0;
 			query1.setString(1, msg.getString("Values"));
-			query1.setString(2, model.getAge().split(",")[0]);
-			query1.setString(3, model.getAge().split(",")[1]);
-			if (model.getGender().equals("All")) {
+			/*if (model.getGender().equals("All")) {
 			}else{
 				query1.setString(3+1+i, model.getGender());
 				i++;
-			}
-			query1.setInt(3 + i + 1, msg.getInt("Values"));
+			}*/
+			query1.setInt(1 + i + 1, msg.getInt("Values"));
 			System.out.print(query1);
 
 			rs = query1.executeQuery();

@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import importDB.*;
 
 public class GetPosts {
-	
+
 	private Connection cnlocal;
 	private int MAXTOP = 5;
 
@@ -33,27 +33,27 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		PreparedStatement query1 = null;
 		int n_tops = 0;
-		insert = "Select "+Settings.lotable_id+" FROM "+Settings.lotable+" where ("+Settings.lotable_pss+"=? AND "+Settings.lotable_product;
+		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
+				+ "=? AND " + Settings.lotable_product;
 		Model model = Data.modeldb.get(id);
-		if (model == null){
-			obj=new JSONObject();
+		if (model == null) {
+			obj = new JSONObject();
 			obj.put("Op", "Error");
 			obj.put("Message", "Requested Model not Found");
 			result.put(obj);
 			return result;
 		}
-		if(model.getProducts()){
+		if (model.getProducts()) {
 			insert += " !=0";
-		}else{
+		} else {
 			insert += "=0";
 		}
 		if (param != null) {
 			insert += " && timestamp >= ? && timestamp <= ?";
-			
+
 			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
 			try {
-				inputdate.setTime(sdf.parse("1 " + 
-			inputdate.get(Calendar.YEAR) + " " + value));
+				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + value));
 			} catch (ParseException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -81,7 +81,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			//System.out.print(query1);
+			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 
@@ -173,40 +173,62 @@ public class GetPosts {
 		return result;
 
 	}
-	
-	public JSONArray getAmmount(String param, String value, long id) throws JSONException {
+
+	public JSONArray getAmmount(String param, String value, String filter, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params;
 		String[] values;
+		String age = null;
+		String location = null;
+		String gender = null;
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
 		PreparedStatement query1 = null;
-		insert = "Select count(*) FROM "+Settings.lotable+" where ("+Settings.lotable_pss+"=? AND "+Settings.lotable_product;
+		insert = "Select count(*) FROM " + Settings.lotable + " where (" + Settings.lotable_pss + "=? AND "
+				+ Settings.lotable_product;
 		Model model = Data.modeldb.get(id);
-		if (model == null){
-			obj=new JSONObject();
+		if (model == null) {
+			obj = new JSONObject();
 			obj.put("Op", "Error");
 			obj.put("Message", "Requested Model not Found");
 			result.put(obj);
 			return result;
 		}
-		if(model.getProducts()){
+		if (model.getProducts()) {
 			insert += " !=0";
-		}else{
+		} else {
 			insert += "=0";
 		}
 		if (param != null) {
+
 			params = param.split(",");
 			values = value.split(",");
-			for(int i=0;i<params.length;i++){
-				if(!values[i].equals("All"))
-					insert += " && " + params[i]+ " =? ";
+			for (int i = 0; i < params.length; i++) {
+				switch (params[i]) {
+				case "Age":
+					if (!values[i].equals("All"))
+						age = values[i];
+					break;
+
+				case "Gender":
+					if (!values[i].equals("All"))
+						gender = values[i];
+					break;
+				case "Location":
+					if (!values[i].equals("All"))
+						location = values[i];
+					break;
+				}
 			}
-			
-			insert += " && timestamp >= ? && timestamp <= ?";
 		}
-		insert += ")";
+		if (age != null)
+			insert += " AND age<=? AND age>?";
+		if (gender != null)
+			insert += " AND gender=?";
+		if (location != null)
+			insert += " AND location=?";
+		insert += " AND timestamp<? AND timestamp>=?)";
 		ResultSet rs = null;
 
 		try {
@@ -214,34 +236,28 @@ public class GetPosts {
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
 			query1.setString(1, model.getPSS());
-			if (param != null) {
-				params = param.split(",");
-				values = value.split(",");
-				for(int i=0;i<params.length;i++){
-					if(!values[i].equals("All")){
-						query1.setString(rangeindex, values[i]);
-						rangeindex++;
-					}
-				}
-				Calendar date = Calendar.getInstance();
-				if (!date.after(inputdate))
-					inputdate.add(Calendar.YEAR, -1);
-				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
-				inputdate.add(Calendar.MONTH, 1);
-				rangeindex++;
-				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
-				rangeindex++;
 
+			if (age != null) {
+				query1.setString(rangeindex++, age.split("-")[1]);
+				query1.setString(rangeindex++, age.split("-")[0]);
 			}
+			if (gender != null)
+				query1.setString(rangeindex++, gender);
+			if (location != null)
+				query1.setString(rangeindex++, location);
+			inputdate.add(Calendar.MONTH, 1);
+			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+			rangeindex++;
+			inputdate.add(Calendar.YEAR, -1);
+			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+			rangeindex++;
+
 			System.out.print(query1);
 			rs = query1.executeQuery();
 			rs.next();
 			obj.put("Param", "Global");
 			obj.put("Value", rs.getInt("count(*)"));
 			result.put(obj);
-
-
-			
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
