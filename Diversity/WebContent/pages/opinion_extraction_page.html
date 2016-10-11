@@ -22,8 +22,60 @@
 			var json;
 			var jsonData;
 			var ws;
-
+			var top_middle;
+			var top_left;
+			var top_right;
+			var bottom_left;
+			var bottom_right;
+			var bottom_middle;
+			var windowwidth = $(window).width();
+			var needlecolor = '#604460';
+			var animationend=false;
 			function connect() {
+				var css = /*Needle*/ "#globalgauge path:nth-child(2){ fill:"+needlecolor+" ; stroke:"+needlecolor+"; }",
+				head = document.head || document.getElementsByTagName('head')[0],
+				style = document.createElement('style');
+
+				style.type = 'text/css';
+				if (style.styleSheet){
+				  style.styleSheet.cssText = css;
+				} else {
+				  style.appendChild(document.createTextNode(css));
+				}
+				head.appendChild(style);
+				top_left = new google.visualization.PieChart(document.getElementById('opinionpie'));
+				top_middle = new google.visualization.ColumnChart(document.getElementById('polaritybar'));
+				top_right = new google.visualization.Gauge(document.getElementById('globalgauge'));
+				bottom_left = new google.visualization.PieChart(document.getElementById('reachpie'));
+				bottom_middle = new google.visualization.LineChart(document.getElementById('reachline'));
+				bottom_right = new google.visualization.LineChart(document.getElementById('globalline'));
+				google.visualization.events.addListener(bottom_right, 'select',
+							function() {
+								var selection = bottom_right.getSelection();
+								if (selection != "") {
+									var row = selection[0].row;
+									var col = selection[0].column;
+									var month = data.getValue(row, 0);
+
+									json = {
+										"Op" : "getposts",
+										"Id" : sessionStorage.id,
+										"Param" : "Month",
+										"Values" : month,
+									}
+									//console.log(json);
+
+									ws.send(JSON.stringify(json));
+
+								} else {
+									json = {
+										"Op" : "getposts",
+										"Pss" : sessionStorage.pss
+									}
+
+									ws.send(JSON.stringify(json));
+								}
+							})
 				document.getElementById("Cookie").innerHTML = "Model: "
 						+ window.sessionStorage.model + "; PSS: "
 						+ window.sessionStorage.pss;
@@ -65,7 +117,7 @@
 								break;
 							}
 							var tsize = jsonData1[i].Size;
-							console.log(tsize);
+							//console.log(tsize);
 							i++;
 							for (var ii = 0; ii < tsize; ii++, i++) {
 								var option = document.createElement('option');
@@ -92,7 +144,6 @@
 					if (json[0].Op == "OE_Redone") {
 						jsonData = JSON.parse(JSON.stringify(json));
 						drawChart();
-						return;
 					}
 
 					if (json[0].Op == "table") {
@@ -167,13 +218,20 @@
 				var data = new google.visualization.DataTable();
 				var i = 1;
 				data.addColumn('string', 'Param')
-				data.addColumn('number', 'Value')
 				if (jsonData[i].Graph == "Top_Left") {
-	
-					for (ii = 0; jsonData[i].Graph == "Top_Left"; ii++, i++) {
-						data.addRow();
-						data.setCell(ii, 0, jsonData[i].Param);
-						data.setCell(ii, 1, jsonData[i].Value);
+					for(filt=1;i<jsonData.length && jsonData[i].hasOwnProperty("Filter") && jsonData[i].Graph == "Top_Left"; filt++){
+								data.addColumn('number', jsonData[i].Filter);
+								i++;
+							for (ii = 0; jsonData[i].Graph == "Top_Left" && !jsonData[i].hasOwnProperty("Filter"); ii++, i++) {
+								data.addRow();
+								data.setCell(ii, 0, "Value");
+								data.setCell(ii, filt, jsonData[i].Value);
+							}
+						}
+					
+					var colors = new Array();
+					for (var color = 1; color < filt; color++) {
+					colors.push(chartcolor(data.getColumnLabel(color)));
 					}
 
 					var options = {
@@ -187,12 +245,14 @@
 							position : 'none'
 						},
 						enableInteractivity : false,
+						colors:colors,
+						animation:{
+							duration: 1000,
+							easing: 'out',
+						  },
 					};
 
-					var chart = new google.visualization.PieChart(document
-							.getElementById('opinionpie'));
-
-					chart.draw(data, options);
+					top_left.draw(data, options);
 				}
 				
 
@@ -200,15 +260,19 @@
 				if (jsonData[i].Graph == "Top_Middle") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Polarity')
-					console.log(jsonData);
+					//console.log(jsonData);
 					for(filt=1;i<jsonData.length && jsonData[i].Graph == "Top_Middle"; filt++){
 						data.addColumn('number', jsonData[i].Filter);
 						i++;
-					for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Middle" && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
-						if(filt==1)data.addRow();
-						data.setCell(ii, 0, jsonData[i].Param);
-						data.setCell(ii, filt, jsonData[i].Value);
+						for (ii = 0; i<jsonData.length && jsonData[i].Graph == "Top_Middle" && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+							if(filt==1)data.addRow();
+							data.setCell(ii, 0, jsonData[i].Param);
+							data.setCell(ii, filt, jsonData[i].Value);
+						}
 					}
+					colors = new Array();
+					for (var color = 1; color < filt; color++) {
+					colors.push(chartcolor(data.getColumnLabel(color)));
 					}
 					var options = {
 						title : 'Polarity',
@@ -228,12 +292,15 @@
 						},
 						legend : {
 							position : 'bottom'
-						}
+						},
+						colors:colors,
+						animation:{
+							duration: 1000,
+							easing: 'out',
+						  },
 					};
 
-					var chart = new google.visualization.ColumnChart(document
-							.getElementById('polaritybar'));
-					chart.draw(data, options);
+					top_middle.draw(data, options);
 				}
 				// Top Right
 				if (jsonData[i].Graph == "Top_Right") {
@@ -249,28 +316,35 @@
 					var options = {
 						max : 100,
 						min : 0,
+						redColor : '#DD6100',
+						yellowColor : '#FFC50A',
 						redFrom : 0,
 						redTo : 25,
 						yellowFrom : 25,
 						yellowTo : 50,
-						minorTicks : 10
+						minorTicks : 10,
+						animation : {
+						duration: 500,
+						},
 					};
-
-					var chart = new google.visualization.Gauge(document
-							.getElementById('globalgauge'));
-
-					chart.draw(data, options);
+					
 				}
+				top_right.draw(data, options);					
 
 				//Bottom Left
 				if (jsonData[i].Graph == "Bottom_Left") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Gender');
-					data.addColumn('number', 'Value');
+					data.addColumn('number', 'Global');
 					for (ii = 0;i<jsonData.length && jsonData[i].Graph == "Bottom_Left"; ii++, i++) {
 						data.addRow();
 						data.setCell(ii, 0, jsonData[i].Param);
 						data.setCell(ii, 1, jsonData[i].Value)
+					}
+					filt = 2;
+					colors = new Array();
+					for (var color = 1; color < filt; color++) {
+					colors.push(chartcolor(data.getColumnLabel(color)));
 					}
 
 					var options = {
@@ -283,11 +357,14 @@
 							position : 'none'
 						},
 						enableInteractivity : false,
+						colors:colors,
+						animation:{
+							duration: 1000,
+							easing: 'out',
+						  },
 					};
 
-					var chart = new google.visualization.PieChart(document
-							.getElementById('reachpie'));
-					chart.draw(data, options);
+					bottom_left.draw(data, options);
 
 				}
 				//Bottom Middle
@@ -299,12 +376,17 @@
 						data.addColumn('number', jsonData[i].Filter);
 						i++;
 
-					for (ii = 0; i < jsonData.length
-							&& jsonData[i].Graph == 'Bottom_Middle' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
-						if(filt==1)data.addRow();
-						data.setCell(ii, 0, jsonData[i].Month);
-						data.setCell(ii, filt, jsonData[i].Value)
+						for (ii = 0; i < jsonData.length
+								&& jsonData[i].Graph == 'Bottom_Middle' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+							if(filt==1)data.addRow();
+							data.setCell(ii, 0, jsonData[i].Month);
+							data.setCell(ii, filt, jsonData[i].Value)
+						}
 					}
+					
+					colors = new Array();
+					for (var color = 1; color < filt; color++) {
+					colors.push(chartcolor(data.getColumnLabel(color)));
 					}
 
 					var options = {
@@ -323,13 +405,15 @@
 						},
 						legend : {
 							position : 'bottom'
-						}
+						},
+						colors:colors,
+						animation:{
+							duration: 1000,
+							easing: 'out',
+						  },
 					};
 
-					var chart = new google.visualization.LineChart(document
-							.getElementById('reachline'));
-
-					chart.draw(data, options);
+					bottom_middle.draw(data, options);
 				}
 				//Bottom Right
 				if (jsonData[i].Graph == "Bottom_Right") {
@@ -339,12 +423,16 @@
 						data.addColumn('number', jsonData[i].Filter);
 						i++;
 
-					for (ii = 0; i < jsonData.length
-							&& jsonData[i].Graph == 'Bottom_Right' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
-						if(filt==1)data.addRow();
-						data.setCell(ii, 0, jsonData[i].Month);
-						data.setCell(ii, filt, jsonData[i].Value)
+						for (ii = 0; i < jsonData.length
+								&& jsonData[i].Graph == 'Bottom_Right' && !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
+							if(filt==1)data.addRow();
+							data.setCell(ii, 0, jsonData[i].Month);
+							data.setCell(ii, filt, jsonData[i].Value)
+						}
 					}
+					colors = new Array();
+					for (var color = 1; color < filt; color++) {
+					colors.push(chartcolor(data.getColumnLabel(color)));
 					}
 
 					var options = {
@@ -363,40 +451,15 @@
 						},
 						legend : {
 							position : 'bottom'
-						}
+						},
+						colors:colors,
+						animation:{
+							duration: 1000,
+							easing: 'out',
+						  },
 					};
 
-					var chart = new google.visualization.LineChart(document
-							.getElementById('globalline'));
-
-					chart.draw(data, options);
-					google.visualization.events.addListener(chart, 'select',
-							function() {
-								var selection = chart.getSelection();
-								if (selection != "") {
-									var row = selection[0].row;
-									var col = selection[0].column;
-									var month = data.getValue(row, 0);
-
-									json = {
-										"Op" : "getposts",
-										"Id" : sessionStorage.id,
-										"Param" : "Month",
-										"Values" : month,
-									}
-									console.log(json);
-
-									ws.send(JSON.stringify(json));
-
-								} else {
-									json = {
-										"Op" : "getposts",
-										"Pss" : sessionStorage.pss
-									}
-
-									ws.send(JSON.stringify(json));
-								}
-							})
+					bottom_right.draw(data, options);
 				}
 
 			}
@@ -412,7 +475,10 @@
 
 			//redraw graph when window resize is completed  
 			$(window).on('resizeEnd', function() {
-				drawChart();
+				if(windowwidth < $(window).width()){
+					windowwidth=$(window).width(); // Workaround because of gauge colors, Check why when on resize to smaller error occurs and graphs dont resize at all
+					drawChart();
+				}
 			});
 
 			function chartcolor(data) {
@@ -451,6 +517,7 @@
 					"Filter" : "",
 					"Id" : sessionStorage.id
 				};
+				if (globalradio == true)needlecolor='#604460';
 
 				if (gender == "All" && location == "All" && age == "All"
 						&& globalradio) {
@@ -469,6 +536,7 @@
 							json.Values += gender + ",";
 						}
 					} else {
+						needlecolor='#00617F';
 						json.Filter="Gender";
 					}
 					if (locationradio == false) {
@@ -483,6 +551,7 @@
 							json.Values += location + ",";
 						}
 					} else {
+						needlecolor='#A60202';
 						json.Filter="Location";
 					}
 
@@ -497,6 +566,17 @@
 						json.Values += age + ",";
 					}
 				}
+				var css = /*Needle*/ "#globalgauge path:nth-child(2){ fill:"+needlecolor+" ; stroke:"+needlecolor+"; }",
+				head = document.head || document.getElementsByTagName('head')[0],
+				style = document.createElement('style');
+
+				style.type = 'text/css';
+				if (style.styleSheet){
+				  style.styleSheet.cssText = css;
+				} else {
+				  style.appendChild(document.createTextNode(css));
+				}
+				head.appendChild(style);
 				ws.send(JSON.stringify(json));
 			}
 			function fixbuttons(data) {
@@ -607,6 +687,14 @@ input[type=radio] {
 #refresh_table {
 	width: 20%;
 }
+/*#globalgauge path:nth-child(2){ fill:#FFFFFF ; }*/
+
+#globalgauge circle:nth-child(1){
+	fill:#DDDDDD;
+	}
+#globalgauge circle:nth-child(3){
+	fill:#DDDDDD;
+	}
 </style>
 </head>
 <body>

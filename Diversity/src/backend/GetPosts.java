@@ -255,7 +255,9 @@ public class GetPosts {
 			System.out.print(query1);
 			rs = query1.executeQuery();
 			rs.next();
-			obj.put("Param", "Global");
+			obj.put("Filter", "Global");
+			result.put(obj);
+			obj=new JSONObject();
 			obj.put("Value", rs.getInt("count(*)"));
 			result.put(obj);
 

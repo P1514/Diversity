@@ -6,6 +6,21 @@ All notable changes to this project will be documented in this file.
 - Integration with outside modules
 - Code refactoring on latest added code (1.1.7+)
 
+### Modeling
+- Create and use Extra DB table to keep info of last time updated
+
+### Extraction
+- Snapshoting values to be saved on local DB
+- Request Extrapolation using prediction
+- Able to filter and see all products related to each PSS
+
+### Prediction Model
+- Everything
+
+## [1.1.10] 2016-10-11
+### Fixed
+- OE page now shows colors as intended
+
 ## [1.1.9] 2016-10-10
 ## Added
 - OE page fully Developed (Requires extensive tests)
