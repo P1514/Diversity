@@ -77,6 +77,7 @@ public class Settings {
 	public static final String lptable_comments = "comments";
 	public static final String lptable_opinion = "opinions_id";
 	public static final String lptable_polarity = "polarity";
+	public static final String lptable_timestamp = "timestamp";
 
 	// Opinion table
 	public static final String lotable= "opinions";
@@ -112,9 +113,23 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static String JSON_uri = "";
+	public static String JSON_uri = "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
+	
+	// Received JSON Parameters
+	public static final String JSON_postid = "postId";
+	public static final String JSON_replies = "Replies";
+	public static final String JSON_userid = "account";
+	public static final String JSON_epoch = "postEpoch";
+	public static final String JSON_message = "Post";
+	public static final String JSON_likes = "Likes";
+	public static final String JSON_views = "Views";
+	public static final String JSON_tweets = "Tweets";
+	public static final String JSON_source = "source";
+	public static final String JSON_age = "age";
+	public static final String JSON_gender = "gender";
+	public static final String JSON_location = "location";
 
-	public Connection conndata() throws ClassNotFoundException, SQLException {
+	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.YEAR, 2);

@@ -12,10 +12,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import backend.GetModels;
+import backend.Settings;
 import importDB.CleanDB;
 import importDB.Data;
 import importDB.Model;
@@ -29,20 +31,30 @@ public class Startup implements ServletContextListener {
 		Data start = new Data();
 		System.out.println("Starting up!");
 		try {
-			clean.clean();
-			start.load();
-			/*JSONObject json = readJsonFromUrl("http://diversity.euprojects.net/socialfeedbackextraction/twitter/PrimeministerGR");
-		    System.out.println(json.toString());*/
-		    //System.out.println(json.get("id"));
+
+			//clean.clean();
+			if (Settings.JSON_uri==null) {
+				start.load();
+			} else {
+				JSONArray json = new JSONArray(readUrl(
+						"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
+				start.load(json);
+			}
+			/*
+			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
+			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
+			 * System.out.println("\n2:"+json.getJSONObject(2).toString()+"\n");
+			 */
+			// System.out.println(json.get("id"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}/* catch (IOException e) {
+		}  catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 
-		GetModels model = new GetModels();
+		/*GetModels model = new GetModels();
 
 		JSONObject obj = new JSONObject();
 
@@ -72,7 +84,7 @@ public class Startup implements ServletContextListener {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 
 	}
 
@@ -80,24 +92,22 @@ public class Startup implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		System.out.println("Shutting down!");
 	}
-	public static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-	    InputStream is = new URL(url).openStream();
-	    try {
-	      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("Unicode")));
-	      String jsonText = readAll(rd);
-	      JSONObject json = new JSONObject(jsonText);
-	      return json;
-	    } finally {
-	      is.close();
-	    }
-	  }
-	
-	private static String readAll(Reader rd) throws IOException {
-	    StringBuilder sb = new StringBuilder();
-	    int cp;
-	    while ((cp = rd.read()) != -1) {
-	      sb.append((char) cp);
-	    }
-	    return sb.toString();
-	  }
+
+	private static String readUrl(String urlString) throws Exception {
+		BufferedReader reader = null;
+		try {
+			URL url = new URL(urlString);
+			reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			StringBuffer buffer = new StringBuffer();
+			int read;
+			char[] chars = new char[1024];
+			while ((read = reader.read(chars)) != -1)
+				buffer.append(chars, 0, read);
+
+			return buffer.toString();
+		} finally {
+			if (reader != null)
+				reader.close();
+		}
+	}
 }

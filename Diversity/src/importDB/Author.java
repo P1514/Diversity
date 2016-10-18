@@ -6,6 +6,7 @@ import backend.Settings;
 public class Author {
 
 	private int id; // Keys
+	private String id2; // Keys String
 	private String name; //
 	private double influence; // Calculated
 	private int age;
@@ -20,6 +21,17 @@ public class Author {
 		this.id = _id;
 		this.age = _age;
 		this.name = _name;
+		this.gender = _gender;
+		this.location = _location;
+		this.influence = 0;
+		this.comments = 0;
+		this.likes = 0;
+		this.views = 0;
+
+	}
+	public Author(String _id, int _age, String _gender, String _location) {
+		this.id2 = _id;
+		this.age = _age;
 		this.gender = _gender;
 		this.location = _location;
 		this.influence = 0;

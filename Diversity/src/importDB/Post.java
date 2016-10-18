@@ -6,11 +6,13 @@ import java.sql.Date;
 public class Post {
 	private int id;
 	private int userid;
+	private String userid2 = null;
 	private Date time;
 	private String message = new String();
-	private int likes=0;
-	private int views=0;
-	private double polarity=50;
+	private int likes = 0;
+	private int views = 0;
+	private double polarity = 50;
+	private String source = "N/A";
 
 	public Post(int _id, int _userid, Date _time, int _likes, int _views, String _message) {
 		this.id = _id;
@@ -39,8 +41,41 @@ public class Post {
 		this.polarity = sentiment;
 	}
 
+	public Post(int _id, String _source, String _userid, Date _time, int _likes, int _views, String _message) {
+		this.id = _id;
+		this.userid2 = _source + ";" + _userid;
+		this.time = _time;
+		this.views = _views;
+		this.likes = _likes;
+		this.message = _message;
+		this.source = _source;
+
+		// To replace with API
+
+		String[] words = message.split("[^\\w'-]+");
+
+		Adjectives adjs = new Adjectives();
+		double sentiment = 50;
+		for (int i = 0; i < words.length; i++) {
+
+			String currentWord = words[i];
+
+			if (adjs.matches(currentWord)) {
+				sentiment = adjs.getSentiment(currentWord);
+			}
+		}
+		// End of To Replace
+
+		this.polarity = sentiment;
+	}
+
 	public int getUID() {
 		return userid;
+
+	}
+	
+	public String getUID(boolean a){
+		return userid2;
 	}
 
 	public String getComment() {
@@ -65,6 +100,10 @@ public class Post {
 
 	public double getPolarity() {
 		return polarity;
+	}
+
+	public String getSource() {
+		return source;
 	}
 
 }

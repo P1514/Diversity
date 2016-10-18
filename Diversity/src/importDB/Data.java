@@ -9,6 +9,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.sql.*;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,25 +35,21 @@ public class Data {
 	private java.sql.Date LastUpdated2 = null;
 	private Calendar cal = Calendar.getInstance();
 	private List<Integer> users = new ArrayList<Integer>();
+	private List<Author> users2 = new ArrayList<Author>();
 
-	Settings dbc = new Settings();
 	Connection cndata = null;
 	Connection cnlocal = null;
 
 	public Data() {
 	}
-	
-	public String loadJSON() throws JSONException {
-		
-		JSONObject json = new JSONObject();
-		try {
-			json = readJsonFromUrl(Settings.JSON_uri);
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-	    System.out.println(json.toString());
-	    System.out.println(json.get("id"));
+
+	public String load(JSONArray json) throws JSONException {
+
+		return loadJSON(json);
+	}
+
+	public String loadJSON(JSONArray json) throws JSONException {
+
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
@@ -77,17 +75,15 @@ public class Data {
 		} catch (SQLException | ClassNotFoundException e1) {
 			obj.put("Op", "Error");
 			obj.put("Message",
-					"Error (1): Local Database Error\r\n Please check if populated and Updated to latest version");
+					"Error (1): Local Database Error\r\n Please Update to latest version " + Settings.dbversion);
 			result.put(obj);
 			try {
 				if (rs != null)
-
 					rs.close();
-
 				if (stmt != null)
 					stmt.close();
-				if (cndata != null)
-					cndata.close();
+				if (cnlocal != null)
+					cnlocal.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -115,12 +111,6 @@ public class Data {
 				e.printStackTrace();
 			}
 		}
-
-		String query;
-
-		stmt = null;
-		rs = null;
-
 		// Load PSS
 
 		System.out.println(" Variable Init " + (System.nanoTime() - stime));
@@ -128,54 +118,13 @@ public class Data {
 
 		// Load Data
 		try {
-			cndata = dbc.conndata();
-			do {
-				// Load Opinions id first
-				cal = Calendar.getInstance();
-				LastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
-				query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
-						+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
-						+ Settings.rptable_rpostid + " end from " + Settings.rptable + " Where " + Settings.ptime
-						+ " > \'" + LastUpdated + "\' && " + Settings.ptime + " <= \'" + LastUpdated2
-						+ "\' ORDER BY ID ASC");
-				stmt = cndata.createStatement();
-				// System.out.println(query);
-				rs = stmt.executeQuery(query);
-
-				// TODO refactor after this read post
-				/*
-				 * query = ("Select * from " + Settings.posttn + " Where " +
-				 * Settings.ptime + " > \'" + LastUpdated + "\' && " +
-				 * Settings.ptime + " <= \'" + LastUpdated2 +
-				 * "\' ORDER BY ID ASC"); //System.out.println(query); stmt =
-				 * cndata.createStatement(); rs = stmt.executeQuery(query);
-				 */
-				if (!rs.next()) {
-					LastUpdated = LastUpdated2;
-					if (LastUpdated.after(new java.sql.Date(Calendar.getInstance().getTimeInMillis()))) {
-						obj.put("Op", "Error");
-						obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
-						result.put(obj);
-						if (rs != null)
-							rs.close();
-						if (stmt != null)
-							stmt.close();
-						if (cndata != null)
-							cndata.close();
-						return result.toString();
-					}
-					if (rs != null)
-						rs.close();
-					if (stmt != null)
-						stmt.close();
-					continue;
-				}
-				break;
-			} while (true);
-			rs.beforeFirst();
 			ExecutorService es = Executors.newFixedThreadPool(100);
-			while (rs.next())
-				es.execute(new Topinions(rs.getInt(1)));
+			for (int id = 0; id < json.length(); id++)
+				es.execute(new Topinions(json.getJSONObject(id))); // TODO done
+																	// before
+																	// this line
+																	// do after
+																	// this
 			es.shutdown();
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -183,11 +132,10 @@ public class Data {
 				System.out.println("ERROR THREAD OP");
 				e.printStackTrace();
 			}
-			rs.beforeFirst();
 			// System.out.println("HELLO");
 			es = Executors.newFixedThreadPool(100);
-			while (rs.next())
-				es.execute(new Tposts(rs.getInt(1)));
+			for (int id = 0; id < json.length(); id++)
+				es.execute(new Tposts(json.getJSONObject(id)));
 			es.shutdown();
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -195,23 +143,44 @@ public class Data {
 				System.out.println("ERROR THREAD Posts");
 				e.printStackTrace();
 			}
-			rs.close();
-			stmt.close();
-			cndata.close();
 			System.out.println(" Load posts from remote " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
 
-			// TODO ir buscar primeiro à DB LOCAL os users
-			cnlocal = Settings.connlocal();
+			// Fetch local DB models
 
+			cnlocal = Settings.connlocal();
+			select = "Select * from " + Settings.lmtable;
+			stmt = cnlocal.createStatement();
+			// System.out.println(query);
+			rs = stmt.executeQuery(select);
+
+			if (rs.next()) {
+				rs.beforeFirst();
+				for (; rs.next();) {
+					Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
+							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
+							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+					Data.modeldb.put(model.getId(), model);
+
+				}
+			}
+
+			// Fetch local DB for users
+			rs.close();
+			stmt.close();
+			cnlocal.close();// TODO tirar a parte de ir buscar users to remote daqui pois passa a ir buscar ao JSON
+			cnlocal = Settings.connlocal();
 			String querycond = users.toString();
 			System.out.println(querycond);
 			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
+
 			// Load users from local DB
-			query = ("Select * from " + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
+			select = ("Select * from " + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
 			// System.out.println(query);
 			stmt = cnlocal.createStatement();
-			rs = stmt.executeQuery(query);
+			rs = stmt.executeQuery(select);
 			while (rs.next()) {
 				if (authordb.containsKey(rs.getInt("id"))) {
 				} else {
@@ -232,10 +201,10 @@ public class Data {
 			stime = System.nanoTime();
 
 			// Load users from foreign DB
-			query = ("Select * from " + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
-			cndata = dbc.conndata();
+			select = ("Select * from " + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
+			cndata = Settings.conndata();
 			stmt = cndata.createStatement();
-			rs = stmt.executeQuery(query);
+			rs = stmt.executeQuery(select);
 			while (rs.next()) {
 				if (authordb.containsKey(rs.getInt(Settings.rutable_userid))) {
 				} else {
@@ -473,11 +442,7 @@ public class Data {
 	}
 
 	public String load() throws JSONException {
-		
-		if(!(Settings.JSON_uri.equals("")))
-		{
-			return loadJSON();
-		}
+
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
@@ -554,7 +519,7 @@ public class Data {
 
 		// Load Data
 		try {
-			cndata = dbc.conndata();
+			cndata = Settings.conndata();
 			do {
 				// Load Opinions id first
 				cal = Calendar.getInstance();
@@ -627,7 +592,27 @@ public class Data {
 			System.out.println(" Load posts from remote " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
 
-			// TODO ir buscar primeiro à DB LOCAL os users
+			// Load local models
+
+			cnlocal = Settings.connlocal();
+			query = "Select * from " + Settings.lmtable;
+			stmt = cnlocal.createStatement();
+			// System.out.println(query);
+			rs = stmt.executeQuery(query);
+
+			if (rs.next()) {
+				for (; rs.next();) {
+					Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
+							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
+							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+					Data.modeldb.put(model.getId(), model);
+
+				}
+			}
+
+			// Load local DB users
 			cnlocal = Settings.connlocal();
 
 			String querycond = users.toString();
@@ -659,7 +644,7 @@ public class Data {
 
 			// Load users from foreign DB
 			query = ("Select * from " + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
-			cndata = dbc.conndata();
+			cndata = Settings.conndata();
 			stmt = cndata.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
@@ -897,27 +882,6 @@ public class Data {
 		result.put(obj);
 		return result.toString();
 	}
-	
-	private static String readAll(Reader rd) throws IOException {
-	    StringBuilder sb = new StringBuilder();
-	    int cp;
-	    while ((cp = rd.read()) != -1) {
-	      sb.append((char) cp);
-	    }
-	    return sb.toString();
-	  }
-	
-	private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
-	    InputStream is = new URL(url).openStream();
-	    try {
-	      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("Unicode")));
-	      String jsonText = readAll(rd);
-	      JSONObject json = new JSONObject(jsonText);
-	      return json;
-	    } finally {
-	      is.close();
-	    }
-	  }
 
 	/**
 	 * Returns an Iterator of all Opinions
@@ -1035,67 +999,139 @@ public class Data {
 		private int id;
 		private Connection condata;
 		private Connection conlocal;
+		private JSONObject obj = null;
 
 		public Topinions(int _id) {
 			id = _id;
 
 		}
 
+		public Topinions(JSONObject _obj) {
+			obj = _obj;
+		}
+
 		public void run() {
-			try {
-				condata = dbc.conndata();
-				conlocal = Settings.connlocal();
-				boolean remoto = true;
-				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_postid + " = " + id);
-				Statement stmt = condata.createStatement();
-				ResultSet rs = stmt.executeQuery(query);
-				if (!rs.next()) {
-					query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
-					stmt = conlocal.createStatement();
-					rs = stmt.executeQuery(query);
-					remoto = false;
-					totalposts--;
+			if (obj == null) {
+				try {
+					condata = Settings.conndata();
+					conlocal = Settings.connlocal();
+					boolean remote = true;
+					String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_postid + " = "
+							+ id);
+					Statement stmt = condata.createStatement();
+					ResultSet rs = stmt.executeQuery(query);
 					if (!rs.next()) {
+						query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
+						stmt = conlocal.createStatement();
+						rs = stmt.executeQuery(query);
+						remote = false;
+						totalposts--;
+						if (!rs.next()) {
+							rs.close();
+							stmt.close();
+							condata.close();
+							conlocal.close();
+							return;
+						}
+					}
+					// System.out.println(id);
+					int postid = remote ? rs.getInt(Settings.rptable_postid) : rs.getInt(Settings.lptable_opinion);
+					// System.out.println(id);
+					int user_id = remote ? rs.getInt(Settings.rptable_userid) : rs.getInt(Settings.lptable_authorid);
+					java.sql.Date time = remote ? rs.getDate(Settings.rptable_date) : null;
+					int likes = remote ? rs.getInt(Settings.rptable_likes) : rs.getInt(Settings.lptable_likes);
+					int views = remote ? rs.getInt(Settings.rptable_views) : rs.getInt(Settings.lptable_views);
+					;
+					String message = remote ? rs.getString(Settings.rptable_message)
+							: rs.getString(Settings.lptable_message);
+					Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
+							: new Post(postid, user_id, null, likes, views, message);
+					if (!(users.contains(user_id))) {
+						users.add(user_id);
+					}
+					PSS pss = new PSS();
+					String tag = pss.getTag(message);
+					int product = pss.getProduct(message);
+
+					opiniondb.put(postid, new Opinion(_post, tag, product));
+					if (rs != null)
+						rs.close();
+					if (stmt != null)
+						stmt.close();
+					if (condata != null)
+						condata.close();
+					if (conlocal != null)
+						conlocal.close();
+				} catch (SQLException | ClassNotFoundException e) {
+					System.out.println("ERROR loading Opinions");
+					e.printStackTrace();
+				}
+			} else {
+				// Run this if importing from JSON
+				try {
+					conlocal = Settings.connlocal();
+					boolean remote = false;
+					String query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
+					Statement stmt = conlocal.createStatement();
+					ResultSet rs = stmt.executeQuery(query);
+					if (!rs.next()) {
+						remote = true;
 						rs.close();
 						stmt.close();
-						condata.close();
 						conlocal.close();
 						return;
 					}
-				}
-				// System.out.println(id);
-				int postid = remoto ? rs.getInt(Settings.rptable_postid) : rs.getInt(Settings.lptable_opinion);
-				// System.out.println(id);
-				int user_id = remoto ? rs.getInt(Settings.rptable_userid) : rs.getInt(Settings.lptable_authorid);
-				java.sql.Date time = remoto ? rs.getDate(Settings.rptable_date) : null;
-				int likes = remoto ? rs.getInt(Settings.rptable_likes) : rs.getInt(Settings.lptable_likes);
-				int views = remoto ? rs.getInt(Settings.rptable_views) : rs.getInt(Settings.lptable_views);
-				;
-				String message = remoto ? rs.getString(Settings.rptable_message)
-						: rs.getString(Settings.lptable_message);
-				Post _post = remoto ? new Post(postid, user_id, time, likes, views, message)
-						: new Post(postid, user_id, null, likes, views, message);
-				if (!(users.contains(user_id))) {
-					users.add(user_id);
-				}
-				PSS pss = new PSS();
-				String tag = pss.getTag(message);
-				int product = pss.getProduct(message);
+					totalposts--;
+					Date date = new Date(Long.valueOf(obj.getString("postEpoch")) * 1000L);
+					DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					format.setTimeZone(TimeZone.getTimeZone("GMT"));
+					String formatted = format.format(date);
 
-				opiniondb.put(postid, new Opinion(_post, tag, product));
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (condata != null)
-					condata.close();
-				if (conlocal != null)
-					conlocal.close();
-			} catch (SQLException | ClassNotFoundException e) {
-				System.out.println("ERROR loading Opinions");
-				e.printStackTrace();
+					// System.out.println(id);
+					int postid = obj.getInt("postId");
+					// System.out.println(id);
+					String source = obj.getString("source");
+					String user_id = obj.getString("account");
+					java.sql.Date time = remote ? Date.valueOf(formatted) : rs.getDate(Settings.lptable_timestamp);
+					int likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getInt("likes") : -1 : -1;
+					int views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getInt("views") : -1 : -1;
+					String message = obj.getString("post");
+					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
+																								// create
+																								// constructor
+																								// for
+																								// the
+																								// different
+																								// type
+																								// of
+																								// media
+																								// specific
+																								// info
+					
+					Author author = new Author(user_id, obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : -1, obj.has(Settings.JSON_gender) ?
+							obj.getString(Settings.JSON_gender) : "", obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "");
+					if (!(users2.contains(author))) {
+						users2.add(author);
+					}
+					PSS pss = new PSS();
+					String tag = pss.getTag(message);
+					int product = pss.getProduct(message);
+
+					opiniondb.put(postid, new Opinion(_post, tag, product));
+					if (rs != null)
+						rs.close();
+					if (stmt != null)
+						stmt.close();
+					if (conlocal != null)
+						conlocal.close();
+				} catch (SQLException | ClassNotFoundException | JSONException e) {
+					System.out.println("ERROR loading Opinions");
+					e.printStackTrace();
+				}
+
 			}
 		}
+
 	}
 
 	class Tposts implements Runnable {
@@ -1103,6 +1139,7 @@ public class Data {
 		private Opinion _opin;
 		private Connection condata;
 		private Connection conlocal;
+		private JSONObject obj = null;
 
 		public Tposts(int _id) {
 			id = _id;
@@ -1110,103 +1147,149 @@ public class Data {
 
 		}
 
+		public Tposts(JSONObject _obj) {
+			obj = _obj;
+		}
+
 		public void run() {
+			if (obj == null) {
+				try {
+					// System.out.println("HELLO1");
+					condata = Settings.conndata();
+					conlocal = Settings.connlocal();
+					String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = "
+							+ id);
+					Statement stmt = condata.createStatement();
+					// System.out.println(query);
+					ResultSet rs = stmt.executeQuery(query);
+					if (rs.next()) {
+						do {
+							// System.out.println("HELLO2");
+							int postid = rs.getInt(Settings.rptable_postid);
+							int user_id = rs.getInt(Settings.rptable_userid);
+							java.sql.Date time = rs.getDate(Settings.rptable_date);
+							int likes = rs.getInt(Settings.rptable_likes);
+							int views = rs.getInt(Settings.rptable_views);
+							String message = rs.getString(Settings.rptable_message);
+							Post _post = new Post(postid, user_id, time, likes, views, message);
+							if (!(users.contains(user_id))) {
+								users.add(user_id);
+							}
+							_opin.addcomment(_post);
+						} while (rs.next());
+					}
+					rs.close();
+					stmt.close();
+					query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_opinion + " = " + id);
+					stmt = conlocal.createStatement();
+					rs = stmt.executeQuery(query);
+					// System.out.println(query);
+					if (rs.next()) {
+						do {
+							// System.out.println("HELLO3");
+							int postid = rs.getInt(Settings.lptable_id);
+							int user_id = rs.getInt(Settings.lptable_authorid);
+							int likes = rs.getInt(Settings.lptable_likes);
+							int views = rs.getInt(Settings.lptable_views);
+							String message = rs.getString(Settings.lptable_message);
+							Post _post = new Post(postid, user_id, null, likes, views, message);
+							if (!(users.contains(user_id)))
+								users.add(user_id);
+							_opin.addcomment(_post);
+						} while (rs.next());
+					}
+					if (rs != null)
+						rs.close();
+					if (stmt != null)
+						stmt.close();
+					if (condata != null)
+						condata.close();
+					if (conlocal != null)
+						conlocal.close();
+				} catch (ClassNotFoundException e) {
+					System.out.println("ERROR loading Posts");
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				opiniondb.put(id, _opin);
+			} else {
+				try {
+
+					if (obj.has(Settings.JSON_replies)) {
+
+						// System.out.println("HELLO2");
+						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
+						for (int index = 0; index < replies.length(); index++) {
+
+							JSONObject reply;
+
+							reply = replies.getJSONObject(index);
+
+							Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
+							DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							format.setTimeZone(TimeZone.getTimeZone("GMT"));
+							String formatted = format.format(date);
+
+							int postid = reply.getInt(Settings.JSON_postid);
+							String user_id = reply.getString(Settings.JSON_userid);
+							java.sql.Date time = Date.valueOf(formatted);
+							int likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getInt("likes") : -1
+									: -1;
+							int views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getInt("views") : -1
+									: -1;
+							String message = reply.getString(Settings.JSON_message);
+							String source = obj.getString(Settings.JSON_source);
+							Post _post = new Post(postid, source, user_id, time, likes, views, message);
+							Author author = new Author(user_id, obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : -1, obj.has(Settings.JSON_gender) ?
+									obj.getString(Settings.JSON_gender) : "", obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "");
+							if (!(users2.contains(author))) {
+								users2.add(author);
+							}
+							_opin.addcomment(_post);
+						}
+
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		}
+
+		/*
+		 * class Tmodels implements Runnable { private Model model; private
+		 * Connection conlocal;
+		 * 
+		 * public Tmodels() { }
+		 */
+		public void Tmodels() {
+			// System.out.println("HELLO1");
 			try {
-				// System.out.println("HELLO1");
-				condata = dbc.conndata();
-				conlocal = Settings.connlocal();
-				String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = "
-						+ id);
-				Statement stmt = condata.createStatement();
+				cnlocal = Settings.connlocal();
+				String query = ("Select * from " + Settings.lmtable);
+				Statement stmt = cnlocal.createStatement();
 				// System.out.println(query);
 				ResultSet rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
-						// System.out.println("HELLO2");
-						int postid = rs.getInt(Settings.rptable_postid);
-						int user_id = rs.getInt(Settings.rptable_userid);
-						java.sql.Date time = rs.getDate(Settings.rptable_date);
-						int likes = rs.getInt(Settings.rptable_likes);
-						int views = rs.getInt(Settings.rptable_views);
-						String message = rs.getString(Settings.rptable_message);
-						Post _post = new Post(postid, user_id, time, likes, views, message);
-						if (!(users.contains(user_id))) {
-							users.add(user_id);
-						}
-						_opin.addcomment(_post);
+						Model model = new Model(rs.getLong(Settings.latable_id), rs.getInt(Settings.lmtable_update),
+								rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+								rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
+								rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}
 				rs.close();
 				stmt.close();
-				query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_opinion + " = " + id);
-				stmt = conlocal.createStatement();
-				rs = stmt.executeQuery(query);
-				// System.out.println(query);
-				if (rs.next()) {
-					do {
-						// System.out.println("HELLO3");
-						int postid = rs.getInt(Settings.lptable_id);
-						int user_id = rs.getInt(Settings.lptable_authorid);
-						int likes = rs.getInt(Settings.lptable_likes);
-						int views = rs.getInt(Settings.lptable_views);
-						String message = rs.getString(Settings.lptable_message);
-						Post _post = new Post(postid, user_id, null, likes, views, message);
-						if (!(users.contains(user_id)))
-							users.add(user_id);
-						_opin.addcomment(_post);
-					} while (rs.next());
-				}
-				if (rs != null)
-					rs.close();
-				if (stmt != null)
-					stmt.close();
-				if (condata != null)
-					condata.close();
-				if (conlocal != null)
-					conlocal.close();
-			} catch (
-
-					SQLException | ClassNotFoundException e) {
-				System.out.println("ERROR loading Posts");
+				cnlocal.close();
+			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-
-			opiniondb.put(id, _opin);
 		}
 	}
-
-/*	class Tmodels implements Runnable {
-		private Model model;
-		private Connection conlocal;
-
-		public Tmodels() {
-		}
-*/
-		public void Tmodels() {
-			// System.out.println("HELLO1");
-			try{
-			cnlocal = Settings.connlocal();
-			String query = ("Select * from " + Settings.lmtable);
-			Statement stmt = cnlocal.createStatement();
-			// System.out.println(query);
-			ResultSet rs = stmt.executeQuery(query);
-			if (rs.next()) {
-				do {
-					Model model = new Model(rs.getLong(Settings.latable_id), rs.getInt(Settings.lmtable_update),
-							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
-							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
-					Data.modeldb.put(model.getId(), model);
-				} while (rs.next());
-			}
-			rs.close();
-			stmt.close();
-			cnlocal.close();
-			}catch(SQLException | ClassNotFoundException e){
-				e.printStackTrace();
-			}
-		}
-
-	//}
 }

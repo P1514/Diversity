@@ -37,9 +37,10 @@ public class GetPosts {
 				+ "=? AND " + Settings.lotable_product;
 		Model model = Data.modeldb.get(id);
 		if (model == null) {
+			result = new JSONArray();
 			obj = new JSONObject();
 			obj.put("Op", "Error");
-			obj.put("Message", "Requested Model not Found");
+			obj.put("Message", "Requested Model Not Found");
 			result.put(obj);
 			return result;
 		}
