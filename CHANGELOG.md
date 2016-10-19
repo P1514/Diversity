@@ -17,6 +17,10 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
+## [2.0] 2016-10-19
+### Added 
+- Big Leap on Version since from now on Software both gets data from LocalDB but also gets it from a Specific Url(able to use models uri on a future release)
+
 ## [1.1.10] 2016-10-11
 ### Fixed
 - OE page now shows colors as intended

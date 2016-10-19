@@ -11,6 +11,7 @@ public class Opinion {
 
 	private Post main;
 	private int author_id; // String
+	private String author_id2;
 	private ArrayList<Post> comments = new ArrayList<Post>();
 	private String URI = "";
 	private double reach = 0;
@@ -31,7 +32,7 @@ public class Opinion {
 	
 	public Opinion(Post _main, String _pss, int _product, String _URI) {
 		this.main = _main;
-		this.author_id = main.getUID();
+		this.author_id2 = main.getUID(false);
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
@@ -40,17 +41,30 @@ public class Opinion {
 	}
 
 	public void evalReach(double avgPost, double avgLikes, double avgViews) {
-		this.reach = Settings.pWcomments * (ncomments() / avgPost) + Settings.pWlikes * (nlikes() / avgLikes)
-				+ Settings.pWviews * (nviews() / avgViews);
+		this.reach = Settings.pWcomments * (ncomments() / avgPost) + Settings.pWlikes * (nlikes() / (avgLikes != 0 ? avgLikes : 1))
+				+ Settings.pWviews * (nviews() / (avgViews != 0 ? avgViews : 1));
 	}
 
 	public void evalPolarity(ConcurrentHashMap<Integer, Author> authordb) {
-		total_inf = authordb.get(author_id).getInfluence();
+		total_inf = authordb.get(author_id2).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((v) -> {
 			total_inf += authordb.get(v.getUID()).getInfluence();
 			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
+
+		});
+
+		polarity = polarity / total_inf;
+	}
+	
+	public void evalPolarity2(ConcurrentHashMap<String, Author> authordb) {
+		total_inf = authordb.get(author_id2).getInfluence();
+		polarity = total_inf * main.getPolarity();
+
+		comments.forEach((v) -> {
+			total_inf += authordb.get(v.getUID(false)).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID(false)).getInfluence();
 
 		});
 
@@ -71,6 +85,10 @@ public class Opinion {
 
 	public int getUID() {
 		return author_id;
+	}
+	
+	public String getUID(boolean a) {
+		return author_id2;
 	}
 
 	public double getTotalInf() {

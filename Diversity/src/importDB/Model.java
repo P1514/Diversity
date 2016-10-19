@@ -130,6 +130,7 @@ public class Model {
 			query1.setInt(5, msg.getInt("Id"));
 			//query1.setString(1, msg.getString("Age"));
 			//query1.setString(2, msg.getString("Gender"));
+			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");

@@ -52,7 +52,7 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://localhost:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	public static final Integer dbversion = 3;
+	public static final Integer dbversion = 4;
 
 	// Author Table
 	public static final String latable = "authors";
@@ -66,6 +66,8 @@ public class Settings {
 	public static final String latable_views = "views";
 	public static final String latable_influence = "influence";
 	public static final String latable_id = "id";
+	//public static final String latable_Uid = "Username";
+	public static final String latable_source = "source";
 
 	// Post Table
 	public static final String lptable = "posts";
@@ -113,21 +115,24 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
+	public static Boolean JSON_use = true;
 	public static String JSON_uri = "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
-	public static final String JSON_replies = "Replies";
+	public static final String JSON_replies = "replies";
 	public static final String JSON_userid = "account";
 	public static final String JSON_epoch = "postEpoch";
-	public static final String JSON_message = "Post";
-	public static final String JSON_likes = "Likes";
-	public static final String JSON_views = "Views";
-	public static final String JSON_tweets = "Tweets";
+	public static final String JSON_message = "post";
+	public static final String JSON_likes = "likes";
+	public static final String JSON_views = "views";
+	public static final String JSON_tweets = "tweets";
 	public static final String JSON_source = "source";
 	public static final String JSON_age = "age";
 	public static final String JSON_gender = "gender";
 	public static final String JSON_location = "location";
+	public static final String JSON_fname = "Fname";
+	public static final String JSON_lname = "Lname";
 
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 

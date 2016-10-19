@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `authors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `authors` (
-  `id` int(11) NOT NULL,
+  `id` varchar(90) NOT NULL,
   `age` int(11) DEFAULT NULL,
   `name` varchar(90) DEFAULT NULL,
   `gender` varchar(45) DEFAULT NULL,
@@ -35,7 +35,8 @@ CREATE TABLE `authors` (
   `likes` int(11) DEFAULT NULL,
   `views` int(11) DEFAULT NULL,
   `posts` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `source` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`,`source`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -94,7 +95,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,3);
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,4);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -106,7 +107,7 @@ DROP TABLE IF EXISTS `influences`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `influences` (
-  `authors_id` int(11) DEFAULT NULL,
+  `authors_id` varchar(90) DEFAULT NULL,
   `timestamp` date DEFAULT NULL,
   `value` double DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -142,7 +143,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=339 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=760 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,6 +152,7 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
+INSERT INTO `models` VALUES (756,'Female','http://www.facebook.com;','D522-1 PSS',1,1,1,1,NULL,NULL),(757,'Male','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL),(758,'Old','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL),(759,'Young','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,15 +168,14 @@ CREATE TABLE `opinions` (
   `reach` double DEFAULT NULL,
   `polarity` double DEFAULT NULL,
   `total_inf` double DEFAULT NULL,
-  `authors_id` int(11) NOT NULL,
+  `authors_id` varchar(90) NOT NULL,
   `timestamp` date DEFAULT NULL,
   `pss` varchar(45) NOT NULL,
   `comments` int(11) DEFAULT NULL,
   `product` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`,`authors_id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `fk_opinions_authors_idx` (`authors_id`),
-  CONSTRAINT `fk_opinions_authors` FOREIGN KEY (`authors_id`) REFERENCES `authors` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `fk_opinions_authors_idx` (`authors_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -222,7 +223,7 @@ CREATE TABLE `posts` (
   `likes` int(11) DEFAULT NULL,
   `views` varchar(45) DEFAULT NULL,
   `opinions_id` int(11) NOT NULL,
-  `authors_id` int(11) NOT NULL,
+  `authors_id` varchar(90) NOT NULL,
   PRIMARY KEY (`id`,`opinions_id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `fk_posts_opinions1_idx` (`opinions_id`,`authors_id`)
@@ -279,4 +280,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-09-28 17:53:00
+-- Dump completed on 2016-10-19 15:17:51

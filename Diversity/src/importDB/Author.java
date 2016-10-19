@@ -7,6 +7,7 @@ public class Author {
 
 	private int id; // Keys
 	private String id2; // Keys String
+	private String source;
 	private String name; //
 	private double influence; // Calculated
 	private int age;
@@ -29,8 +30,10 @@ public class Author {
 		this.views = 0;
 
 	}
-	public Author(String _id, int _age, String _gender, String _location) {
+
+	public Author(String _id, String _source, String _name, int _age, String _gender, String _location) {
 		this.id2 = _id;
+		this.source = _source;
 		this.age = _age;
 		this.gender = _gender;
 		this.location = _location;
@@ -53,6 +56,10 @@ public class Author {
 		return influence;
 	}
 
+	public String getSource() {
+		return this.source;
+	}
+
 	public String getGender() {
 		return gender;
 	}
@@ -64,8 +71,12 @@ public class Author {
 	public int getID() {
 		return id;
 	}
-	
-	public int getPosts(){
+
+	public String getUID() {
+		return id2;
+	}
+
+	public int getPosts() {
 		return posts;
 	}
 
@@ -81,21 +92,26 @@ public class Author {
 		this.likes += number;
 	}
 
-	public void addPosts(){
+	public void addPosts() {
 		this.posts += 1;
 	}
-	public void setComments(int number){
-		this.comments=number;
+
+	public void setComments(int number) {
+		this.comments = number;
 	}
-	public void setViews(int number){
-		this.views=number;
+
+	public void setViews(int number) {
+		this.views = number;
 	}
-	public void setLikes(int number){
-		this.likes=number;
+
+	public void setLikes(int number) {
+		this.likes = number;
 	}
-	public void setPosts(int number){
-		this.posts=number;
+
+	public void setPosts(int number) {
+		this.posts = number;
 	}
+
 	public int getComments() {
 		return this.comments;
 	}
@@ -107,11 +123,13 @@ public class Author {
 	public int getViews() {
 		return this.views;
 	}
-	
+
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
-		this.influence = Settings.aWcomments * ((this.comments/this.posts) / avgcom) + Settings.aWlikes * ((this.likes/this.posts) / avglike)
-				+ Settings.aWviews * ((this.views/this.posts) / avgview);
-		//System.out.println(avgcom + " / " + avglike + " / " + avgview);
+		this.influence = Settings.aWcomments
+				* ((this.comments / this.posts) / (double) (avgcom != 0 ? avgcom : (double) 1))
+				+ Settings.aWlikes * ((this.likes / this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
+				+ Settings.aWviews * ((this.views / this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
+		// System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 
 }

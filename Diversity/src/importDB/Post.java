@@ -43,7 +43,7 @@ public class Post {
 
 	public Post(int _id, String _source, String _userid, Date _time, int _likes, int _views, String _message) {
 		this.id = _id;
-		this.userid2 = _source + ";" + _userid;
+		this.userid2 = _userid;
 		this.time = _time;
 		this.views = _views;
 		this.likes = _likes;
@@ -71,11 +71,11 @@ public class Post {
 
 	public int getUID() {
 		return userid;
-
 	}
 	
 	public String getUID(boolean a){
-		return userid2;
+		if(a) return userid2;
+		return userid2+","+source;
 	}
 
 	public String getComment() {

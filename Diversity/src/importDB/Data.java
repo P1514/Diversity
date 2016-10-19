@@ -1,15 +1,9 @@
 package importDB;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.sql.*;
 import java.sql.Date;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +19,7 @@ import backend.Settings;
 
 public class Data {
 	private ConcurrentHashMap<Integer, Author> authordb = new ConcurrentHashMap<Integer, Author>();
+	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
 	private ConcurrentHashMap<Integer, Opinion> opiniondb = new ConcurrentHashMap<Integer, Opinion>();
 	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
 	private int totalposts;
@@ -85,7 +80,6 @@ public class Data {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			e1.printStackTrace();
@@ -120,11 +114,7 @@ public class Data {
 		try {
 			ExecutorService es = Executors.newFixedThreadPool(100);
 			for (int id = 0; id < json.length(); id++)
-				es.execute(new Topinions(json.getJSONObject(id))); // TODO done
-																	// before
-																	// this line
-																	// do after
-																	// this
+				es.execute(new Topinions(json.getJSONObject(id)));
 			es.shutdown();
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -170,28 +160,47 @@ public class Data {
 			// Fetch local DB for users
 			rs.close();
 			stmt.close();
-			cnlocal.close();// TODO tirar a parte de ir buscar users to remote daqui pois passa a ir buscar ao JSON
+			cnlocal.close();// TODO tirar a parte de ir buscar users to remote
+							// daqui pois passa a ir buscar ao JSON
 			cnlocal = Settings.connlocal();
-			String querycond = users.toString();
+			String querycond = "";
+			for (Author user : users2) {
+				if(user == null) continue;// TODO find the error in here sometimes null appears 
+				System.out.println("\n DEBUG IF HAPPENS USERID="+user.getUID());
+				System.out.println(" RESULT STRING "+querycond );
+				querycond += user.getUID() + ",";
+			}
 			System.out.println(querycond);
-			querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 
 			// Load users from local DB
-			select = ("Select * from " + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
-			// System.out.println(query);
-			stmt = cnlocal.createStatement();
-			rs = stmt.executeQuery(select);
-			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt("id"))) {
-				} else {
-					Author auth = new Author(rs.getInt(Settings.latable_id), rs.getString(Settings.latable_name),
-							rs.getInt(Settings.latable_age), rs.getString(Settings.latable_gender),
-							rs.getString(Settings.latable_location));
-					auth.setComments(rs.getInt(Settings.latable_comments));
-					auth.setLikes(rs.getInt(Settings.latable_likes));
-					auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
-					auth.setViews(rs.getInt(Settings.latable_views));
-					authordb.put(rs.getInt(Settings.latable_id), auth);
+			if (users2.size() != 0) {
+				select = ("Select * from " + Settings.latable + " where " + Settings.latable_id + " in (");
+
+				for (int i = 0; i < users2.size() - 1; i++)
+					select += "?,";
+				select += "?)";
+
+				// System.out.println(query);
+				PreparedStatement stmt2 = cnlocal.prepareStatement(select);
+				for (int i = 0; i < users2.size(); i++) {
+					stmt2.setString(i + 1, querycond.split(",")[i]);
+				}
+				rs = stmt2.executeQuery();
+				//System.out.println(stmt2);
+				while (rs.next()) {
+					if (authordb2
+							.containsKey(rs.getString(Settings.latable_id) + rs.getString(Settings.latable_source))) {
+					} else {
+						Author auth = new Author(rs.getString(Settings.latable_id),
+								rs.getString(Settings.latable_source), rs.getString(Settings.latable_name),
+								rs.getInt(Settings.latable_age), rs.getString(Settings.latable_gender),
+								rs.getString(Settings.latable_location));
+						auth.setComments(rs.getInt(Settings.latable_comments));
+						auth.setLikes(rs.getInt(Settings.latable_likes));
+						auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
+						auth.setViews(rs.getInt(Settings.latable_views));
+						authordb2.put(rs.getString(Settings.latable_id) +","+ rs.getString(Settings.latable_source), auth);
+					}
 				}
 			}
 			rs.close();
@@ -200,19 +209,47 @@ public class Data {
 			System.out.println(" Load users local " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
 
-			// Load users from foreign DB
-			select = ("Select * from " + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
-			cndata = Settings.conndata();
-			stmt = cndata.createStatement();
-			rs = stmt.executeQuery(select);
-			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt(Settings.rutable_userid))) {
+			/*
+			 * // Load users from foreign DB select = ("Select * from " +
+			 * Settings.rutable + " where " + Settings.rutable_userid + " in " +
+			 * querycond); cndata = Settings.conndata(); stmt =
+			 * cndata.createStatement(); rs = stmt.executeQuery(select); while
+			 * (rs.next()) { if
+			 * (authordb.containsKey(rs.getInt(Settings.rutable_userid))) { }
+			 * else { authordb.put(rs.getInt(Settings.rutable_userid), new
+			 * Author(rs.getInt(Settings.rutable_userid),
+			 * rs.getString(Settings.rutable_name),
+			 * rs.getInt(Settings.rutable_age),
+			 * rs.getString(Settings.rutable_gender),
+			 * rs.getString(Settings.rutable_loc))); } }
+			 */
+
+			// Load users from JSON
+
+			for (Author user : users2) {
+				if (authordb2.containsKey(user.getUID() +","+ user.getSource())) {
+					Author luser = authordb2.get(user.getUID() +","+ user.getSource());
+					boolean gender = false, location = false, age = false;
+					location = luser.getLocation().equals("");// TODO see issue
+																// regarding
+																// people
+																// changing
+																// their
+																// location
+					gender = luser.getGender().equals("");
+					age = luser.getAge() == -1;
+					if (gender || location || age) {
+						authordb2.put(user.getUID() +","+ user.getSource(),
+								new Author(user.getUID(), user.getSource(), user.getName(),
+										age ? luser.getAge() : user.getAge(),
+										gender ? luser.getGender() : user.getGender(),
+										location ? luser.getLocation() : user.getLocation()));
+					}
+
 				} else {
-					authordb.put(rs.getInt(Settings.rutable_userid),
-							new Author(rs.getInt(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-									rs.getInt(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-									rs.getString(Settings.rutable_loc)));
+					authordb2.put(user.getUID() + "," + user.getSource(), user);
 				}
+				;
 			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -242,26 +279,32 @@ public class Data {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
+			if (cnlocal != null)
+				try {
+					cnlocal.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 		}
 
 		System.out.println(" Load users remote " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
 		opiniondb.forEach((k, v) -> {
-			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
+			ArrayList<String> uniqueauthors2 = new ArrayList<String>();
 			ArrayList<Post> temp_post = v.getPosts();
 			temp_post.forEach((v2) -> {
-				if (!uniqueauthors.contains(v2.getUID()))
-					uniqueauthors.add(v2.getUID());
+				if (!uniqueauthors2.contains(v2.getUID(true) +","+ v2.getSource()))
+					uniqueauthors2.add(v2.getUID(true) +","+ v2.getSource());
 			});
-			uniqueauthors.forEach((v3) -> {
-				// System.out.println(authordb.containsKey(v3) + " " + v3);
-				Author temp_author = authordb.get(v3);
+			uniqueauthors2.forEach((v3) -> {
+				 System.out.println(authordb2.containsKey(v3) + " " + v3);
+				Author temp_author = authordb2.get(v3);
 				temp_author.addComments(v.newcomments());
 				temp_author.addLikes(v.newlikes());
 				temp_author.addViews(v.newviews());
 				temp_author.addPosts();
-				authordb.put(temp_author.getID(), temp_author);
+				authordb2.put(v3, temp_author);
 			});
 
 			totalcomments += v.newcomments();
@@ -272,15 +315,15 @@ public class Data {
 		System.out.println(" update opinions " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
-		this.totalposts += opiniondb.size();// Modificado
-		authordb.forEach((k, v) -> {
+		this.totalposts += opiniondb.size();// Modified
+		authordb2.forEach((k, v) -> {
 			v.calcInfluence((totalcomments / ((double) totalposts)), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
 		});
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			v.evalPolarity(authordb);
+			v.evalPolarity2(authordb2);
 		});
 		System.out.println(" calc eval and reach " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
@@ -290,15 +333,15 @@ public class Data {
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
-		authordb.forEach((k, author) -> {
+		authordb2.forEach((k, author) -> {
 			String insert = "INSERT INTO " + Settings.latable + " "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
+					+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, author.getID());
+				query1.setString(1, author.getUID());
 				query1.setInt(2, author.getAge());
 				query1.setString(3, author.getName());
 				query1.setString(4, author.getGender());
@@ -308,11 +351,12 @@ public class Data {
 				query1.setInt(8, author.getLikes());
 				query1.setInt(9, author.getViews());
 				query1.setInt(10, author.getPosts());
-				query1.setDouble(11, author.getInfluence());
-				query1.setInt(12, author.getComments());
-				query1.setInt(13, author.getLikes());
-				query1.setInt(14, author.getViews());
-				query1.setInt(15, author.getPosts());
+				query1.setString(11, author.getSource());
+				query1.setDouble(12, author.getInfluence());
+				query1.setInt(13, author.getComments());
+				query1.setInt(14, author.getLikes());
+				query1.setInt(15, author.getViews());
+				query1.setInt(16, author.getPosts());
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
@@ -347,7 +391,7 @@ public class Data {
 						query1.setDouble(2, opinion.getReach());
 						query1.setDouble(3, opinion.getPolarity());
 						query1.setDouble(4, opinion.getTotalInf());
-						query1.setInt(5, opinion.getUID());
+						query1.setString(5, opinion.getUID(true));
 						query1.setDate(6, opinion.getTime());
 						query1.setString(7, opinion.getPSS());
 						query1.setInt(8, opinion.ncomments());
@@ -369,7 +413,7 @@ public class Data {
 								query2.setInt(4, post.getLikes());
 								query2.setInt(5, post.getViews());
 								query2.setInt(6, k);
-								query2.setInt(7, post.getUID());
+								query2.setString(7, post.getUID(true));
 
 								query2.executeUpdate();
 								if (query2 != null)
@@ -421,7 +465,7 @@ public class Data {
 			query1.setDate(5, (Date) LastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
+			// Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -448,7 +492,7 @@ public class Data {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 
-		// DONE FAZER LOAD DAS VARIAVEIS NO GENERAL
+		// General Variable Load
 		String select = "Select * from general WHERE id=1";
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -480,7 +524,7 @@ public class Data {
 				if (cndata != null)
 					cndata.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+				//
 				e.printStackTrace();
 			}
 			e1.printStackTrace();
@@ -512,6 +556,33 @@ public class Data {
 		stmt = null;
 		rs = null;
 
+		// Load local models
+
+		try {
+			cnlocal = Settings.connlocal();
+
+			query = "Select * from " + Settings.lmtable;
+			stmt = cnlocal.createStatement();
+			// System.out.println(query);
+			rs = stmt.executeQuery(query);
+
+			for (; rs.next();) {
+				Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
+						rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+						rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
+						rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+				Data.modeldb.put(model.getId(), model);
+
+			}
+			rs.close();
+			stmt.close();
+			cnlocal.close();
+		} catch (ClassNotFoundException | SQLException e2) {
+			//
+			e2.printStackTrace();
+		}
+
 		// Load PSS
 
 		System.out.println(" Variable Init " + (System.nanoTime() - stime));
@@ -542,24 +613,25 @@ public class Data {
 				 * cndata.createStatement(); rs = stmt.executeQuery(query);
 				 */
 				if (!rs.next()) {
-					LastUpdated = LastUpdated2;
-					if (LastUpdated.after(new java.sql.Date(Calendar.getInstance().getTimeInMillis()))) {
-						obj.put("Op", "Error");
-						obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
-						result.put(obj);
-						if (rs != null)
-							rs.close();
-						if (stmt != null)
-							stmt.close();
-						if (cndata != null)
-							cndata.close();
-						return result.toString();
-					}
-					if (rs != null)
-						rs.close();
-					if (stmt != null)
-						stmt.close();
-					continue;
+					obj.put("Op", "Error");
+					obj.put("Message", "Loaded Successfully");
+					result.put(obj);
+					return result
+							.toString();/*
+										 * LastUpdated = LastUpdated2; if
+										 * (LastUpdated.after(new
+										 * java.sql.Date(Calendar.getInstance().
+										 * getTimeInMillis()))) { obj.put("Op",
+										 * "Error"); obj.put("Message",
+										 * "Error (2): Remote Database Error\r\n Please check if populated"
+										 * ); result.put(obj); if (rs != null)
+										 * rs.close(); if (stmt != null)
+										 * stmt.close(); if (cndata != null)
+										 * cndata.close(); return
+										 * result.toString(); } if (rs != null)
+										 * rs.close(); if (stmt != null)
+										 * stmt.close(); continue;
+										 */
 				}
 				break;
 			} while (true);
@@ -591,26 +663,6 @@ public class Data {
 			cndata.close();
 			System.out.println(" Load posts from remote " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
-
-			// Load local models
-
-			cnlocal = Settings.connlocal();
-			query = "Select * from " + Settings.lmtable;
-			stmt = cnlocal.createStatement();
-			// System.out.println(query);
-			rs = stmt.executeQuery(query);
-
-			if (rs.next()) {
-				for (; rs.next();) {
-					Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
-							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
-							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
-					Data.modeldb.put(model.getId(), model);
-
-				}
-			}
 
 			// Load local DB users
 			cnlocal = Settings.connlocal();
@@ -863,7 +915,7 @@ public class Data {
 			query1.setDate(5, (Date) LastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
+			//
 			e1.printStackTrace();
 		}
 		try {
@@ -1079,22 +1131,27 @@ public class Data {
 						rs.close();
 						stmt.close();
 						conlocal.close();
-						return;
-					}
-					totalposts--;
+					}else{
+					totalposts--;}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")) * 1000L);
 					DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					format.setTimeZone(TimeZone.getTimeZone("GMT"));
 					String formatted = format.format(date);
+					java.util.Date parsed = format.parse(formatted);
 
-					// System.out.println(id);
+					System.out.println(formatted);
 					int postid = obj.getInt("postId");
 					// System.out.println(id);
 					String source = obj.getString("source");
 					String user_id = obj.getString("account");
-					java.sql.Date time = remote ? Date.valueOf(formatted) : rs.getDate(Settings.lptable_timestamp);
-					int likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getInt("likes") : -1 : -1;
-					int views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getInt("views") : -1 : -1;
+					java.sql.Date time = remote ? new java.sql.Date(parsed.getTime()) : rs.getDate(Settings.lptable_timestamp);
+					int likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getInt("likes") : 0 : 0;
+					int views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getInt("views") : 0 : 0;
+					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " ": "";
+					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
+					int age = obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0;
+					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
+					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
 					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
 																								// create
@@ -1107,9 +1164,8 @@ public class Data {
 																								// media
 																								// specific
 																								// info
-					
-					Author author = new Author(user_id, obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : -1, obj.has(Settings.JSON_gender) ?
-							obj.getString(Settings.JSON_gender) : "", obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "");
+
+					Author author = new Author(user_id, source, name, age, gender, location);
 					if (!(users2.contains(author))) {
 						users2.add(author);
 					}
@@ -1117,7 +1173,7 @@ public class Data {
 					String tag = pss.getTag(message);
 					int product = pss.getProduct(message);
 
-					opiniondb.put(postid, new Opinion(_post, tag, product));
+					opiniondb.put(postid, new Opinion(_post, tag, product, "google.pt"));// TODO find url to attack here
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
@@ -1126,6 +1182,9 @@ public class Data {
 						conlocal.close();
 				} catch (SQLException | ClassNotFoundException | JSONException e) {
 					System.out.println("ERROR loading Opinions");
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -1147,8 +1206,9 @@ public class Data {
 
 		}
 
-		public Tposts(JSONObject _obj) {
+		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
+			_opin = opiniondb.get(_obj.getInt(Settings.JSON_postid));
 		}
 
 		public void run() {
@@ -1210,7 +1270,7 @@ public class Data {
 					System.out.println("ERROR loading Posts");
 					e.printStackTrace();
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
+					//
 					e.printStackTrace();
 				}
 
@@ -1222,29 +1282,36 @@ public class Data {
 
 						// System.out.println("HELLO2");
 						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
-						for (int index = 0; index < replies.length(); index++) {
+						for (int index = 0; index < replies.length()-1; index++) {
 
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
 
-							Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
+							//Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
+							Date date = new Date(Long.valueOf(11111 * 1000L));
 							DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 							format.setTimeZone(TimeZone.getTimeZone("GMT"));
 							String formatted = format.format(date);
+							java.util.Date parsed = format.parse(formatted); 
 
 							int postid = reply.getInt(Settings.JSON_postid);
 							String user_id = reply.getString(Settings.JSON_userid);
-							java.sql.Date time = Date.valueOf(formatted);
-							int likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getInt("likes") : -1
-									: -1;
-							int views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getInt("views") : -1
-									: -1;
+							java.sql.Date time = new java.sql.Date(parsed.getTime());
+							int likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getInt("likes") : 0
+									: 0;
+							int views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getInt("views") : 0
+									: 0;
 							String message = reply.getString(Settings.JSON_message);
 							String source = obj.getString(Settings.JSON_source);
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
-							Author author = new Author(user_id, obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : -1, obj.has(Settings.JSON_gender) ?
-									obj.getString(Settings.JSON_gender) : "", obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "");
+							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " ": "";
+							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
+							int age = obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0;
+							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
+							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
+									: "";
+							Author author = new Author(user_id, source, name, age, gender, location);
 							if (!(users2.contains(author))) {
 								users2.add(author);
 							}
@@ -1252,7 +1319,11 @@ public class Data {
 						}
 
 					}
+					
+					System.out.println("HELLO");
 				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
