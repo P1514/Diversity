@@ -106,11 +106,11 @@ public class Globalsentiment {
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND authors.age<=? AND authors.age>?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
 		if (gender != null)
-			insert += " AND authors.gender=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
 		if (location != null)
-			insert += " AND authors.location=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
@@ -145,8 +145,8 @@ public class Globalsentiment {
 			rs = query1.executeQuery();
 
 			while (rs.next()) {
-				auxcalc += (double) rs.getDouble("polarity") * rs.getDouble("reach");
-				totalreach += rs.getDouble("reach");
+				auxcalc += (double) rs.getDouble(Settings.lptable_polarity) * rs.getDouble(Settings.lotable_reach);
+				totalreach += rs.getDouble(Settings.lotable_reach);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -279,11 +279,11 @@ public class Globalsentiment {
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
 		if (age != null)
-			query += " AND age<=? AND age>?";
+			query += " AND "+Settings.latable_age+"<=? AND "+Settings.latable_age+">?";
 		if (gender != null)
-			query += " AND gender=?";
+			query += " AND "+Settings.latable_gender+"=?";
 		if (location != null)
-			query += " AND location=?";
+			query += " AND "+Settings.latable_location+"=?";
 
 		query += ")";
 
@@ -421,11 +421,11 @@ public class Globalsentiment {
 				+ "AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND authors.age<=? AND authors.age>?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
 		if (gender != null)
-			insert += " AND authors.gender=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
 		if (location != null)
-			insert += " AND authors.location=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
 		insert += ")";
 		/*
 		 * if (param != null) { if (!value.contains("-")) { insert +=
@@ -461,7 +461,7 @@ public class Globalsentiment {
 			rs = query1.executeQuery();
 
 			while (rs.next()) {
-				auxcalc += rs.getDouble("reach");
+				auxcalc += rs.getDouble(Settings.lotable_reach);
 				totalreach++;
 			}
 		} catch (Exception e) {

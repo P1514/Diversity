@@ -151,10 +151,10 @@ public class SentimentChart {
 		String insert = "Select " + Settings.lptable_polarity + " FROM " + Settings.lptable + " WHERE "
 				+ Settings.lptable_opinion + " in (" + "Select " + Settings.lotable_id + " from opinions where "
 				+ Settings.lotable_pss + "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0" : "=0")
-				+ ") && authors_id in (Select id from authors WHERE ((AGE >= ? AND AGE <= ? ";
+				+ ") && "+Settings.lotable_author+" in (Select "+Settings.latable_id+" from "+Settings.latable+" WHERE (("+Settings.latable_age+" >= ? AND "+Settings.latable_age+" <= ? ";
 
 		
-		insert += ") AND (AGE >= ? AND AGE <= ?)";		
+		insert += ") AND ("+Settings.latable_age+" >= ? AND "+Settings.latable_age+" <= ?)";		
 
 		if(model.getGender()=="All"){
 			/*for(int i=0; i<genders.length; i++){
@@ -164,21 +164,19 @@ public class SentimentChart {
 			}*/
 			insert+=")";
 		}else{
-			insert+= "AND (gender=?))";
+			insert+= "AND ("+Settings.latable_gender+"=?))";
 			
 		}
 		if (gender != null) {
 			if (!gender.contains("-")) {
-				insert += " AND (GENDER = ?)";
-			} else {
-				insert += " AND (GENDER >= ? AND GENDER <= ?)";
+				insert += " AND ("+Settings.latable_gender+" = ?)";
 			}
 		}
 		if (location != null) {
 			if (!location.contains("-")) {
-				insert += " AND (LOCATION = ?)";
+				insert += " AND ("+Settings.latable_location+" = ?)";
 			} else {
-				insert += " AND (LOCATION >= ? AND LOCATION <= ?)";
+				insert += " AND ("+Settings.latable_location+" >= ? AND "+Settings.latable_location+" <= ?)";
 			}
 		}
 
@@ -235,7 +233,7 @@ public class SentimentChart {
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {
-				auxcalc += (double) rs.getInt("polarity");
+				auxcalc += (double) rs.getInt(Settings.lptable_polarity);
 			}
 
 		} catch (Exception e) {

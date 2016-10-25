@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GetLastPost {
-
+// No longer used, it was used for influence graphs to get last post
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
 

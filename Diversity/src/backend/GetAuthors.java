@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 public class GetAuthors {
 
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
 	public GetAuthors() {
@@ -23,7 +22,7 @@ public class GetAuthors {
 		result.put(obj);
 		String insert = new String();
 		PreparedStatement query1 = null;
-		insert = "Select * FROM "+Settings.latable+" where id in (Select authors_id from opinions)";
+		insert = "Select * FROM "+Settings.latable+" where id in (Select "+Settings.lotable_author+" from "+Settings.lotable+")";
 		ResultSet rs = null;
 
 		try {
@@ -32,19 +31,19 @@ public class GetAuthors {
 			rs = query1.executeQuery();
 			for(;rs.next();){
 				obj= new JSONObject();
-				obj.put("Name", rs.getString("name"));
-				obj.put("Gender", rs.getString("gender"));
-				obj.put("Age", rs.getInt("age"));
-				obj.put("Location", rs.getString("location"));
-				int nposts=rs.getInt("posts");
+				obj.put("Name", rs.getString(Settings.latable_name));
+				obj.put("Gender", rs.getString(Settings.latable_gender));
+				obj.put("Age", rs.getInt(Settings.latable_age));
+				obj.put("Location", rs.getString(Settings.latable_location));
+				int nposts=rs.getInt(Settings.latable_posts);
 				obj.put("Nposts", nposts);
-				double tmp=rs.getInt("comments")/nposts;
+				double tmp=rs.getInt(Settings.latable_comments)/nposts;
 				obj.put("Avgcomms", trunc(String.valueOf(tmp)));
-				tmp=rs.getInt("likes")/nposts;
+				tmp=rs.getInt(Settings.latable_likes)/nposts;
 				obj.put("Avglikes", trunc(String.valueOf(tmp)));
-				tmp = rs.getInt("views")/nposts;
+				tmp = rs.getInt(Settings.latable_views)/nposts;
 				obj.put("Avgviews", trunc(String.valueOf(tmp)));
-				obj.put("Influence", trunc(String.valueOf(rs.getDouble("influence"))));
+				obj.put("Influence", trunc(String.valueOf(rs.getDouble(Settings.latable_influence))));
 				result.put(obj);
 			}
 

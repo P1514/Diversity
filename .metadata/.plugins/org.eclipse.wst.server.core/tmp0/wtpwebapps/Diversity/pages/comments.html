@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta charset="ISO-8859-1">
+<title>Comments</title>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="sorttable.js"></script>
+<style>
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
+}
+</style>
+</head>
+<body>
+	<!-- Tabela Posts-->
+	<div class="container">
+		<hr>
+		<table id="posts" class="table sortable">
+			<thead>
+				<tr>
+					<th>Original Author</th>
+					<th>Message</th>
+					<th>Polarity</th>
+					<th>Influence</th>
+					<th>Location</th>
+					<th>Gender</th>
+					<th>Age</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+</body>
+<script type="text/javascript">
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+	ws.onopen = function() {
+		var id=getParameterByName('id').split(" ");
+		json = {
+			"Op" : "getcomments",
+			"Id" : sessionStorage.id,
+			"Values" : id[0],
+		}
+		console.log(json);
+		ws.send(JSON.stringify(json));
+	}
+	
+	ws.onmessage = function(event) {
+		json = JSON.parse(event.data);
+		comments=json;
+		var tr;
+		$('#posts tbody').empty();
+		tr = $('<tr  bgcolor="#D6CFD6">');
+		tr.append("<td>" + comments[1].Name + "</td>");
+		tr.append("<td>" + comments[1].Message + "</td>");
+		tr.append("<td>" + comments[1].Polarity + "</td>");
+		tr.append("<td>" + comments[1].Influence + "</td>");
+		tr.append("<td>" + comments[1].Location + "</td>");
+		tr.append("<td>" + comments[1].Gender + "</td>");
+		tr.append("<td>" + comments[1].Age + "</td></tr>");
+		$('#posts tbody').append(tr);
+		for (var i = 2; i < comments.length; i++) {
+			tr = $('<tr>');
+			tr.append("<td>" + comments[i].Name + "</td>");
+			tr.append("<td>" + comments[i].Message + "</td>");
+			tr.append("<td>" + comments[i].Polarity + "</td>");
+			tr.append("<td>" + comments[i].Influence + "</td>");
+			tr.append("<td>" + comments[i].Location + "</td>");
+			tr.append("<td>" + comments[i].Gender + "</td>");
+			tr.append("<td>" + comments[i].Age + "</td></tr>");
+			$('#posts tbody').append(tr);
+		}
+	}
+</script>
+</html>

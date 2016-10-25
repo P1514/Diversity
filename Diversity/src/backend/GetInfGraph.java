@@ -10,7 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GetInfGraph {
-
+// So far unused since no more influence graphs will be shown
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
 

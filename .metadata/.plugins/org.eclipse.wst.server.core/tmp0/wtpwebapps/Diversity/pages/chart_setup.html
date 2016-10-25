@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Chart Configuration</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+	var json;
+	var i = 0;
+	function getCookie(name) {
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2)
+			return parts.pop().split(";").shift();
+	}
+	function setCookie() {
+		document.cookie = "Product=" + $("#Products :selected").text();
+		document.cookie = "PSS=" + document.getElementById("Products").value;
+	}
+	ws = new WebSocket('ws://' + window.location.hostname + ":"
+			+ window.location.port + '/Diversity/server');
+
+	ws.onopen = function() {
+		var jsonData = {
+			"Op" : "getconfig",
+		}
+		ws.send(JSON.stringify(jsonData));
+	}
+	ws.onmessage = function(event) {
+		json = JSON.parse(event.data);
+		console.log(json);
+
+		if (json.Op == "Error") {
+			alert(json.Message);
+			if(json.Message.indexOf("updated") !== -1){
+				var jsonData = {
+						"Op" : "getconfig",
+					}
+					ws.send(JSON.stringify(jsonData));
+			}
+				
+			return;
+		}
+		if (json[0].Op == "Configs") {
+			json = JSON.parse(event.data);
+			setConfig();
+		}
+
+	}
+	function send_config() {
+		var gstring="", astring="",lstring="";
+		
+		for(var i=1;;i++){
+			if(document.getElementById("gender"+i) == null)break;
+			gstring+=document.getElementById("gender"+i).value+",,";
+		}
+		for(var i=1;;i++){
+			if(document.getElementById("1age"+i) == null)break;
+			astring+=document.getElementById("1age"+i).value+"-"+document.getElementById("2age"+i).value+",,";
+		}
+		for(var i=1;;i++){
+			if(document.getElementById("location"+i) == null)break;
+			lstring+=document.getElementById("location"+i).value+",,";
+		}
+		var jsonData = {
+			"Op" : "setconfig",
+			"Gender" : gstring,
+			"Age" : astring,
+			"Location" : lstring,
+		}
+
+		console.log(jsonData);
+		ws.send(JSON.stringify(jsonData));
+
+	}
+	function addline(table){
+		var jsonData = new Array();
+		var ii=0;
+		if(table=="age"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Min":"0","Max":"99"
+					}
+					ii++;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="gender"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Gender"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Gender":"",
+					}
+					ii++;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="location"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Location"){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size+=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						jsonData[ii]=json[i];
+					}
+					jsonData[ii]={
+							"Location":"",
+					}
+					ii++;
+					break;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		console.log(jsonData);
+		json=jsonData;
+		setConfig();
+		
+	}
+	
+	function delline(table, id){
+		var jsonData = new Array();
+		var ii=0;
+		if(table=="age"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Age" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="gender"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Gender" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		if(table=="location"){
+			for(var i=0; i<json.length;i++,ii++){
+				if(json[i].hasOwnProperty("Param") && json[i].Param=="Location" && json[i].Size != 1){
+					jsonData[ii]=json[i];
+					var tsize=json[i].Size;
+					json[i].Size-=1;
+					for(var iii=0;iii<tsize+1;iii++, ii++, i++){
+						if(iii==id){
+							ii--;
+							continue;
+						}
+						jsonData[ii]=json[i];
+					}
+					break;
+				}
+				jsonData[ii]=json[i];
+			}
+		}
+		console.log(jsonData);
+		json=jsonData;
+		setConfig();
+		
+		
+		
+		
+	}
+	function setConfig() {
+		var i=1;
+		$('#age tbody').empty();
+		$('#gender tbody').empty();
+		$('#location tbody').empty();
+			var tsize = json[i].Size;
+			i++;
+			for (var ii = 1; ii < 1+tsize; i++, ii++) {
+				tr = $('<tr/>');
+				tr
+						.append("<tr><td>Range "
+								+ ii
+								+ "</td><td><input type=\"number\" id=\""
+								+ "1age" + ii + "\" value=\""
+								+ json[i].Min
+								+ "\" onKeyUp=\"checknumber(this);\">"
+								+ " - <input type=\"number\"id=\""
+								+ "2age" + ii + "\" value=\""
+								+ json[i].Max
+								+ "\" onKeyUp=\"checknumber(this);\">"
+								+ " <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('age',"+ii+");\"></button></td></tr>");
+				$('#age tbody').append(tr);
+			}
+			tr = $('<tr/>');
+			tr
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('age');\"></button></td>");
+			$('#age tbody').append(tr);
+			var tsize = json[i].Size;
+			i++;
+			for (var ii = 1; ii < 1+tsize; i++, ii++) {
+				tr = $('<tr/>');
+				tr
+						.append("<tr><td>Gender "
+								+ ii
+								+ "</td><td><input type=\"text\" id=\""
+								+ "gender" + ii +"\" value=\""
+								+ json[i].Gender
+								+ "\"> <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('gender',"+ii+");\"></button></td></tr>");
+				$('#gender tbody').append(tr);
+			}
+			tr = $('<tr/>');
+			tr
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('gender');\"></button></td>");
+			$('#gender	 tbody').append(tr);
+			var tsize = json[i].Size;
+			i++;
+			for (var ii = 1; ii < 1+tsize; i++, ii++) {
+				tr = $('<tr/>');
+				tr
+						.append("<tr><td>Location "
+								+ ii
+								+ "</td><td><input type=\"text\" id=\""
+								+ "location" + ii + "\" value=\""
+								+ json[i].Location
+								+ "\"> <button class=\"glyphicon glyphicon-remove\" onclick=\"delline('location',"+ii+");\"></button></td></tr>");
+				$('#location tbody').append(tr);
+			}
+			tr = $('<tr/>');
+			tr
+					.append("<td><button class=\"glyphicon glyphicon-plus\" onclick=\"addline('location');\"></button></td>");
+			$('#location tbody').append(tr);
+	}
+	function checknumber(field) {
+		field.value = field.value.replace(/[^0-9]/g, '');
+		if (field.value > 99) {
+			field.value = '99';
+		} else if (field.value < 0) {
+			field.value = '0';
+		}
+
+	}
+</script>
+<style>
+input[type="number"] {
+	width: 50px;
+}
+
+#tables {
+	position: relative;
+	width: 80%;
+	margin-left: 10%;
+	height: 50vh;
+}
+
+.inlineTable {
+	display: inline-block;
+	vertical-align: top
+}
+
+#setup {
+	position: absolute;
+	bottom: 0;
+}
+</style>
+</head>
+<body>
+
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+	</center>
+	<!-- Botões opcionais -->
+	<div id="tables" align="center">
+		<table id="age" class="inlineTable">
+			<thead>
+				<tr>
+					<th>Age</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		<table id="gender" class="inlineTable">
+			<thead>
+				<tr>
+					<th>Gender (A-Z)</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+		<table id="location" class="inlineTable">
+			<thead>
+				<tr>
+					<th>Location (A-Z)</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+
+		</table>
+
+		<input id="setup" class="btn btn-default btn-block"
+			onclick="send_config();" type="submit" value="Set up" />
+	</div>
+
+</body>

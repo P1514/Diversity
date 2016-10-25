@@ -50,7 +50,7 @@ public class GetPosts {
 			insert += "=0";
 		}
 		if (param != null) {
-			insert += " && timestamp >= ? && timestamp <= ?";
+			insert += " && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?";
 
 			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
 			try {
@@ -91,40 +91,46 @@ public class GetPosts {
 				n_tops++;
 			}
 
-			insert = "Select name,influence,location,gender,age from authors where id in (Select authors_id from opinions where id = ? )";
+			insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + ","
+					+ Settings.latable_location + "," + Settings.latable_gender + "," + Settings.latable_age + " from "
+					+ Settings.latable + " where " + Settings.latable_id + " in (Select " + Settings.lotable_author
+					+ " from " + Settings.lotable + " where " + Settings.lotable_id + " = ? )";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] = topid[i] + ",," + rs.getString("name") + ",," + rs.getDouble("influence") + ",,"
-						+ rs.getString("location") + ",," + rs.getString("gender") + ",," + rs.getInt("age") + ",,";
+				pre_result[i] = topid[i] + ",," + rs.getString(Settings.latable_name) + ",,"
+						+ rs.getDouble(Settings.latable_influence) + ",," + rs.getString(Settings.latable_location)
+						+ ",," + rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age) + ",,";
 				rs.close();
 				query1.close();
 			}
 
-			insert = "Select timestamp,polarity,reach,comments from opinions where id = ?";
+			insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + ","
+					+ Settings.lotable_reach + "," + Settings.lotable_comments + " from " + Settings.lotable + " where "
+					+ Settings.lotable_id + " = ?";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] += rs.getDate("timestamp") + ",," + rs.getDouble("polarity") + ",,"
-						+ rs.getDouble("reach") + ",," + rs.getInt("comments") + ",,";
+				pre_result[i] += rs.getDate(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity) + ",,"
+						+ rs.getDouble(Settings.lotable_reach) + ",," + rs.getInt(Settings.lotable_comments) + ",,";
 				rs.close();
 				query1.close();
 			}
 
-			insert = "Select message from posts where id = ?";
+			insert = "Select "+Settings.lptable_message+" from "+Settings.lptable+" where "+Settings.lptable_id+" = ?";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] += rs.getString("message");
+				pre_result[i] += rs.getString(Settings.lptable_message);
 				rs.close();
 				query1.close();
 			}
@@ -258,7 +264,7 @@ public class GetPosts {
 			rs.next();
 			obj.put("Filter", "Global");
 			result.put(obj);
-			obj=new JSONObject();
+			obj = new JSONObject();
 			obj.put("Value", rs.getInt("count(*)"));
 			result.put(obj);
 

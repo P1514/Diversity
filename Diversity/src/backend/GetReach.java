@@ -21,6 +21,20 @@ public class GetReach {
 	public GetReach() {
 	}
 	// TODO Redo this piece of code
+	
+	public JSONArray getTOPReach(int nTOP){
+		JSONObject obj = new JSONObject();
+		JSONArray result = new JSONArray();
+		
+		//String select = "Select "
+		
+		
+		
+		
+		
+		return result;
+		
+	}
 
 	public JSONArray getReach(int timespan /* years */, String param, String values, long id) throws JSONException {
 		JSONArray result = new JSONArray();
@@ -114,11 +128,11 @@ public class GetReach {
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND authors.age<=? AND authors.age>?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
 		if (gender != null)
-			insert += " AND authors.gender=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
 		if (location != null)
-			insert += " AND authors.location=?";
+			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
@@ -153,7 +167,7 @@ public class GetReach {
 			rs = query1.executeQuery();
 
 			while (rs.next()) {
-				auxcalc += (double) rs.getDouble("reach");
+				auxcalc += (double) rs.getDouble(Settings.lotable_reach);
 				totalreach++;
 			}
 		} catch (Exception e) {

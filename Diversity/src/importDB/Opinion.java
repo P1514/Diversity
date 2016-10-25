@@ -46,7 +46,7 @@ public class Opinion {
 	}
 
 	public void evalPolarity(ConcurrentHashMap<Integer, Author> authordb) {
-		total_inf = authordb.get(author_id2).getInfluence();
+		total_inf = authordb.get(author_id).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((v) -> {

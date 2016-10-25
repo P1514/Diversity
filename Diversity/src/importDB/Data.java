@@ -786,7 +786,7 @@ public class Data {
 		}
 		authordb.forEach((k, author) -> {
 			String insert = "INSERT INTO " + Settings.latable + " "
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
+					+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			PreparedStatement query1 = null;
@@ -802,11 +802,12 @@ public class Data {
 				query1.setInt(8, author.getLikes());
 				query1.setInt(9, author.getViews());
 				query1.setInt(10, author.getPosts());
-				query1.setDouble(11, author.getInfluence());
-				query1.setInt(12, author.getComments());
-				query1.setInt(13, author.getLikes());
-				query1.setInt(14, author.getViews());
-				query1.setInt(15, author.getPosts());
+				query1.setString(11, author.getSource() != null ? author.getSource() : "Not Avaliable");
+				query1.setDouble(12, author.getInfluence());
+				query1.setInt(13, author.getComments());
+				query1.setInt(14, author.getLikes());
+				query1.setInt(15, author.getViews());
+				query1.setInt(16, author.getPosts());
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {

@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Global Sentiment</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="sorttable.js"></script>
+<script type="text/javascript">
+	var ws;
+	var jsonData;
+	var json;
+	var global_data;
+	var gendata;
+	var agedata;
+	var locdata;
+
+	function getCookie(name) {
+		var value = "; " + document.cookie;
+		var parts = value.split("; " + name + "=");
+		if (parts.length == 2)
+			return parts.pop().split(";").shift();
+	}
+
+	//create trigger to resizeEnd event     
+	$(window).resize(function() {
+		if (this.resizeTO)
+			clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function() {
+			$(this).trigger('resizeEnd');
+		}, 500);
+	});
+
+	//redraw graph when window resize is completed  
+	$(window).on('resizeEnd', function() {
+		if (jsonData != 0)
+			drawGlobal();
+		if (gendata != 0)
+			drawColumn("genchart_div", "Gender", gendata);
+		if (locdata != 0)
+			drawColumn("locchart_div", "Location", locdata);
+		if (agedata != 0)
+			drawColumn("agechart_div", "Age", agedata);
+	});
+
+	function connect() {
+		document.getElementById("Cookie").innerHTML = "Model: " +sessionStorage.model + "; PSS: " + sessionStorage.pss;
+
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+		ws.onopen = function() {
+			json = {
+				"Op" : "globalsentiment",
+				"Id" : sessionStorage.id
+			}
+			ws.send(JSON.stringify(json));
+
+			json = {
+				"Op" : "getposts",
+				"Id" : sessionStorage.id
+			}
+
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Id" : sessionStorage.id,
+				"Param" : "gender"
+			}
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Id" : sessionStorage.id,
+				"Param" : "age"
+			}
+			ws.send(JSON.stringify(json));
+			json = {
+				"Op" : "getpopulation",
+				"Id" : sessionStorage.id,
+				"Param" : "location"
+			}
+			ws.send(JSON.stringify(json));
+		};
+		ws.onmessage = function(event) {
+			json = JSON.parse(event.data);
+
+			if (json[0].Op == "Error") {
+				alert(json[0].Message);
+				return;
+			}
+
+			if (json[0].Op == "table") {
+				//populate table
+				var tr;
+				$('#posts tbody').empty();
+				for (var i = 1; i < json.length; i++) {
+					tr = $('<tr/>');
+					tr.append("<td>" + json[i].Name + "</td>");
+					tr.append("<td>" + json[i].Message + "</td>");
+					tr.append("<td>" + json[i].Comments + "</td>");
+					tr.append("<td width=\"100px\">" + json[i].Date + "</td>");
+					tr.append("<td>" + json[i].Polarity + "</td>");
+					tr.append("<td>" + json[i].Reach + "</td>");
+					tr.append("<td>" + json[i].Influence + "</td>");
+					tr.append("<td>" + json[i].Location + "</td>");
+					tr.append("<td>" + json[i].Gender + "</td>");
+					tr.append("<td>" + json[i].Age + "</td>");
+					tr
+							.append("<td><input type=\"hidden\" name=\"id\" value=\"" + json[i].Id +"\">");
+					$('#posts tbody').append(tr);
+				}
+				// Detect table click
+				$('.table > tbody > tr').click(function(e) {
+					console.log("HELLO");
+					/*json = {
+						"Op" : "getcomments",
+						"Values" : $(this).find('input[name="id"]').val()
+					}
+					ws.send(JSON.stringify(json));*/
+					clicker($(this).find('input[name="id"]').val());
+				});
+			}
+
+			if (json[0].Op == "graph") {
+				global_data = JSON.parse(JSON.stringify(json));
+				drawGlobal();
+			}
+			if (json[0].Op == "gengraph") {
+				gendata = JSON.parse(JSON.stringify(json));
+				drawColumn("genchart_div", "Gender", gendata);
+			}
+			if (json[0].Op == "agegraph") {
+				agedata = JSON.parse(JSON.stringify(json));
+				drawColumn("agechart_div", "Age", agedata);
+			}
+			if (json[0].Op == "locgraph") {
+				locdata = JSON.parse(JSON.stringify(json));
+				drawColumn("locchart_div", "Location", locdata);
+			}
+			//if 
+			if (json[0].Op == "comments") {
+				clicker();
+				//var w = window.open("comments.html", "Comments", "width=700,height=800");
+			}
+		};
+	}
+
+	google.charts.load('current', {
+		packages : [ 'corechart', 'bar' ]
+	});
+	google.charts.setOnLoadCallback(connect);
+
+	var globaldata;
+
+	//global sentiment graph
+	function drawGlobal() {
+
+		var data = JSON.parse(JSON.stringify(global_data));
+		globaldata = new google.visualization.DataTable();
+		globaldata.addColumn('string', 'Month');
+		globaldata.addColumn('number', 'Global');
+
+		for (var i = 1; i < data.length; i++) {
+			var counter = data[i];
+			globaldata.addRows([ [ counter.Month, counter.Sentiment ] ]);
+		}
+
+		var options = {
+			title : 'Average Global Sentiment Over Time',
+
+			colors : [ '#604460' ],
+			hAxis : {
+				title : 'Month',
+				showTextEvery : 1
+			},
+			vAxis : {
+				title : 'Sentiment',
+				viewWindow : {
+					max : 0,
+					min : 100
+				}
+			},
+			legend : {
+				position : 'none'
+			},
+			width : '100%',
+			height : '100%'
+		};
+
+		var chart = new google.visualization.LineChart(document
+				.getElementById('chart_div'));
+		chart.draw(globaldata, options);
+		google.visualization.events.addListener(chart, 'select', function() {
+			var selection = chart.getSelection();
+			if (selection != "") {
+				var row = selection[0].row;
+				var col = selection[0].column;
+				var month = globaldata.getValue(row, 0);
+
+				json = {
+					"Op" : "getposts",
+					"Pss" : sessionStorage.pss,
+					"Param" : "Month",
+					"Values" : month,
+				}
+
+				ws.send(JSON.stringify(json));
+
+			} else {
+				json = {
+					"Op" : "getposts",
+					"Pss" : sessionStorage.pss
+				}
+
+				ws.send(JSON.stringify(json));
+			}
+		})
+	}
+
+	// Population Graphs
+	function drawColumn(graph, title, data) {
+		var localdata = new google.visualization.DataTable();
+		var paramcount = 0;
+		localdata.addColumn('string', data[0].Param);
+		for (var i = 1; i < data.length; i++)
+			localdata.addColumn('number', data[i].Param);
+		var values = new Array();
+		values.push(data[0].param);
+		for (var i = 1; i < data.length; i++) {
+			values.push(data[i].Value);
+			paramcount++;
+		}
+		localdata.addRow(values);
+		var colors = new Array();
+		for (var i = 1; i < paramcount + 1; i++) {
+			colors.push(chartcolor(data[0].Param, i));
+		}
+		console.log(colors);
+
+		var options = {
+			title : title,
+			colors : colors,
+			legend : {
+				position : 'none'
+			},
+			bar : {
+				groupWidth : '50%'
+			},
+			vAxis : {
+				viewWindow : {
+					min : 0,
+				},
+			},
+			width : '100%',
+			height : '100%'
+		};
+
+		var chart = new google.visualization.ColumnChart(document
+				.getElementById(graph));
+		chart.draw(localdata, options);
+
+		function chartcolor(data, i) {
+			switch (data) {
+			case "Global":
+				return "#604460";
+			case "Gender":
+				switch (i) {
+				case 1:
+					return "#00617F";
+				case 2:
+					return "#0093C8";
+				default:
+					return "#0CC5FC";
+				}
+			case "Location":
+				switch (i) {
+				case 1:
+					return "#FF3C14";
+				case 2:
+					return "#A60202";
+				default:
+					return "#540001";
+
+				}
+			case "Age":
+				switch (i) {
+				case 1:
+					return "#BFD730";
+				case 2:
+					return "#8CA122";
+				case 3:
+					return "#5C6E0E";
+				case 4:
+					return "#405008";
+				default:
+					return "#202D02";
+				}
+			}
+		}
+	}
+
+	//draws chart according to selected radio button
+	/*function checkValue() {
+		switch (document.test.field.value) {
+
+		case "Global":
+			var json = {
+				"Op" : "globalsentiment",
+				"Pss" : getCookie("Product")
+			}
+			ws.send(JSON.stringify(json));
+			break;
+
+		case "Gender":
+
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "gender",
+				"Values" : "Male,Female",
+				"Pss" : getCookie("Product")
+			}
+			ws.send(JSON.stringify(json));
+			break;
+
+		case "Location":
+
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "location",
+				"Values" : "East,West",
+				"Pss" : getCookie("Product")
+			}
+			ws.send(JSON.stringify(json));
+			break;
+
+		case "Age":
+
+			var json = {
+				"Op" : "globalsentiment",
+				"Param" : "age",
+				"Values" : "0-30,31-60,61-90",
+				"Pss" : getCookie("Product")
+			}
+			ws.send(JSON.stringify(json));
+			break;
+		}
+	}*/
+
+	function clicker(hidden) {
+		var thediv = document.getElementById('displaybox');
+		var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
+				+ hidden + ' frameborder="0" allowfullscreen="no"></iframe>';
+		if (thediv.style.display == "none") {
+			thediv.style.display = "";
+			thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+					+ "<param name='bgcolor' value='#000000'>"
+					+ embedCode
+					+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+			//thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage' class='btn btn-default'>Close Page</button>";
+		} else {
+			thediv.style.display = "none";
+			thediv.innerHTML = '';
+		}
+		return false;
+	}
+</script>
+
+
+<style>
+#displaybox {
+	z-index: 10000;
+	filter: alpha(opacity = 90); /*older IE*/
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=90); /* IE */
+	-moz-opacity: .9; /*older Mozilla*/
+	-khtml-opacity: 0.9; /*older Safari*/
+	opacity: 0.9; /*supported by current Mozilla, Safari, and Opera*/
+	background-color: #000000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	vertical-align: bottom;
+}
+
+table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
+	 ):not (.sorttable_nosort ):after {
+	content: " \25B4\25BE"
+}
+
+#dashboard {
+	position: relative;
+}
+
+#buttons {
+	margin-top: 150px;
+}
+
+#refresh {
+	display: inline-block;
+}
+
+product {
+	display: block;
+	font-size: 20px;
+	margin-top: 0.83em;
+	margin-bottom: 0.83em;
+	margin-left: 0;
+	margin-right: 0;
+	font-weight: normal;
+}
+
+#home {
+	position: absolute;
+	right: 10px;
+	top: 20px;
+}
+
+#graphst {
+	width: 100%;
+	table-layout: fixed;
+}
+</style>
+</head>
+
+<body>
+	<!-- Diversity Logo-->
+	<center>
+		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
+			align="top">
+	</center>
+
+	<!-- POPUP -->
+	<div id="displaybox" style="display: none;"></div>
+
+	<!-- Charts -->
+	<div class="container" id="dashboard">
+		<product align="left">
+		<div id="Cookie">Error no product to display</div>
+		</product>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
+
+		<hr>
+		<div id='chart_div'></div>
+		<div class="container">
+			<table class="container" id="graphst">
+				<h2>Population</h2>
+				<tr>
+					<td><div id='genchart_div'></div></td>
+					<td><div id='locchart_div'></div></td>
+					<td><div id='agechart_div'></div></td>
+				</tr>
+			</table>
+		</div>
+
+		<!-- Tabela Posts-->
+		<div class="container">
+			<h2>Top 5</h2>
+			<hr>
+			<table id="posts" class="table sortable">
+				<thead>
+					<tr>
+						<th>Original Author</th>
+						<th>Post</th>
+						<th># Comments</th>
+						<th>Date</th>
+						<th>Polarity</th>
+						<th>Reach</th>
+						<th>Influence</th>
+						<th>Location</th>
+						<th>Gender</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
