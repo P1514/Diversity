@@ -48,26 +48,6 @@ LOCK TABLES `authors` WRITE;
 /*!40000 ALTER TABLE `authors` DISABLE KEYS */;
 /*!40000 ALTER TABLE `authors` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `diversitydb`.`authors_BEFORE_UPDATE` BEFORE UPDATE ON `authors` FOR EACH ROW
-BEGIN
-
-Insert into `diversitydb`.`influences`(authors_id,timestamp,value) values(OLD.id,(Select lastupdated from general where id=1),OLD.influence);
-
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `general`
@@ -95,7 +75,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,4);
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,5);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +123,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=760 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=790 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +132,6 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
-INSERT INTO `models` VALUES (756,'Female','http://www.facebook.com;','D522-1 PSS',1,1,1,1,NULL,NULL),(757,'Male','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL),(758,'Old','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL),(759,'Young','http://www.facebook.com','D522-1 PSS',1,0,1,1,NULL,NULL);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,27 +166,6 @@ LOCK TABLES `opinions` WRITE;
 /*!40000 ALTER TABLE `opinions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `opinions` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `diversitydb`.`opinions_BEFORE_UPDATE` BEFORE UPDATE ON `opinions` FOR EACH ROW
-BEGIN
-
-Insert into `diversitydb`.`reach`(opinion_id,timestamp,value) values(OLD.id,(Select last_update from general where id=1),OLD.reach);
-
-
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
 -- Table structure for table `posts`
@@ -247,10 +205,7 @@ DROP TABLE IF EXISTS `reach`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `reach` (
-  `opinion_id` int(11) NOT NULL,
-  `timestamp` timestamp NULL DEFAULT NULL,
-  `value` double DEFAULT NULL,
-  PRIMARY KEY (`opinion_id`)
+  `value` longtext
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -260,16 +215,9 @@ CREATE TABLE `reach` (
 
 LOCK TABLES `reach` WRITE;
 /*!40000 ALTER TABLE `reach` DISABLE KEYS */;
+INSERT INTO `reach` VALUES ('[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"NOV\",\"Value\":62.7},{\"Month\":\"DEC\",\"Value\":84.64},{\"Month\":\"JAN\",\"Value\":89.02},{\"Month\":\"FEB\",\"Value\":89.63},{\"Month\":\"MAR\",\"Value\":81.96},{\"Month\":\"APR\",\"Value\":73.27},{\"Month\":\"MAY\",\"Value\":64.02},{\"Month\":\"JUN\",\"Value\":52.45},{\"Month\":\"JUL\",\"Value\":41.65},{\"Month\":\"AUG\",\"Value\":44.41},{\"Month\":\"SEP\",\"Value\":48.71},{\"Month\":\"OCT\",\"Value\":74.6}]');
 /*!40000 ALTER TABLE `reach` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'diversitydb'
---
-
---
--- Dumping routines for database 'diversitydb'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -280,4 +228,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-10-19 15:17:51
+-- Dump completed on 2016-10-26 17:41:56

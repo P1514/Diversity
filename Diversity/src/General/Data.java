@@ -919,6 +919,7 @@ public class Data {
 		}
 		try {
 			cnlocal.commit();
+			cnlocal.setAutoCommit(true);
 		} catch (SQLException e2) {
 			try {
 				cnlocal.rollback();
