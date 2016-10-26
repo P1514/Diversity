@@ -1,5 +1,7 @@
 package General;
 
+import java.util.ArrayList;
+
 import org.json.*;
 
 import Extraction.GetAuthors;
@@ -63,7 +65,33 @@ public class Backend {
 			switch (op) {
 
 			case 99:
+				result = new JSONArray();
+				gr.getTOPReach(5).forEach((k) -> {
+					try {
+						gs.calc_TOPreachglobalsentiment(1, null, null, k, k);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				});
+				ArrayList<String> temp_result = gs.Topreachglobalsentiment();
+				
+				temp_result.forEach((k)-> {
+					try {
+						JSONArray obj = new JSONArray(k);
+						result = convert(result, obj, "Graph", obj.getJSONObject(0).getString("Filter"));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				
+				
+				
+				return result.toString();
 
+			case 19:
 				result = new JSONArray();
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");

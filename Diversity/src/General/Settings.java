@@ -107,6 +107,9 @@ public class Settings {
 	public static final String lmtable_age="age_range";
 	public static final String lmtable_gender="gender";
 	
+	
+	// Reach table
+	public static final String lrtable="reach";
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";

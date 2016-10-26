@@ -26,6 +26,7 @@ public class Operations {
 		op.put("update_model",16);
 		op.put("getpss", 17);
 		op.put("opinion_extraction", 18);
+		op.put("oe_refresh", 19);
 		op.put("testing", 99);
 		
 		

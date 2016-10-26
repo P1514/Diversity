@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -21,7 +22,48 @@ public class Globalsentiment {
 
 	public Globalsentiment() {
 	}
-
+	
+	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,String output, String pss) throws JSONException{
+		Data.modeldb.put((long)-1, new Model(-1, 0, 0, "", "", pss, "0,150", "All", true, false));
+		
+		String insert =  "Insert into "+Settings.lrtable+" values (?)";
+		String delete = "Delete from reach";
+		
+		try {
+			dbconnect();
+			PreparedStatement query1 = cnlocal.prepareStatement(delete);
+			query1.execute();
+			query1 = cnlocal.prepareStatement(insert);
+			query1.setString(1, globalsentiment(timespan, param, values, output, -1).toString());
+			query1.executeUpdate();
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Data.modeldb.remove((long)-1);
+	}
+	public ArrayList<String> Topreachglobalsentiment(){
+		
+		String select = "Select * from "+Settings.lrtable;
+		ArrayList<String> result= new ArrayList<String>();
+		try {
+			dbconnect();
+			PreparedStatement query1 = cnlocal.prepareStatement(select);
+			ResultSet rs = query1.executeQuery();
+			while(rs.next()){
+				result.add(rs.getString(1));
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+		
+		
+		
+	}
+	
+	
 	public JSONArray globalsentiment(int timespan /* years */, String param, String values,String output, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();

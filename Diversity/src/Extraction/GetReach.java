@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -22,19 +23,34 @@ public class GetReach {
 	public GetReach() {
 	}
 	// TODO Redo this piece of code
-	
-	public JSONArray getTOPReach(int nTOP){
+
+	public ArrayList<String> getTOPReach(int nTOP) {
 		JSONObject obj = new JSONObject();
 		JSONArray result = new JSONArray();
+		ArrayList<String> tops = new ArrayList<String>();
+		PreparedStatement query1 = null;
+		ResultSet rs = null;
+
+		String select = "Select " + Settings.lotable_pss + " from "
+				+ Settings.lotable + " group by " + Settings.lotable_pss + " order by AVG("+Settings.lotable_reach+") desc limit "+nTOP;
+
+		try {
+			dbconnect();
+			query1 = cnlocal.prepareStatement(select);
+			rs = query1.executeQuery();
+			while(rs.next()){
+				tops.add(rs.getString(Settings.lotable_pss));
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		//String select = "Select "
-		
-		
-		
-		
-		
-		return result;
-		
+		return tops;
+
 	}
 
 	public JSONArray getReach(int timespan /* years */, String param, String values, long id) throws JSONException {
@@ -68,7 +84,7 @@ public class GetReach {
 		data.add(Calendar.YEAR, -1);
 		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param,values, id);
+			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
 			avg++;
 		}
 		value = value / avg;
@@ -129,11 +145,12 @@ public class GetReach {
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
+					+ Settings.latable_age + ">?";
 		if (gender != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
