@@ -28,12 +28,12 @@ public class Startup implements ServletContextListener {
 		System.out.println("Starting up!");
 		try {
 
-			System.out.println(clean.clean());
+			//System.out.println(clean.clean());
 			if (Settings.JSON_use == false) {
 				//start.load();
 			} else {
-				//JSONArray json = new JSONArray(readUrl(
-				//		"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
+				JSONArray json = new JSONArray(readUrl(
+				"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
 				//System.out.println(json);
 				//start.load(json);
 			}

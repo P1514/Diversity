@@ -22,35 +22,47 @@ public class Globalsentiment {
 
 	public Globalsentiment() {
 	}
-	
-	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,String output, String pss) throws JSONException{
-		Data.modeldb.put((long)-1, new Model(-1, 0, 0, "", "", pss, "0,150", "All", true, false));
-		
-		String insert =  "Insert into "+Settings.lrtable+" values (?)";
-		String delete = "Delete from reach";
-		
+
+	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
+			ArrayList<String> top5) throws JSONException {
 		try {
 			dbconnect();
+			String delete = "Delete from reach";
 			PreparedStatement query1 = cnlocal.prepareStatement(delete);
 			query1.execute();
+			String result = "";
+			cnlocal.close();
+
+			
+			for(String k : top5){
+
+				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", true, false));
+				result +=globalsentiment(timespan, param, values, k, -1).toString();	
+				Data.modeldb.remove((long) -1);
+			}
+			dbconnect();
+			result=result.replaceAll("\\]\\[", ",");
+			String insert = "Insert into " + Settings.lrtable + " values (?)";
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setString(1, globalsentiment(timespan, param, values, output, -1).toString());
-			query1.executeUpdate();
-		} catch (ClassNotFoundException | SQLException e) {
+			query1.setString(1, result);
+			query1.execute();
+			cnlocal.close();
+			
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Data.modeldb.remove((long)-1);
 	}
-	public ArrayList<String> Topreachglobalsentiment(){
-		
-		String select = "Select * from "+Settings.lrtable;
-		ArrayList<String> result= new ArrayList<String>();
+
+	public ArrayList<String> Topreachglobalsentiment() {
+
+		String select = "Select * from " + Settings.lrtable;
+		ArrayList<String> result = new ArrayList<String>();
 		try {
 			dbconnect();
 			PreparedStatement query1 = cnlocal.prepareStatement(select);
 			ResultSet rs = query1.executeQuery();
-			while(rs.next()){
+			while (rs.next()) {
 				result.add(rs.getString(1));
 			}
 		} catch (ClassNotFoundException | SQLException e) {
@@ -58,13 +70,10 @@ public class Globalsentiment {
 			e.printStackTrace();
 		}
 		return result;
-		
-		
-		
+
 	}
-	
-	
-	public JSONArray globalsentiment(int timespan /* years */, String param, String values,String output, long id)
+
+	public JSONArray globalsentiment(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -149,11 +158,12 @@ public class Globalsentiment {
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
+					+ Settings.latable_age + ">?";
 		if (gender != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
@@ -322,11 +332,11 @@ public class Globalsentiment {
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
 		if (age != null)
-			query += " AND "+Settings.latable_age+"<=? AND "+Settings.latable_age+">?";
+			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?";
 		if (gender != null)
-			query += " AND "+Settings.latable_gender+"=?";
+			query += " AND " + Settings.latable_gender + "=?";
 		if (location != null)
-			query += " AND "+Settings.latable_location+"=?";
+			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
 
@@ -381,7 +391,8 @@ public class Globalsentiment {
 
 	}
 
-	public JSONArray globalreach(int timespan /* years */, String param, String values, String output, long id) throws JSONException {
+	public JSONArray globalreach(int timespan /* years */, String param, String values, String output, long id)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
@@ -464,11 +475,12 @@ public class Globalsentiment {
 				+ "AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_age+"<=? AND "+Settings.latable+"."+Settings.latable_age+">?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
+					+ Settings.latable_age + ">?";
 		if (gender != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_gender+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
-			insert += " AND "+Settings.latable+"."+Settings.latable_location+"=?";
+			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		insert += ")";
 		/*
 		 * if (param != null) { if (!value.contains("-")) { insert +=

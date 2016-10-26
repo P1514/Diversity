@@ -66,21 +66,15 @@ public class Backend {
 
 			case 99:
 				result = new JSONArray();
-				gr.getTOPReach(5).forEach((k) -> {
-					try {
-						gs.calc_TOPreachglobalsentiment(1, null, null, k, k);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				});
-				ArrayList<String> temp_result = gs.Topreachglobalsentiment();
 				
+						gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
+					
+				ArrayList<String> temp_result = gs.Topreachglobalsentiment();
+				result.put(new JSONObject().put("Op", "Graph"));
 				temp_result.forEach((k)-> {
 					try {
 						JSONArray obj = new JSONArray(k);
-						result = convert(result, obj, "Graph", obj.getJSONObject(0).getString("Filter"));
+						result.put(obj);
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -197,6 +191,11 @@ public class Backend {
 		}
 
 		return result.toString();
+	}
+
+	private JSONArray convert(JSONArray result2, JSONArray obj2, String string) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private JSONArray convert(JSONArray result, JSONArray to_add, String param, String graph) throws JSONException {
