@@ -31,14 +31,16 @@ public class GetReach {
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 
-		String select = "Select " + Settings.lotable_pss + " from "
-				+ Settings.lotable + " group by " + Settings.lotable_pss + " order by AVG("+Settings.lotable_reach+") desc limit "+nTOP;
+		String select = "Select " + Settings.lotable_pss + " from " + Settings.lotable + " where "
+				+ Settings.lotable_pss + " in (Select distinct " + Settings.lmtable_pss + " from "+Settings.lmtable+" where "
+				+ Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
+				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(select);
 			rs = query1.executeQuery();
-			while(rs.next()){
+			while (rs.next()) {
 				tops.add(rs.getString(Settings.lotable_pss));
 			}
 		} catch (ClassNotFoundException e) {
@@ -48,7 +50,7 @@ public class GetReach {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return tops;
 
 	}

@@ -139,7 +139,7 @@ public class Data {
 			cnlocal = Settings.connlocal();
 			select = "Select * from " + Settings.lmtable;
 			stmt = cnlocal.createStatement();
-			// System.out.println(query);
+			 //System.out.println(select);
 			rs = stmt.executeQuery(select);
 
 			if (rs.next()) {
@@ -779,8 +779,12 @@ public class Data {
 
 		try {
 			cnlocal = Settings.connlocal();
+			cnlocal.setAutoCommit(false);
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		authordb.forEach((k, author) -> {
 			String insert = "INSERT INTO " + Settings.latable + " "
@@ -819,6 +823,20 @@ public class Data {
 				}
 			}
 		});
+		try {
+			cnlocal.commit();
+			cnlocal.close();
+			cnlocal = Settings.connlocal();
+			cnlocal.setAutoCommit(false);
+		} catch (SQLException | ClassNotFoundException e2) {
+			try {
+				cnlocal.rollback();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			e2.printStackTrace();
+		}
 
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
@@ -898,6 +916,17 @@ public class Data {
 		} catch (InterruptedException e) {
 			System.out.println("ERROR THREAD OP");
 			e.printStackTrace();
+		}
+		try {
+			cnlocal.commit();
+		} catch (SQLException e2) {
+			try {
+				cnlocal.rollback();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			e2.printStackTrace();
 		}
 		System.out.println(" insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();

@@ -29,7 +29,7 @@ public class Backend {
 		String values;
 		String filtering;
 		String tmp;
-		String[] filter = {"Global"};
+		String[] filter = { "Global" };
 		Settings conf;
 		GetModels model;
 		GetPosts gp = new GetPosts();
@@ -66,30 +66,21 @@ public class Backend {
 
 			case 99:
 				result = new JSONArray();
-				
-						gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
-					
-				ArrayList<String> temp_result = gs.Topreachglobalsentiment();
+
+				gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
+
 				result.put(new JSONObject().put("Op", "Graph"));
-				temp_result.forEach((k)-> {
-					try {
-						JSONArray obj = new JSONArray(k);
-						result.put(obj);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				});
-				
-				
-				
+
+				System.out.println(gs.Topreachglobalsentiment());
+				result.put(new JSONArray(gs.Topreachglobalsentiment()));
+
 				return result.toString();
 
 			case 19:
 				result = new JSONArray();
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
-				result.put(obj);			
+				result.put(obj);
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result, gs.getPolarityDistribution(id, param + "," + filtering,
 							values + "," + filter[i], filter[i]), "Graph", "Top_Middle");
@@ -97,9 +88,13 @@ public class Backend {
 				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
-				result = convert(result, gs.globalreach(1, param + "," + filtering, values + "," + filter[i],filter[i], id), "Graph", "Bottom_Middle");
+					result = convert(result,
+							gs.globalreach(1, param + "," + filtering, values + "," + filter[i], filter[i], id),
+							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
-				result = convert(result, gs.globalsentiment(1, param + "," + filtering, values + "," + filter[i],filter[i], id), "Graph", "Bottom_Right");
+					result = convert(result,
+							gs.globalsentiment(1, param + "," + filtering, values + "," + filter[i], filter[i], id),
+							"Graph", "Bottom_Right");
 				return result.toString();
 
 			case 18:
@@ -107,12 +102,13 @@ public class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				result = convert(result, gp.getAmmount(param, values,"Global", id), "Graph", "Top_Left");
-				result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph", "Top_Middle");
+				result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
+				result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
+						"Top_Middle");
 				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
-				result = convert(result, gs.globalreach(1, param, values,"Global", id), "Graph", "Bottom_Middle");
-				result = convert(result, gs.globalsentiment(1, param, values,"Global", id), "Graph", "Bottom_Right");
+				result = convert(result, gs.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
+				result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph", "Bottom_Right");
 				return result.toString();
 			case 1:
 				SentimentChart sc = new SentimentChart();

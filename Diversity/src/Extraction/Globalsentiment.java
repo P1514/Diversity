@@ -54,7 +54,7 @@ public class Globalsentiment {
 		}
 	}
 
-	public ArrayList<String> Topreachglobalsentiment() {
+	public String Topreachglobalsentiment() {
 
 		String select = "Select * from " + Settings.lrtable;
 		ArrayList<String> result = new ArrayList<String>();
@@ -63,13 +63,13 @@ public class Globalsentiment {
 			PreparedStatement query1 = cnlocal.prepareStatement(select);
 			ResultSet rs = query1.executeQuery();
 			while (rs.next()) {
-				result.add(rs.getString(1));
+				return rs.getString(1);
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return result;
+		return "";
 
 	}
 
