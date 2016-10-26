@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file.
 
 ### Prediction Model
 - Everything
+## [2.1] 2016-10-26
+### Fixed
+- Code Refactoring and Package Reorganization
 
 ## [2.0] 2016-10-19
 ### Added 
