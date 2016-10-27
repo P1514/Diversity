@@ -37,11 +37,13 @@ public class GetModels {
 		Model add = new Model();
 		JSONArray result;
 		result = add.add_model(msg);
-		if (add.getId() != 0) {
+		if (!(result.getJSONObject(0).getString("Op").equals("Error"))) {
 			Data.modeldb.put(add.getId(), add);
 			long id = add.getId();
 			System.out.println(id);
 		}
+		
+		result.put(0, result.getJSONObject(0).put("Op", "Error"));
 		return result;
 
 	}

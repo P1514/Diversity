@@ -123,7 +123,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=790 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=793 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,6 +132,7 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
+INSERT INTO `models` VALUES (790,'123','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,1,1,NULL,NULL),(791,'321','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,1,1,NULL,NULL),(792,'4444','http://www.google.pt;http://www.twitter.com;','D522-1 PSS',1,0,1,1,NULL,NULL);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -228,4 +229,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-10-26 17:41:56
+-- Dump completed on 2016-10-27  9:58:31

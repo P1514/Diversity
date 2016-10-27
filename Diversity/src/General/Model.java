@@ -96,7 +96,7 @@ public class Model {
 
 		}
 
-		obj.put("Op", "Error");
+		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
 		return result;
