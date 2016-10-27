@@ -52,7 +52,7 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://127.0.0.1:3306/diversitydb?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	public static final Integer dbversion = 5;
+	public static final Integer dbversion = 4;
 
 	// Author Table
 	public static final String latable = "authors";
