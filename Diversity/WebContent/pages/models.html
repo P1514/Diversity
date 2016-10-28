@@ -29,7 +29,7 @@
 	var i = 0;
 	var id=0;
 	var jsonData;
-	function getCookie(name) {
+	function getCookie(name) { //not being used
 		var value = "; " + document.cookie;
 		var parts = value.split("; " + name + "=");
 		if (parts.length == 2)
@@ -65,18 +65,18 @@
 			return;
 		}
 		if (json[0].Op == "pss") {
-		jsonData = JSON.parse(JSON.stringify(json));
+			jsonData = JSON.parse(JSON.stringify(json));
 			populatePSS();
-			if (sessionStorage.id != null) {
-			var json2 = {
-				"Op" : "get_model",
-				"Id" : sessionStorage.id,
+				if (sessionStorage.id != null) {
+				var json2 = {
+					"Op" : "get_model",
+					"Id" : sessionStorage.id,
+				}
+				//console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
+				ws.send(JSON.stringify(json2));
+				return;
+				}
 			}
-			//console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
-			ws.send(JSON.stringify(json2));
-			return;
-			}
-		}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
 			
@@ -103,7 +103,7 @@
 			document.getElementById("submit").value = "Update";
 			edit = true;
 		}
-	}
+		}
 
 	}, false);
 
@@ -130,10 +130,8 @@
 		var value = escapeHtml(document.getElementById("new_URI").value);
 		if (name == "" || value == "")
 			return;
-		value = value.replace("http://", "");
-		value = "http://" + value;
 		$('#left_menu').append(
-				'<div class="checkbox"><label><input type="checkbox" value="'+value+'"">'
+				'<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
 						+ name + '</label></div>');
 		document.getElementById("new_name").value = "";
 		document.getElementById("new_URI").value = "";
@@ -167,7 +165,7 @@
 			"User" : 1,//TODO find this field
 			"Id":sessionStorage.id,
 
-		}
+		};
 		if (erro == true) {
 			alert("All Fields must be filled");
 			return;
@@ -240,22 +238,16 @@ input[type="number"] {
 		<table id="menu">
 			<tr>
 				<td style="vertical-align: top">
-					<div id="left_menu" class="inlineTop">
-						<input type="text" id="new_name" placeholder="Name"><input
-							type="text" id="new_URI" placeholder="URI">
+					<div id="left_menu" class="inlineTable">
+						<div class="form-group">
+							<select class="form-control" id="new_name">
+								<option value="Facebook">Facebook</option>
+								<option value="Twitter">Twitter</option>
+							</select>
+						</div>
+						<input class="form-control" type="text" id="new_URI" placeholder="Account">
 						<button class="glyphicon glyphicon-plus" onclick="addline();"></button>
-						<div class="checkbox">
-							<label for="test"><input id="test" type="checkbox"
-								value="http://www.google.pt">Google</label>
-						</div>
-						<div class="checkbox">
-							<label><input type="checkbox"
-								value="http://www.twitter.com">Twitter</label>
-						</div>
-						<div class="checkbox">
-							<label><input type="checkbox"
-								value="http://www.facebook.com">Facebook</label>
-						</div>
+
 					</div>
 				</td>
 				<td style="vertical-align: top">
@@ -268,10 +260,9 @@ input[type="number"] {
 										type="number" class="form-control" id="frequency"
 										style="width: 75px;" onKeyUp="checknumber(this)" min="0">
 									<div class="form-group">
-  <label for="pss">PSS:</label>
-  <select class="form-control" id="pss">
-  </select>
-</div>
+										<label for="pss">PSS:</label> <select class="form-control"
+											id="pss"></select>
+									</div>
 								</div>
 								<div id="fcheckbox" style="display: none;" class="checkbox">
 									<label><input id="Archive" type="checkbox" value=""
@@ -281,7 +272,6 @@ input[type="number"] {
 						</tr>
 						<tr>
 							<td>
-
 								<!--<div class="form-group">
 									<label for="age">Age Range:</label> <b>0 &nbsp</b> <input
 										id="age" type="text" class="span2" value=""
@@ -297,9 +287,10 @@ input[type="number"] {
 							</select>
 								</div>-->
 								<div class="checkbox">
-									<label><input id="final" type="checkbox" value="" checked>Include
-										Final Products</label>
-								</div></td>
+									<label><input id="final" type="checkbox" value=""
+										checked>Include Final Products</label>
+								</div>
+							</td>
 							<td></td>
 						</tr>
 					</table>
@@ -310,6 +301,5 @@ input[type="number"] {
 		</table>
 		<input id="submit" class="btn btn-default btn-block"
 			onclick="send_config();" type="submit" value="Create" />
-	</div>
 	</div>
 </body>
