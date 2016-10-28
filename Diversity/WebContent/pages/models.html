@@ -23,12 +23,23 @@
 	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.css" />
+<!--<script src="jquery.js" type="text/javascript"></script>
+<script src="jquery.maskedinput.js" type="text/javascript"></script>-->
+	
 <script>
+
+
+
 	var json = "";
 	var edit = false;
 	var i = 0;
 	var id=0;
 	var jsonData;
+	
+	/*jQuery(function($){
+		   $("#date_").mask("99/99/9999",{placeholder:"mm/dd/yyyy"});
+		});*/
+	
 	function getCookie(name) { //not being used
 		var value = "; " + document.cookie;
 		var parts = value.split("; " + name + "=");
@@ -117,7 +128,7 @@
 		
 	}
 	
-	function escapeHtml(html)
+	function escapeHtml(html)//stops the user from injectinh html in forms
 	{
 	    var text = document.createTextNode(html);
 	    var div = document.createElement('div');
@@ -128,26 +139,48 @@
 	function addline() {
 		var name = escapeHtml(document.getElementById("new_name").value);
 		var value = escapeHtml(document.getElementById("new_URI").value);
+		console.log("line added");
 		if (name == "" || value == "")
 			return;
 		$('#left_menu').append(
 				'<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
-						+ name + '</label></div>');
+						+ name + " / " + value +  '</label></div>');
 		document.getElementById("new_name").value = "";
 		document.getElementById("new_URI").value = "";
 	}
+	
+	function showdate() {
+		var checkbox = document.getElementById("start_date");
+		var data = new Date(document.getElementById("date_input").value);
+		console.log(document.getElementById("date_input").value);
+		console.log(data.getDate());
+		console.log(data.getMonth()+1);
+		console.log(data.getFullYear());
+	console.log("data:" + transformdate(data));
+			if(!checkbox.checked)
+				document.getElementById("date_input").style.display = 'none';//hide
+			else
+				document.getElementById("date_input").style.display = 'block';//show as block
+	}
+	
+	function transformdate(date){
+		var month = date.getMonth()+1;
+		return date.getDate() + ";" + month + ";" + date.getFullYear();
+		
+	}
+	
 
 	function send_config() {
-		var configs = "";
-		$('#left_menu').find('input[type=checkbox]').each(function() {
+		var configs = ""; //to make sure it has the checkbox active
+		$('#left_menu').find('input[type=checkbox]').each(function() { 
 			if (this.checked == true) {
 				configs += this.value + ";";
 			}
 		});
 		var erro = false;
 		var jsonData = {
-			"Op" : document.getElementById("submit").value.toLowerCase()+"_model",
-			"URI" : configs != "" ? configs : erro = true,
+			"Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
+			"URI" : configs != "" ? configs : erro = true, 
 			"Update" : document.getElementById('frequency').value != "" ? document
 					.getElementById('frequency').value
 					: erro = true,
@@ -164,6 +197,7 @@
 					: erro = true,
 			"User" : 1,//TODO find this field
 			"Id":sessionStorage.id,
+			"Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :0,
 
 		};
 		if (erro == true) {
@@ -184,6 +218,7 @@
 
 	}
 </script>
+</head>
 <style>
 input[type="number"] {
 	width: 50px;
@@ -227,7 +262,8 @@ input[type="number"] {
 	bottom: 0;
 }
 </style>
-</head>
+
+
 <body>
 	<center>
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
@@ -245,10 +281,11 @@ input[type="number"] {
 								<option value="Twitter">Twitter</option>
 							</select>
 						</div>
-						<input class="form-control" type="text" id="new_URI" placeholder="Account">
+						<input class="form-control" type="text" id="new_URI" placeholder="Account name">
 						<button class="glyphicon glyphicon-plus" onclick="addline();"></button>
 
 					</div>
+						
 				</td>
 				<td style="vertical-align: top">
 					<table id="right_menu" class="inlineTable">
@@ -290,9 +327,16 @@ input[type="number"] {
 									<label><input id="final" type="checkbox" value=""
 										checked>Include Final Products</label>
 								</div>
+								<div class="checkbox">
+							<label><input id="start_date"  type="checkbox" onchange="showdate();">
+							Choose start date
+							</label>
+						</div>
+						<div><input id="date_input" class="form-control" type="date" style = "display:none" value = "2011-01-01"></div>
+						
+						<!-- <input id="date_" tabindex="1" type="text">-->
 							</td>
-							<td></td>
-						</tr>
+							<tr></tr>
 					</table>
 				</td>
 				<td></td>
