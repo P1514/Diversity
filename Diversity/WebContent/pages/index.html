@@ -89,6 +89,22 @@
 		}
 	}
 
+	$(window).resize(function() {
+		if (this.resizeTO)
+			clearTimeout(this.resizeTO);
+		this.resizeTO = setTimeout(function() {
+			$(this).trigger('resizeEnd');
+		}, 500);
+	});
+
+	//redraw graph when window resize is completed
+	$(window).on('resizeEnd', function() {
+		if (newData != 0) {
+			drawChart();
+		}
+	});
+
+
 	function refreshDB(clean) {
 		if (clean == 1) {
 			json = {
@@ -116,81 +132,11 @@
 
 		var data = JSON.parse(JSON.stringify(newData));
 
-		// test data with 5 PSSs. structure: [{Op: 'Graph'}, [{Filter : 'PSS Name'}, {Month : 'XXX', Value : YY.ZZ}, ...]]
-		var testData = [{Op: 'Graph'}
-							,[{Filter : 'D522-1 PSS'}
-										,{Month : 'NOV', Value : 55.41}
-										,{Month : 'DEC', Value : 58.46}
-										,{Month : 'JAN', Value : 35.45}
-										,{Month : 'FEB', Value : 88.47}
-										,{Month : 'MAR', Value : 75.49}
-										,{Month : 'APR', Value : 23.56}
-										,{Month : 'MAY', Value : 92.66}
-										,{Month : 'JUN', Value : 18.80}
-										,{Month : 'JUL', Value : 23.62}
-										,{Month : 'AUG', Value : 30.63}
-										,{Month : 'SEP', Value : 40.65}
-										,{Month : 'OCT', Value : 98.55}
-							,{Filter : 'D522-2 PSS'}
-										,{Month : 'NOV', Value : 41.55}
-										,{Month : 'DEC', Value : 46.58}
-										,{Month : 'JAN', Value : 45.35}
-										,{Month : 'FEB', Value : 47.88}
-										,{Month : 'MAR', Value : 49.76}
-										,{Month : 'APR', Value : 56.23}
-										,{Month : 'MAY', Value : 66.92}
-										,{Month : 'JUN', Value : 70.18}
-										,{Month : 'JUL', Value : 72.23}
-										,{Month : 'AUG', Value : 73.30}
-										,{Month : 'SEP', Value : 65.40}
-										,{Month : 'OCT', Value : 55.98}
-							,{Filter : 'D522-3 PSS'}
-										,{Month : 'NOV', Value : 30.23}
-										,{Month : 'DEC', Value : 48.58}
-										,{Month : 'JAN', Value : 87.35}
-										,{Month : 'FEB', Value : 33.88}
-										,{Month : 'MAR', Value : 27.76}
-										,{Month : 'APR', Value : 45.23}
-										,{Month : 'MAY', Value : 38.92}
-										,{Month : 'JUN', Value : 59.18}
-										,{Month : 'JUL', Value : 23.23}
-										,{Month : 'AUG', Value : 77.30}
-										,{Month : 'SEP', Value : 23.40}
-										,{Month : 'OCT', Value : 12.98}
-							,{Filter : 'D522-4 PSS'}
-										,{Month : 'NOV', Value : 36.55}
-										,{Month : 'DEC', Value : 43.58}
-										,{Month : 'JAN', Value : 48.35}
-										,{Month : 'FEB', Value : 11.88}
-										,{Month : 'MAR', Value : 13.76}
-										,{Month : 'APR', Value : 26.23}
-										,{Month : 'MAY', Value : 35.92}
-										,{Month : 'JUN', Value : 36.18}
-										,{Month : 'JUL', Value : 43.23}
-										,{Month : 'AUG', Value : 28.30}
-										,{Month : 'SEP', Value : 65.40}
-										,{Month : 'OCT', Value : 55.98}
-							,{Filter : 'D522-5 PSS'}
-										,{Month : 'NOV', Value : 29.55}
-										,{Month : 'DEC', Value : 30.58}
-										,{Month : 'JAN', Value : 31.35}
-										,{Month : 'FEB', Value : 36.88}
-										,{Month : 'MAR', Value : 49.76}
-										,{Month : 'APR', Value : 49.23}
-										,{Month : 'MAY', Value : 35.92}
-										,{Month : 'JUN', Value : 23.18}
-										,{Month : 'JUL', Value : 19.23}
-										,{Month : 'AUG', Value : 17.30}
-										,{Month : 'SEP', Value : 12.40}
-										,{Month : 'OCT', Value : 5.98}]];
 
 		var globaldata = new google.visualization.DataTable();
 		globaldata.addColumn('string', 'Month');
 
 		var counter = data[1];
-
-		// to use test data uncomment the next line
-		counter = testData[1]
 
 		var pssNumber = 0;
 		for (var i = 0; i < counter.length; i++) {							// find the number of PSSs to display (amount of 'Filter' in JSON)
@@ -262,7 +208,7 @@
 }
 
 #top5 {
-	width: 60%;
+	width: 100%;
 	height: 100%
 }
 
