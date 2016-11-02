@@ -19,13 +19,19 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/bootstrap-slider.js"></script>
 <script type="text/javascript"
 	src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script> <!--added-->
+
 <link rel="stylesheet"
 	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" /> <!--added-->
+
 <!--<script src="jquery.js" type="text/javascript"></script>
 <script src="jquery.maskedinput.js" type="text/javascript"></script>-->
-	
+
 <script>
 
 
@@ -35,11 +41,11 @@
 	var i = 0;
 	var id=0;
 	var jsonData;
-	
+
 	/*jQuery(function($){
 		   $("#date_").mask("99/99/9999",{placeholder:"mm/dd/yyyy"});
 		});*/
-	
+
 	function getCookie(name) { //not being used
 		var value = "; " + document.cookie;
 		var parts = value.split("; " + name + "=");
@@ -52,14 +58,14 @@
 		$('#age').slider();
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
-			
+
 			ws.onopen = function() {
 	json = {
 			"Op" : "getpss",
 		}
 		ws.send(JSON.stringify(json));
 	}
-	
+
 	ws.onmessage = function(event) {
 	console.log(event.data);
 		var json = JSON.parse(event.data);
@@ -71,7 +77,7 @@
 			alert(json[0].Message);
 			if(json[0].hasOwnProperty('id')){
 			sessionStorage.Id="model="+json[0].id;
-			location.reload();			
+			location.reload();
 			}
 			return;
 		}
@@ -90,7 +96,7 @@
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
-			
+
 			document.getElementById("model_name").value=json2[0].Name;
 			document.getElementById("model_name").readOnly = true;
 			document.getElementById("frequency").value=json2[0].Update;
@@ -108,7 +114,7 @@
 			for(i=0; i<uris.length; i++){
 			console.log("HELLO "+uris[i]+"\r\n");
 			$(':checkbox[value="'+uris[i]+'"]').prop("checked","true");}
-			
+
 			document.getElementById("fcheckbox").style.display = "block";
 			document.getElementById("Archive").disabled = false;
 			document.getElementById("submit").value = "Update";
@@ -118,16 +124,16 @@
 
 	}, false);
 
-	
+
 	function populatePSS() {
 		var products = JSON.parse(JSON.stringify(jsonData));
 		for (var i = 1; i < products.length; i++) {
 		console.log(products[i].Pss);
 		$('#pss').append('<option value="'+products[i].Pss+'">'+products[i].Pss+'</option>');
 		}
-		
+
 	}
-	
+
 	function escapeHtml(html)//stops the user from injectinh html in forms
 	{
 	    var text = document.createTextNode(html);
@@ -148,7 +154,7 @@
 		document.getElementById("new_name").value = "";
 		document.getElementById("new_URI").value = "";
 	}
-	
+
 	function showdate() {
 		var checkbox = document.getElementById("start_date");
 		var data = new Date(document.getElementById("date_input").value);
@@ -162,17 +168,72 @@
 			else
 				document.getElementById("date_input").style.display = 'block';//show as block
 	}
-	
+
 	function transformdate(date){
 		var month = date.getMonth()+1;
 		return date.getDate() + ";" + month + ";" + date.getFullYear();
-		
 	}
-	
+
+	var testProducts = [{Op : 'test'}, [{Filter: 'PSS1'}, {Product : 'A'}, {Product : 'B'}, {Filter: 'PSS2'}, {Product: 'C'}]];
+	window.onload = makeTree;
+	var globalTest;
+
+	function makeTree() {
+		document.getElementById('final_input').appendChild(makeList(testProducts));
+
+		$('#final_input').jstree({
+    "plugins" : [ "checkbox", "wholerow" ]
+  	});
+
+		$('#final_input').on("changed.jstree", function (e, data) {
+			console.log(data.selected);
+		});
+	}
+
+	function showTree() {
+		var checkbox = document.getElementById('final');
+		if (!checkbox.checked) {
+			document.getElementById('final_input').style.display = 'none';
+		} else {
+			document.getElementById('final_input').style.display = 'block';
+		}
+	}
+
+	/*
+	* Makes a HTML unordered list from a json array
+	*/
+	function makeList(products) {
+		var data = JSON.parse(JSON.stringify(products));
+		var content = data[1];
+		var list = document.createElement('ul');
+		var item;
+
+		for (var i = 0; i < content.length; i++) {
+			if (content[i].hasOwnProperty('Filter')) {
+				item = document.createElement('li');
+				item.setAttribute("id", "pss_" + content[i].Filter);
+				item.appendChild(document.createTextNode(content[i].Filter));
+				item2 = document.createElement('ul');
+
+				for (var j = i+1; j < content.length && !content[j].hasOwnProperty('Filter'); j++) {
+					if (content[j].hasOwnProperty('Product')) {
+						item3 = document.createElement('li');
+						item3.setAttribute("id", "final_" + content[j].Product);
+						item3.appendChild(document.createTextNode(content[j].Product));
+						item2.appendChild(item3);
+					}
+				}
+				item.appendChild(item2);
+			}
+			list.appendChild(item);
+		}
+		globalTest = list;
+		return list;
+	}
 
 	function send_config() {
 		var configs = ""; //to make sure it has the checkbox active
-		$('#left_menu').find('input[type=checkbox]').each(function() { 
+		$('#left_menu').find('input[type=checkbox]').each(function() {
 			if (this.checked == true) {
 				configs += this.value + ";";
 			}
@@ -180,7 +241,7 @@
 		var erro = false;
 		var jsonData = {
 			"Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
-			"URI" : configs != "" ? configs : erro = true, 
+			"URI" : configs != "" ? configs : erro = true,
 			"Update" : document.getElementById('frequency').value != "" ? document
 					.getElementById('frequency').value
 					: erro = true,
@@ -285,7 +346,7 @@ input[type="number"] {
 						<button class="glyphicon glyphicon-plus" onclick="addline();"></button>
 
 					</div>
-						
+
 				</td>
 				<td style="vertical-align: top">
 					<table id="right_menu" class="inlineTable">
@@ -324,8 +385,11 @@ input[type="number"] {
 							</select>
 								</div>-->
 								<div class="checkbox">
-									<label><input id="final" type="checkbox" value=""
+									<label><input id="final" type="checkbox"  onchange="showTree();" value=""
 										checked>Include Final Products</label>
+								</div>
+								<div id="final_input">
+								<!--list added through javascript-->
 								</div>
 								<div class="checkbox">
 							<label><input id="start_date"  type="checkbox" onchange="showdate();">
@@ -333,7 +397,7 @@ input[type="number"] {
 							</label>
 						</div>
 						<div><input id="date_input" class="form-control" type="date" style = "display:none" value = "2011-01-01"></div>
-						
+
 						<!-- <input id="date_" tabindex="1" type="text">-->
 							</td>
 							<tr></tr>

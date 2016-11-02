@@ -59,7 +59,7 @@
 		if (json[0].Op == 'Models') {
 			populatePSS();
 			var jsonData = {
-				'Op' : 'testing',
+				'Op' : 'Top5Reach',
 			}
 			ws.send(JSON.stringify(jsonData));
 		}
@@ -159,7 +159,7 @@
 		}
 
 	 var options = {
-		 title: 'Top 5 PSS Global Sentiment',
+		 title: 'Top ' + pssNumber + ' PSS Global Sentiment',
 		 lineWidth: 3,
 		 legend : {
 			 position : 'bottom'
