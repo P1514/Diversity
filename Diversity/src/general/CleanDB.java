@@ -1,4 +1,4 @@
-package general3;
+package general;
 
 import java.sql.*;
 

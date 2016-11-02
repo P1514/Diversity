@@ -1,4 +1,4 @@
-package general3;
+package general;
 
 
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import monitoring3.Monitor;;
+import monitoring.Monitor;;
 public class Model {
 	Connection cnlocal;
 	private long id = 0;

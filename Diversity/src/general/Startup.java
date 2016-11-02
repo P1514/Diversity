@@ -1,4 +1,4 @@
-package general3;
+package general;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import modeling3.GetModels;
+import modeling.GetModels;
 
 @WebListener
 public class Startup implements ServletContextListener {
