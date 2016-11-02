@@ -1,17 +1,17 @@
-package General;
+package general;
 
 import java.util.ArrayList;
 
 import org.json.*;
 
-import Extraction.GetAuthors;
-import Extraction.GetComments;
-import Extraction.GetLastPost;
-import Extraction.GetPosts;
-import Extraction.GetReach;
-import Extraction.Globalsentiment;
-import Extraction.SentimentChart;
-import Modeling.GetModels;
+import extraction.GetAuthors;
+import extraction.GetComments;
+import extraction.GetLastPost;
+import extraction.GetPosts;
+import extraction.GetReach;
+import extraction.Globalsentiment;
+import extraction.SentimentChart;
+import modeling.GetModels;
 
 public class Backend {
 	private int op = 0;
@@ -63,8 +63,32 @@ public class Backend {
 			}
 
 			switch (op) {
-
 			case 99:
+				result = new JSONArray();
+				result.put(new JSONObject().put("Op", "Tree"));
+				JSONArray sub_products = new JSONArray();
+				JSONArray sub_products2 = new JSONArray();
+				JSONObject obj2 = new JSONObject();
+				obj= new JSONObject();
+				obj.put("PSS", "PSS D522-1");
+				obj2 = new JSONObject();
+				obj2.put("Name", "Paiting Machine");
+				sub_products2.put(new JSONObject().put("Name", "Red Brush"));
+				sub_products2.put(new JSONObject().put("Name", "Blue Brush"));
+				obj2.put("Products", sub_products2);
+				sub_products.put(obj2);
+				obj2 = new JSONObject();
+				obj2.put("Name", "Glueing Machine");
+				sub_products2.put(new JSONObject().put("Name", "Super-Glue +9000"));
+				sub_products2.put(new JSONObject().put("Name", "Cheap-Glue 100"));
+				obj2.put("Products", sub_products2);
+				sub_products.put(obj2);
+				obj.put("Products", sub_products);
+				result.put(obj);
+				return result.toString();
+				
+
+			case 20:
 				result = new JSONArray();
 
 				gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));

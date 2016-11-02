@@ -1,5 +1,5 @@
 
-package General;
+package general;
 
 import java.io.IOException;
 import javax.websocket.OnClose;

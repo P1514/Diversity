@@ -1,4 +1,4 @@
-package General;
+package general;
 
 //Author Individual Object
 public class Author {

@@ -1,4 +1,4 @@
-package General;
+package general;
 
 import java.util.HashMap;
 
@@ -27,6 +27,7 @@ public class Operations {
 		op.put("getpss", 17);
 		op.put("opinion_extraction", 18);
 		op.put("oe_refresh", 19);
+		op.put("Top5Reach", 20);
 		op.put("testing", 99);
 		
 		

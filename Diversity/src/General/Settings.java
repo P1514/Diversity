@@ -1,4 +1,4 @@
-package General;
+package general;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -49,10 +49,13 @@ public class Settings {
 	public static final double aWcomments = (double) 1 / 3;
 
 	// Local DB Specs
-	public static final String url2 = "jdbc:mysql://127.0.0.1:3306/diversitydb?autoReconnect=true&useSSL=false";
+	private static final String dbip="127.0.0.1";
+	private static final String dbport="3306";
+	private static final String dbname = "diversitydb";//"sentimentanalysis";
+	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	public static final Integer dbversion = 5;
+	public static final Integer dbversion = 6;
 
 	// Author Table
 	public static final String latable = "authors";

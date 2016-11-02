@@ -1,4 +1,4 @@
-package Extraction;
+package extraction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +12,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import General.Data;
-import General.Model;
-import General.Settings;
+import general.Data;
+import general.Model;
+import general.Settings;
 
 public class GetReach {
 

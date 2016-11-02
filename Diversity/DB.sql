@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `diversitydb` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `diversitydb`;
+CREATE DATABASE  IF NOT EXISTS `SentimentAnalysis` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `SentimentAnalysis`;
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- Host: localhost    Database: diversitydb
+-- Host: localhost    Database: SentimentAnalysis
 -- ------------------------------------------------------
 -- Server version	5.7.13-log
 

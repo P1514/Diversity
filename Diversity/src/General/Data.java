@@ -1,4 +1,4 @@
-package General;
+package general;
 
 import java.sql.*;
 import java.sql.Date;
@@ -1316,8 +1316,8 @@ public class Data {
 
 							reply = replies.getJSONObject(index);
 
-							//Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
-							Date date = new Date(Long.valueOf(11111 * 1000L));
+							Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
+							//Date date = new Date(Long.valueOf(11111 * 1000L));
 							DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 							format.setTimeZone(TimeZone.getTimeZone("GMT"));
 							String formatted = format.format(date);

@@ -1,4 +1,5 @@
-package General;
+package general;
+
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +10,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import monitoring.Monitor;;
 public class Model {
 	Connection cnlocal;
 	private long id = 0;
@@ -99,6 +100,8 @@ public class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
+		
+		Monitor.update(msg);
 		return result;
 
 	}
@@ -157,6 +160,7 @@ public class Model {
 		obj.put("Op", "Error");
 		obj.put("Message", "Successfully updated model " + msg.getString("Name"));
 		result.put(obj);
+		Monitor.update(msg);
 		return result;
 	}
 
