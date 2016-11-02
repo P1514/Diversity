@@ -1,4 +1,4 @@
-package Extraction;
+package extraction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import General.Settings;
+import general.Settings;
 
 public class GetLastPost {
 // No longer used, it was used for influence graphs to get last post

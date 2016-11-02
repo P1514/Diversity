@@ -1,17 +1,17 @@
-package General;
+package general;
 
 import java.util.ArrayList;
 
 import org.json.*;
 
-import Extraction.GetAuthors;
-import Extraction.GetComments;
-import Extraction.GetLastPost;
-import Extraction.GetPosts;
-import Extraction.GetReach;
-import Extraction.Globalsentiment;
-import Extraction.SentimentChart;
-import Modeling.GetModels;
+import extraction.GetAuthors;
+import extraction.GetComments;
+import extraction.GetLastPost;
+import extraction.GetPosts;
+import extraction.GetReach;
+import extraction.Globalsentiment;
+import extraction.SentimentChart;
+import modeling.GetModels;
 
 public class Backend {
 	private int op = 0;

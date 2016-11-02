@@ -1,4 +1,4 @@
-package General;
+package general;
 
 import java.sql.Date;
 
