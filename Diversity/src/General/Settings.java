@@ -51,7 +51,7 @@ public class Settings {
 	// Local DB Specs
 	private static final String dbip="127.0.0.1";
 	private static final String dbport="3306";
-	private static final String dbname = "sentimentanalysis";
+	private static final String dbname = "diversitydb";//"sentimentanalysis";
 	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
