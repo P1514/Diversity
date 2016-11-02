@@ -1,4 +1,4 @@
-package extraction;
+package extraction3;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import general.Settings;
+import general3.Settings;
 
 public class GetInfGraph {
 // So far unused since no more influence graphs will be shown

@@ -1,10 +1,10 @@
-package modeling;
+package modeling3;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import general.Data;
-import general.Model;
+import general3.Data;
+import general3.Model;
 
 public class GetModels {
 	public GetModels() {

@@ -1,4 +1,4 @@
-package general;
+package general3;
 
 
 import java.sql.Connection;
@@ -10,7 +10,8 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import monitoring.Monitor;;
+
+import monitoring3.Monitor;;
 public class Model {
 	Connection cnlocal;
 	private long id = 0;
