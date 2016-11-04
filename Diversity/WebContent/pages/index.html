@@ -65,8 +65,14 @@
 		}
 		if (json[0].Op == 'Graph') {
 			newData = JSON.parse(JSON.stringify(json));
-			drawChart();
-			//google.charts.setOnLoadCallback(drawChart);
+			//drawChart();
+			if (!json[1].hasOwnProperty('Graph')) {
+				google.charts.setOnLoadCallback(drawChart);
+			} else if (json[1].Graph == "ERROR") {
+					console.log("No data to display.")
+				}
+			}
+
 		}
 	}
 
@@ -86,6 +92,17 @@
 			if(getCookie('Product') == option.text)
 				option.selected=true;
 			x.add(option);
+		}
+		checkEditable();
+		console.log($('#Models option').size());
+	}
+
+
+	function checkEditable() {
+		if ($('#Models option').size() == 0) {
+			document.getElementById('edit_model').disabled = true;
+		} else {
+			document.getElementById('edit_model').disabled = false;
 		}
 	}
 

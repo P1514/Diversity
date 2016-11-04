@@ -96,7 +96,11 @@ public class Backend {
 				result.put(new JSONObject().put("Op", "Graph"));
 
 				System.out.println(gs.Topreachglobalsentiment());
+				try{
 				result.put(new JSONArray(gs.Topreachglobalsentiment()));
+				} catch (JSONException e){
+					result.put(new JSONObject().put("Graph", "ERROR"));
+				}
 
 				return result.toString();
 
