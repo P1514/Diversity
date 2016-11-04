@@ -60,14 +60,14 @@
 			+ window.location.port + '/Diversity/server');
 
 			ws.onopen = function() {
-	json = {
-			"Op" : "getpss",
-		}
-		ws.send(JSON.stringify(json));
-		var jsonData = {
-			'Op' : 'testing',
-		}
-		ws.send(JSON.stringify(jsonData));
+		json = {
+				"Op" : "getpss",
+			}
+			ws.send(JSON.stringify(json));
+			var jsonData = {
+				'Op' : 'testing',
+			}
+			ws.send(JSON.stringify(jsonData));
 	}
 
 	ws.onmessage = function(event) {
@@ -98,6 +98,7 @@
 				return;
 				}
 			}
+
 			if (json[0].Op == "Tree") {
 				jsonData = JSON.parse(JSON.stringify(json))
 				makeTree();
