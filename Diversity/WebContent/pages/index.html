@@ -63,15 +63,16 @@
 			}
 			ws.send(JSON.stringify(jsonData));
 		}
+
 		if (json[0].Op == 'Graph') {
-			newData = JSON.parse(JSON.stringify(json));
-			//drawChart();
 			if (!json[1].hasOwnProperty('Graph')) {
+				newData = JSON.parse(JSON.stringify(json));
 				google.charts.setOnLoadCallback(drawChart);
-			} else if (json[1].Graph == "ERROR") {
-					console.log("No data to display.")
-				}
+			} else {
+				console.log("No data to display");
 			}
+			//drawChart();
+
 
 		}
 	}
