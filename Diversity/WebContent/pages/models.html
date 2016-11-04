@@ -31,6 +31,16 @@
 
 
 <script src="maskedinput.js" type="text/javascript"></script>
+    
+<script type="text/javascript">
+    var datefield=document.createElement("input")
+    datefield.setAttribute("type", "date")
+    if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
+        document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n') 
+    }
+</script>
 
 <script>
 
@@ -43,8 +53,16 @@
 	var jsonData;
 
 	jQuery(function($){
-		   $("#date_").mask("99/99/9999",{placeholder:"dd/mm/yyyy"});
+		   $("#date_").mask("99/99/9999",{placeholder:"mm/dd/yyyy"}); //TODO: DD/MM/YYYY
 		});
+    
+
+if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
+    jQuery(function($){ //on document.ready
+        $('#date_input').datepicker();
+    })
+}
+
 
 	function getCookie(name) { //not being used
 		var value = "; " + document.cookie;
@@ -157,16 +175,16 @@
 
 	function showdate() {
 		var checkbox = document.getElementById("start_date");
-		var data = new Date(document.getElementById("date_").value);
-		console.log(document.getElementById("date_").value);
+		var data = new Date(document.getElementById("date_input").value);
+		console.log(document.getElementById("date_input").value);
 		console.log(data.getDate());
 		console.log(data.getMonth()+1);
 		console.log(data.getFullYear());
 	console.log("data:" + transformdate(data));
 			if(!checkbox.checked)
-				document.getElementById("date_").style.display = 'none';//hide
+				document.getElementById("date_input").style.display = 'none';//hide
 			else
-				document.getElementById("date_").style.display = 'block';//show as block
+				document.getElementById("date_input").style.display = 'block';//show as block
 	}
 
 	function transformdate(date){
@@ -396,9 +414,9 @@ input[type="number"] {
 							Choose start date (<i>otherwise, starts today<i>)
 							</label>
 						</div>
-						<!-- <div><input id="date_input" class="form-control" type="date" style = "display:none" value = "2011-01-01"></div>-->
+						<div><input id="date_input" class="form-control" type="date" style = "display:none" value = "none"></div>
 
-						<input id="date_" tabindex="1" type="text" style = "display:none">
+						<!-- <input id="date_" tabindex="1" type="text" style = "display:none">-->
 							</td>
 							<tr></tr>
 					</table>
