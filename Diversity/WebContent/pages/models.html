@@ -64,6 +64,10 @@
 			"Op" : "getpss",
 		}
 		ws.send(JSON.stringify(json));
+		var jsonData = {
+			'Op' : 'testing',
+		}
+		ws.send(JSON.stringify(jsonData));
 	}
 
 	ws.onmessage = function(event) {
@@ -93,6 +97,10 @@
 				ws.send(JSON.stringify(json2));
 				return;
 				}
+			}
+			if (json[0].Op == "Tree") {
+				jsonData = JSON.parse(JSON.stringify(json))
+				makeTree();
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
@@ -174,21 +182,35 @@
 		return date.getDate() + ";" + month + ";" + date.getFullYear();
 	}
 
-	var testProducts = [{Op : 'test'}, [{Filter: 'PSS1'}, {Product : 'A'}, {Product : 'B'}, {Filter: 'PSS2'}, {Product: 'C'}]];
-	window.onload = makeTree;
-	var globalTest;
+	//var testProducts = [{Op : 'test'}, [{Filter: 'PSS1'}, {Product : 'A'}, {Product : 'B'}, {Filter: 'PSS2'}, {Product: 'C'}]];
+	//var globalTest;
 
+	var str = "";
+
+	/*
+	* Uses JSTree to make a tree view from an unordered HTML list
+	*/
 	function makeTree() {
-		document.getElementById('final_input').appendChild(makeList(testProducts));
+		str = "";
+		document.getElementById('final_input').innerHTML = "";
+//		if (jsonData[1].hasOwnProperty('PSS')) {
+//			if (jsonData[1].PSS == pss_sel) {
+				str += "<ul>";
+				makeList(jsonData[1]);
+				str += "</ul>"
+				document.getElementById('final_input').innerHTML = str;
 
-		$('#final_input').jstree({
-    "plugins" : [ "checkbox", "wholerow" ]
-  	});
+				$('#final_input').jstree({
+				"plugins" : [ "checkbox", "wholerow" ]
+				});
 
-		$('#final_input').on("changed.jstree", function (e, data) {
-			console.log(data.selected);
-		});
+				$('#final_input').on("changed.jstree", function (e, data) {
+					console.log(data.selected);
+				});
+//			}
+//		}
 	}
+
 
 	function showTree() {
 		var checkbox = document.getElementById('final');
@@ -199,36 +221,35 @@
 		}
 	}
 
+
 	/*
-	* Makes a HTML unordered list from a json array
+	* Makes a HTML unordered list from a json array (uses recursion)
 	*/
-	function makeList(products) {
-		var data = JSON.parse(JSON.stringify(products));
-		var content = data[1];
-		var list = document.createElement('ul');
-		var item;
-
-		for (var i = 0; i < content.length; i++) {
-			if (content[i].hasOwnProperty('Filter')) {
-				item = document.createElement('li');
-				item.setAttribute("id", "pss_" + content[i].Filter);
-				item.appendChild(document.createTextNode(content[i].Filter));
-				item2 = document.createElement('ul');
-
-				for (var j = i+1; j < content.length && !content[j].hasOwnProperty('Filter'); j++) {
-					if (content[j].hasOwnProperty('Product')) {
-						item3 = document.createElement('li');
-						item3.setAttribute("id", "final_" + content[j].Product);
-						item3.appendChild(document.createTextNode(content[j].Product));
-						item2.appendChild(item3);
-					}
-				}
-				item.appendChild(item2);
-			}
-			list.appendChild(item);
+	function makeList(array) {
+		if (typeof array == 'undefined') {
+			return;
 		}
-		globalTest = list;
-		return list;
+
+		if (!array.hasOwnProperty('Products') && !start) {
+			str += "<li>" + array.Name + "</li>";
+			return null;
+		}
+
+		if (array.hasOwnProperty('Products')/* && start */) {
+			start = false;
+			if (array.hasOwnProperty('Name')) {
+				str += "<li>"+ array.Name;
+				str += "<ul>";
+			}
+			for (var i = 0; i < array.Products.length; i++) {
+				makeList(array.Products[i]);
+			}
+			if (array.hasOwnProperty('Name')) {
+				str += "</ul>";
+				str += "</li>";
+			}
+		}
+
 	}
 
 	function send_config() {

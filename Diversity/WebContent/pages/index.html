@@ -65,8 +65,8 @@
 		}
 		if (json[0].Op == 'Graph') {
 			newData = JSON.parse(JSON.stringify(json));
-			drawChart();
-			//google.charts.setOnLoadCallback(drawChart);
+			//drawChart();
+			google.charts.setOnLoadCallback(drawChart);
 		}
 	}
 

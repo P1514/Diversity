@@ -18,6 +18,7 @@
 		<script type="text/javascript"
 			src="https://www.gstatic.com/charts/loader.js"></script>
 		<script src="sorttable.js"></script>
+		<script src="jquery.tagcloud.js"></script>
 		<script type="text/javascript">
 			var json;
 			var jsonData;
@@ -228,7 +229,7 @@
 								data.setCell(ii, filt, jsonData[i].Value);
 							}
 						}
-					
+
 					var colors = new Array();
 					for (var color = 1; color < filt; color++) {
 					colors.push(chartcolor(data.getColumnLabel(color)));
@@ -254,7 +255,7 @@
 
 					top_left.draw(data, options);
 				}
-				
+
 
 				// Top Middle
 				if (jsonData[i].Graph == "Top_Middle") {
@@ -327,9 +328,9 @@
 						duration: 500,
 						},
 					};
-					
+
 				}
-				top_right.draw(data, options);					
+				top_right.draw(data, options);
 
 				//Bottom Left
 				if (jsonData[i].Graph == "Bottom_Left") {
@@ -371,7 +372,7 @@
 				if (jsonData[i].Graph == "Bottom_Middle") {
 					var data = new google.visualization.DataTable();
 					data.addColumn('string', 'Month');
-					
+
 					for(filt=1;i<jsonData.length && jsonData[i].Graph == "Bottom_Middle" ; filt++){
 						data.addColumn('number', jsonData[i].Filter);
 						i++;
@@ -383,7 +384,7 @@
 							data.setCell(ii, filt, jsonData[i].Value)
 						}
 					}
-					
+
 					colors = new Array();
 					for (var color = 1; color < filt; color++) {
 					colors.push(chartcolor(data.getColumnLabel(color)));
@@ -464,7 +465,7 @@
 
 			}
 
-			//create trigger to resizeEnd event     
+			//create trigger to resizeEnd event
 			$(window).resize(function() {
 				if (this.resizeTO)
 					clearTimeout(this.resizeTO);
@@ -473,7 +474,7 @@
 				}, 500);
 			});
 
-			//redraw graph when window resize is completed  
+			//redraw graph when window resize is completed
 			$(window).on('resizeEnd', function() {
 				if(windowwidth < $(window).width()){
 					windowwidth=$(window).width(); // Workaround because of gauge colors, Check why when on resize to smaller error occurs and graphs dont resize at all
@@ -529,7 +530,7 @@
 						if (gender == "All") {
 							json.Param += "Gender,";
 							json.Values += "All,";
-							
+
 						} else {
 							json.Param += "Gender,";
 							var select = document.getElementById('genderfilt');
@@ -556,7 +557,7 @@
 					}
 
 					if (age == "All") {
-						
+
 						json.Param += "Age,";
 						json.Values += "All,";
 					} else {
@@ -596,6 +597,134 @@
 					document.getElementById("locationfilt").disabled = true;
 				}
 			}
+
+			window.onload = tagCloud();
+
+			function tagCloud() {
+				//TODO: send keywords request to server; get json with words and relative weights; replace fake data with actual data
+				var tag_data = [
+				  {
+				    "Word": "mollit",
+				    "Weight": 7
+				  },
+				  {
+				    "Word": "non",
+				    "Weight": 1
+				  },
+				  {
+				    "Word": "deserunt",
+				    "Weight": 8
+				  },
+				  {
+				    "Word": "sint",
+				    "Weight": 2
+				  },
+				  {
+				    "Word": "nulla",
+				    "Weight": 10
+				  },
+				  {
+				    "Word": "consequat",
+				    "Weight": 1
+				  },
+				  {
+				    "Word": "eiusmod",
+				    "Weight": 6
+				  },
+				  {
+				    "Word": "irure",
+				    "Weight": 6
+				  },
+				  {
+				    "Word": "duis",
+				    "Weight": 7
+				  },
+				  {
+				    "Word": "ad",
+				    "Weight": 5
+				  },
+				  {
+				    "Word": "sunt",
+				    "Weight": 5
+				  },
+				  {
+				    "Word": "ut",
+				    "Weight": 3
+				  },
+				  {
+				    "Word": "esse",
+				    "Weight": 2
+				  },
+				  {
+				    "Word": "aute",
+				    "Weight": 8
+				  },
+				  {
+				    "Word": "labore",
+				    "Weight": 10
+				  },
+				  {
+				    "Word": "dolore",
+				    "Weight": 8
+				  },
+				  {
+				    "Word": "qui",
+				    "Weight": 2
+				  },
+				  {
+				    "Word": "voluptate",
+				    "Weight": 9
+				  },
+				  {
+				    "Word": "irure",
+				    "Weight": 7
+				  },
+				  {
+				    "Word": "aliqua",
+				    "Weight": 2
+				  },
+				  {
+				    "Word": "nisi",
+				    "Weight": 5
+				  },
+				  {
+				    "Word": "voluptate",
+				    "Weight": 7
+				  },
+				  {
+				    "Word": "nostrud",
+				    "Weight": 4
+				  },
+				  {
+				    "Word": "ex",
+				    "Weight": 1
+				  },
+				  {
+				    "Word": "nostrud",
+				    "Weight": 6
+				  },
+				  {
+				    "Word": "culpa",
+				    "Weight": 2
+				  }
+				];
+				var str = "";
+				for (var i = 0; i < tag_data.length; i++) {
+					str += "<a href='#' rel=" + tag_data[i].Weight + ">" + tag_data[i].Word + "</a>\n";
+				}
+
+				$.fn.tagcloud.defaults = {
+				  size: {start: 10, end: 20, unit: 'pt'},
+				  color: {start: '#cde', end: '#604460'}
+				};
+
+				$(function () {
+
+				  $('#tag a').tagcloud();
+				});
+			}
+
+
 		</script>
 		<style>
 #displaybox {
@@ -621,6 +750,11 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 }
 
 #dashboard {
+	position: relative;
+	width: 80%;
+}
+
+#tag {
 	position: relative;
 	width: 80%;
 }
@@ -800,7 +934,59 @@ input[type=radio] {
 					</td>
 				</tr>
 			</table>
-
+			<div id="tag">
+				<a href='#' rel=7>mollit</a>
+				<a href='#' rel=1>non</a>
+				<a href='#' rel=8>deserunt</a>
+				<a href='#' rel=2>sint</a>
+				<a href='#' rel=10>nulla</a>
+				<a href='#' rel=1>consequat</a>
+				<a href='#' rel=6>eiusmod</a>
+				<a href='#' rel=6>irure</a>
+				<a href='#' rel=7>duis</a>
+				<a href='#' rel=5>ad</a>
+				<a href='#' rel=5>sunt</a>
+				<a href='#' rel=3>ut</a>
+				<a href='#' rel=2>esse</a>
+				<a href='#' rel=8>aute</a>
+				<a href='#' rel=10>labore</a>
+				<a href='#' rel=8>dolore</a>
+				<a href='#' rel=2>qui</a>
+				<a href='#' rel=9>voluptate</a>
+				<a href='#' rel=7>irure</a>
+				<a href='#' rel=2>aliqua</a>
+				<a href='#' rel=5>nisi</a>
+				<a href='#' rel=7>voluptate</a>
+				<a href='#' rel=4>nostrud</a>
+				<a href='#' rel=1>ex</a>
+				<a href='#' rel=6>nostrud</a>
+				<a href='#' rel=2>culpa</a>
+				<a href='#' rel=7>mollit</a>
+				<a href='#' rel=1>non</a>
+				<a href='#' rel=8>deserunt</a>
+				<a href='#' rel=2>sint</a>
+				<a href='#' rel=10>nulla</a>
+				<a href='#' rel=1>consequat</a>
+				<a href='#' rel=6>eiusmod</a>
+				<a href='#' rel=6>irure</a>
+				<a href='#' rel=7>duis</a>
+				<a href='#' rel=5>ad</a>
+				<a href='#' rel=5>sunt</a>
+				<a href='#' rel=3>ut</a>
+				<a href='#' rel=2>esse</a>
+				<a href='#' rel=8>aute</a>
+				<a href='#' rel=10>labore</a>
+				<a href='#' rel=8>dolore</a>
+				<a href='#' rel=2>qui</a>
+				<a href='#' rel=9>voluptate</a>
+				<a href='#' rel=7>irure</a>
+				<a href='#' rel=2>aliqua</a>
+				<a href='#' rel=5>nisi</a>
+				<a href='#' rel=7>voluptate</a>
+				<a href='#' rel=4>nostrud</a>
+				<a href='#' rel=1>ex</a>
+				<a href='#' rel=6>nostrud</a>
+				<a href='#' rel=2>culpa</a></div>
 			</center>
 	</div>
 
