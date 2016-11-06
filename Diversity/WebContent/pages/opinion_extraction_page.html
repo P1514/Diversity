@@ -499,17 +499,19 @@
 				case "31-60":
 					return "#8CA122";
 				case "61-90":
-					return "#5C6EoE";
+					return "#5C6E0E";
 				}
 			}
 
 			function changeRequest() {
 				var gender = document.getElementById("genderfilt").value;
 				var location = document.getElementById("locationfilt").value;
+				var age = document.getElementById("agefilt").value;
 				var globalradio = document.getElementById('Global').checked;
 				var genderradio = document.getElementById('Gender').checked;
 				var locationradio = document.getElementById('Location').checked;
-				var age = document.getElementById("agefilt").value;
+				var ageradio = document.getElementById('Age_radio').checked;
+
 
 				var json = {
 					"Op" : "oe_refresh",// OE_Filter
@@ -525,6 +527,21 @@
 					json.Param += "Global";
 					json.Values += "Global";
 				} else {
+					if (ageradio == false) {
+
+						if (age == "All") {
+							json.Param += "Age,";
+							json.Values += "All,";
+
+						} else {
+							json.Param += "Age,";
+							var select = document.getElementById('agefilt');
+							json.Values += age + ",";
+						}
+					} else {
+						needlecolor="#5C6E0E";
+						json.Filter="Age";
+					}
 					if (genderradio == false) {
 
 						if (gender == "All") {
@@ -555,7 +572,9 @@
 						needlecolor='#A60202';
 						json.Filter="Location";
 					}
-
+				}
+/*
+				if (ageradio == "false") {
 					if (age == "All") {
 
 						json.Param += "Age,";
@@ -564,9 +583,17 @@
 						json.Param += "Age,";
 						var select = document
 								.getElementById('agefilt');
+								console.log(age);
 						json.Values += age + ",";
+						}
+					} else {
+						needlecolor="#5C6E0E"
+						json.Filter="Age";
 					}
+
 				}
+*/
+
 				var css = /*Needle*/ "#globalgauge path:nth-child(2){ fill:"+needlecolor+" ; stroke:"+needlecolor+"; }",
 				head = document.head || document.getElementsByTagName('head')[0],
 				style = document.createElement('style');
@@ -585,16 +612,25 @@
 				if (data == "Global") {
 					document.getElementById("genderfilt").disabled = false;
 					document.getElementById("locationfilt").disabled = false;
+					document.getElementById('agefilt').disabled = false;
 				}
 				if (data == "Gender") {
 					document.getElementById('genderfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = true;
 					document.getElementById("locationfilt").disabled = false;
+					document.getElementById('agefilt').disabled = false;
 				}
 				if (data == "Location") {
 					document.getElementById('locationfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = false;
 					document.getElementById("locationfilt").disabled = true;
+					document.getElementById('agefilt').disabled = false;
+				}
+				if (data == "Age") {
+					document.getElementById('agefilt').selectedIndex = 0;
+					document.getElementById('genderfilt').disabled = false;
+					document.getElementById('locationfilt').disabled = false;
+					document.getElementById('agefilt').disabled = true;
 				}
 			}
 
@@ -715,7 +751,7 @@
 
 				$.fn.tagcloud.defaults = {
 				  size: {start: 10, end: 20, unit: 'pt'},
-				  color: {start: '#cde', end: '#604460'}
+				  color: {start: '#cde', end: needlecolor}
 				};
 
 				$(function () {
@@ -807,6 +843,11 @@ input[type=radio] {
 	margin-left: 25%;
 }
 
+#finalfilt {
+	margin-top: 25px;
+	margin-left: 25%;
+}
+
 #refresh {
 	margin: auto;
 	margin-top: 25px;
@@ -857,6 +898,12 @@ input[type=radio] {
 					<th><input type="radio" name="field" id="Location"
 						value="Location" onclick="fixbuttons('Location');"> &nbsp
 							Location </th>
+					<th><input type="radio" name="field" id="Age_radio"
+						value="Age" onclick="fixbuttons('Age');"> &nbsp
+							Age </th>
+					<th><input type="radio" name="field" id="Final"
+						value="Final" onclick=""> &nbsp
+							Final Product </th>
 					<th><input type="radio" name="field" id="Global"
 						value="Global" onclick="fixbuttons('Global');" checked>
 							&nbsp All </th>
@@ -870,7 +917,10 @@ input[type=radio] {
 					</select></th>
 					<th><select id="agefilt">
 							<option value="All">All Ages
-					</select>
+					</select></th>
+					<th><select id="finalfilt">
+							<option value="All">All Products
+					</select></th>
 				</tr>
 			</table>
 			<table id="refresh_table">
