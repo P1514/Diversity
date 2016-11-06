@@ -42,7 +42,6 @@ public class Data {
 	}
 
 	public String loadJSON(JSONArray json) throws JSONException {
-
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();

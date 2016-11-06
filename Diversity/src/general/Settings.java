@@ -55,7 +55,7 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	public static final Integer dbversion = 6;
+	public static final Integer dbversion = 7;
 
 	// Author Table
 	public static final String latable = "authors";
@@ -109,6 +109,14 @@ public class Settings {
 	public static final String lmtable_creator="created_by_user";
 	public static final String lmtable_age="age_range";
 	public static final String lmtable_gender="gender";
+	
+	// Sources Table
+	public static final String lutable="sources";
+	public static final String lutable_source="source";
+	public static final String lutable_account="account";
+	public static final String lutable_lastupdate="last_updated";
+	public static final String lutable_nextupdate="next_update";
+	public static final String lutable_pss="pss";
 	
 	
 	// Reach table

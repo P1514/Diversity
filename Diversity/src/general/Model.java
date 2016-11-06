@@ -37,7 +37,7 @@ public class Model {
 	}
 
 	public JSONArray add_model(JSONObject msg) throws JSONException {
-
+		//TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		name = msg.getString("Name");

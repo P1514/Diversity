@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -16,7 +19,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mysql.jdbc.Connection;
+
 import modeling.GetModels;
+import monitoring.Overwatch;
 
 @WebListener
 public class Startup implements ServletContextListener {
@@ -26,11 +32,21 @@ public class Startup implements ServletContextListener {
 		CleanDB clean = new CleanDB();
 		Data start = new Data();
 		System.out.println("Starting up!");
+		new Overwatch(true).run();
+		new Overwatch();
 		try {
-
+			Connection cnlocal = Settings.connlocal();
+			String select = "Select * from general WHERE id=1";
+			Statement stmt = null;
+			ResultSet rs = null;
+			stmt=cnlocal.createStatement();
+			rs = stmt.executeQuery(select);
+			rs.next();
+			if (rs.getInt("Version") != Settings.dbversion)
+				rs.getLong("asdasasd");
 			//System.out.println(clean.clean());
 			if (Settings.JSON_use == false) {
-				//start.load();
+				start.load();
 			} else {
 				JSONArray json = new JSONArray(readUrl(
 				"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
@@ -46,7 +62,12 @@ public class Startup implements ServletContextListener {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  catch (Exception e) {
+		}  catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR Database Outdated");
+			
+			//e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
