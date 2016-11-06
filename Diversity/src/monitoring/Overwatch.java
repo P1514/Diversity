@@ -12,8 +12,12 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONException;
+
 import com.mysql.jdbc.Connection;
 
+import extraction.GetReach;
+import extraction.Globalsentiment;
 import general.Data;
 import general.Settings;
 
@@ -26,6 +30,7 @@ public class Overwatch extends TimerTask {
 	private String uri = "http://diversity.euprojects.net/";
 	private HashMap<String, url> requesturl = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
+	private boolean local = Settings.JSON_use;
 
 	public Overwatch() {
 		Timer timer = new Timer();
@@ -39,7 +44,6 @@ public class Overwatch extends TimerTask {
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.AM_PM, Calendar.AM);
-		System.out.println(c);
 		
 		timer.scheduleAtFixedRate(this, c.getTime(), 24*60*60*1000);
 	}
@@ -62,6 +66,7 @@ public class Overwatch extends TimerTask {
 		String getsources = "Select * from " + Settings.lutable + " where "+Settings.lutable_source+"=? AND "+Settings.lutable_nextupdate+"<?";
 		String getpss = "Select distinct( " + Settings.lutable_source + ") from " + Settings.lutable;
 
+		if(local==true){
 		dbconnect();
 		try {
 			PreparedStatement query = cnlocal.prepareStatement(getpss);
@@ -154,6 +159,22 @@ public class Overwatch extends TimerTask {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("ERROR ON OVERWATCH");
+		}
+		}else{
+			try {
+				dat.load();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		Globalsentiment gs = new Globalsentiment();
+		GetReach gr = new GetReach();
+		try {
+			gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

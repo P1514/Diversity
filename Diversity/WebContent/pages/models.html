@@ -82,10 +82,6 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 				"Op" : "getpss",
 			}
 			ws.send(JSON.stringify(json));
-			var jsonData = {
-				'Op' : 'testing',
-			}
-			ws.send(JSON.stringify(jsonData));
 	}
 
 	ws.onmessage = function(event) {
@@ -106,20 +102,25 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		if (json[0].Op == "pss") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			populatePSS();
-				if (sessionStorage.id != null) {
-				var json2 = {
-					"Op" : "get_model",
-					"Id" : sessionStorage.id,
+			var jsonData2 = {
+					'Op' : 'testing',
 				}
-				//console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
-				ws.send(JSON.stringify(json2));
-				return;
-				}
+				ws.send(JSON.stringify(jsonData2));
+				
 			}
 
 			if (json[0].Op == "Tree") {
 				jsonData = JSON.parse(JSON.stringify(json))
 				makeTree();
+				if (sessionStorage.id != null) {
+					var json2 = {
+						"Op" : "get_model",
+						"Id" : sessionStorage.id,
+					}
+					//console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
+					ws.send(JSON.stringify(json2));
+					return;
+					}
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);

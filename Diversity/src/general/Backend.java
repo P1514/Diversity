@@ -91,8 +91,6 @@ public class Backend {
 			case 20:
 				result = new JSONArray();
 
-				gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
-
 				result.put(new JSONObject().put("Op", "Graph"));
 
 				System.out.println(gs.Topreachglobalsentiment());

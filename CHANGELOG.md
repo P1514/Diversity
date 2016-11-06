@@ -17,7 +17,18 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
-
+## [2.2] 2016-11-06
+###Added
+#### Monitoring
+- Monitoring Implemented 24h cycle
+- Monitoring implemented with local and remote data possibilities
+#### Home
+Top 5 Reach PSS chart displayed on Sentiment Analysis home page
+#### Modeling
+- Modeling page now allows for start date and products filtering (due to DB limitations not implemented on back-end)
+##### Opinion extraction:
+-Option to filter by age
+-Option to filter by final product (not implemented)
 
 ## [2.1] 2016-10-26
 ### Fixed

@@ -30,9 +30,15 @@ public class Startup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		CleanDB clean = new CleanDB();
-		Data start = new Data();
+		/*try {
+			clean.clean();
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
 		System.out.println("Starting up!");
-		new Overwatch(true).run();
+		Overwatch o = new Overwatch(true);
+		o.run();
 		new Overwatch();
 		try {
 			Connection cnlocal = Settings.connlocal();
@@ -45,23 +51,20 @@ public class Startup implements ServletContextListener {
 			if (rs.getInt("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 			//System.out.println(clean.clean());
-			if (Settings.JSON_use == false) {
+			/*if (Settings.JSON_use == false) {
 				start.load();
 			} else {
 				JSONArray json = new JSONArray(readUrl(
 				"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
 				//System.out.println(json);
 				//start.load(json);
-			}
+			}*/
 			/*
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
 			 * System.out.println("\n2:"+json.getJSONObject(2).toString()+"\n");
 			 */
 			// System.out.println(json.get("id"));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}  catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("ERROR Database Outdated");
