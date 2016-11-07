@@ -613,24 +613,35 @@
 					document.getElementById("genderfilt").disabled = false;
 					document.getElementById("locationfilt").disabled = false;
 					document.getElementById('agefilt').disabled = false;
+					document.getElementById('finalfilt').disabled = false;
 				}
 				if (data == "Gender") {
 					document.getElementById('genderfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = true;
 					document.getElementById("locationfilt").disabled = false;
 					document.getElementById('agefilt').disabled = false;
+					document.getElementById('finalfilt').disabled = false;
 				}
 				if (data == "Location") {
 					document.getElementById('locationfilt').selectedIndex = 0;
 					document.getElementById("genderfilt").disabled = false;
 					document.getElementById("locationfilt").disabled = true;
 					document.getElementById('agefilt').disabled = false;
+					document.getElementById('finalfilt').disabled = false;
 				}
 				if (data == "Age") {
 					document.getElementById('agefilt').selectedIndex = 0;
 					document.getElementById('genderfilt').disabled = false;
 					document.getElementById('locationfilt').disabled = false;
 					document.getElementById('agefilt').disabled = true;
+					document.getElementById('finalfilt').disabled = false;
+				}
+				if (data == "Final") {
+					document.getElementById('agefilt').selectedIndex = 0;
+					document.getElementById('genderfilt').disabled = false;
+					document.getElementById('locationfilt').disabled = false;
+					document.getElementById('agefilt').disabled = false;
+					document.getElementById('finalfilt').disabled = true;
 				}
 			}
 
@@ -902,7 +913,7 @@ input[type=radio] {
 						value="Age" onclick="fixbuttons('Age');"> &nbsp
 							Age </th>
 					<th><input type="radio" name="field" id="Final"
-						value="Final" onclick=""> &nbsp
+						value="Final" onclick="fixbuttons('Final');"> &nbsp
 							Final Product </th>
 					<th><input type="radio" name="field" id="Global"
 						value="Global" onclick="fixbuttons('Global');" checked>
