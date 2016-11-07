@@ -31,14 +31,14 @@
 
 
 <script src="maskedinput.js" type="text/javascript"></script>
-    
+
 <script type="text/javascript">
     var datefield=document.createElement("input")
     datefield.setAttribute("type", "date")
     if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
         document.write('<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />\n')
         document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"><\/script>\n')
-        document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n') 
+        document.write('<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"><\/script>\n')
     }
 </script>
 
@@ -51,11 +51,12 @@
 	var i = 0;
 	var id=0;
 	var jsonData;
+	var final_products = [];
 
 	jQuery(function($){
 		   $("#date_").mask("99/99/9999",{placeholder:"mm/dd/yyyy"}); //TODO: DD/MM/YYYY
 		});
-    
+
 
 if (datefield.type!="date"){ //if browser doesn't support input type="date", initialize date picker widget:
     jQuery(function($){ //on document.ready
@@ -106,7 +107,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 					'Op' : 'testing',
 				}
 				ws.send(JSON.stringify(jsonData2));
-				
+
 			}
 
 			if (json[0].Op == "Tree") {
@@ -225,8 +226,15 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 				});
 
 				$('#final_input').on("changed.jstree", function (e, data) {
-					console.log(data.selected);
+					final_input = [];
+					var i, j, r = [];
+	        for (i = 0, j = data.selected.length; i < j; i++) {
+	            r.push(data.instance.get_node(data.selected[i]).text);
+	        }
+
+	        final_products = r;
 				});
+
 //			}
 //		}
 	}
@@ -293,6 +301,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			"Gender" : document.getElementById('gender').value != "" ? document
 					.getElementById('gender').value : erro = true,*/
 			"Final_Product" : document.getElementById('final').checked,
+			"Products" : final_products,
 			"Archive" : document.getElementById('Archive').checked,
 			"Name" : document.getElementById('model_name').value != "" ? document
 					.getElementById('model_name').value
