@@ -54,7 +54,7 @@
 	var final_products = [];
 
 	jQuery(function($){
-		   $("#date_").mask("99/99/9999",{placeholder:"mm/dd/yyyy"}); //TODO: DD/MM/YYYY
+		  // $("#date").mask("99/99/9999",{placeholder:"mm/dd/yyyy"}); //TODO: DD/MM/YYYY
 		});
 
 
@@ -163,7 +163,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 
 	}
 
-	function escapeHtml(html)//stops the user from injectinh html in forms
+	function escapeHtml(html)//stops the user from injecting html in forms
 	{
 	    var text = document.createTextNode(html);
 	    var div = document.createElement('div');
@@ -288,6 +288,11 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			}
 		});
 		var erro = false;
+        var date;
+        if(document.getElementById('start_date').checked==1)
+            console.log(document.getElementById('start_date').value);
+        
+        
 		var jsonData = {
 			"Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
 			"URI" : configs != "" ? configs : erro = true,
@@ -446,7 +451,7 @@ input[type="number"] {
 							Choose start date (<i>otherwise, starts today<i>)
 							</label>
 						</div>
-						<div><input id="date_input" class="form-control" type="date" style = "display:none" value = "none"></div>
+						<div><input id="date_input" class="form-control" type="date" style = "display:none" ></div>
 
 						<!-- <input id="date_" tabindex="1" type="text" style = "display:none">-->
 							</td>
