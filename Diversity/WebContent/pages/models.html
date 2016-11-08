@@ -125,7 +125,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
-
+			
 			document.getElementById("model_name").value=json2[0].Name;
 			document.getElementById("model_name").readOnly = true;
 			document.getElementById("frequency").value=json2[0].Update;
@@ -187,11 +187,13 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 	function showdate() {
 		var checkbox = document.getElementById("start_date");
 		var data = new Date(document.getElementById("date_input").value);
-		console.log(document.getElementById("date_input").value);
-		console.log(data.getDate());
-		console.log(data.getMonth()+1);
-		console.log(data.getFullYear());
-	console.log("data:" + transformdate(data));
+		//console.log(data.toString());
+		//console.log(data.getDate());
+		//console.log(data.getMonth()+1);
+		//console.log(data.getFullYear());
+		// if(data.toString()=="Invalid Date")
+	      //      console.log("NaN");
+	//console.log("data:" + transformdate(data));
 			if(!checkbox.checked)
 				document.getElementById("date_input").style.display = 'none';//hide
 			else
@@ -288,9 +290,13 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			}
 		});
 		var erro = false;
-        var date;
-        if(document.getElementById('start_date').checked==1)
-            console.log(document.getElementById('start_date').value);
+		
+		var date = new Date(document.getElementById("date_input").value);
+        //console.log("TESTE***********"+date);
+        if(date.toString() == "Invalid Date" && document.getElementById('start_date').checked){//checks for invalid date
+        	alert("Invalid Date");
+			return;
+			}
         
         
 		var jsonData = {

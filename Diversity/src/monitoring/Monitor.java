@@ -13,7 +13,7 @@ public class Monitor {
 	public static void update(String uri) {
 		String[] urilists = uri.split(";");
 		String account, source, url;
-		url ="http://diversity.euprojects.net/socialfeedbackextraction/registeraccount?accounts[]=\"";
+		url ="http://diversity.euprojects.net/socialfeedbackextraction/registerSFE?accounts[]=\"";
 		
 		for(int i = 0 ; i < urilists.length ; i++){
 			source = urilists[i].split(",")[0];	
