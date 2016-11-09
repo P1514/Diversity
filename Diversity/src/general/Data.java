@@ -16,24 +16,95 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Data {
-	private ConcurrentHashMap<Integer, Author> authordb = new ConcurrentHashMap<Integer, Author>();
+	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
-	private ConcurrentHashMap<Integer, Opinion> opiniondb = new ConcurrentHashMap<Integer, Opinion>();
+	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
 	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
-	private int totalposts;
-	private int totalviews;
-	private int totalcomments;
-	private int totallikes;
+	public static ConcurrentHashMap<Long, PSS> pssdb = new ConcurrentHashMap<Long, PSS>();
+	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
+	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
+	private long totalposts;
+	private long totalviews;
+	private long totalcomments;
+	private long totallikes;
 	private java.sql.Date LastUpdated = null;
 	private java.sql.Date LastUpdated2 = null;
 	private Calendar cal = Calendar.getInstance();
-	private List<Integer> users = new ArrayList<Integer>();
+	private List<Long> users = new ArrayList<Long>();
 	private List<Author> users2 = new ArrayList<Author>();
 
 	Connection cndata = null;
 	Connection cnlocal = null;
+	Connection cncr = null;
 
 	public Data() {
+	}
+	
+	private long identifyPSS(long product){
+		
+		return productdb.get(product).get_PSS();
+		
+	}
+	
+	private long identifyProduct(String message){
+		
+		for(Product a : productdb.values()){
+			if (a.checkMessage(message) == true)
+				return a.get_Id();
+		}
+		
+		return 0;
+	}
+
+	private void LoadPSS() {
+		try {
+			String select = "Select * from " + Settings.crpsstable;
+			cncr = Settings.conncr();
+			PreparedStatement query = cncr.prepareStatement(select);
+			ResultSet rs;
+			rs = query.executeQuery();
+
+			while (rs.next()) {
+				pssdb.put(rs.getLong(Settings.crpsstable_id),
+						new PSS(rs.getLong(Settings.crpsstable_id), rs.getLong(Settings.crpsstable_company),
+								rs.getString(Settings.crpsstable_name), rs.getLong(Settings.crpsstable_author),
+								rs.getString(Settings.crpsstable_type)));
+
+			}
+
+			select = "Select * from " + Settings.crproducttable;
+			query = cncr.prepareStatement(select);
+			rs = query.executeQuery();
+
+			while (rs.next()) {
+				productdb.put(rs.getLong(Settings.crproducttable_id), new Product(
+						rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
+						rs.getLong(Settings.crproducttable_supplied_by), rs.getBoolean(Settings.crproducttable_isfinal),
+						rs.getLong(Settings.crproducttable_supplied_by), rs.getLong(Settings.crproducttable_parent)));
+			}
+
+			select = "Select * from " + Settings.crcompanytable;
+			query = cncr.prepareStatement(select);
+			rs = query.executeQuery();
+
+			while (rs.next()) {
+				companydb.put(rs.getLong(Settings.crcompanytable_id),
+						new Company(rs.getLong(Settings.crcompanytable_id), rs.getString(Settings.crcompanytable_name),
+								rs.getString(Settings.crcompanytable_type),
+								rs.getLong(Settings.crcompanytable_belongs_to)));
+			}
+			
+			rs.close();
+			query.close();
+			cncr.close();
+
+		} catch (SQLException e1) {
+			System.out.println("ERROR: Connecting do Common Repository Database");
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR: Settings class not found inside LoadPSS() on Data class");
+		}
 	}
 
 	public String load(JSONArray json) throws JSONException {
@@ -47,6 +118,8 @@ public class Data {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 
+		LoadPSS();
+
 		// DONE FAZER LOAD DAS VARIAVEIS NO GENERAL
 		String select = "Select * from general WHERE id=1";
 		Statement stmt = null;
@@ -57,12 +130,12 @@ public class Data {
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
-			totalviews = rs.getInt("totalviews");
-			totalcomments = rs.getInt("totalcomments");
-			totallikes = rs.getInt("totallikes");
-			totalposts = rs.getInt("totalposts");
+			totalviews = rs.getLong("totalviews");
+			totalcomments = rs.getLong("totalcomments");
+			totallikes = rs.getLong("totallikes");
+			totalposts = rs.getLong("totalposts");
 			LastUpdated = rs.getDate("lastupdated");
-			if (rs.getInt("Version") != Settings.dbversion)
+			if (rs.getLong("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
 			obj.put("Op", "Error");
@@ -138,14 +211,14 @@ public class Data {
 			cnlocal = Settings.connlocal();
 			select = "Select * from " + Settings.lmtable;
 			stmt = cnlocal.createStatement();
-			 //System.out.println(select);
+			// System.out.println(select);
 			rs = stmt.executeQuery(select);
 
 			if (rs.next()) {
 				rs.beforeFirst();
 				for (; rs.next();) {
-					Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
-							rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+					Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
+							rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
@@ -162,9 +235,11 @@ public class Data {
 			cnlocal = Settings.connlocal();
 			String querycond = "";
 			for (Author user : users2) {
-				if(user == null) continue;// TODO find the error in here sometimes null appears 
-				System.out.println("\n DEBUG IF HAPPENS USERID="+user.getUID());
-				System.out.println(" RESULT STRING "+querycond );
+				if (user == null)
+					continue;// TODO find the error in here sometimes null
+								// appears
+				System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
+				System.out.println(" RESULT STRING " + querycond);
 				querycond += user.getUID() + ",";
 			}
 			System.out.println(querycond);
@@ -183,20 +258,21 @@ public class Data {
 					stmt2.setString(i + 1, querycond.split(",")[i]);
 				}
 				rs = stmt2.executeQuery();
-				//System.out.println(stmt2);
+				// System.out.println(stmt2);
 				while (rs.next()) {
 					if (authordb2
 							.containsKey(rs.getString(Settings.latable_id) + rs.getString(Settings.latable_source))) {
 					} else {
 						Author auth = new Author(rs.getString(Settings.latable_id),
 								rs.getString(Settings.latable_source), rs.getString(Settings.latable_name),
-								rs.getInt(Settings.latable_age), rs.getString(Settings.latable_gender),
+								rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
 								rs.getString(Settings.latable_location));
-						auth.setComments(rs.getInt(Settings.latable_comments));
-						auth.setLikes(rs.getInt(Settings.latable_likes));
-						auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
-						auth.setViews(rs.getInt(Settings.latable_views));
-						authordb2.put(rs.getString(Settings.latable_id) +","+ rs.getString(Settings.latable_source), auth);
+						auth.setComments(rs.getLong(Settings.latable_comments));
+						auth.setLikes(rs.getLong(Settings.latable_likes));
+						auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
+						auth.setViews(rs.getLong(Settings.latable_views));
+						authordb2.put(rs.getString(Settings.latable_id) + "," + rs.getString(Settings.latable_source),
+								auth);
 					}
 				}
 			}
@@ -224,8 +300,8 @@ public class Data {
 			// Load users from JSON
 
 			for (Author user : users2) {
-				if (authordb2.containsKey(user.getUID() +","+ user.getSource())) {
-					Author luser = authordb2.get(user.getUID() +","+ user.getSource());
+				if (authordb2.containsKey(user.getUID() + "," + user.getSource())) {
+					Author luser = authordb2.get(user.getUID() + "," + user.getSource());
 					boolean gender = false, location = false, age = false;
 					location = luser.getLocation().equals("");// TODO see issue
 																// regarding
@@ -236,7 +312,7 @@ public class Data {
 					gender = luser.getGender().equals("");
 					age = luser.getAge() == -1;
 					if (gender || location || age) {
-						authordb2.put(user.getUID() +","+ user.getSource(),
+						authordb2.put(user.getUID() + "," + user.getSource(),
 								new Author(user.getUID(), user.getSource(), user.getName(),
 										age ? luser.getAge() : user.getAge(),
 										gender ? luser.getGender() : user.getGender(),
@@ -291,11 +367,11 @@ public class Data {
 			ArrayList<String> uniqueauthors2 = new ArrayList<String>();
 			ArrayList<Post> temp_post = v.getPosts();
 			temp_post.forEach((v2) -> {
-				if (!uniqueauthors2.contains(v2.getUID(true) +","+ v2.getSource()))
-					uniqueauthors2.add(v2.getUID(true) +","+ v2.getSource());
+				if (!uniqueauthors2.contains(v2.getUID(true) + "," + v2.getSource()))
+					uniqueauthors2.add(v2.getUID(true) + "," + v2.getSource());
 			});
 			uniqueauthors2.forEach((v3) -> {
-				 System.out.println(authordb2.containsKey(v3) + " " + v3);
+				System.out.println(authordb2.containsKey(v3) + " " + v3);
 				Author temp_author = authordb2.get(v3);
 				temp_author.addComments(v.newcomments());
 				temp_author.addLikes(v.newlikes());
@@ -339,32 +415,31 @@ public class Data {
 			try {
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setString(1, author.getUID());
-				query1.setInt(2, author.getAge());
+				query1.setLong(2, author.getAge());
 				query1.setString(3, author.getName());
 				query1.setString(4, author.getGender());
 				query1.setString(5, author.getLocation());
 				query1.setDouble(6, author.getInfluence());
-				query1.setInt(7, author.getComments());
-				query1.setInt(8, author.getLikes());
-				query1.setInt(9, author.getViews());
-				query1.setInt(10, author.getPosts());
+				query1.setLong(7, author.getComments());
+				query1.setLong(8, author.getLikes());
+				query1.setLong(9, author.getViews());
+				query1.setLong(10, author.getPosts());
 				query1.setString(11, author.getSource());
 				query1.setDouble(12, author.getInfluence());
-				query1.setInt(13, author.getComments());
-				query1.setInt(14, author.getLikes());
-				query1.setInt(15, author.getViews());
-				query1.setInt(16, author.getPosts());
+				query1.setLong(13, author.getComments());
+				query1.setLong(14, author.getLikes());
+				query1.setLong(15, author.getViews());
+				query1.setLong(16, author.getPosts());
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
 				e.printStackTrace();
 				return;
 			} finally {
-				/*try {
-					if (query1 != null)
-						query1.close();
-				} catch (Exception e) {
-				}*/
+				/*
+				 * try { if (query1 != null) query1.close(); } catch (Exception
+				 * e) { }
+				 */
 			}
 		});
 
@@ -384,19 +459,19 @@ public class Data {
 					PreparedStatement query1 = null;
 					try {
 						query1 = cnlocal.prepareStatement(update);
-						query1.setInt(1, k);
+						query1.setLong(1, k);
 						query1.setDouble(2, opinion.getReach());
 						query1.setDouble(3, opinion.getPolarity());
 						query1.setDouble(4, opinion.getTotalInf());
 						query1.setString(5, opinion.getUID(true));
 						query1.setDate(6, opinion.getTime());
-						query1.setString(7, opinion.getPSS());
-						query1.setInt(8, opinion.ncomments());
-						query1.setInt(9, opinion.getProduct());
+						query1.setLong(7, opinion.getPSS());
+						query1.setLong(8, opinion.ncomments());
+						query1.setLong(9, opinion.getProduct());
 						query1.setDouble(10, opinion.getReach());
 						query1.setDouble(11, opinion.getPolarity());
 						query1.setDouble(12, opinion.getTotalInf());
-						query1.setInt(13, opinion.ncomments());
+						query1.setLong(13, opinion.ncomments());
 						query1.executeUpdate();
 
 						opinion.getPosts().forEach((post) -> {
@@ -404,12 +479,12 @@ public class Data {
 							try {
 								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
-								query2.setInt(1, post.getID());
+								query2.setLong(1, post.getID());
 								query2.setDouble(2, post.getPolarity());
 								query2.setString(3, post.getComment());
-								query2.setInt(4, post.getLikes());
-								query2.setInt(5, post.getViews());
-								query2.setInt(6, k);
+								query2.setLong(4, post.getLikes());
+								query2.setLong(5, post.getViews());
+								query2.setLong(6, k);
 								query2.setString(7, post.getUID(true));
 
 								query2.executeUpdate();
@@ -455,10 +530,10 @@ public class Data {
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(update);
-			query1.setInt(1, totalposts);
-			query1.setInt(2, totallikes);
-			query1.setInt(3, totalcomments);
-			query1.setInt(4, totalviews);
+			query1.setLong(1, totalposts);
+			query1.setLong(2, totallikes);
+			query1.setLong(3, totalcomments);
+			query1.setLong(4, totalviews);
 			query1.setDate(5, (Date) LastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
@@ -488,7 +563,7 @@ public class Data {
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
-
+		LoadPSS();
 		// General Variable Load
 		String select = "Select * from general WHERE id=1";
 		Statement stmt = null;
@@ -499,12 +574,12 @@ public class Data {
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
-			totalviews = rs.getInt("totalviews");
-			totalcomments = rs.getInt("totalcomments");
-			totallikes = rs.getInt("totallikes");
-			totalposts = rs.getInt("totalposts");
+			totalviews = rs.getLong("totalviews");
+			totalcomments = rs.getLong("totalcomments");
+			totallikes = rs.getLong("totallikes");
+			totalposts = rs.getLong("totalposts");
 			LastUpdated = rs.getDate("lastupdated");
-			if (rs.getInt("Version") != Settings.dbversion)
+			if (rs.getLong("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
 			obj.put("Op", "Error");
@@ -564,8 +639,8 @@ public class Data {
 			rs = stmt.executeQuery(query);
 
 			for (; rs.next();) {
-				Model model = new Model(rs.getInt(Settings.lmtable_id), rs.getInt(Settings.lmtable_update),
-						rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+				Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
+						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 						rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 						rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
@@ -635,7 +710,7 @@ public class Data {
 			rs.beforeFirst();
 			ExecutorService es = Executors.newFixedThreadPool(100);
 			while (rs.next())
-				es.execute(new Topinions(rs.getInt(1)));
+				es.execute(new Topinions(rs.getLong(1)));
 			es.shutdown();
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -647,7 +722,7 @@ public class Data {
 			// System.out.println("HELLO");
 			es = Executors.newFixedThreadPool(100);
 			while (rs.next())
-				es.execute(new Tposts(rs.getInt(1)));
+				es.execute(new Tposts(rs.getLong(1)));
 			es.shutdown();
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -673,16 +748,16 @@ public class Data {
 			stmt = cnlocal.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt("id"))) {
+				if (authordb.containsKey(rs.getLong("id"))) {
 				} else {
-					Author auth = new Author(rs.getInt(Settings.latable_id), rs.getString(Settings.latable_name),
-							rs.getInt(Settings.latable_age), rs.getString(Settings.latable_gender),
+					Author auth = new Author(rs.getLong(Settings.latable_id), rs.getString(Settings.latable_name),
+							rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
 							rs.getString(Settings.latable_location));
-					auth.setComments(rs.getInt(Settings.latable_comments));
-					auth.setLikes(rs.getInt(Settings.latable_likes));
-					auth.setPosts(rs.getInt(Settings.latable_posts) - 1);
-					auth.setViews(rs.getInt(Settings.latable_views));
-					authordb.put(rs.getInt(Settings.latable_id), auth);
+					auth.setComments(rs.getLong(Settings.latable_comments));
+					auth.setLikes(rs.getLong(Settings.latable_likes));
+					auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
+					auth.setViews(rs.getLong(Settings.latable_views));
+					authordb.put(rs.getLong(Settings.latable_id), auth);
 				}
 			}
 			rs.close();
@@ -697,11 +772,11 @@ public class Data {
 			stmt = cndata.createStatement();
 			rs = stmt.executeQuery(query);
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getInt(Settings.rutable_userid))) {
+				if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
 				} else {
-					authordb.put(rs.getInt(Settings.rutable_userid),
-							new Author(rs.getInt(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-									rs.getInt(Settings.rutable_age), rs.getString(Settings.rutable_gender),
+					authordb.put(rs.getLong(Settings.rutable_userid),
+							new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
+									rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
 									rs.getString(Settings.rutable_loc)));
 				}
 			}
@@ -739,7 +814,7 @@ public class Data {
 		stime = System.nanoTime();
 
 		opiniondb.forEach((k, v) -> {
-			ArrayList<Integer> uniqueauthors = new ArrayList<Integer>();
+			ArrayList<Long> uniqueauthors = new ArrayList<Long>();
 			ArrayList<Post> temp_post = v.getPosts();
 			temp_post.forEach((v2) -> {
 				if (!uniqueauthors.contains(v2.getUID()))
@@ -793,22 +868,22 @@ public class Data {
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, author.getID());
-				query1.setInt(2, author.getAge());
+				query1.setLong(1, author.getID());
+				query1.setLong(2, author.getAge());
 				query1.setString(3, author.getName());
 				query1.setString(4, author.getGender());
 				query1.setString(5, author.getLocation());
 				query1.setDouble(6, author.getInfluence());
-				query1.setInt(7, author.getComments());
-				query1.setInt(8, author.getLikes());
-				query1.setInt(9, author.getViews());
-				query1.setInt(10, author.getPosts());
+				query1.setLong(7, author.getComments());
+				query1.setLong(8, author.getLikes());
+				query1.setLong(9, author.getViews());
+				query1.setLong(10, author.getPosts());
 				query1.setString(11, author.getSource() != null ? author.getSource() : "Not Avaliable");
 				query1.setDouble(12, author.getInfluence());
-				query1.setInt(13, author.getComments());
-				query1.setInt(14, author.getLikes());
-				query1.setInt(15, author.getViews());
-				query1.setInt(16, author.getPosts());
+				query1.setLong(13, author.getComments());
+				query1.setLong(14, author.getLikes());
+				query1.setLong(15, author.getViews());
+				query1.setLong(16, author.getPosts());
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
@@ -853,19 +928,19 @@ public class Data {
 					PreparedStatement query1 = null;
 					try {
 						query1 = cnlocal.prepareStatement(update);
-						query1.setInt(1, k);
+						query1.setLong(1, k);
 						query1.setDouble(2, opinion.getReach());
 						query1.setDouble(3, opinion.getPolarity());
 						query1.setDouble(4, opinion.getTotalInf());
-						query1.setInt(5, opinion.getUID());
+						query1.setLong(5, opinion.getUID());
 						query1.setDate(6, opinion.getTime());
-						query1.setString(7, opinion.getPSS());
-						query1.setInt(8, opinion.ncomments());
-						query1.setInt(9, opinion.getProduct());
+						query1.setLong(7, opinion.getPSS());
+						query1.setLong(8, opinion.ncomments());
+						query1.setLong(9, opinion.getProduct());
 						query1.setDouble(10, opinion.getReach());
 						query1.setDouble(11, opinion.getPolarity());
 						query1.setDouble(12, opinion.getTotalInf());
-						query1.setInt(13, opinion.ncomments());
+						query1.setLong(13, opinion.ncomments());
 						query1.executeUpdate();
 
 						opinion.getPosts().forEach((post) -> {
@@ -873,13 +948,13 @@ public class Data {
 							try {
 								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
-								query2.setInt(1, post.getID());
+								query2.setLong(1, post.getID());
 								query2.setDouble(2, post.getPolarity());
 								query2.setString(3, post.getComment());
-								query2.setInt(4, post.getLikes());
-								query2.setInt(5, post.getViews());
-								query2.setInt(6, k);
-								query2.setInt(7, post.getUID());
+								query2.setLong(4, post.getLikes());
+								query2.setLong(5, post.getViews());
+								query2.setLong(6, k);
+								query2.setLong(7, post.getUID());
 
 								query2.executeUpdate();
 								if (query2 != null)
@@ -918,6 +993,7 @@ public class Data {
 		}
 		try {
 			cnlocal.commit();
+			cnlocal.setAutoCommit(true);
 		} catch (SQLException e2) {
 			try {
 				cnlocal.rollback();
@@ -927,6 +1003,7 @@ public class Data {
 			}
 			e2.printStackTrace();
 		}
+
 		System.out.println(" insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
@@ -935,10 +1012,10 @@ public class Data {
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(update);
-			query1.setInt(1, totalposts);
-			query1.setInt(2, totallikes);
-			query1.setInt(3, totalcomments);
-			query1.setInt(4, totalviews);
+			query1.setLong(1, totalposts);
+			query1.setLong(2, totallikes);
+			query1.setLong(3, totalcomments);
+			query1.setLong(4, totalviews);
 			query1.setDate(5, (Date) LastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
@@ -1004,19 +1081,19 @@ public class Data {
 		return authordb.get(comment.getUID());
 	}
 
-	public int getTotalComments() {
+	public long getTotalComments() {
 		return this.totalcomments;
 	}
 
-	public int getTotalViews() {
+	public long getTotalViews() {
 		return this.totalviews;
 	}
 
-	public int getTotalLikes() {
+	public long getTotalLikes() {
 		return this.totallikes;
 	}
 
-	public int getTotalPosts() {
+	public long getTotalPosts() {
 		return this.totalposts;
 	}
 
@@ -1043,21 +1120,21 @@ public class Data {
 			PreparedStatement query1 = null;
 			try {
 				query1 = cnlocal.prepareStatement(insert);
-				query1.setInt(1, a.getID());
-				query1.setInt(2, a.getAge());
+				query1.setLong(1, a.getID());
+				query1.setLong(2, a.getAge());
 				query1.setString(3, a.getName());
 				query1.setString(4, a.getGender());
 				query1.setString(5, a.getLocation());
 				query1.setDouble(6, a.getInfluence());
-				query1.setInt(7, a.getComments());
-				query1.setInt(8, a.getLikes());
-				query1.setInt(9, a.getViews());
-				query1.setInt(10, a.getPosts());
+				query1.setLong(7, a.getComments());
+				query1.setLong(8, a.getLikes());
+				query1.setLong(9, a.getViews());
+				query1.setLong(10, a.getPosts());
 				query1.setDouble(11, a.getInfluence());
-				query1.setInt(12, a.getComments());
-				query1.setInt(13, a.getLikes());
-				query1.setInt(14, a.getViews());
-				query1.setInt(15, a.getPosts());
+				query1.setLong(12, a.getComments());
+				query1.setLong(13, a.getLikes());
+				query1.setLong(14, a.getViews());
+				query1.setLong(15, a.getPosts());
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
@@ -1075,12 +1152,12 @@ public class Data {
 	}
 
 	class Topinions implements Runnable {
-		private int id;
+		private long id;
 		private Connection condata;
 		private Connection conlocal;
 		private JSONObject obj = null;
 
-		public Topinions(int _id) {
+		public Topinions(long _id) {
 			id = _id;
 
 		}
@@ -1114,12 +1191,12 @@ public class Data {
 						}
 					}
 					// System.out.println(id);
-					int postid = remote ? rs.getInt(Settings.rptable_postid) : rs.getInt(Settings.lptable_opinion);
+					long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 					// System.out.println(id);
-					int user_id = remote ? rs.getInt(Settings.rptable_userid) : rs.getInt(Settings.lptable_authorid);
+					long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
 					java.sql.Date time = remote ? rs.getDate(Settings.rptable_date) : null;
-					int likes = remote ? rs.getInt(Settings.rptable_likes) : rs.getInt(Settings.lptable_likes);
-					int views = remote ? rs.getInt(Settings.rptable_views) : rs.getInt(Settings.lptable_views);
+					long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
+					long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
 					;
 					String message = remote ? rs.getString(Settings.rptable_message)
 							: rs.getString(Settings.lptable_message);
@@ -1128,11 +1205,10 @@ public class Data {
 					if (!(users.contains(user_id))) {
 						users.add(user_id);
 					}
-					PSS pss = new PSS();
-					String tag = pss.getTag(message);
-					int product = pss.getProduct(message);
+					
+					long product = identifyProduct(message);
 
-					opiniondb.put(postid, new Opinion(_post, tag, product));
+					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product));
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
@@ -1158,8 +1234,9 @@ public class Data {
 						rs.close();
 						stmt.close();
 						conlocal.close();
-					}else{
-					totalposts--;}
+					} else {
+						totalposts--;
+					}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")) * 1000L);
 					DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					format.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -1167,16 +1244,17 @@ public class Data {
 					java.util.Date parsed = format.parse(formatted);
 
 					System.out.println(formatted);
-					int postid = obj.getInt("postId");
+					long postid = obj.getLong("postId");
 					// System.out.println(id);
 					String source = obj.getString("source");
 					String user_id = obj.getString("account");
-					java.sql.Date time = remote ? new java.sql.Date(parsed.getTime()) : rs.getDate(Settings.lptable_timestamp);
-					int likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getInt("likes") : 0 : 0;
-					int views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getInt("views") : 0 : 0;
-					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " ": "";
+					java.sql.Date time = remote ? new java.sql.Date(parsed.getTime())
+							: rs.getDate(Settings.lptable_timestamp);
+					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
+					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
+					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
-					int age = obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0;
+					long age = obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0;
 					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
@@ -1196,11 +1274,14 @@ public class Data {
 					if (!(users2.contains(author))) {
 						users2.add(author);
 					}
-					PSS pss = new PSS();
-					String tag = pss.getTag(message);
-					int product = pss.getProduct(message);
-
-					opiniondb.put(postid, new Opinion(_post, tag, product, "google.pt"));// TODO find url to attack here
+					
+					long product = identifyProduct(message);
+					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product, "google.pt"));// TODO
+																							// find
+																							// url
+																							// to
+																							// attack
+																							// here
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
@@ -1221,13 +1302,13 @@ public class Data {
 	}
 
 	class Tposts implements Runnable {
-		private int id;
+		private long id;
 		private Opinion _opin;
 		private Connection condata;
 		private Connection conlocal;
 		private JSONObject obj = null;
 
-		public Tposts(int _id) {
+		public Tposts(long _id) {
 			id = _id;
 			_opin = opiniondb.get(id);
 
@@ -1235,7 +1316,7 @@ public class Data {
 
 		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
-			_opin = opiniondb.get(_obj.getInt(Settings.JSON_postid));
+			_opin = opiniondb.get(_obj.getLong(Settings.JSON_postid));
 		}
 
 		public void run() {
@@ -1252,11 +1333,11 @@ public class Data {
 					if (rs.next()) {
 						do {
 							// System.out.println("HELLO2");
-							int postid = rs.getInt(Settings.rptable_postid);
-							int user_id = rs.getInt(Settings.rptable_userid);
+							long postid = rs.getLong(Settings.rptable_postid);
+							long user_id = rs.getLong(Settings.rptable_userid);
 							java.sql.Date time = rs.getDate(Settings.rptable_date);
-							int likes = rs.getInt(Settings.rptable_likes);
-							int views = rs.getInt(Settings.rptable_views);
+							long likes = rs.getLong(Settings.rptable_likes);
+							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
 							Post _post = new Post(postid, user_id, time, likes, views, message);
 							if (!(users.contains(user_id))) {
@@ -1274,10 +1355,10 @@ public class Data {
 					if (rs.next()) {
 						do {
 							// System.out.println("HELLO3");
-							int postid = rs.getInt(Settings.lptable_id);
-							int user_id = rs.getInt(Settings.lptable_authorid);
-							int likes = rs.getInt(Settings.lptable_likes);
-							int views = rs.getInt(Settings.lptable_views);
+							long postid = rs.getLong(Settings.lptable_id);
+							long user_id = rs.getLong(Settings.lptable_authorid);
+							long likes = rs.getLong(Settings.lptable_likes);
+							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
 							Post _post = new Post(postid, user_id, null, likes, views, message);
 							if (!(users.contains(user_id)))
@@ -1309,32 +1390,33 @@ public class Data {
 
 						// System.out.println("HELLO2");
 						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
-						for (int index = 0; index < replies.length()-1; index++) {
+						for (int index = 0; index < replies.length() - 1; index++) {
 
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
 
 							Date date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
-							//Date date = new Date(Long.valueOf(11111 * 1000L));
+							// Date date = new Date(Long.valueOf(11111 *
+							// 1000L));
 							DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 							format.setTimeZone(TimeZone.getTimeZone("GMT"));
 							String formatted = format.format(date);
-							java.util.Date parsed = format.parse(formatted); 
+							java.util.Date parsed = format.parse(formatted);
 
-							int postid = reply.getInt(Settings.JSON_postid);
+							long postid = reply.getLong(Settings.JSON_postid);
 							String user_id = reply.getString(Settings.JSON_userid);
 							java.sql.Date time = new java.sql.Date(parsed.getTime());
-							int likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getInt("likes") : 0
+							long likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getLong("likes") : 0
 									: 0;
-							int views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getInt("views") : 0
+							long views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getLong("views") : 0
 									: 0;
 							String message = reply.getString(Settings.JSON_message);
 							String source = obj.getString(Settings.JSON_source);
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
-							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " ": "";
+							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
-							int age = obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0;
+							long age = obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0;
 							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
@@ -1346,7 +1428,7 @@ public class Data {
 						}
 
 					}
-					
+
 					System.out.println("HELLO");
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1374,8 +1456,8 @@ public class Data {
 				ResultSet rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
-						Model model = new Model(rs.getLong(Settings.latable_id), rs.getInt(Settings.lmtable_update),
-								rs.getInt(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
+						Model model = new Model(rs.getLong(Settings.latable_id), rs.getLong(Settings.lmtable_update),
+								rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 								rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));

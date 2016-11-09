@@ -188,13 +188,13 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
-			System.out.println(query1);
+			//System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
 			 * values[0]); query1.setString(5, values[1]); } }
 			 */
-			System.out.println(query1);
+			//System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {
@@ -353,7 +353,7 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
-			System.out.println(query1);
+			//System.out.println(query1);
 
 			rs = query1.executeQuery();
 			rs.next();
@@ -512,7 +512,7 @@ public class Globalsentiment {
 			if (location != null)
 				query1.setString(rangeindex++, location);
 
-			System.out.println(query1);
+			//System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

@@ -147,7 +147,41 @@ public class Settings {
 	public static final String JSON_location = "location";
 	public static final String JSON_fname = "Fname";
 	public static final String JSON_lname = "Lname";
-
+	
+	// Common Repository DB Specs
+	private static final String crdbip="127.0.0.1";
+	private static final String crdbport="3306";
+	private static final String crdbname = "diversity_common_repository";
+	private static final String crurl = "jdbc:mysql://"+crdbip+":"+crdbport+"/"+crdbname+"?autoReconnect=true&useSSL=false";
+	private static final String cruser = "diversity";
+	private static final String crpass = "diversity";
+	
+	// PSS Table
+	public static final String crpsstable ="pss";
+	public static final String crpsstable_id="id";
+	public static final String crpsstable_type="type";
+	public static final String crpsstable_company="sold_by_company_id";
+	public static final String crpsstable_author="user_id";
+	public static final String crpsstable_name ="name";
+	
+	
+	// Product Table
+	public static final String crproducttable="product";
+	public static final String crproducttable_id="id";
+	public static final String crproducttable_name="name";
+	public static final String crproducttable_type="type";
+	public static final String crproducttable_parent="parent_product_id";
+	public static final String crproducttable_supplied_by="supplied_by_company_id";
+	public static final String crproducttable_isfinal="is_final_product";
+	
+	// Company Table
+	public static final String crcompanytable="company";
+	public static final String crcompanytable_id="id";
+	public static final String crcompanytable_name="name";
+	public static final String crcompanytable_type="type";
+	public static final String crcompanytable_belongs_to = "belongs_to_company_id";
+	
+	
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
 		Calendar cal = Calendar.getInstance();
@@ -161,6 +195,23 @@ public class Settings {
 		while (true) {
 			try {
 				return (Connection) DriverManager.getConnection(url2, user2, pass2);
+			} catch (SQLException e) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static Connection conncr() throws ClassNotFoundException {
+		Class.forName("com.mysql.jdbc.Driver");
+		while (true) {
+			try {
+				return (Connection) DriverManager.getConnection(crurl, cruser, crpass);
 			} catch (SQLException e) {
 				try {
 					Thread.sleep(1000);

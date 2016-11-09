@@ -15,11 +15,11 @@ import monitoring.Monitor;;
 public class Model {
 	Connection cnlocal;
 	private long id = 0;
-	private int frequency, user;
+	private long frequency, user;
 	private String name, uri, pss, age, gender;
 	private boolean products, archived;
 
-	public Model(long _id, int _frequency, int _user, String _name, String _uri, String _pss, String _age,
+	public Model(long _id, long _frequency, long _user, String _name, String _uri, String _pss, String _age,
 			String _gender, Boolean _products, Boolean _archived) {
 		this.id=_id;
 		this.frequency=_frequency;
@@ -61,10 +61,10 @@ public class Model {
 			query1.setString(1, name);
 			query1.setString(2, uri);
 			query1.setString(3, pss);
-			query1.setInt(4, frequency);
+			query1.setLong(4, frequency);
 			query1.setBoolean(5, archived);
 			query1.setBoolean(6, products);
-			query1.setInt(7, user);
+			query1.setLong(7, user);
 			//query1.setString(8, age);
 			//query1.setString(9, gender);
 			query1.executeUpdate();
@@ -189,7 +189,7 @@ public class Model {
 		return this.uri;
 	}
 
-	public Integer getFrequency() {
+	public long getFrequency() {
 		return this.frequency;
 	}
 

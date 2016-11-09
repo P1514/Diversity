@@ -3,20 +3,20 @@ package general;
 //Author Individual Object
 public class Author {
 
-	private int id; // Keys
+	private long id; // Keys
 	private String id2; // Keys String
 	private String source;
 	private String name; //
 	private double influence; // Calculated
-	private int age;
+	private long age;
 	private String gender;
 	private String location;
-	private int comments;
-	private int posts;
-	private int likes;
-	private int views;
+	private long comments;
+	private long posts;
+	private long likes;
+	private long views;
 
-	public Author(int _id, String _name, int _age, String _gender, String _location) {
+	public Author(long _id, String _name, long _age, String _gender, String _location) {
 		this.id = _id;
 		this.age = _age;
 		this.name = _name;
@@ -29,7 +29,7 @@ public class Author {
 
 	}
 
-	public Author(String _id, String _source, String _name, int _age, String _gender, String _location) {
+	public Author(String _id, String _source, String _name, long _age, String _gender, String _location) {
 		this.id2 = _id;
 		this.source = _source;
 		this.age = _age;
@@ -62,11 +62,11 @@ public class Author {
 		return gender;
 	}
 
-	public int getAge() {
+	public long getAge() {
 		return age;
 	}
 
-	public int getID() {
+	public long getID() {
 		return id;
 	}
 
@@ -74,19 +74,19 @@ public class Author {
 		return id2;
 	}
 
-	public int getPosts() {
+	public long getPosts() {
 		return posts;
 	}
 
-	public void addComments(int number) {
+	public void addComments(long number) {
 		this.comments += number;
 	}
 
-	public void addViews(int number) {
+	public void addViews(long number) {
 		this.views += number;
 	}
 
-	public void addLikes(int number) {
+	public void addLikes(long number) {
 		this.likes += number;
 	}
 
@@ -94,31 +94,31 @@ public class Author {
 		this.posts += 1;
 	}
 
-	public void setComments(int number) {
+	public void setComments(long number) {
 		this.comments = number;
 	}
 
-	public void setViews(int number) {
+	public void setViews(long number) {
 		this.views = number;
 	}
 
-	public void setLikes(int number) {
+	public void setLikes(long number) {
 		this.likes = number;
 	}
 
-	public void setPosts(int number) {
+	public void setPosts(long number) {
 		this.posts = number;
 	}
 
-	public int getComments() {
+	public long getComments() {
 		return this.comments;
 	}
 
-	public int getLikes() {
+	public long getLikes() {
 		return this.likes;
 	}
 
-	public int getViews() {
+	public long getViews() {
 		return this.views;
 	}
 

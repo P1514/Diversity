@@ -33,7 +33,6 @@ public class Backend {
 		Settings conf;
 		GetModels model;
 		GetPosts gp = new GetPosts();
-		PSS pss = new PSS();
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		long id = 0;
@@ -198,7 +197,16 @@ public class Backend {
 				tmp = model.update_model(msg).toString();
 				return tmp;
 			case 17:
-				return pss.getPss();
+				result = new JSONArray();
+				result.put(new JSONObject().put("Op", "pss"));
+				
+				for(PSS a : Data.pssdb.values()){
+					result.put(new JSONObject().put("Pss", a.getName()));
+				}
+				
+				
+				
+				return result.toString();
 			default:
 				msg = new JSONObject();
 				msg.put("Op", "Error");

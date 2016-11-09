@@ -39,9 +39,9 @@ public class Overwatch extends TimerTask {
 		// timer.scheduleAtFixedRate(this, date.getTime(),
 		// 24*60*60*1000);//h/d*m/d*s/m*ms/s = ms/d (runs once a day)
 		Calendar c = Calendar.getInstance();
-		c.add(Calendar.DAY_OF_MONTH, 1);
+		c.add(Calendar.DAY_OF_MONTH, 0/*1*/);
 		c.set(Calendar.HOUR, 0);
-		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.MINUTE, 1/*0*/);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.AM_PM, Calendar.AM);
 		
@@ -56,6 +56,8 @@ public class Overwatch extends TimerTask {
 
 	@Override
 	public void run() {
+		
+		// TODO Introduce here loading PSS's and Products and save them on static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
 		updatelist = new ArrayList<String>();
 		requesturl = new HashMap<String, url>();
@@ -119,7 +121,7 @@ public class Overwatch extends TimerTask {
 							+ Settings.lutable_source + "=?) AND (";
 					try {
 						/*
-						 * TODO Missing check net update time, currently doing
+						 * TODO Missing check standard update time update time, currently doing
 						 * update each day Calendar cal=now; for (Model m :
 						 * Data.modeldb.values()) { if (m.getPSS().equals(k)) {
 						 * cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());

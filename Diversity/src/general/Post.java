@@ -4,17 +4,17 @@ import java.sql.Date;
 
 //Post individual Object
 public class Post {
-	private int id;
-	private int userid;
+	private long id;
+	private long userid;
 	private String userid2 = null;
 	private Date time;
 	private String message = new String();
-	private int likes = 0;
-	private int views = 0;
+	private long likes = 0;
+	private long views = 0;
 	private double polarity = 50;
 	private String source = "N/A";
 
-	public Post(int _id, int _userid, Date _time, int _likes, int _views, String _message) {
+	public Post(long _id, long _userid, Date _time, long _likes, long _views, String _message) {
 		this.id = _id;
 		this.userid = _userid;
 		this.time = _time;
@@ -41,7 +41,7 @@ public class Post {
 		this.polarity = sentiment;
 	}
 
-	public Post(int _id, String _source, String _userid, Date _time, int _likes, int _views, String _message) {
+	public Post(long _id, String _source, String _userid, Date _time, long _likes, long _views, String _message) {
 		this.id = _id;
 		this.userid2 = _userid;
 		this.time = _time;
@@ -69,7 +69,7 @@ public class Post {
 		this.polarity = sentiment;
 	}
 
-	public int getUID() {
+	public long getUID() {
 		return userid;
 	}
 	
@@ -82,7 +82,7 @@ public class Post {
 		return message;
 	}
 
-	public int getID() {
+	public long getID() {
 		return id;
 	}
 
@@ -90,11 +90,11 @@ public class Post {
 		return time;
 	}
 
-	public int getLikes() {
+	public long getLikes() {
 		return likes;
 	}
 
-	public int getViews() {
+	public long getViews() {
 		return views;
 	}
 
