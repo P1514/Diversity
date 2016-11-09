@@ -16,7 +16,7 @@
 <script
 	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script type="text/javascript"
-	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/bootstrap-slider.js"></script>
+	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.4.1/bootstrap-slider.js"></script>
 <script type="text/javascript"
 	src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -25,7 +25,7 @@
 <link rel="stylesheet"
 	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.2.0/css/bootstrap-slider.css" />
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.4.1/css/bootstrap-slider.css" />
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" /> <!--added-->
 
@@ -74,7 +74,12 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 
 	var ws;
 	document.addEventListener('DOMContentLoaded', function() {
-		$('#age').slider();
+
+			$('#ex1').slider({
+				formatter: function(value) {
+					return value;
+				}
+			});
 		ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
 
@@ -125,7 +130,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
-			
+
 			document.getElementById("model_name").value=json2[0].Name;
 			document.getElementById("model_name").readOnly = true;
 			document.getElementById("frequency").value=json2[0].Update;
@@ -136,7 +141,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			document.getElementById("final").checked=json2[0].Final_products;
 			//console.log(json2[0].Archive);
 			//console.log(json2[0].Final_products);
-			document.getElementById("Archive").checked=json2[0].Archive;
+			//document.getElementById("Archive").checked=json2[0].Archive;
 			//var ager=json2[0].Age.split(",").map(Number).filter(Boolean);// Converts string from DB to array of ints
 			//$('#age').slider('setValue', ager);
 			var uris = json2[0].URI.split(";");
@@ -144,8 +149,8 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			console.log("HELLO "+uris[i]+"\r\n");
 			$(':checkbox[value="'+uris[i]+'"]').prop("checked","true");}
 
-			document.getElementById("fcheckbox").style.display = "block";
-			document.getElementById("Archive").disabled = false;
+			//document.getElementById("fcheckbox").style.display = "block";
+			//document.getElementById("Archive").disabled = false;
 			document.getElementById("submit").value = "Update";
 			edit = true;
 		}
@@ -177,7 +182,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		console.log("line added");
 		if (name == "" || value == "")
 			return;
-		$('#left_menu').append(
+		$('#table_div2').append(
 				'<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
 						+ name + " / " + value +  '</label></div>');
 		document.getElementById("new_name").value = "";
@@ -204,9 +209,6 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		var month = date.getMonth()+1;
 		return date.getDate() + ";" + month + ";" + date.getFullYear();
 	}
-
-	//var testProducts = [{Op : 'test'}, [{Filter: 'PSS1'}, {Product : 'A'}, {Product : 'B'}, {Filter: 'PSS2'}, {Product: 'C'}]];
-	//var globalTest;
 
 	var str = "";
 
@@ -246,7 +248,11 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		var checkbox = document.getElementById('final');
 		if (!checkbox.checked) {
 			document.getElementById('final_input').style.display = 'none';
+			document.getElementById('tree_div').style.display = 'none';
+			$('#final_input').jstree(true).deselect_all();
+			final_products = [];
 		} else {
+			document.getElementById('tree_div').style.display = 'block';
 			document.getElementById('final_input').style.display = 'block';
 		}
 	}
@@ -282,23 +288,37 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 
 	}
 
+	var minSliderValue = $("#ex1").data("slider-min");
+	var maxSliderValue = $("#ex1").data("slider-max");
+
+
+	// If You want to change input text using slider handler
+	$('#ex1').on('change', function(slider){
+		$("#inputValue").text(slider.getValue());
+	});
+
+	// If you want to change slider using input text
+	$("#inputValue").on("keyup", function() {
+	    var val = Math.abs(parseInt(this.value, 10) || minSliderValue);
+	    this.value = val > maxSliderValue ? maxSliderValue : val;
+	    $('#ex1').slider('setValue', val);
+	});
+
 	function send_config() {
 		var configs = ""; //to make sure it has the checkbox active
-		$('#left_menu').find('input[type=checkbox]').each(function() {
+		$('#table_div2').find('input[type=checkbox]').each(function() {
 			if (this.checked == true) {
 				configs += this.value + ";";
 			}
 		});
 		var erro = false;
-		
+
 		var date = new Date(document.getElementById("date_input").value);
         //console.log("TESTE***********"+date);
         if(date.toString() == "Invalid Date" && document.getElementById('start_date').checked){//checks for invalid date
         	alert("Invalid Date");
 			return;
 			}
-        
-        
 		var jsonData = {
 			"Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
 			"URI" : configs != "" ? configs : erro = true,
@@ -313,10 +333,8 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 					.getElementById('gender').value : erro = true,*/
 			"Final_Product" : document.getElementById('final').checked,
 			"Products" : final_products,
-			"Archive" : document.getElementById('Archive').checked,
-			"Name" : document.getElementById('model_name').value != "" ? document
-					.getElementById('model_name').value
-					: erro = true,
+			"Archive" : false,
+			"Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
 			"User" : 1,//TODO find this field
 			"Id":sessionStorage.id,
 			"Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :0,
@@ -326,7 +344,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			alert("All Fields must be filled");
 			return;
 		}
-		console.log(jsonData);
+
 		ws.send(JSON.stringify(jsonData));
 
 	}
@@ -339,59 +357,233 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		}
 
 	}
+
+
 </script>
 </head>
 <style>
+
+a {color: black; margin-left: 10px;}
+a:link {color: black;}
+a:visited {color: black;}
+a:hover {color: black;}
+a:active {color: black;}
+
+body {
+		color: #604460;
+		font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+
+input {
+	margin-top: 0;
+	margin-left: 0;
+	padding-top: 0;
+	padding-left: 0;
+}
+
+h1 {
+	margin-left:50px;
+	padding-top: 0px;
+	text-align: left;
+	font-weight: bold;
+	font-size: 24;
+}
+
+h2 {
+	font-weight: normal;
+	text-align: left;
+	font-size: 24;
+}
+
+h3 {
+	font-weight: normal;
+	margin-top: 0px;
+	text-align: center;
+	font-size: 18;
+	color: white;
+}
+
+img {
+	height: 30px;
+	width: 30px;
+}
+
+form {
+	margin-top: 0px;
+	margin-left: 0px;
+}
+
+.container {
+	background-color: #DDDDDD;
+	margin-top: 20px;
+	width: 90%;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	padding-bottom: 20px;
+	min-height: 200px;
+	overflow: hidden;
+}
+
+.col-sm-6 {
+	text-align: left;
+}
+
 input[type="number"] {
 	width: 50px;
 }
 
-#global {
-	position: relative;
-	width: 80%;
-	margin-left: 10%;
-	height: 50vh;
+#tree_div {
+	background-color: #FFFFFF;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	color: black;
 }
 
-#menu {
-	position: relative;
-	width: 80%;
-	height: 80%;
-	margin-top: 4%;
-}
-
-.inlineTable {
+#pss {
 	display: inline-block;
-	vertical-align: top;
-	margin-left: "10%";
-	margin-rigth: "10%";
+	width = 100%;
 }
 
-.inlineTop {
-	vertical-align: top;
+#model_name {
+	display: inline-block;
+	width = 60%;
 }
 
-.checkbox {
-	vertical-align: top;
+#frequency_slider .slider-track {
+	background: #604460;
 }
 
-.left_menu {
-	vertical-align: top;
+#frequency_slider .slider-handle {
+	background: #604460;
 }
 
-#setup {
-	position: absolute;
-	bottom: 0;
+p {
+	text-align: left;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+table, th, td {
+	text-align: right;
+	vertical-align: middle;
+	padding-left: 10px;
+	padding-bottom: 20px;
+	margin-bottom: 0;
 }
 </style>
 
-
 <body>
+	<h1 id="page_title"></h1>
+	<center>
+			<div class="container" id="define">
+				<h2>Define model:</h2>
+				<div class="col-sm-4 offset-0" >
+					<div class="form-group">
+						<div id="table_div" style="overflow:hidden;width:400px;float:left;">
+							<table style="margin:5px;" >
+								<tr>
+										<td style="width:300px" valign="middle">
+												PSS:
+										</td>
+										<td style="width:300px;" valign="middle">
+											<select class="form-control" id="pss"></select><br>
+										</td>
+								</tr>
+								<tr>
+										<td style="width:30%">
+												Model Name:
+										</td>
+										<td style="width:300px;" valign="middle">
+											<input type="text" class="form-control" id="model_name" placeholder="Model name">
+										</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4 offset-0" >
+					<div class="checkbox" style: "padding-left: 10px;padding-top: 20px;">
+						<label><input id="final" type="checkbox"  onchange="showTree();" value=""
+							checked>Include Final Product</label>
+					</div>
+
+				</div>
+				<div class="col-sm-4 offset-0" id="tree_div" style="text-align:left;" >
+					<div id="final_input">
+						<!--list added through javascript-->
+					</div>
+				</div>
+			</div>
+			<div class="container" id="sources">
+				<h2>Select sources:</h2>
+				<div id = "table_div2" style="width: 50%; text-align: left;">
+					<table >
+						<tr style="margin-bottom: 0; padding-bottom: 0;">
+								<td>
+										<p>Social Network:</p>
+								</td>
+								<td>
+										<p>Account Name:</p>
+								</td>
+								<td>
+									<button style="margin-left=40px; color: black;" class="glyphicon glyphicon-plus" onclick="addline();"></button>
+								</td>
+						</tr>
+						<tr>
+							<td>
+								<div id="left_menu">
+									<div class="form-group">
+										<select class="form-control" id="new_name">
+											<option value="Facebook">Facebook</option>
+											<option value="Twitter">Twitter</option>
+										</select>
+									</div>
+								</div>
+							</td>
+							<td style="margin-top: 0; padding-top: 0;">
+								<div>
+									<input class="form-control" type="text" id="new_URI" placeholder="Account name">
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<p><i>(unchecked items will not be included in the opinion model)</i></p>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+
+			<div class="container" id="time">
+				<h2>Define frequency and start time:</h2>
+				<div class="col-md-4" id="slider" style="text-align:left;margin-top:50px;margin-right:250px;">
+					<div class="wrapper">
+						<input type="number" class="form-control" id="frequency" style="width: 75px;" onKeyUp="checknumber(this)" min="0">
+					</div>
+				</div>
+				<div class="col-md-4" id="date" style="float: right;margin-top:30px;">
+					<div class="checkbox">
+						<label><input id="start_date"  type="checkbox" onchange="showdate();">
+							Define start date:
+						</label>
+					</div>
+					<div>
+						<input id="date_input" class="form-control" type="date" style = "display:none" >
+					</div>
+					<i>(if unchecked, monitoring starts immediatly)<i>
+				</div>
+			</div>
+	</center>
+
+	<input id="submit" class="btn btn-default pull-right" style="margin-right:30px;margin-top:15px;" onclick="send_config();" type="submit" value="Create" />
+	<input id="submit" class="btn btn-default pull-right" style="margin-right:30px;margin-top:15px;" onclick="location.href ='index.html';" type="submit" value="Back" />
+
+
+	<!--
 	<center>
 		<img src="../images/Diversity-Logo-120x62.png" alt="Diversity Logo"
 			align="top">
 	</center>
-	<!-- Botões opcionais -->
+	<!-- Botões opcionais
 	<div id="global" align="center">
 		<table id="menu">
 			<tr>
@@ -444,13 +636,13 @@ input[type="number"] {
 									<option value="Male">Male</option>
 									<option value="Female">Female</option>
 							</select>
-								</div>-->
+						</div> --
 								<div class="checkbox">
 									<label><input id="final" type="checkbox"  onchange="showTree();" value=""
 										checked>Include Final Products</label>
 								</div>
 								<div id="final_input">
-								<!--list added through javascript-->
+								<!--list added through javascript
 								</div>
 								<div class="checkbox">
 							<label><input id="start_date"  type="checkbox" onchange="showdate();">
@@ -459,7 +651,7 @@ input[type="number"] {
 						</div>
 						<div><input id="date_input" class="form-control" type="date" style = "display:none" ></div>
 
-						<!-- <input id="date_" tabindex="1" type="text" style = "display:none">-->
+						<!-- <input id="date_" tabindex="1" type="text" style = "display:none">--
 							</td>
 							<tr></tr>
 					</table>
@@ -471,4 +663,5 @@ input[type="number"] {
 		<input id="submit" class="btn btn-default btn-block"
 			onclick="send_config();" type="submit" value="Create" />
 	</div>
+-->
 </body>
