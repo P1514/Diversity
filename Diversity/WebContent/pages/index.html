@@ -34,19 +34,33 @@
     
 	function getRole(){
 		var url = window.location.href.toString();
-		//console.log("1"+url+"\n");
-		var type = url.split("role_desc=");
-		var role = type[1];
-		//console.log("2"+type[1]+"\n");
-		var jsonData = {
+		var type = url.split("role_desc=")
+        var role;
+        document.getElementById("dropdown").style.display = 'none';//hides dropdown
+         if(typeof type[1] != 'undefined'){
+            type = type[1].split("&");
+            role = type[0];
+        }
+        
+        if(typeof role == 'undefined'){
+            role = sessionStorage.session;
+        }
+		else
+            {
+			
+                sessionStorage.session = role;
+                console.log("Bemvindo:"+role+"\n");
+            }
+        
+        		var jsonData = {
 				"Op" : "getrestrictions",//create or update
 				"Role": role,
 			};
 		// ws.send(JSON.stringify(jsonData));
-		
+            
 		switch(role) {
 	    case "DESIGNER":
-	    	console.log("USER:"+type[1]+"\n");
+	    	console.log("USER:"+role+"\n");
 	    	document.getElementById("create").style.display = 'block';//show
 	   		document.getElementById("create_gray").style.display = 'none';//hide
 	    	document.getElementById("view").style.display = 'block';//show
@@ -61,22 +75,22 @@
 	   		document.getElementById("predict_gray").style.display = 'none';//hide
 	        break;
 	    case "SYS_ENG":
-	    	console.log("USER:"+type[1]+"\n");
+	    	console.log("USER:"+role+"\n");
 	    	document.getElementById("create").style.display =  'none';//hide
 	   		document.getElementById("create_gray").style.display = 'block';//show
-	    	document.getElementById("view").style.display =  'none';//hide
-	   		document.getElementById("view_gray").style.display = 'block';//show
+	    	document.getElementById("view").style.display = 'block';//show
+	   		document.getElementById("view_gray").style.display = 'none';//hide
 	    	document.getElementById("edit").style.display =  'none';//hide
 	   		document.getElementById("edit_gray").style.display = 'block';//show
 	    	document.getElementById("delete").style.display =  'none';//hide
 	   		document.getElementById("delete_gray").style.display = 'block';//show
-	    	document.getElementById("_view").style.display = 'none';//hide
-	   		document.getElementById("_view_gray").style.display = 'block';//show
+	    	document.getElementById("_view").style.display = 'block';//show
+	   		document.getElementById("_view_gray").style.display = 'none';//hide
 	    	document.getElementById("predict").style.display = 'none';//hide
 	   		document.getElementById("predict_gray").style.display = 'block';//show
 	        break;
 	    case "CONF_MAN":
-	    	console.log("USER:"+type[1]+"\n");
+	    	console.log("USER:"+role+"\n");
 	    	document.getElementById("create").style.display =  'none';//hide
 	   		document.getElementById("create_gray").style.display = 'block';//show
 	    	document.getElementById("view").style.display =  'none';//hide
@@ -92,7 +106,7 @@
 	   		
 	        break;
 	    case "PROD_MAN":
-	    	console.log("USER:"+type[1]+"\n");
+	    	console.log("USER:"+role+"\n");
 	    	document.getElementById("create").style.display =  'none';//hide
 	   		document.getElementById("create_gray").style.display = 'block';//show
 	    	document.getElementById("view").style.display =  'none';//hide
@@ -107,7 +121,7 @@
 	   		document.getElementById("predict_gray").style.display = 'block';//show
 	        break;
 	    case "ADMIN":
-	    	console.log("USER:"+type[1]+"\n");
+	    	console.log("USER:"+role+"\n");
 	    	document.getElementById("create").style.display = 'block';//show
 	   		document.getElementById("create_gray").style.display = 'none';//hide
 	    	document.getElementById("view").style.display = 'block';//show
@@ -344,6 +358,10 @@
 			$('#view').hide();
 			$('#edit').hide();
 			$('#delete').hide();
+            $('#create_gray').hide();
+			$('#view_gray').hide();
+			$('#edit_gray').hide();
+			$('#delete_gray').hide();
 			$('#view_models').show();
 			if (op == "edit") {
 				$('#edit').show();
@@ -353,6 +371,7 @@
 			}
 			if (op == "view") {
 				$('#view').show();
+				$('#view_edit').hide();
 				$('#view_edit').hide();
 				$('#view_select').show();
 				$('#view_delete').hide();
@@ -414,7 +433,7 @@
 				"Gender" : document.getElementById('gender').value != "" ? document
 						.getElementById('gender').value : erro = true,*/
 				"Final_Product" : true,
-				"Archive" : 1,
+				"Archive" : true,
 				"Name" : name,
 				"User" : 1,//TODO find this field
 				"Id": model_data[0],
@@ -473,11 +492,27 @@
 	display: inline-block;
 	margin-left: 100px;
 }
-a {color: black; margin-left: 10px;}
-a:link {color: black;}
-a:visited {color: black;}
-a:hover {color: black;}
-a:active {color: black;}
+
+a {
+	color: black;
+	margin-left: 10px;
+}
+
+a:link {
+	color: black;
+}
+
+a:visited {
+	color: black;
+}
+
+a:hover {
+	color: black;
+}
+
+a:active {
+	color: black;
+}
 
 #_view {
 	overflow-y: auto;
@@ -490,34 +525,35 @@ input {
 }
 
 body {
-	  font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
 }
 
 h1 {
-  margin-left:50px;
-  padding-top: 0px;
-  text-align: left;
-  font-weight: bold;
-  font-size: 24;
+	margin-left: 50px;
+	padding-top: 0px;
+	text-align: left;
+	font-weight: bold;
+	font-size: 24;
 }
 
 h2 {
-  font-weight: normal;
-  text-align: left;
-  font-size: 24;
+	font-weight: normal;
+	text-align: left;
+	font-size: 24;
 }
 
 h3 {
-  font-weight: normal;
-  margin-top: 0px;
-  text-align: center;
-  font-size: 18;
-  color: white;
+	font-weight: normal;
+	margin-top: 0px;
+	text-align: center;
+	font-size: 18;
+	color: white;
 }
 
 img {
-  height: 30px;
-  width: 30px;
+	height: 30px;
+	width: 30px;
 }
 
 form {
@@ -526,22 +562,22 @@ form {
 }
 
 .container {
-  background-color: #DDDDDD;
-  margin-top: 20px;
-  width: 90%;
-  box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
-  padding-bottom: 20px;
+	background-color: #DDDDDD;
+	margin-top: 20px;
+	width: 90%;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	padding-bottom: 20px;
 	min-height: 250px;
 	color: black;
 	overflow: hidden;
 }
 
 .col-sm-8 {
-  margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 .navbar {
-  position: relative;
+	position: relative;
 	margin-left: 0;
 	margin-right: 0;
 	text-align: center;
@@ -549,197 +585,240 @@ form {
 
 /* Dropdown Button */
 .dropbtn {
-      font-weight: normal;
-  margin-top: 0px;
-  text-align: center;
-  font-size: 50;
-  color: white;
-    background-color: #604460;
-    cursor: pointer;
-    padding:40;
-
+	font-weight: normal;
+	margin-top: 0px;
+	text-align: center;
+	font-size: 50;
+	color: white;
+	background-color: #604460;
+	cursor: pointer;
+	padding: 40;
 }
 
 /* Dropdown button on hover & focus */
 .dropbtn:hover, .dropbtn:focus {
-    background-color: #604480;
+	background-color: #604480;
 }
 
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
-    position: relative;
-    display: inline-block;
-    z-index: 99999;
+	position: relative;
+	display: inline-block;
+	z-index: 99999;
 }
 
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	display: none;
+	position: absolute;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
 /* Links inside the dropdown */
 .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #604460}
+.dropdown-content a:hover {
+	background-color: #604460
+}
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
-
+.show {
+	display: block;
+}
 </style>
 </head>
 <body>
 
-<div class="dropdown">
-  <button onclick="myFunction()" class="dropbtn">Role</button>
-  <div id="myDropdown" class="dropdown-content">
+	<div class="dropdown" id="dropdown">
+		<button onclick="myFunction()" class="dropbtn">Role</button>
+		<div id="myDropdown" class="dropdown-content">
 
-    <a href="index.html?amp;role_desc=DESIGNER">Designer PSS</a>
-    <a href="index.html?amp;role_desc=SYS_ENG">PLM System Engineer</a>
-    <a href="index.html?amp;role_desc=CONF_MAN">PLM Configuration Manager</a>
-    <a href="index.html?amp;role_desc=PROD_MAN">Product Manufacturer</a>
-    <a href="index.html?amp;role_desc=ADMIN">System Administrator</a>
-                    
-  </div>
-</div>
+			<a href="index.html?amp;role_desc=DESIGNER">Designer PSS</a> <a
+				href="index.html?amp;role_desc=SYS_ENG">PLM System Engineer</a> <a
+				href="index.html?amp;role_desc=CONF_MAN">PLM Configuration
+				Manager</a> <a href="index.html?amp;role_desc=PROD_MAN">Product
+				Manufacturer</a> <a href="index.html?amp;role_desc=ADMIN">System
+				Administrator</a>
+
+		</div>
+	</div>
 
 
 	<h1>Sentiment Analysis</h1>
 	<center>
 		<div class="container" id="container">
 			<h2>Options</h2>
-				<div class="row">
-						<div class="col-sm-4 offset-0" >
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="define">
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
-									<span class="navbar-text">
-										<h3>DEFINE</h3>
-									</span>
-								</nav>
-								<div class="row" id="create" style = "display:none">
-									<div class="col-sm-8 offset-0">
-										<a onClick="new_model();" href="models.html" style="cursor: pointer; cursor: hand;">Create Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a onClick="new_model();" href="models.html"><img src="..\images\icons\button_add.png" onClick="new_model();" ></a>
-									</div>
-								</div>
-								<div class="row" id="create_gray">
-									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand; color:#BBBBBB;">Create Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_add_gray.png"></a>
-									</div>
-								</div>
-								<div class="row" id="view" style = "display:none">
-									<div class="col-sm-8 offset-0">
-										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand; ">View Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view.png"></a>
-									</div>
-								</div>
-								<div class="row" id="view_gray">
-									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">View Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view_gray.png"></a>
-									</div>
-								</div>
-								<div class="row" id="edit" style = "display:none">
-									<div class="col-sm-8 offset-0">
-										<a onClick="viewModels('edit');" style="cursor: pointer; cursor: hand;">Edit Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a onClick="viewModels('edit');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_edit.png"></a>
-									</div>
-								</div>
-								<div class="row" id="edit_gray">
-									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">Edit Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_edit_gray.png"></a>
-									</div>
-								</div>
-								<div class="row" id="delete" style = "display:none">
-									<div class="col-sm-8 offset-0">
-										<a onClick="viewModels('delete');" style="cursor: pointer; cursor: hand;">Delete Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a onClick="viewModels('delete');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_delete.png"></a>
-									</div>
-								</div>
-								<div class="row" id="delete_gray">
-									<div class="col-sm-8 offset-0" >
-										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">Delete Opinion Model</a>
-									</div>
-									<div class="col-sm-4 offset-0">
-										<a  style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_delete_gray.png"></a>
-									</div>
-								</div>
-								<div class="row" id="view_models" style="display:none;">
-									<p style:'text-align: left;'>Select Model: <br><select id='Models'>
-									</select>
-									<br><form action='models.html'><input id='view_back' formaction="" class='btn btn-default' onclick='viewModels(false);' type='submit' value='Back' />
-									<input id='view_edit' class='btn btn-default' onclick='setCookie()' type='submit' value='Edit Model' />
-									<input id='view_delete' class='btn btn-default' formaction= ""; onclick='deleteModel()' type='submit' value='Delete Model' />
-									<input id='view_select' class='btn btn-default' formaction="models.html" onclick='viewModel();setCookie();' type='submit' value='View Model' />
-									</form>
-								</div>
+			<div class="row">
+				<div class="col-sm-4 offset-0">
+					<div class="container"
+						style="padding-left: 0; padding-right: 0; background-color: '#E2D6E2';"
+						id="define">
+						<nav class="navbar navbar-fixed-top navbar-light"
+							style="background-color: #604460;">
+							<span class="navbar-text">
+								<h3>DEFINE</h3>
+							</span>
+						</nav>
+						<div class="row" id="create" style="display: none">
+							<div class="col-sm-8 offset-0">
+								<a onClick="new_model();" href="models.html"
+									style="cursor: pointer; cursor: hand;">Create Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a onClick="new_model();" href="models.html"><img
+									src="..\images\icons\button_add.png" onClick="new_model();"></a>
 							</div>
 						</div>
-						<div class="col-sm-4 offset-0">
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';  display:none;"  id="_view">
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
-									<span class="navbar-text">
-										<h3>VIEW</h3>
-									</span>
-								</nav>
+						<div class="row" id="create_gray">
+							<div class="col-sm-8 offset-0">
+								<a style="cursor: pointer; cursor: hand; color: #BBBBBB;">Create
+									Opinion Model</a>
 							</div>
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="_view_gray">
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #666666;">
-									<span class="navbar-text">
-										<h3>VIEW</h3>
-									</span>
-								</nav>
+							<div class="col-sm-4 offset-0">
+								<a style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_add_gray.png"></a>
 							</div>
 						</div>
-						<div class="col-sm-4 offset-0">
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';  display:none;" id="predict" >
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
-									<span class="navbar-text">
-										<h3>PREDICT</h3>
-									</span>
-								</nav>
+						<div class="row" id="view" style="display: none">
+							<div class="col-sm-8 offset-0">
+								<a onClick="viewModels('view');"
+									style="cursor: pointer; cursor: hand;">View Opinion Model</a>
 							</div>
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="predict_gray">
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #666666;">
-									<span class="navbar-text">
-										<h3>PREDICT</h3>
-									</span>
-								</nav>
+							<div class="col-sm-4 offset-0">
+								<a onClick="viewModels('view');"
+									style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_view.png"></a>
 							</div>
 						</div>
+						<div class="row" id="view_gray">
+							<div class="col-sm-8 offset-0">
+								<a style="cursor: pointer; cursor: hand; color: #BBBBBB">View
+									Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_view_gray.png"></a>
+							</div>
+						</div>
+						<div class="row" id="edit" style="display: none">
+							<div class="col-sm-8 offset-0">
+								<a onClick="viewModels('edit');"
+									style="cursor: pointer; cursor: hand;">Edit Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a onClick="viewModels('edit');"
+									style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_edit.png"></a>
+							</div>
+						</div>
+						<div class="row" id="edit_gray">
+							<div class="col-sm-8 offset-0">
+								<a style="cursor: pointer; cursor: hand; color: #BBBBBB">Edit
+									Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_edit_gray.png"></a>
+							</div>
+						</div>
+						<div class="row" id="delete" style="display: none">
+							<div class="col-sm-8 offset-0">
+								<a onClick="viewModels('delete');"
+									style="cursor: pointer; cursor: hand;">Delete Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a onClick="viewModels('delete');"
+									style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_delete.png"></a>
+							</div>
+						</div>
+						<div class="row" id="delete_gray">
+							<div class="col-sm-8 offset-0">
+								<a style="cursor: pointer; cursor: hand; color: #BBBBBB">Delete
+									Opinion Model</a>
+							</div>
+							<div class="col-sm-4 offset-0">
+								<a style="cursor: pointer; cursor: hand;"><img
+									src="..\images\icons\button_delete_gray.png"></a>
+							</div>
+						</div>
+						<div class="row" id="view_models" style="display: none;">
+							<pstyle:'text-align:left;'>
+								Select Model: <br>
+								<select id='Models'>
+								</select> <br>
+							<form action='models.html'>
+								<input id='view_back' formaction="" class='btn btn-default'
+									onclick='viewModels(false);' type='submit' value='Back' /> <input
+									id='view_edit' class='btn btn-default' onclick='setCookie()'
+									type='submit' value='Edit Model' /> <input id='view_delete'
+									class='btn btn-default' formaction="" ; onclick='deleteModel()'
+									type='submit' value='Delete Model' /> <input id='view_select'
+									class='btn btn-default' formaction="models.html"
+									onclick='viewModel();setCookie();' type='submit'
+									value='View Model' />
+							</form>
+						</div>
+					</div>
 				</div>
+				<div class="col-sm-4 offset-0">
+					<div class="container"
+						style="padding-left: 0; padding-right: 0; background-color: '#E2D6E2'; display: none;"
+						id="_view">
+						<nav class="navbar navbar-fixed-top navbar-light"
+							style="background-color: #604460;">
+							<span class="navbar-text">
+								<h3>VIEW</h3>
+							</span>
+						</nav>
+					</div>
+					<div class="container"
+						style="padding-left: 0; padding-right: 0; background-color: '#E2D6E2';"
+						id="_view_gray">
+						<nav class="navbar navbar-fixed-top navbar-light"
+							style="background-color: #666666;">
+							<span class="navbar-text">
+								<h3>VIEW</h3>
+							</span>
+						</nav>
+					</div>
+				</div>
+				<div class="col-sm-4 offset-0">
+					<div class="container"
+						style="padding-left: 0; padding-right: 0; background-color: '#E2D6E2'; display: none;"
+						id="predict">
+						<nav class="navbar navbar-fixed-top navbar-light"
+							style="background-color: #604460;">
+							<span class="navbar-text">
+								<h3>PREDICT</h3>
+							</span>
+						</nav>
+					</div>
+					<div class="container"
+						style="padding-left: 0; padding-right: 0; background-color: '#E2D6E2';"
+						id="predict_gray">
+						<nav class="navbar navbar-fixed-top navbar-light"
+							style="background-color: #666666;">
+							<span class="navbar-text">
+								<h3>PREDICT</h3>
+							</span>
+						</nav>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="container">
 			<h2>Top 5 PSS Global Sentiment</h2>
-			<div class="container"  style="box-shadow:none;" id="top5">
-
-			</div>
+			<div class="container" style="box-shadow: none;" id="top5"></div>
 		</div>
 	</center>
 
