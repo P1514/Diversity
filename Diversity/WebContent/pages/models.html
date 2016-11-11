@@ -511,22 +511,22 @@ table, th, td {
 				<h2>Define model:</h2>
 				<div class="col-sm-4 offset-0" >
 					<div class="form-group" style="width:300px;">
-						<div id="table_div" style="overflow:hidden;width:400px;float:left;">
+						<div id="table_div" style="overflow:hidden;width:400px;margin-left: 0;padding-left: 0;">
 							<table style="margin:5px;" >
 								<tr>
-										<td style="width:300px" valign="middle">
+										<td style="" valign="middle">
 												PSS:
 										</td>
-										<td style="width:300px;" valign="middle">
-											<select class="form-control" id="pss" onchange="makeTree();"></select><br>
+										<td style="" valign="middle">
+											<select class="form-control" id="pss" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" onchange="makeTree();"></select><br>
 										</td>
 								</tr>
 								<tr>
-										<td style="width:30%">
+										<td style="">
 												Model Name:
 										</td>
-										<td style="width:300px;" valign="middle">
-											<input type="text" class="form-control" id="model_name" placeholder="Model name">
+										<td style="" valign="middle">
+											<input type="text" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" class="form-control" id="model_name" placeholder="Model name">
 										</td>
 								</tr>
 							</table>
@@ -535,7 +535,7 @@ table, th, td {
 				</div>
 				<div class="col-sm-4 offset-0" >
 					<div class="checkbox" style: "padding-left: 10px;padding-top: 20px;">
-						<label><input id="final" type="checkbox"  onchange="showTree();" value=""
+						<label><input id="final" type="checkbox" onchange="showTree();" value=""
 							checked>Include Final Product</label>
 					</div>
 
@@ -551,31 +551,31 @@ table, th, td {
 				<div id = "table_div2" style="width: 50%; text-align: left;">
 					<table >
 						<tr style="margin-bottom: 0; padding-bottom: 0;">
-								<td>
+								<td style="padding-bottom:0;">
 										<p>Social Network:</p>
 								</td>
-								<td>
+								<td style="padding-bottom:0;">
 										<p>Account Name:</p>
-								</td>
-								<td>
-									<button style="margin-left=40px; color: black;" class="glyphicon glyphicon-plus" onclick="addline();"></button>
-								</td>
+								</td >
 						</tr>
 						<tr>
 							<td>
-								<div id="left_menu" >
-									<div class="form-group" style ="padding-top:15px;width:250px;">
-										<select class="form-control" id="new_name">
+								<div id="left_menu" style="margin-top:0;">
+									<div class="form-group" style ="margin-top:0;padding-top:15px;width:250px;">
+										<select class="form-control" id="new_name" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);">
 											<option value="Facebook">Facebook</option>
 											<option value="Twitter">Twitter</option>
 										</select>
 									</div>
 								</div>
 							</td>
-							<td>
-								<div style="width:250px;" >
-									<input class="form-control" type="text" id="new_URI" placeholder="Account name">
+							<td style="padding-top:0;">
+								<div style="width:250px;padding-top:0;" >
+									<input class="form-control" type="text" id="new_URI" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" placeholder="Account name">
 								</div>
+							</td>
+							<td style="padding-top:0;">
+								<button style="margin-left=40px; color: black;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);height:35px;" class="glyphicon glyphicon-plus" onclick="addline();"></button>
 							</td>
 						</tr>
 
@@ -588,7 +588,7 @@ table, th, td {
 				<h2>Define frequency and start time:</h2>
 				<div class="col-md-4" id="slider" style="text-align:left;margin-top:50px;margin-right:250px;">
 					<div class="wrapper">
-						Update frequency <i>(in days)</i>: <input type="number" class="form-control" id="frequency" style="width: 75px;" onKeyUp="checknumber(this)" min="0">
+						Update frequency <i>(in days)</i>: <input type="number" class="form-control"style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);width:75px;" id="frequency" onKeyUp="checknumber(this)" min="0">
 					</div>
 				</div>
 				<div class="col-md-4" id="date" style="float: right;margin-top:30px;">
@@ -598,7 +598,7 @@ table, th, td {
 						</label>
 					</div>
 					<div>
-						<input id="date_input" class="form-control" type="date" style = "display:none" >
+						<input id="date_input" class="form-control" type="date" style = "box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);display:none" >
 					</div>
 					<i>(if unchecked, monitoring starts immediatly)<i>
 				</div>
