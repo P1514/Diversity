@@ -519,11 +519,12 @@
 				var gender = document.getElementById("genderfilt").value;
 				var location = document.getElementById("locationfilt").value;
 				var age = document.getElementById("agefilt").value;
+				var products = document.getElementById("finalfilt").value;
 				var globalradio = document.getElementById('Global').checked;
 				var genderradio = document.getElementById('Gender').checked;
 				var locationradio = document.getElementById('Location').checked;
 				var ageradio = document.getElementById('Age_radio').checked;
-
+				var finalradio = document.getElementById('Final').checked;
 
 				var json = {
 					"Op" : "oe_refresh",// OE_Filter
@@ -535,7 +536,7 @@
 				if (globalradio == true)needlecolor='#604460';
 
 				if (gender == "All" && location == "All" && age == "All"
-						&& globalradio) {
+						&& products == "All" && globalradio) {
 					json.Param += "Global";
 					json.Values += "Global";
 				} else {
@@ -583,6 +584,19 @@
 					} else {
 						needlecolor='#A60202';
 						json.Filter="Location";
+					}
+					if (finalradio == false) {
+						if (products == "All") {
+							json.Param += "Product,";
+							json.Values += "All,";
+						} else {
+							json.Param += "Product,";
+							var select = document.getElementById('finalfilt');
+							json.Values += products + ",";
+
+						}
+					} else {
+						json.Filter="Product";
 					}
 				}
 /*
@@ -649,7 +663,7 @@
 					document.getElementById('finalfilt').disabled = false;
 				}
 				if (data == "Final") {
-					document.getElementById('agefilt').selectedIndex = 0;
+					document.getElementById('finalfilt').selectedIndex = 0;
 					document.getElementById('genderfilt').disabled = false;
 					document.getElementById('locationfilt').disabled = false;
 					document.getElementById('agefilt').disabled = false;
