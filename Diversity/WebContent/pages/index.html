@@ -259,6 +259,12 @@
 			$('#delete').show();
 			$('#view_models').hide();
 		}
+
+		sessionStorage.setItem('view', 'false');
+	}
+
+	function viewModel() {
+		sessionStorage.setItem('view','true');
 	}
 
 	function displayModels() {
@@ -306,8 +312,8 @@
 			window.alert("No models were deleted.");
 		}
 	}
-	
-	/* When the user clicks on the button, 
+
+	/* When the user clicks on the button,
 	toggle between hiding and showing the dropdown content */
 	function myFunction() {
 	    document.getElementById("myDropdown").classList.toggle("show");
@@ -436,7 +442,7 @@ form {
     background-color: #604460;
     cursor: pointer;
     padding:40;
-    
+
 }
 
 /* Dropdown button on hover & focus */
@@ -486,7 +492,7 @@ form {
     <a href="homepage_RO.html">PLM Configuration Manager</a>
     <a href="homepage_RO.html">Product Manufacturer</a>
     <a href="index.htlm">System Administrator</a>
-                    
+
   </div>
 </div>
 
@@ -541,7 +547,7 @@ form {
 									<br><form action='models.html'><input id='view_back' formaction="" class='btn btn-default' onclick='viewModels(false);' type='submit' value='Back' />
 									<input id='view_edit' class='btn btn-default' onclick='setCookie()' type='submit' value='Edit Model' />
 									<input id='view_delete' class='btn btn-default' formaction= ""; onclick='deleteModel()' type='submit' value='Delete Model' />
-									<input id='view_select' class='btn btn-default' formaction="opinion_extraction_page.html" onclick='setCookie();' type='submit' value='View' />
+									<input id='view_select' class='btn btn-default' formaction="models.html" onclick='viewModel();setCookie();' type='submit' value='View Model' />
 									</form>
 								</div>
 							</div>

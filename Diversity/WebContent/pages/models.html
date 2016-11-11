@@ -51,7 +51,7 @@
 	var i = 0;
 	var id=0;
 	var jsonData;
-	var final_products = [];
+	var final_products = "";
 
 	jQuery(function($){
 		  // $("#date").mask("99/99/9999",{placeholder:"mm/dd/yyyy"}); //TODO: DD/MM/YYYY
@@ -74,7 +74,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 
 	var ws;
 	document.addEventListener('DOMContentLoaded', function() {
-
+			document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
 			$('#ex1').slider({
 				formatter: function(value) {
 					return value;
@@ -109,7 +109,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			jsonData = JSON.parse(JSON.stringify(json));
 			populatePSS();
 			var jsonData2 = {
-					'Op' : 'testing',
+					'Op' : 'gettree',
 				}
 				ws.send(JSON.stringify(jsonData2));
 
@@ -130,7 +130,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			}
 		if(json2 != null && json2[0].Op=="Model"){
 		console.log(json2[0]);
-
+			document.getElementById("page_title").innerHTML = "<h1>Edit Opinion Model</h1>"
 			document.getElementById("model_name").value=json2[0].Name;
 			document.getElementById("model_name").readOnly = true;
 			document.getElementById("frequency").value=json2[0].Update;
@@ -153,6 +153,32 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			//document.getElementById("Archive").disabled = false;
 			document.getElementById("submit").value = "Update";
 			edit = true;
+		}
+		if(json2 != null && json2[0].Op=="Model" && sessionStorage.getItem('view') == 'true'){
+			document.getElementById("page_title").innerHTML = "<h1>View Opinion Model</h1>"
+			document.getElementById("model_name").value=json2[0].Name;
+			document.getElementById("model_name").readOnly = true;
+			document.getElementById("frequency").value=json2[0].Update;
+			document.getElementById("frequency").readOnly = true;
+			document.getElementById('pss').value=json2[0].PSS;
+			document.getElementById('pss').text=json2[0].PSS;
+			document.getElementById("pss").disabled = true;
+			document.getElementById("final").checked=json2[0].Final_products;
+			document.getElementById("final").disabled = true;
+
+			var uris = json2[0].URI.split(";");
+			for(i=0; i<uris.length; i++){
+				console.log("HELLO "+uris[i]+"\r\n");
+				$(':checkbox[value="'+uris[i]+'"]').prop("checked","true");
+				$(':checkbox[value="'+uris[i]+'"]').prop("disabled","true");
+			}
+			$("#submit").hide();
+			document.getElementById("start_date").disabled = true;
+			document.getElementById("new_name").disabled = true;
+			document.getElementById("new_URI").disabled = true;
+
+			$("#tree_div").hide(); //change this later to display selected products
+
 		}
 		}
 
@@ -210,38 +236,46 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		return date.getDate() + ";" + month + ";" + date.getFullYear();
 	}
 
-	var str = "";
+	$
 
+	var str = "";
 	/*
 	* Uses JSTree to make a tree view from an unordered HTML list
 	*/
 	function makeTree() {
 		str = "";
-		document.getElementById('final_input').innerHTML = "";
-//		if (jsonData[1].hasOwnProperty('PSS')) {
-//			if (jsonData[1].PSS == pss_sel) {
-				str += "<ul>";
-				makeList(jsonData[1]);
-				str += "</ul>"
-				document.getElementById('final_input').innerHTML = str;
+		$('#final_input').jstree("destroy");
+		document.getElementById('final_input').innerHTML = str;
+		str += "<ul>";
+		var test = jsonData;
+		console.log(test);
+		for (var i = 0; i < test.length; i++) {
+			if (test[i].PSS == document.getElementById("pss").value) {
+				makeList(test[i]);//makeList(jsonData[1]);
+				break;
+			}
+		}
+		str += "</ul>"
+		document.getElementById('final_input').innerHTML = str;
 
-				$('#final_input').jstree({
-				"plugins" : [ "checkbox", "wholerow" ]
-				});
+		$('#final_input').jstree({
+		"plugins" : [ "checkbox", "wholerow" ]
+		});
 
-				$('#final_input').on("changed.jstree", function (e, data) {
-					final_input = [];
-					var i, j, r = [];
-	        for (i = 0, j = data.selected.length; i < j; i++) {
-	            r.push(data.instance.get_node(data.selected[i]).text);
-	        }
+		$('#final_input').on("changed.jstree", function (e, data) {
+			final_products = "";
+			var i, j, r = [];
+			for (i = 0, j = data.selected.length; i < j; i++) {
+					r.push(data.instance.get_node(data.selected[i]).text);
+					final_products += data.instance.get_node(data.selected[i]).text + ",," ;
+			}
+			console.log(final_products);
+		});
 
-	        final_products = r;
-				});
-
-//			}
-//		}
+		$('#final_input').jstree(true).refresh();
 	}
+
+
 
 
 	function showTree() {
@@ -250,13 +284,14 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 			document.getElementById('final_input').style.display = 'none';
 			document.getElementById('tree_div').style.display = 'none';
 			$('#final_input').jstree(true).deselect_all();
-			final_products = [];
+			final_products = "";
 		} else {
 			document.getElementById('tree_div').style.display = 'block';
 			document.getElementById('final_input').style.display = 'block';
 		}
 	}
 
+var start = true;
 
 	/*
 	* Makes a HTML unordered list from a json array (uses recursion)
@@ -278,6 +313,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 				str += "<ul>";
 			}
 			for (var i = 0; i < array.Products.length; i++) {
+
 				makeList(array.Products[i]);
 			}
 			if (array.hasOwnProperty('Name')) {
@@ -331,8 +367,7 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 					.getElementById('age').value : erro = true,
 			"Gender" : document.getElementById('gender').value != "" ? document
 					.getElementById('gender').value : erro = true,*/
-			"Final_Product" : document.getElementById('final').checked,
-			"Products" : final_products,
+			"Final_Products" : final_products,//document.getElementById('final').checked,
 			"Archive" : false,
 			"Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
 			"User" : 1,//TODO find this field
@@ -357,7 +392,6 @@ if (datefield.type!="date"){ //if browser doesn't support input type="date", ini
 		}
 
 	}
-
 
 </script>
 </head>
@@ -463,7 +497,6 @@ p {
 
 table, th, td {
 	text-align: right;
-	vertical-align: middle;
 	padding-left: 10px;
 	padding-bottom: 20px;
 	margin-bottom: 0;
@@ -484,7 +517,7 @@ table, th, td {
 												PSS:
 										</td>
 										<td style="width:300px;" valign="middle">
-											<select class="form-control" id="pss"></select><br>
+											<select class="form-control" id="pss" onchange="makeTree();"></select><br>
 										</td>
 								</tr>
 								<tr>
@@ -529,8 +562,8 @@ table, th, td {
 						</tr>
 						<tr>
 							<td>
-								<div id="left_menu">
-									<div class="form-group">
+								<div id="left_menu" >
+									<div class="form-group" style ="padding-top:15px;width:250px;">
 										<select class="form-control" id="new_name">
 											<option value="Facebook">Facebook</option>
 											<option value="Twitter">Twitter</option>
@@ -538,18 +571,15 @@ table, th, td {
 									</div>
 								</div>
 							</td>
-							<td style="margin-top: 0; padding-top: 0;">
-								<div>
+							<td>
+								<div style="width:250px;" >
 									<input class="form-control" type="text" id="new_URI" placeholder="Account name">
 								</div>
 							</td>
 						</tr>
-						<tr>
-							<td>
-								<p><i>(unchecked items will not be included in the opinion model)</i></p>
-							</td>
-						</tr>
+
 					</table>
+					<p><i>(unchecked items will not be included in the opinion model)</i></p>
 				</div>
 			</div>
 
@@ -557,7 +587,7 @@ table, th, td {
 				<h2>Define frequency and start time:</h2>
 				<div class="col-md-4" id="slider" style="text-align:left;margin-top:50px;margin-right:250px;">
 					<div class="wrapper">
-						<input type="number" class="form-control" id="frequency" style="width: 75px;" onKeyUp="checknumber(this)" min="0">
+						Update frequency <i>(in days)</i>: <input type="number" class="form-control" id="frequency" style="width: 75px;" onKeyUp="checknumber(this)" min="0">
 					</div>
 				</div>
 				<div class="col-md-4" id="date" style="float: right;margin-top:30px;">
