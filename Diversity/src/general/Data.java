@@ -239,7 +239,7 @@ public class Data {
 				for (; rs.next();) {
 					Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
 							rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+							rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 					Data.modeldb.put(model.getId(), model);
@@ -661,7 +661,7 @@ public class Data {
 			for (; rs.next();) {
 				Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
 						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-						rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+						rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 				Data.modeldb.put(model.getId(), model);
@@ -1478,7 +1478,7 @@ public class Data {
 					do {
 						Model model = new Model(rs.getLong(Settings.latable_id), rs.getLong(Settings.lmtable_update),
 								rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-								rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
+								rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 						Data.modeldb.put(model.getId(), model);

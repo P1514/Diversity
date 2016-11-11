@@ -24,10 +24,10 @@ public class GetReach {
 	}
 	// TODO Redo this piece of code
 
-	public ArrayList<String> getTOPReach(int nTOP) {
+	public ArrayList<Long> getTOPReach(int nTOP) {
 		JSONObject obj = new JSONObject();
 		JSONArray result = new JSONArray();
-		ArrayList<String> tops = new ArrayList<String>();
+		ArrayList<Long> tops = new ArrayList<Long>();
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 
@@ -36,12 +36,13 @@ public class GetReach {
 				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
+		System.out.println(select);
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(select);
 			rs = query1.executeQuery();
 			while (rs.next()) {
-				tops.add(rs.getString(Settings.lotable_pss));
+				tops.add(rs.getLong(Settings.lotable_pss));
 			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -177,7 +178,7 @@ public class GetReach {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setLong(3, Data.identifyPSSbyname(model.getPSS()));
+			query1.setLong(3, model.getPSS());
 			int rangeindex = 4;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);

@@ -14,12 +14,12 @@ import monitoring.Monitor;;
 
 public class Model {
 	Connection cnlocal;
-	private long id = 0;
+	private long id = 0, pss;
 	private long frequency, user;
-	private String name, uri, pss, age, gender, products;
+	private String name, uri, age, gender, products;
 	private boolean archived;
 
-	public Model(long _id, long _frequency, long _user, String _name, String _uri, String _pss, String _age,
+	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
 			String _gender, String _products, Boolean _archived) {
 		this.id = _id;
 		this.frequency = _frequency;
@@ -42,7 +42,7 @@ public class Model {
 		JSONObject obj = new JSONObject();
 		name = msg.getString("Name");
 		uri = msg.getString("URI");
-		pss = msg.getString("PSS");
+		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
 		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(",,") : null;
@@ -58,7 +58,7 @@ public class Model {
 					break;
 				}
 			for(PSS pss2 : Data.pssdb.values()){
-				if(pss2.getName().equals(pss)){
+				if(pss2.getID() == pss){
 					pss1=pss2;
 					break;
 				}
@@ -87,7 +87,7 @@ public class Model {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
 			query1.setString(1, name);
 			query1.setString(2, uri);
-			query1.setString(3, pss);
+			query1.setLong(3, pss);
 			query1.setLong(4, frequency);
 			query1.setBoolean(5, archived);
 			query1.setString(6, products);
@@ -138,7 +138,7 @@ public class Model {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		if (msg.get("Name") != this.name || msg.getString("PSS") != this.pss) {
+		if (msg.get("Name") != this.name || Data.pssdb.get(msg.getString("PSS")).getID() != this.pss) {
 			obj.put("id", msg.getInt("Id"));
 			obj.put("Op", "Error");
 			obj.put("Message", "Error updating model " + msg.getString("Name") + "updated attempt not allowed");
@@ -157,11 +157,12 @@ public class Model {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
 			query1.setString(3, msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
-			query1.setBoolean(2, msg.getBoolean("Archive"));
-			query1.setString(1, msg.getString("Final_Product"));
+			query1.setBoolean(1, msg.getBoolean("Archive"));
+			query1.setString(2, msg.getString("Final_Product"));
 			query1.setInt(5, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
+			System.out.println(query1);
 			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -200,7 +201,7 @@ public class Model {
 		return this.name;
 	}
 
-	public String getPSS() {
+	public Long getPSS() {
 		return this.pss;
 	}
 

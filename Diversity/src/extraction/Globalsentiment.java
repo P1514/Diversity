@@ -24,7 +24,7 @@ public class Globalsentiment {
 	}
 
 	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
-			ArrayList<String> top5) throws JSONException {
+			ArrayList<Long> top5) throws JSONException {
 		try {
 			dbconnect();
 			String delete = "Delete from reach";
@@ -33,10 +33,10 @@ public class Globalsentiment {
 			String result = "";
 			cnlocal.close();
 
-			for (String k : top5) {
+			for (long k : top5) {
 
 				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false));
-				result += globalsentiment(timespan, param, values, k, -1).toString();
+				result += globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString();
 				Data.modeldb.remove((long) -1);
 			}
 			dbconnect();
@@ -173,9 +173,13 @@ public class Globalsentiment {
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		if (products != null) {
-			insert += " AND " + Settings.lotable_product + "=?";
+			if (!products.equals("-1")) {
+				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+			} else {
+				insert += " AND " + Settings.lotable_product + "=?";
+			}
 		} else {
-			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+
 		}
 		insert += ")";
 
@@ -192,7 +196,7 @@ public class Globalsentiment {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setLong(3, Data.identifyPSSbyname(model.getPSS()));
+			query1.setLong(3, model.getPSS());
 			int rangeindex = 4;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
@@ -363,7 +367,7 @@ public class Globalsentiment {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(query);
-			query1.setLong(1, Data.identifyPSSbyname(model.getPSS()));
+			query1.setLong(1, model.getPSS());
 			int rangeindex = 2;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
@@ -508,10 +512,10 @@ public class Globalsentiment {
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (products != null){
+		if (products != null) {
 			insert += " AND " + Settings.lotable_product + "=?";
-		}else{
-			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() +")";
+		} else {
+			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
 		insert += ")";
 		/*
@@ -533,7 +537,7 @@ public class Globalsentiment {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setLong(3, Data.identifyPSSbyname(model.getPSS()));
+			query1.setLong(3, model.getPSS());
 			int rangeindex = 4;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);

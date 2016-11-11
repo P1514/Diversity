@@ -68,7 +68,7 @@ public class GetPopulation {
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
 					query1.setString(1, out_params[i]);
-					query1.setString(2, model.getPSS());
+					query1.setLong(2, model.getPSS());
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();
@@ -94,7 +94,7 @@ public class GetPopulation {
 					query1.setString(1, out_params[i]);
 					i++;
 					query1.setString(2, out_params[i]);
-					query1.setString(3, model.getPSS());
+					query1.setLong(3, model.getPSS());
 					//System.out.println(query1);
 					rs = query1.executeQuery();
 					rs.next();

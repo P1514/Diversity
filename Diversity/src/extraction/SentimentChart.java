@@ -193,7 +193,7 @@ public class SentimentChart {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setString(1, model.getPSS());
+			query1.setLong(1, model.getPSS());
 			query1.setInt(2, minage);
 			query1.setInt(3, maxage);
 			query1.setString(4, model.getAge().split(",")[0]);
