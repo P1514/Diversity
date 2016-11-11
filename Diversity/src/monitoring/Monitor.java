@@ -21,9 +21,9 @@ public class Monitor {
 			url += account +"\"&type[]=\""+ source + "\"&" ;
 		}
 		url = url.substring(0, url.length()-1);
-		System.out.println("****TESTE****" + url +   "  ****TESTE****\n");
+		//System.out.println("****TESTE****" + url +   "  ****TESTE****\n");
 		
-        URL registeraccount;
+        /*URL registeraccount;
 		try {
 			registeraccount = new URL(url);
 
@@ -40,7 +40,7 @@ public class Monitor {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 	}

@@ -95,7 +95,7 @@ public class GetPopulation {
 					i++;
 					query1.setString(2, out_params[i]);
 					query1.setString(3, model.getPSS());
-					System.out.println(query1);
+					//System.out.println(query1);
 					rs = query1.executeQuery();
 					rs.next();
 					obj = new JSONObject();

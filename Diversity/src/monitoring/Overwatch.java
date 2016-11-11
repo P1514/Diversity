@@ -108,7 +108,7 @@ public class Overwatch extends TimerTask {
 				requesturl.forEach((k, v) -> {
 					String request = uri + a + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\""
 							+ k + "\"";
-					System.out.println(request);
+					//System.out.println(request);
 					try {
 						// dat.load(new JSONArray(readUrl(request)));
 					} catch (Exception e) {
@@ -143,7 +143,7 @@ public class Overwatch extends TimerTask {
 						for (String acc : account) {
 							query1.setString(i++, acc.split("=")[1]);
 						}
-						System.out.println(query1);
+						//System.out.println(query1);
 						query1.execute();
 
 						/*

@@ -15,7 +15,7 @@ public class Settings {
 	// Data Origin DB Specs
 	public static final String rurl = "jdbc:mysql://127.0.0.1:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	public static final String ruser = "diversity";
-	public static final String rpass = "diversity";
+	public static final String rpass = "!diversity!";
 
 	// Post Table
 	public static final String rptable = "post"; // Table Name
@@ -54,7 +54,7 @@ public class Settings {
 	private static final String dbname = "sentimentanalysis";
 	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
-	public static final String pass2 = "diversity";
+	public static final String pass2 = "!diversity!";
 	public static final Integer dbversion = 8;
 
 	// Author Table
@@ -153,8 +153,8 @@ public class Settings {
 	private static final String crdbport="3306";
 	private static final String crdbname = "diversity_common_repository";
 	private static final String crurl = "jdbc:mysql://"+crdbip+":"+crdbport+"/"+crdbname+"?autoReconnect=true&useSSL=false";
-	private static final String cruser = "diversity";
-	private static final String crpass = "diversity";
+	private static final String cruser = "!diversity!";
+	private static final String crpass = "!diversity!";
 	
 	// PSS Table
 	public static final String crpsstable ="pss";

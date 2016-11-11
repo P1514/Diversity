@@ -39,8 +39,8 @@ public class GetModels {
 		result = add.add_model(msg);
 		if (!(result.getJSONObject(0).getString("Op").equals("Error"))) {
 			Data.modeldb.put(add.getId(), add);
-			long id = add.getId();
-			System.out.println(id);
+			//long id = add.getId();
+			//System.out.println(id);
 		}
 		
 		result.put(0, result.getJSONObject(0).put("Op", "Error"));

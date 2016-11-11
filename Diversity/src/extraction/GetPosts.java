@@ -253,7 +253,7 @@ public class GetPosts {
 			if (gender != null)
 				query1.setString(rangeindex++, gender);
 			if (location != null)
-				query1.setString(rangeindex++, location);
+				query1.setString(rangeindex++, location.substring(0, location.length()));
 			inputdate.add(Calendar.MONTH, 1);
 			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
 			rangeindex++;

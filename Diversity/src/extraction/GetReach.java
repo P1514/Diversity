@@ -176,7 +176,7 @@ public class GetReach {
 			if (gender != null)
 				query1.setString(rangeindex++, gender);
 			if (location != null)
-				query1.setString(rangeindex++, location);
+				query1.setString(rangeindex++, location.substring(0, location.length()));
 			// System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
