@@ -1,6 +1,5 @@
 package general;
 
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import monitoring.Monitor;;
+
 public class Model {
 	Connection cnlocal;
 	private long id = 0;
@@ -21,23 +21,23 @@ public class Model {
 
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, String _pss, String _age,
 			String _gender, String _products, Boolean _archived) {
-		this.id=_id;
-		this.frequency=_frequency;
-		this.user=_user;
-		this.name=_name;
-		this.uri=_uri;
-		this.pss=_pss;
-		this.age=_age;
-		this.gender=_gender;
-		this.products=_products;
-		this.archived=_archived;
+		this.id = _id;
+		this.frequency = _frequency;
+		this.user = _user;
+		this.name = _name;
+		this.uri = _uri;
+		this.pss = _pss;
+		this.age = _age;
+		this.gender = _gender;
+		this.products = _products;
+		this.archived = _archived;
 	}
 
 	public Model() {
 	}
 
 	public JSONArray add_model(JSONObject msg) throws JSONException {
-		//TODO Verify data that exists in sources to be updated
+		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		name = msg.getString("Name");
@@ -45,23 +45,43 @@ public class Model {
 		pss = msg.getString("PSS");
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		String [] productsbyname = msg.has("Products") ? msg.getString("Products").split(",,"): null;
-		products="";
-		for(String a : productsbyname){
-			if(!Data.productdb.containsKey(Long.valueOf(a))) continue;
-			if(Data.productdb.get(Long.valueOf(a)).get_PSS() != Long.valueOf(pss)) continue;
-			products+=Data.productdb.get(Long.valueOf(a)).get_Id()+",";
+		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(",,") : null;
+		products = "";
+		Product product=null;
+		PSS pss1=null;
+		for (String a : productsbyname) {
+			product = null;
+			pss1=null;
+			for (Product product2 : Data.productdb.values())
+				if (product2.get_Name().equals(a)) {
+					product = product2;
+					break;
+				}
+			for(PSS pss2 : Data.pssdb.values()){
+				if(pss2.getName().equals(pss)){
+					pss1=pss2;
+					break;
+				}
+			}
+			if (product == null || pss1==null)
+				continue;
+			if (product.get_PSS() != pss1.getID())
+				continue;
+			products += product.get_Id() + ",";
 		}
-		//products = msg.getString("Final_Product");
+		// products = msg.getString("Final_Product");
 		user = msg.getInt("User");
-		//age = msg.getString("Age");
-		//gender = msg.getString("Gender");
+		// age = msg.getString("Age");
+		// gender = msg.getString("Gender");
 		dbconnect();
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
-				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator /*+ "," + Settings.lmtable_age + ","
-				+ Settings.lmtable_gender */+ ") values (?,?,?,?,?,?,?"/*,?,?*/+")";
+				+ Settings.lmtable_monitorfinal + ","
+				+ Settings.lmtable_creator /*
+											 * + "," + Settings.lmtable_age +
+											 * "," + Settings.lmtable_gender
+											 */ + ") values (?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -72,8 +92,8 @@ public class Model {
 			query1.setBoolean(5, archived);
 			query1.setString(6, products);
 			query1.setLong(7, user);
-			//query1.setString(8, age);
-			//query1.setString(9, gender);
+			// query1.setString(8, age);
+			// query1.setString(9, gender);
 			query1.executeUpdate();
 			ResultSet generatedKeys = query1.getGeneratedKeys();
 			if (generatedKeys.next())
@@ -108,7 +128,7 @@ public class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-		
+
 		Monitor.update(msg.getString("URI"));
 		return result;
 
@@ -125,8 +145,11 @@ public class Model {
 			result.put(obj);
 		}
 
-		String insert = "Update " + Settings.lmtable + " Set "/* + Settings.lmtable_age + "=?, " + Settings.lmtable_gender
-				+ "=?, " */+ Settings.lmtable_archived + "=?, " + Settings.lmtable_monitorfinal + "=?, "
+		String insert = "Update " + Settings.lmtable
+				+ " Set "/*
+							 * + Settings.lmtable_age + "=?, " +
+							 * Settings.lmtable_gender + "=?, "
+							 */ + Settings.lmtable_archived + "=?, " + Settings.lmtable_monitorfinal + "=?, "
 				+ Settings.lmtable_uri + "=?, " + Settings.lmtable_update + "=? Where " + Settings.lmtable_id + "=?";
 		PreparedStatement query1 = null;
 		try {
@@ -137,8 +160,8 @@ public class Model {
 			query1.setBoolean(2, msg.getBoolean("Archive"));
 			query1.setString(1, msg.getString("Final_Product"));
 			query1.setInt(5, msg.getInt("Id"));
-			//query1.setString(1, msg.getString("Age"));
-			//query1.setString(2, msg.getString("Gender"));
+			// query1.setString(1, msg.getString("Age"));
+			// query1.setString(2, msg.getString("Gender"));
 			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -146,23 +169,24 @@ public class Model {
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
-		}finally{
+		} finally {
 			try {
-			if(query1!=null)query1.close();
-			if(cnlocal!=null)
-				
+				if (query1 != null)
+					query1.close();
+				if (cnlocal != null)
+
 					cnlocal.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
-		
-		this.uri=msg.getString("URI");
-		this.frequency=msg.getInt("Update");
-		this.archived=msg.getBoolean("Archive");
-		this.products=msg.getString("Final_Product");
+
+		this.uri = msg.getString("URI");
+		this.frequency = msg.getInt("Update");
+		this.archived = msg.getBoolean("Archive");
+		this.products = msg.getString("Final_Product");
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
