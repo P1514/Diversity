@@ -21,6 +21,16 @@ All notable changes to this project will be documented in this file.
 ### Refactoring
 - Program now able to store more data
 
+### Extraction
+- Final product filtering implemented( Waiting for Testing)
+
+### Modeling
+- Now can select final products from tree list that are supposed to be monitored
+
+### Pages
+- Home page Redesigned
+
+
 ## [2.2] 2016-11-06
 ### Monitoring
 - Monitoring Implemented 24h cycle

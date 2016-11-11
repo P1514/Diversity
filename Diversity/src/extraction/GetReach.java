@@ -32,8 +32,8 @@ public class GetReach {
 		ResultSet rs = null;
 
 		String select = "Select " + Settings.lotable_pss + " from " + Settings.lotable + " where "
-				+ Settings.lotable_pss + " in (Select distinct " + Settings.lmtable_pss + " from "+Settings.lmtable+" where "
-				+ Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
+				+ Settings.lotable_pss + " in (Select distinct " + Settings.lmtable_pss + " from " + Settings.lmtable
+				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
 		try {
@@ -143,7 +143,7 @@ public class GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
 				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0 " : "=0 ") + "AND ("
+				+ "=? AND " + Settings.lotable_product + " in (" + model.getProducts() + ")" + "AND ("
 				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
@@ -177,13 +177,13 @@ public class GetReach {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
-			//System.out.println(query1);
+			// System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
 			 * values[0]); query1.setString(5, values[1]); } }
 			 */
-			//System.out.println(query1);
+			// System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

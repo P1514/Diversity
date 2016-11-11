@@ -28,7 +28,7 @@ public class Operations {
 		op.put("opinion_extraction", 18);
 		op.put("oe_refresh", 19);
 		op.put("Top5Reach", 20);
-		op.put("testing", 99);
+		op.put("gettree", 21);
 		
 		
 	}

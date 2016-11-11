@@ -39,20 +39,20 @@ public class Data {
 
 	public Data() {
 	}
-	
-	private long identifyPSS(long product){
-		
+
+	private long identifyPSS(long product) {
+
 		return productdb.get(product).get_PSS();
-		
+
 	}
-	
-	private long identifyProduct(String message){
-		
-		for(Product a : productdb.values()){
+
+	private long identifyProduct(String message) {
+
+		for (Product a : productdb.values()) {
 			if (a.checkMessage(message) == true)
 				return a.get_Id();
 		}
-		
+
 		return 0;
 	}
 
@@ -93,7 +93,17 @@ public class Data {
 								rs.getString(Settings.crcompanytable_type),
 								rs.getLong(Settings.crcompanytable_belongs_to)));
 			}
-			
+
+			select = "Select * from " + Settings.crpssproducttable;
+
+			query = cncr.prepareStatement(select);
+			rs = query.executeQuery();
+
+			while (rs.next()) {
+				productdb.get(rs.getLong(Settings.crrpssproducttable_product))
+						.set_PSS(rs.getLong(Settings.crrpssproducttable_pss));
+			}
+
 			rs.close();
 			query.close();
 			cncr.close();
@@ -221,7 +231,7 @@ public class Data {
 							rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 							rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-							rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 					Data.modeldb.put(model.getId(), model);
 
 				}
@@ -643,7 +653,7 @@ public class Data {
 						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 						rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-						rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 				Data.modeldb.put(model.getId(), model);
 
 			}
@@ -1205,7 +1215,7 @@ public class Data {
 					if (!(users.contains(user_id))) {
 						users.add(user_id);
 					}
-					
+
 					long product = identifyProduct(message);
 
 					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product));
@@ -1274,14 +1284,14 @@ public class Data {
 					if (!(users2.contains(author))) {
 						users2.add(author);
 					}
-					
+
 					long product = identifyProduct(message);
 					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product, "google.pt"));// TODO
-																							// find
-																							// url
-																							// to
-																							// attack
-																							// here
+					// find
+					// url
+					// to
+					// attack
+					// here
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
@@ -1407,10 +1417,10 @@ public class Data {
 							long postid = reply.getLong(Settings.JSON_postid);
 							String user_id = reply.getString(Settings.JSON_userid);
 							java.sql.Date time = new java.sql.Date(parsed.getTime());
-							long likes = reply.has("mediaSpecificInfo") ? reply.has("likes") ? reply.getLong("likes") : 0
-									: 0;
-							long views = reply.has("mediaSpecificInfo") ? reply.has("views") ? reply.getLong("views") : 0
-									: 0;
+							long likes = reply.has("mediaSpecificInfo")
+									? reply.has("likes") ? reply.getLong("likes") : 0 : 0;
+							long views = reply.has("mediaSpecificInfo")
+									? reply.has("views") ? reply.getLong("views") : 0 : 0;
 							String message = reply.getString(Settings.JSON_message);
 							String source = obj.getString(Settings.JSON_source);
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
@@ -1460,7 +1470,7 @@ public class Data {
 								rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 								rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-								rs.getBoolean(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}

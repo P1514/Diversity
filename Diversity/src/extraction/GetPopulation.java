@@ -63,7 +63,7 @@ public class GetPopulation {
 						+ " in (Select " + Settings.lptable_authorid + " from " + Settings.lptable + " where "
 						+ Settings.lptable_opinion + " in (Select " + Settings.lotable_id + " from " + Settings.lotable
 						+ " where " + Settings.lotable_pss + "=? AND " + Settings.lotable_product
-						+ (model.getProducts() ? "!=0" : "=0") + ")))";
+						+ " in ("+ model.getProducts() + ")"+ ")))";
 				//System.out.println(insert);
 				for (int i = 0; i < out_params.length; i++) {
 					query1 = cnlocal.prepareStatement(insert);
@@ -87,7 +87,7 @@ public class GetPopulation {
 						+ Settings.latable_id + " in (Select " + Settings.lptable_authorid + " from " + Settings.lptable
 						+ " where " + Settings.lptable_opinion + " in (Select " + Settings.lotable_id + " from "
 						+ Settings.lotable + " where " + Settings.lotable_pss + "=? AND "
-						+ Settings.lotable_product + (model.getProducts() ? "!=0" : "=0") + ")))";
+						+ Settings.lotable_product + " in ("+ model.getProducts() + ")"+ ")))";
 				for (int i = 0; i < out_params.length; i++) {
 					//System.out.println(out_params[i]);
 					query1 = cnlocal.prepareStatement(insert);

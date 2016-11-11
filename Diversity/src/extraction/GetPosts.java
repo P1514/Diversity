@@ -46,8 +46,8 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (model.getProducts()) {
-			insert += " !=0";
+		if (model.getProducts() != null) {
+			insert += " in ("+ model.getProducts() + ")";
 		} else {
 			insert += "=0";
 		}
@@ -204,8 +204,8 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (model.getProducts()) {
-			insert += " !=0";
+		if (model.getProducts() != null) {
+			insert += " in ("+ model.getProducts() + ")";
 		} else {
 			insert += "=0";
 		}

@@ -8,6 +8,7 @@ import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetLastPost;
 import extraction.GetPosts;
+import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.SentimentChart;
@@ -57,35 +58,15 @@ public class Backend {
 				case "Location":
 					filter = Settings.locations.split(",,");
 					break;
+				case "Products":
+					filter = Data.modeldb.get(msg.get("Id")).getProducts().split(",");
 				}
 
 			}
 
 			switch (op) {
-			case 99:
-				result = new JSONArray();
-				result.put(new JSONObject().put("Op", "Tree"));
-				JSONArray sub_products = new JSONArray();
-				JSONArray sub_products2 = new JSONArray();
-				JSONObject obj2 = new JSONObject();
-				obj= new JSONObject();
-				obj.put("PSS", "PSS D522-1");
-				obj2 = new JSONObject();
-				obj2.put("Name", "Paiting Machine");
-				sub_products2.put(new JSONObject().put("Name", "Red Brush"));
-				sub_products2.put(new JSONObject().put("Name", "Blue Brush"));
-				obj2.put("Products", sub_products2);
-				sub_products.put(obj2);
-				obj2 = new JSONObject();
-				obj2.put("Name", "Glueing Machine");
-				sub_products2.put(new JSONObject().put("Name", "Super-Glue +9000"));
-				sub_products2.put(new JSONObject().put("Name", "Cheap-Glue 100"));
-				obj2.put("Products", sub_products2);
-				sub_products.put(obj2);
-				obj.put("Products", sub_products);
-				result.put(obj);
-				return result.toString();
-				
+			case 21:
+				return GetProducts.getTree().toString();
 
 			case 20:
 				result = new JSONArray();
@@ -93,9 +74,9 @@ public class Backend {
 				result.put(new JSONObject().put("Op", "Graph"));
 
 				System.out.println(gs.Topreachglobalsentiment());
-				try{
-				result.put(new JSONArray(gs.Topreachglobalsentiment()));
-				} catch (JSONException e){
+				try {
+					result.put(new JSONArray(gs.Topreachglobalsentiment()));
+				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
 
@@ -178,7 +159,9 @@ public class Backend {
 			 */
 			case 12:
 				conf = new Settings();
-				tmp = conf.getConf().toString();
+				tmp="";
+				if(msg.has("Id"))
+					tmp = conf.getConf(msg.getLong("Id")).toString();
 				return tmp;
 			case 13:
 				conf = new Settings();
@@ -199,13 +182,11 @@ public class Backend {
 			case 17:
 				result = new JSONArray();
 				result.put(new JSONObject().put("Op", "pss"));
-				
-				for(PSS a : Data.pssdb.values()){
+
+				for (PSS a : Data.pssdb.values()) {
 					result.put(new JSONObject().put("Pss", a.getName()));
 				}
-				
-				
-				
+
 				return result.toString();
 			default:
 				msg = new JSONObject();

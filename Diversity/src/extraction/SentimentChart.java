@@ -151,33 +151,36 @@ public class SentimentChart {
 		Model model = Data.modeldb.get(id);
 		String insert = "Select " + Settings.lptable_polarity + " FROM " + Settings.lptable + " WHERE "
 				+ Settings.lptable_opinion + " in (" + "Select " + Settings.lotable_id + " from opinions where "
-				+ Settings.lotable_pss + "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0" : "=0")
-				+ ") && "+Settings.lotable_author+" in (Select "+Settings.latable_id+" from "+Settings.latable+" WHERE (("+Settings.latable_age+" >= ? AND "+Settings.latable_age+" <= ? ";
+				+ Settings.lotable_pss + "=? "
+				+ (model.getProducts().equals("-1") ? ""
+						: "AND " + Settings.lotable_product + " in (" + model.getProducts() + ")")
+				+ ") && " + Settings.lotable_author + " in (Select " + Settings.latable_id + " from " + Settings.latable
+				+ " WHERE ((" + Settings.latable_age + " >= ? AND " + Settings.latable_age + " <= ? ";
 
-		
-		insert += ") AND ("+Settings.latable_age+" >= ? AND "+Settings.latable_age+" <= ?)";		
+		insert += ") AND (" + Settings.latable_age + " >= ? AND " + Settings.latable_age + " <= ?)";
 
-		if(model.getGender()=="All"){
-			/*for(int i=0; i<genders.length; i++){
-				insert += i==0 ? "": " OR ";
-				insert += "gender=?";
-				
-			}*/
-			insert+=")";
-		}else{
-			insert+= "AND ("+Settings.latable_gender+"=?))";
-			
+		if (model.getGender() == "All") {
+			/*
+			 * for(int i=0; i<genders.length; i++){ insert += i==0 ? "": " OR ";
+			 * insert += "gender=?";
+			 * 
+			 * }
+			 */
+			insert += ")";
+		} else {
+			insert += "AND (" + Settings.latable_gender + "=?))";
+
 		}
 		if (gender != null) {
 			if (!gender.contains("-")) {
-				insert += " AND ("+Settings.latable_gender+" = ?)";
+				insert += " AND (" + Settings.latable_gender + " = ?)";
 			}
 		}
 		if (location != null) {
 			if (!location.contains("-")) {
-				insert += " AND ("+Settings.latable_location+" = ?)";
+				insert += " AND (" + Settings.latable_location + " = ?)";
 			} else {
-				insert += " AND ("+Settings.latable_location+" >= ? AND "+Settings.latable_location+" <= ?)";
+				insert += " AND (" + Settings.latable_location + " >= ? AND " + Settings.latable_location + " <= ?)";
 			}
 		}
 
@@ -195,20 +198,21 @@ public class SentimentChart {
 			query1.setInt(3, maxage);
 			query1.setString(4, model.getAge().split(",")[0]);
 			query1.setString(5, model.getAge().split(",")[1]);
-			
-			if(model.getGender()=="All"){
-				/*for(; i<genders.length; i++){
-					query1.setString(i, model.getAge().split(",")[i-6]);
-				}*/
-				//insert+=")";
-			}else{
+
+			if (model.getGender() == "All") {
+				/*
+				 * for(; i<genders.length; i++){ query1.setString(i,
+				 * model.getAge().split(",")[i-6]); }
+				 */
+				// insert+=")";
+			} else {
 				query1.setString(i, model.getGender());
-				i++;				
+				i++;
 			}
-			
+
 			if (gender != null) {
 				if (gender.contains("-")) {
-				    genders = gender.split("-");
+					genders = gender.split("-");
 					query1.setString(i, genders[0]);
 					i++;
 					query1.setString(i, genders[1]);

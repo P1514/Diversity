@@ -16,11 +16,11 @@ public class Model {
 	Connection cnlocal;
 	private long id = 0;
 	private long frequency, user;
-	private String name, uri, pss, age, gender;
-	private boolean products, archived;
+	private String name, uri, pss, age, gender, products;
+	private boolean archived;
 
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, String _pss, String _age,
-			String _gender, Boolean _products, Boolean _archived) {
+			String _gender, String _products, Boolean _archived) {
 		this.id=_id;
 		this.frequency=_frequency;
 		this.user=_user;
@@ -45,7 +45,14 @@ public class Model {
 		pss = msg.getString("PSS");
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		products = msg.getBoolean("Final_Product");
+		String [] productsbyname = msg.getString("Final_Products").split(",,");
+		products="";
+		for(String a : productsbyname){
+			if(!Data.productdb.containsKey(Long.valueOf(a))) continue;
+			if(Data.productdb.get(Long.valueOf(a)).get_PSS() != Long.valueOf(pss)) continue;
+			products+=Data.productdb.get(Long.valueOf(a)).get_Id()+",";
+		}
+		//products = msg.getString("Final_Product");
 		user = msg.getInt("User");
 		//age = msg.getString("Age");
 		//gender = msg.getString("Gender");
@@ -63,7 +70,7 @@ public class Model {
 			query1.setString(3, pss);
 			query1.setLong(4, frequency);
 			query1.setBoolean(5, archived);
-			query1.setBoolean(6, products);
+			query1.setString(6, products);
 			query1.setLong(7, user);
 			//query1.setString(8, age);
 			//query1.setString(9, gender);
@@ -128,7 +135,7 @@ public class Model {
 			query1.setString(3, msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
 			query1.setBoolean(2, msg.getBoolean("Archive"));
-			query1.setBoolean(1, msg.getBoolean("Final_Product"));
+			query1.setString(1, msg.getString("Final_Product"));
 			query1.setInt(5, msg.getInt("Id"));
 			//query1.setString(1, msg.getString("Age"));
 			//query1.setString(2, msg.getString("Gender"));
@@ -155,7 +162,7 @@ public class Model {
 		this.uri=msg.getString("URI");
 		this.frequency=msg.getInt("Update");
 		this.archived=msg.getBoolean("Archive");
-		this.products=msg.getBoolean("Final_Product");
+		this.products=msg.getString("Final_Product");
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
@@ -197,7 +204,7 @@ public class Model {
 		return this.gender;
 	}
 
-	public Boolean getProducts() {
+	public String getProducts() {
 		return this.products;
 	}
 

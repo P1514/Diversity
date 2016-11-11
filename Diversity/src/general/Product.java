@@ -23,6 +23,10 @@ public class Product {
 		return name;
 	}
 	
+	public void set_PSS(Long id){
+		this.pss_id=id;
+	}
+	
 	public long get_PSS(){
 		return pss_id;
 	}

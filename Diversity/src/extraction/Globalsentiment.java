@@ -33,21 +33,20 @@ public class Globalsentiment {
 			String result = "";
 			cnlocal.close();
 
-			
-			for(String k : top5){
+			for (String k : top5) {
 
-				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", true, false));
-				result +=globalsentiment(timespan, param, values, k, -1).toString();	
+				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false));
+				result += globalsentiment(timespan, param, values, k, -1).toString();
 				Data.modeldb.remove((long) -1);
 			}
 			dbconnect();
-			result=result.replaceAll("\\]\\[", ",");
+			result = result.replaceAll("\\]\\[", ",");
 			String insert = "Insert into " + Settings.lrtable + " values (?)";
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setString(1, result);
 			query1.execute();
 			cnlocal.close();
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,6 +124,7 @@ public class Globalsentiment {
 		String gender = null;
 		String location = null;
 		String age = null;
+		String products = null;
 		String[] params;
 		String[] values;
 		if (param != null) {
@@ -146,6 +146,10 @@ public class Globalsentiment {
 					if (!values[i].equals("All"))
 						location = values[i];
 					break;
+				case "Products":
+					if(!values[i].equals("All"))
+						products = values[i];
+					break;
 				}
 			}
 		}
@@ -153,9 +157,13 @@ public class Globalsentiment {
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
-				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0 " : "=0 ") + "AND ("
-				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
+				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?"
+				// TODO
+																									// Check
+																									// if
+																									// this
+																									// works
+				+ "AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -164,6 +172,8 @@ public class Globalsentiment {
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
+		if (products !=null)
+			insert += "AND " + Settings.lotable_product + " in (?)";
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
@@ -188,13 +198,15 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
-			//System.out.println(query1);
+			if(products != null)
+				query1.setString(rangeindex++,  products);
+			// System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
 			 * values[0]); query1.setString(5, values[1]); } }
 			 */
-			//System.out.println(query1);
+			// System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {
@@ -289,6 +301,7 @@ public class Globalsentiment {
 		String gender = null;
 		String location = null;
 		String age = null;
+		String products = null;
 		if (param != null) {
 
 			params = param.split(",");
@@ -299,7 +312,6 @@ public class Globalsentiment {
 					if (!values[i].equals("All"))
 						age = values[i];
 					break;
-
 				case "Gender":
 					if (!values[i].equals("All"))
 						gender = values[i];
@@ -307,6 +319,10 @@ public class Globalsentiment {
 				case "Location":
 					if (!values[i].equals("All"))
 						location = values[i];
+					break;
+				case "Products":
+					if(!values[i].equals("All"))
+						products = values[i];
 					break;
 				}
 			}
@@ -326,9 +342,8 @@ public class Globalsentiment {
 				+ " sum(case when (" + Settings.lptable_polarity + " >80 AND " + Settings.lptable_polarity
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where "
-				+ Settings.lotable_product + (model.getProducts() ? "!=0" : "==0") + " and " + Settings.lotable_pss
-				+ "=?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
-				+ Settings.latable;
+			    + Settings.lotable_pss + "=?) AND " + Settings.lptable_authorid + " in (Select "
+				+ Settings.latable_id + " from " + Settings.latable;
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
 		if (age != null)
@@ -337,6 +352,8 @@ public class Globalsentiment {
 			query += " AND " + Settings.latable_gender + "=?";
 		if (location != null)
 			query += " AND " + Settings.latable_location + "=?";
+		if (products != null)
+			query +=  " AND "+ Settings.lotable_product + " in (?)";
 
 		query += ")";
 
@@ -353,8 +370,11 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
-			//System.out.println(query1);
-
+			// System.out.println(query1);
+			if(products != null){
+				query1.setString(rangeindex++, products);
+			}
+			System.out.print(query1+"\n");
 			rs = query1.executeQuery();
 			rs.next();
 
@@ -443,7 +463,7 @@ public class Globalsentiment {
 		String age = null;
 		String location = null;
 		String[] params = null;
-		;
+		String products=null;
 		String[] values = null;
 		if (param != null) {
 
@@ -464,6 +484,10 @@ public class Globalsentiment {
 					if (!values[i].equals("All"))
 						location = values[i];
 					break;
+				case "Product":
+					if(!values[i].equals("All"))
+						products = null;
+					break;
 				}
 			}
 		}
@@ -471,7 +495,7 @@ public class Globalsentiment {
 		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.latable + ","
 				+ Settings.lptable + ", " + Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_id
 				+ "=" + Settings.lptable + "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && "
-				+ Settings.lotable_pss + "=? AND " + Settings.lotable_product + (model.getProducts() ? "!=0 " : "=0 ")
+				+ Settings.lotable_pss + "=? "
 				+ "AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
@@ -481,6 +505,8 @@ public class Globalsentiment {
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
+		if (products != null)
+			insert +=  "AND " + Settings.lotable_product + " in (?)";
 		insert += ")";
 		/*
 		 * if (param != null) { if (!value.contains("-")) { insert +=
@@ -511,8 +537,10 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
+			if (products !=null)
+				query1.setString(rangeindex++, products);
 
-			//System.out.println(query1);
+			// System.out.println(query1);
 			rs = query1.executeQuery();
 
 			while (rs.next()) {

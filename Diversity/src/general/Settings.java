@@ -55,7 +55,7 @@ public class Settings {
 	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	public static final String user2 = "diversity";
 	public static final String pass2 = "diversity";
-	public static final Integer dbversion = 7;
+	public static final Integer dbversion = 8;
 
 	// Author Table
 	public static final String latable = "authors";
@@ -105,7 +105,7 @@ public class Settings {
 	public static final String lmtable_pss="pss";
 	public static final String lmtable_update="update_frequency";
 	public static final String lmtable_archived="archived";
-	public static final String lmtable_monitorfinal="monitor_final_products";
+	public static final String lmtable_monitorfinal="products";
 	public static final String lmtable_creator="created_by_user";
 	public static final String lmtable_age="age_range";
 	public static final String lmtable_gender="gender";
@@ -181,6 +181,10 @@ public class Settings {
 	public static final String crcompanytable_type="type";
 	public static final String crcompanytable_belongs_to = "belongs_to_company_id";
 	
+	// PSS has Product Table
+	public static final String crpssproducttable="pss_has_product";
+	public static final String crrpssproducttable_pss="pss_id";
+	public static final String crrpssproducttable_product="product_id";
 	
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
@@ -224,7 +228,7 @@ public class Settings {
 		}
 	}
 
-	public JSONArray getConf() throws JSONException {
+	public JSONArray getConf(long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Configs");
@@ -261,6 +265,20 @@ public class Settings {
 			obj.put("Location", values3[i]);
 			result.put(obj);
 		}
+		obj = new JSONObject();
+		String[] values4 = Data.modeldb.get(id).getProducts().split(",");
+		obj.put("Size", values4.length);
+		obj.put("Param", "Product");
+		result.put(obj);
+		for (int i = 0; i < values4.length; i++) {
+			if(!Data.productdb.containsKey(Long.valueOf(values4[i]))) continue;
+			obj = new JSONObject();
+			obj.put("Product", Data.productdb.get(Long.valueOf(values4[i])).get_Name());
+			result.put(obj);
+		}
+		
+		
+		
 		System.out.print(result.toString());
 		return result;
 
