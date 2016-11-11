@@ -36,8 +36,15 @@
 		var url = window.location.href.toString();
 		//console.log("1"+url+"\n");
 		var type = url.split("role_desc=");
+		var role = type[1];
 		//console.log("2"+type[1]+"\n");
-		switch(type[1]) {
+		var jsonData = {
+				"Op" : "getrestrictions",//create or update
+				"Role": role,
+			};
+		// ws.send(JSON.stringify(jsonData));
+		
+		switch(role) {
 	    case "DESIGNER":
 	    	console.log("USER:"+type[1]+"\n");
 	    	document.getElementById("create").style.display = 'block';//show
@@ -407,7 +414,7 @@
 				"Gender" : document.getElementById('gender').value != "" ? document
 						.getElementById('gender').value : erro = true,*/
 				"Final_Product" : true,
-				"Archive" : true,
+				"Archive" : 1,
 				"Name" : name,
 				"User" : 1,//TODO find this field
 				"Id": model_data[0],
@@ -628,7 +635,7 @@ form {
 								</div>
 								<div class="row" id="create_gray">
 									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand;">Create Opinion Model</a>
+										<a style="cursor: pointer; cursor: hand; color:#BBBBBB;">Create Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
 										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_add_gray.png"></a>
@@ -636,7 +643,7 @@ form {
 								</div>
 								<div class="row" id="view" style = "display:none">
 									<div class="col-sm-8 offset-0">
-										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;">View Opinion Model</a>
+										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand; ">View Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
 										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view.png"></a>
@@ -644,10 +651,10 @@ form {
 								</div>
 								<div class="row" id="view_gray">
 									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand;">View Opinion Model</a>
+										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">View Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
-										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view_gray.png"></a>
+										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view_gray.png"></a>
 									</div>
 								</div>
 								<div class="row" id="edit" style = "display:none">
@@ -660,7 +667,7 @@ form {
 								</div>
 								<div class="row" id="edit_gray">
 									<div class="col-sm-8 offset-0">
-										<a style="cursor: pointer; cursor: hand;">Edit Opinion Model</a>
+										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">Edit Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
 										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_edit_gray.png"></a>
@@ -676,7 +683,7 @@ form {
 								</div>
 								<div class="row" id="delete_gray">
 									<div class="col-sm-8 offset-0" >
-										<a style="cursor: pointer; cursor: hand;">Delete Opinion Model</a>
+										<a style="cursor: pointer; cursor: hand; color:#BBBBBB">Delete Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
 										<a  style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_delete_gray.png"></a>
@@ -694,7 +701,7 @@ form {
 							</div>
 						</div>
 						<div class="col-sm-4 offset-0">
-							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="_view">
+							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';  display:none;"  id="_view">
 								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
 									<span class="navbar-text">
 										<h3>VIEW</h3>
