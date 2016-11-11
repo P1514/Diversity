@@ -45,7 +45,7 @@ public class Model {
 		pss = msg.getString("PSS");
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		String [] productsbyname = msg.getString("Final_Products").split(",,");
+		String [] productsbyname = msg.has("Products") ? msg.getString("Products").split(",,"): null;
 		products="";
 		for(String a : productsbyname){
 			if(!Data.productdb.containsKey(Long.valueOf(a))) continue;
