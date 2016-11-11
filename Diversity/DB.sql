@@ -18,6 +18,35 @@ USE `sentimentanalysis`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `acess_rights`
+--
+
+DROP TABLE IF EXISTS `acess_rights`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `acess_rights` (
+  `role` varchar(50) NOT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `view_opinion_model` bit(1) DEFAULT NULL,
+  `create_edit_delete_model` bit(1) DEFAULT NULL,
+  `view_opinion_results` bit(1) DEFAULT NULL,
+  `save_delete_snapshots` bit(1) DEFAULT NULL,
+  `use_opinion_prediction` bit(1) DEFAULT NULL,
+  PRIMARY KEY (`role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `acess_rights`
+--
+
+LOCK TABLES `acess_rights` WRITE;
+/*!40000 ALTER TABLE `acess_rights` DISABLE KEYS */;
+INSERT INTO `acess_rights` VALUES ('BUS_PART',NULL,'\0','\0','\0','\0','\0'),('DESIGNER',NULL,'','','','',''),('PROD_MAN',NULL,'\0','\0','','\0','\0'),('SYS_ENG',NULL,'','\0','','\0','\0');
+/*!40000 ALTER TABLE `acess_rights` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `authors`
 --
 
@@ -117,7 +146,7 @@ CREATE TABLE `models` (
   `pss` varchar(45) NOT NULL,
   `update_frequency` int(11) DEFAULT NULL,
   `archived` tinyint(4) DEFAULT NULL,
-  `monitor_final_products` tinyint(4) DEFAULT NULL,
+  `products` longtext,
   `created_by_user` int(11) DEFAULT NULL,
   `age_range` varchar(45) DEFAULT NULL,
   `gender` varchar(45) DEFAULT NULL,
@@ -133,7 +162,7 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
-INSERT INTO `models` VALUES (790,'123','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,1,1,NULL,NULL),(791,'321','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,1,1,NULL,NULL),(792,'4444','http://www.google.pt;http://www.twitter.com;','D522-1 PSS',1,0,1,1,NULL,NULL),(794,'123333','Facebook,123;','D522-1 PSS',12,0,1,1,NULL,NULL);
+INSERT INTO `models` VALUES (790,'123','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,'1',1,NULL,NULL),(791,'321','http://www.twitter.com;http://www.facebook.com;','D522-1 PSS',1,0,'1',1,NULL,NULL),(792,'4444','http://www.google.pt;http://www.twitter.com;','D522-1 PSS',1,0,'1',1,NULL,NULL),(794,'123333','Facebook,123;','D522-1 PSS',12,0,'1',1,NULL,NULL);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -259,4 +288,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-06 16:47:13
+-- Dump completed on 2016-11-11 14:01:23
