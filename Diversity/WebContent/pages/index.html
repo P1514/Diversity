@@ -26,6 +26,50 @@
 	var jsonData;
 	var newData;
 	var all_models = [];
+	
+	$(function() {
+	    getUserType()
+	});
+
+    
+	function getUserType(){
+		var url = window.location.href.toString();
+		//console.log("1"+url+"\n");
+		var type = url.split("role_desc=");
+		//console.log("2"+type[1]+"\n");
+		switch(type[1]) {
+	    case "DESIGNER":
+	    	console.log("USER:"+type[1]+"\n");
+	    	document.getElementById("container_edit").style.display = 'block';//show
+	   		document.getElementById("container_view").style.display = 'none';//hide
+	        break;
+	    case "SYS_ENG":
+	    	console.log("USER:"+type[1]+"\n");
+	   		document.getElementById("container_edit").style.display = 'none';//hide
+	   		document.getElementById("container_view").style.display = 'block';//show
+	        break;
+	    case "CONF_MAN":
+	    	console.log("USER:"+type[1]+"\n");
+	   		document.getElementById("container_edit").style.display = 'none';//hide
+	   		document.getElementById("container_view").style.display = 'block';//show
+	        break;
+	    case "PROD_MAN":
+	    	console.log("USER:"+type[1]+"\n");
+	   		document.getElementById("container_edit").style.display = 'none';//hide
+	   		document.getElementById("container_view").style.display = 'block';//show
+	        break;
+	    case "ADMIN":
+	    	console.log("USER:"+type[1]+"\n");
+	   		document.getElementById("container_edit").style.display = 'block';//show
+	   		document.getElementById("container_view").style.display = 'none';//hide
+	        break;
+	    default:
+	        console.log("Default\n");
+	   		document.getElementById("container_edit").style.display = 'none';//hide
+	   		document.getElementById("container_view").style.display = 'block';//show
+	}
+
+	}
 
 	function getCookie(name) {
 		var value = '; ' + document.cookie;
@@ -279,6 +323,8 @@
 			button.setAttribute("style", "text-align:left;border-radius: 0; width: 90%; margin-bottom: 5px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .1);");
 			form.appendChild(button);
 		}
+		var form2= form;
+		$('#_view2').append(form);
 		$('#_view').append(form);
 	}
 
@@ -329,6 +375,7 @@
 	      var openDropdown = dropdowns[i];
 	      if (openDropdown.classList.contains('show')) {
 	        openDropdown.classList.remove('show');
+
 	      }
 	    }
 	  }
@@ -487,19 +534,28 @@ form {
 <div class="dropdown">
   <button onclick="myFunction()" class="dropbtn">Role</button>
   <div id="myDropdown" class="dropdown-content">
+<<<<<<< HEAD
+    <a href="index.html?amp;role_desc=DESIGNER">Designer PSS</a>
+    <a href="index.html?amp;role_desc=SYS_ENG">PLM System Engineer</a>
+    <a href="index.html?amp;role_desc=CONF_MAN">PLM Configuration Manager</a>
+    <a href="index.html?amp;role_desc=PROD_MAN">Product Manufacturer</a>
+    <a href="index.html?amp;role_desc=ADMIN">System Administrator</a>
+                    
+=======
     <a href="index.html">Designer PSS</a>
     <a href="homepage_RO.html">PLM System Engineer</a>
     <a href="homepage_RO.html">PLM Configuration Manager</a>
     <a href="homepage_RO.html">Product Manufacturer</a>
     <a href="index.htlm">System Administrator</a>
 
+>>>>>>> origin/master
   </div>
 </div>
 
 
 	<h1>Sentiment Analysis</h1>
 	<center>
-		<div class="container">
+		<div class="container" id="container_edit" style = "display:none">
 			<h2>Options</h2>
 				<div class="row">
 						<div class="col-sm-4 offset-0" >
@@ -538,7 +594,7 @@ form {
 										<a onClick="viewModels('delete');" style="cursor: pointer; cursor: hand;">Delete Opinion Model</a>
 									</div>
 									<div class="col-sm-4 offset-0">
-										<a onClick="viewModels('delete');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_edit.png"></a>
+										<a onClick="viewModels('delete');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_delete.png"></a>
 									</div>
 								</div>
 								<div class="row" id="view_models" style="display:none;">
@@ -548,6 +604,79 @@ form {
 									<input id='view_edit' class='btn btn-default' onclick='setCookie()' type='submit' value='Edit Model' />
 									<input id='view_delete' class='btn btn-default' formaction= ""; onclick='deleteModel()' type='submit' value='Delete Model' />
 									<input id='view_select' class='btn btn-default' formaction="models.html" onclick='viewModel();setCookie();' type='submit' value='View Model' />
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-4 offset-0">
+							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="_view2">
+								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
+									<span class="navbar-text">
+										<h3>VIEW</h3>
+									</span>
+								</nav>
+							</div>
+						</div>
+						<div class="col-sm-4 offset-0">
+							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="predict">
+								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
+									<span class="navbar-text">
+										<h3>PREDICT</h3>
+									</span>
+								</nav>
+							</div>
+						</div>
+				</div>
+		</div>
+		<div class="container" id="container_view">
+			<h2>Options</h2>
+				<div class="row">
+						<div class="col-sm-4 offset-0" >
+							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2'color:'#E2D6E2';" id="define">
+								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
+									<span class="navbar-text">
+										<h3>DEFINE</h3>
+									</span>
+								</nav>
+								<div class="row" id="create">
+									<div class="col-sm-8 offser-0 read-only" offset-0">
+										<a style="cursor: pointer; cursor: hand; color:#808080">Create Opinion Model</a>
+									</div>
+									<div class="col-sm-4 offset-0">
+										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_add_gray.png"></a>
+									</div>
+								</div>
+								<div class="row" id="view">
+									<div class="col-sm-8 offset-0">
+										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;">View Opinion Model</a>
+									</div>
+									<div class="col-sm-4 offset-0">
+										<a onClick="viewModels('view');" style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_view.png"></a>
+									</div>
+								</div>
+								<div class="row" id="edit">
+									<div class="col-sm-8 offset-0">
+										<a style="cursor: pointer; cursor: hand; color:#808080">Edit Opinion Model</a>
+									</div>
+									<div class="col-sm-4 offset-0">
+										<a style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_edit_gray.png"></a>
+									</div>
+								</div>
+								<div class="row" id="delete">
+									<div class="col-sm-8 offset-0" >
+										<a style="cursor: pointer; cursor: hand; color:#808080">Delete Opinion Model</a>
+									</div>
+									<div class="col-sm-4 offset-0">
+										<a  style="cursor: pointer; cursor: hand;"><img src="..\images\icons\button_delete_gray.png"></a>
+									</div>
+								</div>
+								<div class="row" id="view_models" style="display:none;">
+									<p style:'text-align: left;'>Select Model: <br><select id='Models'>
+									</select>
+									<br><form action='models.html'><input id='view_back' formaction="" class='btn btn-default' onclick='viewModels(false);' type='submit' value='Back' />
+									<input id='view_edit' class='btn btn-default' onclick='setCookie()' type='submit' value='Edit Model' />
+									<input id='view_delete' class='btn btn-default' formaction= ""; onclick='deleteModel()' type='submit' value='Delete Model' />
+									<input id='view_select' class='btn btn-default' formaction="opinion_extraction_page.html" onclick='setCookie();' type='submit' value='View' />
 									</form>
 								</div>
 							</div>
@@ -563,7 +692,7 @@ form {
 						</div>
 						<div class="col-sm-4 offset-0">
 							<div class="container" style="padding-left: 0;padding-right: 0;background-color:'#E2D6E2';" id="predict">
-								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #604460;">
+								<nav class="navbar navbar-fixed-top navbar-light" style="background-color: #666666;">
 									<span class="navbar-text">
 										<h3>PREDICT</h3>
 									</span>
