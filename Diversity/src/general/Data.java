@@ -708,6 +708,9 @@ public class Data {
 					obj.put("Op", "Error");
 					obj.put("Message", "Loaded Successfully");
 					result.put(obj);
+					rs.close();
+					stmt.close();
+					cndata.close();
 					return result
 							.toString();/*
 										 * LastUpdated = LastUpdated2; if

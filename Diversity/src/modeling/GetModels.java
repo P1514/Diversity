@@ -21,7 +21,7 @@ public class GetModels {
 				try {
 					obj.put("Name", v.getName());
 					obj.put("Id", v.getId());
-					obj.put("PSS", v.getPSS());
+					obj.put("PSS", Data.pssdb.get(v.getPSS()).getName());
 					result.put(obj);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
