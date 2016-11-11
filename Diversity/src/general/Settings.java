@@ -153,7 +153,7 @@ public class Settings {
 	private static final String crdbport="3306";
 	private static final String crdbname = "diversity_common_repository";
 	private static final String crurl = "jdbc:mysql://"+crdbip+":"+crdbport+"/"+crdbname+"?autoReconnect=true&useSSL=false";
-	private static final String cruser = "!diversity!";
+	private static final String cruser = "diversity";
 	private static final String crpass = "!diversity!";
 	
 	// PSS Table
