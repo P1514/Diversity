@@ -72,7 +72,7 @@ public class GetPosts {
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
 			int i = 0;
-			query1.setString(1, model.getPSS());
+			query1.setLong(1, Data.identifyPSSbyname(model.getPSS()));
 			if (param != null) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
@@ -244,7 +244,7 @@ public class GetPosts {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
-			query1.setString(1, model.getPSS());
+			query1.setLong(1, Data.identifyPSSbyname(model.getPSS()));
 
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);

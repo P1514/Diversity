@@ -40,13 +40,23 @@ public class Data {
 	public Data() {
 	}
 
-	private long identifyPSS(long product) {
+	public static long identifyPSSbyproduct(long product) {
 
 		return productdb.get(product).get_PSS();
 
 	}
+	
+	public static long identifyPSSbyname(String name) {
 
-	private long identifyProduct(String message) {
+		for (PSS a : pssdb.values()) {
+			if (a.getName().equals(name))
+				return a.getID();
+		}
+		return 0;
+
+	}
+
+	public static long identifyProduct(String message) {
 
 		for (Product a : productdb.values()) {
 			if (a.checkMessage(message) == true)
@@ -1218,7 +1228,7 @@ public class Data {
 
 					long product = identifyProduct(message);
 
-					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product));
+					opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product));
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
@@ -1286,7 +1296,7 @@ public class Data {
 					}
 
 					long product = identifyProduct(message);
-					opiniondb.put(postid, new Opinion(_post, identifyPSS(product), product, "google.pt"));// TODO
+					opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product, "google.pt"));// TODO
 					// find
 					// url
 					// to

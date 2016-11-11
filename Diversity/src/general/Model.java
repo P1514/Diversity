@@ -229,7 +229,7 @@ public class Model {
 	}
 
 	public String getProducts() {
-		return this.products;
+		return this.products.substring(0, this.products.length()-1);
 	}
 
 	private void dbconnect() {

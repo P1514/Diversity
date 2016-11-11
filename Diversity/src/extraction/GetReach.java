@@ -114,6 +114,7 @@ public class GetReach {
 		String gender = null;
 		String location = null;
 		String age = null;
+		String products=null;
 		String[] params;
 		String[] values;
 		if (param != null) {
@@ -135,6 +136,10 @@ public class GetReach {
 					if (!values[i].equals("All"))
 						location = values[i];
 					break;
+				case "Product":
+					if (!values[i].equals("All"))
+						products = values[i];
+					break;
 				}
 			}
 		}
@@ -153,6 +158,11 @@ public class GetReach {
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
+		if (products != null) {
+			insert += " AND " + Settings.lotable_product + "=?";
+		} else {
+			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+		}
 		insert += ")";
 		// System.out.println(insert);
 		ResultSet rs = null;
@@ -167,7 +177,7 @@ public class GetReach {
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
 			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setString(3, model.getPSS());
+			query1.setLong(3, Data.identifyPSSbyname(model.getPSS()));
 			int rangeindex = 4;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
@@ -177,7 +187,9 @@ public class GetReach {
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location.substring(0, location.length()));
-			// System.out.println(query1);
+			if (products != null)
+				query1.setLong(rangeindex++, Long.valueOf(products));
+			 System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
