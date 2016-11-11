@@ -28,11 +28,11 @@
 	var all_models = [];
 	
 	$(function() {
-	    getUserType()
+	    getRole()
 	});
 
     
-	function getUserType(){
+	function getRole(){
 		var url = window.location.href.toString();
 		//console.log("1"+url+"\n");
 		var type = url.split("role_desc=");
