@@ -671,7 +671,6 @@ public class Data {
 			stmt.close();
 			cnlocal.close();
 		} catch (ClassNotFoundException | SQLException e2) {
-			//
 			e2.printStackTrace();
 		}
 
@@ -1016,6 +1015,8 @@ public class Data {
 		}
 		try {
 			cnlocal.commit();
+			cnlocal.close();
+			cnlocal=Settings.connlocal();
 			cnlocal.setAutoCommit(true);
 		} catch (SQLException e2) {
 			try {
@@ -1025,6 +1026,9 @@ public class Data {
 				e.printStackTrace();
 			}
 			e2.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		System.out.println(" insert opinions and posts " + (System.nanoTime() - stime));
@@ -1167,6 +1171,8 @@ public class Data {
 				try {
 					if (query1 != null)
 						query1.close();
+					if (cnlocal != null)
+						cnlocal.close();
 				} catch (Exception e) {
 				}
 			}

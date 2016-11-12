@@ -115,7 +115,7 @@ public class GetReach {
 		String gender = null;
 		String location = null;
 		String age = null;
-		String products=null;
+		String products = null;
 		String[] params;
 		String[] values;
 		if (param != null) {
@@ -149,8 +149,7 @@ public class GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
 				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_product + " in (" + model.getProducts() + ")" + "AND ("
-				+ Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
+				+ "=? AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -189,8 +188,8 @@ public class GetReach {
 			if (location != null)
 				query1.setString(rangeindex++, location.substring(0, location.length()));
 			if (products != null)
-				query1.setLong(rangeindex++, Long.valueOf(products));
-			 System.out.println(query1);
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
+			System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,

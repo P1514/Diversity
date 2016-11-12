@@ -45,7 +45,15 @@ public class CleanDB {
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 			stmt.close();
-			query = "UPDATE `diversitydb`.`general` SET `totalposts`='0', `totallikes`='0', `totalcomments`='0', `totalviews`='0', `lastupdated`='1970-01-01' WHERE `id`='1'";
+			query = "DELETE from "+Settings.lmtable;
+			stmt = cnlocal.createStatement();
+			stmt.execute(query);
+			stmt.close();
+			query = "DELETE from "+Settings.lutable;
+			stmt = cnlocal.createStatement();
+			stmt.execute(query);
+			stmt.close();
+			query = "UPDATE `general` SET `totalposts`='0', `totallikes`='0', `totalcomments`='0', `totalviews`='0', `lastupdated`='1970-01-01' WHERE `id`='1'";
 			stmt = cnlocal.createStatement();
 			stmt.execute(query);
 		} catch (ClassNotFoundException e) {

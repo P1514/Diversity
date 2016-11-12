@@ -173,7 +173,7 @@ public class Globalsentiment {
 		if (location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		if (products != null) {
-			if (!products.equals("-1")) {
+			if (products.equals("-1")) {
 				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 			} else {
 				insert += " AND " + Settings.lotable_product + "=?";
@@ -202,13 +202,14 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, age.split("-")[1]);
 				query1.setString(rangeindex++, age.split("-")[0]);
 			}
+			//System.out.println(query1);
 			if (gender != null)
 				query1.setString(rangeindex++, gender);
 			if (location != null)
 				query1.setString(rangeindex++, location);
 			if (products != null)
-				query1.setLong(rangeindex++, Long.valueOf(products));
-			System.out.println(query1);
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
+			//System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,
@@ -369,13 +370,14 @@ public class Globalsentiment {
 			query1 = cnlocal.prepareStatement(query);
 			query1.setLong(1, model.getPSS());
 			int rangeindex = 2;
+			if (products != null) {
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
+			}
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
 				query1.setString(rangeindex++, age.split("-")[0]);
 			}
-			if (products != null) {
-				query1.setLong(rangeindex++, Long.valueOf(products));
-			}
+			
 			if (gender != null)
 				query1.setString(rangeindex++, gender);
 			if (location != null)
@@ -548,7 +550,7 @@ public class Globalsentiment {
 			if (location != null)
 				query1.setString(rangeindex++, location);
 			if (products != null)
-				query1.setString(rangeindex++, products);
+				query1.setLong(rangeindex++, Data.identifyProduct(products));
 
 			// System.out.println(query1);
 			rs = query1.executeQuery();

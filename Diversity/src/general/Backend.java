@@ -67,8 +67,12 @@ public class Backend {
 
 			switch (op) {
 			case 22:
-				return Roles.getRestrictions(msg.getString("Role")).toString();//TODO função retorna JSONARRAy ).toString();
- 			case 21:
+				return Roles.getRestrictions(msg.getString("Role")).toString();// TODO
+																				// função
+																				// retorna
+																				// JSONARRAy
+																				// ).toString();
+			case 21:
 				return GetProducts.getTree().toString();
 
 			case 20:
@@ -91,18 +95,33 @@ public class Backend {
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
 				for (int i = 0; i < filter.length; i++)
-					result = convert(result, gs.getPolarityDistribution(id, param + "," + filtering,
-							values + "," + filter[i], (filtering.equals("Product") ? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i])), "Graph", "Top_Middle");
+					result = convert(result,
+							gs.getPolarityDistribution(id, param + "," + filtering,
+									values + "," + (filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i])),
+							"Graph", "Top_Middle");
 
 				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalreach(1, param + "," + filtering, values + "," + filter[i], (filtering.equals("Product") ? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]), id),
+							gs.globalreach(1, param + "," + filtering,
+									values + "," + (filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									id),
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalsentiment(1, param + "," + filtering, values + "," + filter[i], (filtering.equals("Product") ? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]), id),
+							gs.globalsentiment(1, param + "," + filtering,
+									values + "," + (filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									id),
 							"Graph", "Bottom_Right");
 				return result.toString();
 
@@ -162,8 +181,8 @@ public class Backend {
 			 */
 			case 12:
 				conf = new Settings();
-				tmp="";
-				if(msg.has("Id"))
+				tmp = "";
+				if (msg.has("Id"))
 					tmp = conf.getConf(msg.getLong("Id")).toString();
 				return tmp;
 			case 13:

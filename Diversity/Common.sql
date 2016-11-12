@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `diversity_common_repository` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `diversity_common_repository`;
--- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
 -- Host: localhost    Database: diversity_common_repository
 -- ------------------------------------------------------
--- Server version	5.7.16-log
+-- Server version	5.7.13-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -646,7 +646,7 @@ CREATE TABLE `product` (
   KEY `fk_product_product_idx` (`parent_product_id`),
   CONSTRAINT `fk_product_company` FOREIGN KEY (`supplied_by_company_id`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_product_product` FOREIGN KEY (`parent_product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -655,7 +655,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES (1,'Morris Ground 1',NULL,NULL,NULL,1),(2,'Austin Basket',NULL,NULL,NULL,1),(3,'Austin Soccer',NULL,NULL,NULL,1);
+INSERT INTO `product` VALUES (1,'Morris Ground 1',NULL,NULL,NULL,1),(2,'Austin Basket',NULL,NULL,NULL,1),(3,'Austin Soccer',NULL,NULL,NULL,1),(4,'Morris Sea 1000',NULL,NULL,NULL,1),(5,'Morris Sea 2099',NULL,NULL,NULL,1),(6,'Morris Wind',NULL,NULL,NULL,1),(7,'Austin Polo',NULL,NULL,NULL,1),(8,'Austin Cricket',NULL,NULL,NULL,1),(9,'Austin XC',NULL,NULL,NULL,1),(10,'Austin Base',NULL,NULL,NULL,1);
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -678,7 +678,7 @@ CREATE TABLE `pss` (
   KEY `fk_pss_user_idx` (`user_id`),
   CONSTRAINT `fk_pss_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `pssOwnedBy` FOREIGN KEY (`sold_by_company_id`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -687,7 +687,7 @@ CREATE TABLE `pss` (
 
 LOCK TABLES `pss` WRITE;
 /*!40000 ALTER TABLE `pss` DISABLE KEYS */;
-INSERT INTO `pss` VALUES (1,'PRODUCT',1,NULL,'D522-1 PSS'),(2,'PRODUCT',2,NULL,'D522-2 PSS');
+INSERT INTO `pss` VALUES (1,'PRODUCT',1,NULL,'D522-1 PSS'),(2,'PRODUCT',2,NULL,'D522-2 PSS'),(3,'PRODUCT',1,NULL,'D341-1 PSS'),(4,'PRODUCT',2,NULL,'D231-1 PSS'),(5,'PRODUCT',2,NULL,'D231-2 PSS');
 /*!40000 ALTER TABLE `pss` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -714,7 +714,7 @@ CREATE TABLE `pss_has_product` (
 
 LOCK TABLES `pss_has_product` WRITE;
 /*!40000 ALTER TABLE `pss_has_product` DISABLE KEYS */;
-INSERT INTO `pss_has_product` VALUES (1,1),(2,2),(2,3);
+INSERT INTO `pss_has_product` VALUES (1,1),(2,2),(2,3),(3,4),(3,5),(3,6),(4,7),(4,8),(5,9),(5,10);
 /*!40000 ALTER TABLE `pss_has_product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -952,4 +952,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-07 12:51:51
+-- Dump completed on 2016-11-12  0:14:09
