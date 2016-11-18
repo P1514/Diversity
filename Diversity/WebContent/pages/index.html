@@ -10,13 +10,13 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <link rel='stylesheet'
 	href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-<script
+<script type='text/javascript'
 	src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
-<script
+<script type='text/javascript'
 	src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
 <script type='text/javascript'
 	src='https://www.gstatic.com/charts/loader.js'></script>
-<script>
+<script type='text/javascript'>
 	google.charts.load('current', {packages:['corechart']});
 	ws = new WebSocket('ws://' + window.location.hostname + ':'
 			+ window.location.port + '/Diversity/server');
@@ -26,38 +26,37 @@
 	var jsonData;
 	var newData;
 	var all_models = [];
-	
+	var role;
 	$(function() {
 	    getRole()
 	});
 
-    
+
 	function getRole(){
 		var url = window.location.href.toString();
 		var type = url.split("role_desc=")
-        var role;
         document.getElementById("dropdown").style.display = 'none';//hides dropdown
          if(typeof type[1] != 'undefined'){
             type = type[1].split("&");
             role = type[0];
         }
-        
+
         if(typeof role == 'undefined'){
             role = sessionStorage.session;
         }
 		else
             {
-			
+
                 sessionStorage.session = role;
                 //console.log("Bemvindo:"+role+"\n");
             }
-        
+
         		var jsonData = {
 				"Op" : "getrestrictions",//create or update
 				"Role": role,
 			};
 		// ws.send(JSON.stringify(jsonData));
-            
+
 		switch(role) {
 	    case "DESIGNER":
 	    	console.log("USER:"+role+"\n");
@@ -103,7 +102,7 @@
 	   		document.getElementById("_view_gray").style.display = 'block';//show
 	    	document.getElementById("predict").style.display = 'none';//hide
 	   		document.getElementById("predict_gray").style.display = 'block';//show
-	   		
+
 	        break;
 	    case "PROD_MAN":
 	    	console.log("USER:"+role+"\n");
@@ -134,7 +133,7 @@
 	   		document.getElementById("_view_gray").style.display = 'none';//hide
 	    	document.getElementById("predict").style.display = 'block';//show
 	   		document.getElementById("predict_gray").style.display = 'none';//hide
-	   		
+
 	        break;
 	    default:
 		    console.log("Default\n");
@@ -210,13 +209,12 @@
 	}
 
 	ws.onclose = function (evt) {
-	    location.reload();
+	    //location.reload();
 	};
 
 	function new_model(){
-
-	sessionStorage.clear();
-
+		sessionStorage.clear();
+		sessionStorage.session = role;
 	}
 
 	function populatePSS() {
