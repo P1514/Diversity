@@ -187,7 +187,7 @@ public class Model {
 		this.uri = msg.getString("URI");
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = msg.getString("Final_Product");
+		this.products = msg.getString("Final_Products");
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");

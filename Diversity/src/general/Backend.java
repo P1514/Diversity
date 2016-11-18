@@ -47,7 +47,6 @@ public class Backend {
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
 			filtering = (msg.has("Filter")) ? msg.getString("Filter") : null;
-			System.out.println(msg);
 			if (filtering != null) {
 				switch (filtering) {
 				case "Age":

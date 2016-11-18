@@ -82,7 +82,7 @@ public class Server {
 		public void runn(JSONObject msg) {
 			JSONArray result = new JSONArray();
 			JSONObject obj = new JSONObject();
-			// System.out.println(msg);
+		    System.out.println("IN:"+msg);
 			Backend be;
 
 			try {
