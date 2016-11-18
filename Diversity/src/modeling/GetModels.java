@@ -59,10 +59,14 @@ public class GetModels {
 		obj.put("Name", model.getName());
 		obj.put("URI", model.getURI());
 		obj.put("Update", model.getFrequency());
-		obj.put("PSS", model.getPSS());
+		obj.put("PSS", Data.pssdb.get(model.getPSS()).getName());
 		//obj.put("Age", model.getAge());
 		//obj.put("Gender", model.getGender());
-		obj.put("Final_products", model.getProducts());
+		String Products = new String();
+		for(String a : model.getProducts().split(",")){
+			Products+=Data.productdb.get(Long.valueOf(a)).get_Name()+";";
+		}
+		obj.put("Final_products", Products);
 		obj.put("Archive", model.getArchived());
 		result.put(obj);
 		}else{
