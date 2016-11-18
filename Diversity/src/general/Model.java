@@ -158,7 +158,7 @@ public class Model {
 			query1.setString(3, msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
 			query1.setBoolean(1, msg.getBoolean("Archive"));
-			query1.setString(2, msg.getString("Final_Product"));
+			query1.setString(2, msg.has("Final_Products") ? msg.getString("Final_Products") : null);
 			query1.setInt(5, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
@@ -187,7 +187,7 @@ public class Model {
 		this.uri = msg.getString("URI");
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = msg.getString("Final_Product");
+		this.products = msg.getString("Final_Products");
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
