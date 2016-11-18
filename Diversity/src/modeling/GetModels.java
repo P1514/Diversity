@@ -64,7 +64,7 @@ public class GetModels {
 		//obj.put("Gender", model.getGender());
 		String Products = new String();
 		for(String a : model.getProducts().split(",")){
-			Products+=a+";";
+			Products+=Data.productdb.get(Long.valueOf(a)).get_Name()+";";
 		}
 		obj.put("Final_products", Products);
 		obj.put("Archive", model.getArchived());

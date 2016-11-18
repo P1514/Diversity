@@ -145,6 +145,7 @@ public class Model {
 			result.put(obj);
 			return result;
 		}
+		String product=new String();
 
 		String insert = "Update " + Settings.lmtable
 				+ " Set "/*
@@ -159,10 +160,10 @@ public class Model {
 			query1.setString(3, msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
 			query1.setBoolean(1, msg.getBoolean("Archive"));
-			String products=new String();
-			if(msg.has("Final_products")){
+			
+			if(msg.has("Final_Products")){
 				for (String a : msg.getString("Final_Products").split(";")){
-					products+=Data.identifyProduct(a)+",";
+					product+=Data.identifyProduct(a)+",";
 				}
 			}
 			query1.setString(2, products);
@@ -194,7 +195,7 @@ public class Model {
 		this.uri = msg.getString("URI");
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = msg.getString("Final_Products");
+		this.products = product.equals("") ? "," : product;
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
