@@ -26,131 +26,93 @@
 	var jsonData;
 	var newData;
 	var all_models = [];
-	var role;
-	$(function() {
-	    getRole()
-	});
 
+	function giveAcessRights(json){
+        if(json[0].view_OM){
+	    	document.getElementById("view").style.display = 'block';//show
+	   		document.getElementById("view_gray").style.display = 'none';//hide
+        }
+        	
+        else{
+	   		document.getElementById("view_gray").style.display = 'block';//show
+	    	document.getElementById("edit").style.display =  'none';//hide
+        }
+        
+        if(json[0].create_edit_delete_model){
 
+	    	document.getElementById("create").style.display = 'block';//show
+	   		document.getElementById("create_gray").style.display = 'none';//hide
+	    	document.getElementById("edit").style.display = 'block';//show
+	   		document.getElementById("edit_gray").style.display = 'none';//hide
+	    	document.getElementById("delete").style.display = 'block';//show
+	   		document.getElementById("delete_gray").style.display = 'none';//hide
+        	
+        }
+        else{
+	    	document.getElementById("create").style.display =  'none';//hide
+	   		document.getElementById("create_gray").style.display = 'block';//show
+	    	document.getElementById("edit").style.display =  'none';//hide
+	   		document.getElementById("edit_gray").style.display = 'block';//show
+	    	document.getElementById("delete").style.display =  'none';//hide
+	   		document.getElementById("delete_gray").style.display = 'block';//show
+        	
+        }
+        
+        if(json[0].view_opinion_results){
+	    	document.getElementById("_view").style.display = 'block';//show
+	   		document.getElementById("_view_gray").style.display = 'none';//hide
+        	
+        }
+        else{
+	    	document.getElementById("_view_gray").style.display = 'block';//show
+	   		document.getElementById("_view").style.display = 'none';//hide
+        	
+        }
+        
+        if(json[0].view_use_opinion_prediction){
+	    	document.getElementById("predict").style.display = 'block';//show
+	   		document.getElementById("predict_gray").style.display = 'none';//hide
+        	
+        }
+        else{
+	    	document.getElementById("predict").style.display = 'none';//hide
+	   		document.getElementById("predict_gray").style.display = 'block';//show
+        	
+        }
+        
+        if(json[0].save_delete_snapshots){
+        	//not implemented yet
+        }
+        else{
+        	
+        }
+	}
+	
+    
 	function getRole(){
 		var url = window.location.href.toString();
 		var type = url.split("role_desc=")
-        document.getElementById("dropdown").style.display = 'none';//hides dropdown
+        var role;
+        //document.getElementById("dropdown").style.display = 'none';//hides dropdown
          if(typeof type[1] != 'undefined'){
             type = type[1].split("&");
             role = type[0];
         }
-
-        if(typeof role == 'undefined'){
+        
+        if(typeof role == 'undefined'){ // change to == null
             role = sessionStorage.session;
         }
 		else
             {
-
+			
                 sessionStorage.session = role;
-                //console.log("Bemvindo:"+role+"\n");
             }
-
+        
         		var jsonData = {
-				"Op" : "getrestrictions",//create or update
-				"Role": role,
+				"Op" : 'getrestrictions',//create or update
+				"Role": role==null?'no_role':role,
 			};
-		// ws.send(JSON.stringify(jsonData));
-
-		switch(role) {
-	    case "DESIGNER":
-	    	console.log("USER:"+role+"\n");
-	    	document.getElementById("create").style.display = 'block';//show
-	   		document.getElementById("create_gray").style.display = 'none';//hide
-	    	document.getElementById("view").style.display = 'block';//show
-	   		document.getElementById("view_gray").style.display = 'none';//hide
-	    	document.getElementById("edit").style.display = 'block';//show
-	   		document.getElementById("edit_gray").style.display = 'none';//hide
-	    	document.getElementById("delete").style.display = 'block';//show
-	   		document.getElementById("delete_gray").style.display = 'none';//hide
-	    	document.getElementById("_view").style.display = 'block';//show
-	   		document.getElementById("_view_gray").style.display = 'none';//hide
-	    	document.getElementById("predict").style.display = 'block';//show
-	   		document.getElementById("predict_gray").style.display = 'none';//hide
-	        break;
-	    case "SYS_ENG":
-	    	console.log("USER:"+role+"\n");
-	    	document.getElementById("create").style.display =  'none';//hide
-	   		document.getElementById("create_gray").style.display = 'block';//show
-	    	document.getElementById("view").style.display = 'block';//show
-	   		document.getElementById("view_gray").style.display = 'none';//hide
-	    	document.getElementById("edit").style.display =  'none';//hide
-	   		document.getElementById("edit_gray").style.display = 'block';//show
-	    	document.getElementById("delete").style.display =  'none';//hide
-	   		document.getElementById("delete_gray").style.display = 'block';//show
-	    	document.getElementById("_view").style.display = 'block';//show
-	   		document.getElementById("_view_gray").style.display = 'none';//hide
-	    	document.getElementById("predict").style.display = 'none';//hide
-	   		document.getElementById("predict_gray").style.display = 'block';//show
-	        break;
-	    case "CONF_MAN":
-	    	console.log("USER:"+role+"\n");
-	    	document.getElementById("create").style.display =  'none';//hide
-	   		document.getElementById("create_gray").style.display = 'block';//show
-	    	document.getElementById("view").style.display =  'none';//hide
-	   		document.getElementById("view_gray").style.display = 'block';//show
-	    	document.getElementById("edit").style.display =  'none';//hide
-	   		document.getElementById("edit_gray").style.display = 'block';//show
-	    	document.getElementById("delete").style.display =  'none';//hide
-	   		document.getElementById("delete_gray").style.display = 'block';//show
-	    	document.getElementById("_view").style.display = 'none';//hide
-	   		document.getElementById("_view_gray").style.display = 'block';//show
-	    	document.getElementById("predict").style.display = 'none';//hide
-	   		document.getElementById("predict_gray").style.display = 'block';//show
-
-	        break;
-	    case "PROD_MAN":
-	    	console.log("USER:"+role+"\n");
-	    	document.getElementById("create").style.display =  'none';//hide
-	   		document.getElementById("create_gray").style.display = 'block';//show
-	    	document.getElementById("view").style.display =  'none';//hide
-	   		document.getElementById("view_gray").style.display = 'block';//show
-	    	document.getElementById("edit").style.display =  'none';//hide
-	   		document.getElementById("edit_gray").style.display = 'block';//show
-	    	document.getElementById("delete").style.display =  'none';//hide
-	   		document.getElementById("delete_gray").style.display = 'block';//show
-	    	document.getElementById("_view").style.display = 'none';//hide
-	   		document.getElementById("_view_gray").style.display = 'block';//show
-	    	document.getElementById("predict").style.display = 'none';//hide
-	   		document.getElementById("predict_gray").style.display = 'block';//show
-	        break;
-	    case "ADMIN":
-	    	console.log("USER:"+role+"\n");
-	    	document.getElementById("create").style.display = 'block';//show
-	   		document.getElementById("create_gray").style.display = 'none';//hide
-	    	document.getElementById("view").style.display = 'block';//show
-	   		document.getElementById("view_gray").style.display = 'none';//hide
-	    	document.getElementById("edit").style.display = 'block';//show
-	   		document.getElementById("edit_gray").style.display = 'none';//hide
-	    	document.getElementById("delete").style.display = 'block';//show
-	   		document.getElementById("delete_gray").style.display = 'none';//hide
-	    	document.getElementById("_view").style.display = 'block';//show
-	   		document.getElementById("_view_gray").style.display = 'none';//hide
-	    	document.getElementById("predict").style.display = 'block';//show
-	   		document.getElementById("predict_gray").style.display = 'none';//hide
-
-	        break;
-	    default:
-		    console.log("Default\n");
-	    	document.getElementById("create").style.display =  'none';//hide
-	   		document.getElementById("create_gray").style.display = 'block';//show
-	    	document.getElementById("view").style.display =  'none';//hide
-	   		document.getElementById("view_gray").style.display = 'block';//show
-	    	document.getElementById("edit").style.display =  'none';//hide
-	   		document.getElementById("edit_gray").style.display = 'block';//show
-	    	document.getElementById("delete").style.display =  'none';//hide
-	   		document.getElementById("delete_gray").style.display = 'block';//show
-	    	document.getElementById("_view").style.display = 'none';//hide
-	   		document.getElementById("_view_gray").style.display = 'block';//show
-	    	document.getElementById("predict").style.display = 'none';//hide
-	   		document.getElementById("predict_gray").style.display = 'block';//show
-	}
-
+				ws.send(JSON.stringify(jsonData));
 	}
 
 	function getCookie(name) {
@@ -179,11 +141,10 @@
 	}
 
 	ws.onopen = function() {
-		var jsonData = {
-			'Op' : 'getmodels',
-		}
-		ws.send(JSON.stringify(jsonData));
+		getRole();
 	}
+
+	
 	ws.onmessage = function(event) {
 		json = JSON.parse(event.data);
 		if (json[0].Op == 'Error') {
@@ -205,6 +166,13 @@
 				console.log("No data to display");
 			}
 			//drawChart();
+		}
+		if (json[0].Op == 'Rights') {
+			giveAcessRights(json);
+			var jsonData = {
+					'Op' : 'getmodels',
+				}
+				ws.send(JSON.stringify(jsonData));
 		}
 	}
 

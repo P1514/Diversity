@@ -66,6 +66,7 @@ public class Backend {
 
 			switch (op) {
 			case 22:
+			
 				return Roles.getRestrictions(msg.getString("Role")).toString();// TODO
 																				// função
 																				// retorna

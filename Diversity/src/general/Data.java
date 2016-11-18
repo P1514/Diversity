@@ -73,13 +73,11 @@ public class Data {
 			PreparedStatement query = cncr.prepareStatement(select);
 			ResultSet rs;
 			rs = query.executeQuery();
-
 			while (rs.next()) {
 				pssdb.put(rs.getLong(Settings.crpsstable_id),
 						new PSS(rs.getLong(Settings.crpsstable_id), rs.getLong(Settings.crpsstable_company),
 								rs.getString(Settings.crpsstable_name), rs.getLong(Settings.crpsstable_author),
 								rs.getString(Settings.crpsstable_type)));
-
 			}
 
 			select = "Select * from " + Settings.crproducttable;
