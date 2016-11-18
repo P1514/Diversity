@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `sentimentanalysis` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `sentimentanalysis`;
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
 -- Host: localhost    Database: sentimentanalysis
@@ -18,32 +16,32 @@ USE `sentimentanalysis`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `acess_rights`
+-- Table structure for table `access_rights`
 --
 
-DROP TABLE IF EXISTS `acess_rights`;
+DROP TABLE IF EXISTS `access_rights`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `acess_rights` (
+CREATE TABLE `access_rights` (
   `role` varchar(50) NOT NULL,
   `description` varchar(500) DEFAULT NULL,
-  `view_opinion_model` bit(1) DEFAULT NULL,
-  `create_edit_delete_model` bit(1) DEFAULT NULL,
-  `view_opinion_results` bit(1) DEFAULT NULL,
-  `save_delete_snapshots` bit(1) DEFAULT NULL,
-  `use_opinion_prediction` bit(1) DEFAULT NULL,
+  `view_opinion_model` tinyint(1) DEFAULT NULL,
+  `create_edit_delete_model` tinyint(1) DEFAULT NULL,
+  `view_opinion_results` tinyint(1) DEFAULT NULL,
+  `save_delete_snapshots` tinyint(1) DEFAULT NULL,
+  `use_opinion_prediction` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `acess_rights`
+-- Dumping data for table `access_rights`
 --
 
-LOCK TABLES `acess_rights` WRITE;
-/*!40000 ALTER TABLE `acess_rights` DISABLE KEYS */;
-INSERT INTO `acess_rights` VALUES ('BUS_PART',NULL,'\0','\0','\0','\0','\0'),('DESIGNER',NULL,'','','','',''),('PROD_MAN',NULL,'\0','\0','','\0','\0'),('SYS_ENG',NULL,'','\0','','\0','\0');
-/*!40000 ALTER TABLE `acess_rights` ENABLE KEYS */;
+LOCK TABLES `access_rights` WRITE;
+/*!40000 ALTER TABLE `access_rights` DISABLE KEYS */;
+INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1),('PROD_MAN',NULL,0,0,1,0,0),('SYS_ENG',NULL,1,0,1,0,0);
+/*!40000 ALTER TABLE `access_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -287,4 +285,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-12  0:14:25
+-- Dump completed on 2016-11-18 12:24:58
