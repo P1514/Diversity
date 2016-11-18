@@ -272,7 +272,7 @@ function makeTree() {
     var i, j, r = [];
     for (i = 0, j = data.selected.length; i < j; i++) {
         r.push(data.instance.get_node(data.selected[i]).text);
-        final_products += data.instance.get_node(data.selected[i]).text + ",," ;
+        final_products += data.instance.get_node(data.selected[i]).text + ";" ;
     }
     //console.log(final_products);
   });
