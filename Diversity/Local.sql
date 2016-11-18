@@ -18,32 +18,32 @@ USE `sentimentanalysis`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `acess_rights`
+-- Table structure for table `access_rights`
 --
 
-DROP TABLE IF EXISTS `acess_rights`;
+DROP TABLE IF EXISTS `access_rights`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `acess_rights` (
+CREATE TABLE `access_rights` (
   `role` varchar(50) NOT NULL,
   `description` varchar(500) DEFAULT NULL,
-  `view_opinion_model` bit(1) DEFAULT NULL,
-  `create_edit_delete_model` bit(1) DEFAULT NULL,
-  `view_opinion_results` bit(1) DEFAULT NULL,
-  `save_delete_snapshots` bit(1) DEFAULT NULL,
-  `use_opinion_prediction` bit(1) DEFAULT NULL,
+  `view_opinion_model` tinyint(1) DEFAULT NULL,
+  `create_edit_delete_model` tinyint(1) DEFAULT NULL,
+  `view_opinion_results` tinyint(1) DEFAULT NULL,
+  `save_delete_snapshots` tinyint(1) DEFAULT NULL,
+  `use_opinion_prediction` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `acess_rights`
+-- Dumping data for table `access_rights`
 --
 
-LOCK TABLES `acess_rights` WRITE;
-/*!40000 ALTER TABLE `acess_rights` DISABLE KEYS */;
-INSERT INTO `acess_rights` VALUES ('BUS_PART',NULL,'\0','\0','\0','\0','\0'),('DESIGNER',NULL,'','','','',''),('PROD_MAN',NULL,'\0','\0','','\0','\0'),('SYS_ENG',NULL,'','\0','','\0','\0');
-/*!40000 ALTER TABLE `acess_rights` ENABLE KEYS */;
+LOCK TABLES `access_rights` WRITE;
+/*!40000 ALTER TABLE `access_rights` DISABLE KEYS */;
+INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1),('PROD_MAN',NULL,0,0,1,0,0),('SYS_ENG',NULL,1,0,1,0,0);
+/*!40000 ALTER TABLE `access_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -248,7 +248,7 @@ CREATE TABLE `reach` (
 
 LOCK TABLES `reach` WRITE;
 /*!40000 ALTER TABLE `reach` DISABLE KEYS */;
-INSERT INTO `reach` VALUES ('[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":49.81},{\"Month\":\"NOV\",\"Value\":68.12},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5}]');
+INSERT INTO `reach` VALUES ('[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":49.81},{\"Month\":\"NOV\",\"Value\":68.12},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5}]');
 /*!40000 ALTER TABLE `reach` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -287,4 +287,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-12  0:14:25
+-- Dump completed on 2016-11-18 16:33:04
