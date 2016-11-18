@@ -26,17 +26,24 @@
 	var jsonData;
 	var newData;
 	var all_models = [];
-	
-	$(function() {
-	    getRole()
-	});
 
+
+	
+	function giveAcessRights(json){
+		console.log(json);
+        var view_OM;
+        var create_edit_delete_model;
+        var view_opinion_results;
+        var use_opinion_prediction;
+	}
+	
+	
     
 	function getRole(){
 		var url = window.location.href.toString();
 		var type = url.split("role_desc=")
         var role;
-        document.getElementById("dropdown").style.display = 'none';//hides dropdown
+        //document.getElementById("dropdown").style.display = 'none';//hides dropdown
          if(typeof type[1] != 'undefined'){
             type = type[1].split("&");
             role = type[0];
@@ -53,11 +60,12 @@
             }
         
         		var jsonData = {
-				"Op" : "getrestrictions",//create or update
-				"Role": role,
+				"Op" : 'getrestrictions',//create or update
+				"Role": role=='undefined'?'no_role':role,
 			};
-		// ws.send(JSON.stringify(jsonData));
-            
+        		console.log(JSON.stringify(jsonData));
+				//ws.send(JSON.stringify(jsonData));
+		
 		switch(role) {
 	    case "DESIGNER":
 	    	console.log("USER:"+role+"\n");
@@ -180,11 +188,10 @@
 	}
 
 	ws.onopen = function() {
-		var jsonData = {
-			'Op' : 'getmodels',
-		}
-		ws.send(JSON.stringify(jsonData));
+		getRole();
 	}
+
+	
 	ws.onmessage = function(event) {
 		json = JSON.parse(event.data);
 		if (json[0].Op == 'Error') {
@@ -207,11 +214,19 @@
 			}
 			//drawChart();
 		}
+		if (json[0].Op == 'Rights') {
+			giveAcessRights(json);
+			var jsonData = {
+					'Op' : 'getmodels',
+				}
+				ws.send(JSON.stringify(jsonData));
+		}
 	}
 
 	ws.onclose = function (evt) {
 	    location.reload();
 	};
+
 
 	function new_model(){
 
