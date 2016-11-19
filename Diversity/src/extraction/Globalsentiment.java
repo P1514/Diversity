@@ -25,6 +25,7 @@ public class Globalsentiment {
 
 	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
 			ArrayList<Long> top5) throws JSONException {
+		if(top5.isEmpty())return;
 		try {
 			dbconnect();
 			String delete = "Delete from reach";

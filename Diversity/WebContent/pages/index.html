@@ -181,6 +181,7 @@
 	};
 
 	function new_model(){
+		var role = sessonStorage.session;
 		sessionStorage.clear();
 		sessionStorage.session = role;
 	}
@@ -603,7 +604,7 @@ form {
 </head>
 <body>
 
-	<div class="dropdown" id="dropdown">
+	<!--<div class="dropdown" id="dropdown">
 		<button onclick="myFunction()" class="dropbtn">Role</button>
 		<div id="myDropdown" class="dropdown-content">
 
@@ -615,7 +616,7 @@ form {
 				Administrator</a>
 
 		</div>
-	</div>
+	</div>-->
 
 
 	<h1>Sentiment Analysis</h1>
