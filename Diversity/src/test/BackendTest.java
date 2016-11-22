@@ -29,7 +29,7 @@ public class BackendTest {
 	public void resolveRole1() throws JSONException {
 		obj.put("Role","no_role");
 		tester = new Backend(22,obj);
-		result = "[{\"Op\":\"Rights\",\"view_use_opinion_prediction\":false,\"create_edit_delete_model\":false,\"view_opinion_results\":false,\"view_OM\":false,\"save_delete_snapshots\":false}]";
+		result = "[{\"Op\":\"Rights\",\"view_use_opinion_prediction\":fals,\"create_edit_delete_model\":false,\"view_opinion_results\":false,\"view_OM\":false,\"save_delete_snapshots\":false}]";
 		assertEquals("Should equal the string",result , tester.resolve());
 	}
 
