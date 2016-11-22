@@ -33,9 +33,9 @@ public class Data {
 	private List<Long> users = new ArrayList<Long>();
 	private List<Author> users2 = new ArrayList<Author>();
 
-	Connection cndata = null;
-	Connection cnlocal = null;
-	Connection cncr = null;
+	private Connection cndata = null;
+	private Connection cnlocal = null;
+	private Connection cncr = null;
 
 	public Data() {
 	}
@@ -202,7 +202,7 @@ public class Data {
 
 		// Load Data
 		try {
-			ExecutorService es = Executors.newFixedThreadPool(100);
+			ExecutorService es = Executors.newFixedThreadPool(50);
 			for (int id = 0; id < json.length(); id++)
 				es.execute(new Topinions(json.getJSONObject(id)));
 			es.shutdown();
@@ -213,7 +213,7 @@ public class Data {
 				e.printStackTrace();
 			}
 			// System.out.println("HELLO");
-			es = Executors.newFixedThreadPool(100);
+			es = Executors.newFixedThreadPool(50);
 			for (int id = 0; id < json.length(); id++)
 				es.execute(new Tposts(json.getJSONObject(id)));
 			es.shutdown();
@@ -466,7 +466,7 @@ public class Data {
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
-		ExecutorService es = Executors.newFixedThreadPool(100);
+		ExecutorService es = Executors.newFixedThreadPool(50);
 
 		opiniondb.forEach((k, opinion) -> {
 			es.execute(new Runnable() {
@@ -730,7 +730,7 @@ public class Data {
 				break;
 			} while (true);
 			rs.beforeFirst();
-			ExecutorService es = Executors.newFixedThreadPool(100);
+			ExecutorService es = Executors.newFixedThreadPool(50);
 			while (rs.next())
 				es.execute(new Topinions(rs.getLong(1)));
 			es.shutdown();
@@ -742,7 +742,7 @@ public class Data {
 			}
 			rs.beforeFirst();
 			// System.out.println("HELLO");
-			es = Executors.newFixedThreadPool(100);
+			es = Executors.newFixedThreadPool(50);
 			while (rs.next())
 				es.execute(new Tposts(rs.getLong(1)));
 			es.shutdown();
@@ -937,7 +937,7 @@ public class Data {
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
-		ExecutorService es = Executors.newFixedThreadPool(100);
+		ExecutorService es = Executors.newFixedThreadPool(50);
 
 		opiniondb.forEach((k, opinion) -> {
 			es.execute(new Runnable() {
@@ -1230,8 +1230,13 @@ public class Data {
 					String message = remote ? rs.getString(Settings.rptable_message)
 							: rs.getString(Settings.lptable_message);
 					long product = identifyProduct(message);
-					if (product == 0)
+					if (product == 0){
+						rs.close();
+						stmt.close();
+						conlocal.close();
+						condata.close();
 						return;
+					}
 					Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
 							: new Post(postid, user_id, null, likes, views, message);
 					if (!(users.contains(user_id))) {
@@ -1289,8 +1294,13 @@ public class Data {
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
 					long product = identifyProduct(message);
-					if (product == 0)
+					if (product == 0){
+						rs.close();
+						stmt.close();
+						conlocal.close();
+						condata.close();
 						return;
+					}
 					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
 																								// create
 																								// constructor
