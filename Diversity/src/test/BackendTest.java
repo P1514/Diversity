@@ -11,26 +11,30 @@ import general.Backend;
 
 public class BackendTest {
 
-	JSONObject obj = new JSONObject();
+	JSONObject obj;
 	Backend tester;
 	String result;
 	
 	
 	@Test
-	public void resolveRole0() throws JSONException {
+	public void resolveRole() throws JSONException {
+		obj = new JSONObject();
 		obj.put("Role","DESIGNER");
 		tester = new Backend(22,obj);
 		result = "[{\"Op\":\"Rights\",\"view_use_opinion_prediction\":true,\"create_edit_delete_model\":true,\"view_opinion_results\":true,\"view_OM\":true,\"save_delete_snapshots\":true}]";
-		assertEquals("Should equal the string",result , tester.resolve());
+		assertEquals("Should be equal to the string",result , tester.resolve());
 
 	}
 	
 	@Test
-	public void resolveRole1() throws JSONException {
-		obj.put("Role","no_role");
-		tester = new Backend(22,obj);
-		result = "[{\"Op\":\"Rights\",\"view_use_opinion_prediction\":fals,\"create_edit_delete_model\":false,\"view_opinion_results\":false,\"view_OM\":false,\"save_delete_snapshots\":false}]";
-		assertEquals("Should equal the string",result , tester.resolve());
+	public void resolveGetTree() throws JSONException {
+		obj = new JSONObject();
+		obj.put("Op","gettree");
+		tester = new Backend(21,obj);
+		result = "[{\"Op\":\"Tree\"}]";
+		assertEquals("Should be equal to the string",result , tester.resolve());
+
 	}
+	
 
 }
