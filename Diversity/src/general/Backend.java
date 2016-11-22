@@ -47,7 +47,6 @@ public class Backend {
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
 			filtering = (msg.has("Filter")) ? msg.getString("Filter") : null;
-			System.out.println(msg);
 			if (filtering != null) {
 				switch (filtering) {
 				case "Age":
@@ -68,7 +67,7 @@ public class Backend {
 			switch (op) {
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
-																				
+
 			case 21:
 				return GetProducts.getTree().toString();
 

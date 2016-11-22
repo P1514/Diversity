@@ -1,54 +1,60 @@
 package security;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 import org.json.JSONArray;
-//import org.json.JSONObject;
-
-import general.Data;
-import general.Model;
+import org.json.JSONException;
+import org.json.JSONObject;
 import general.Settings;
 
 public class Roles {
 
 	
 	
-	public static JSONArray getRestrictions(String Role) {
+	public static JSONArray getRestrictions(String Role)throws JSONException{
 
 		Connection cnlocal = null;
 		String query;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
 
-		Role = '"' + Role + '"';
-		Role = Role + ";";
+
 
 		try {
 			cnlocal = Settings.connlocal();
-
-			query = "SELECT view_opinion_model, create_edit_delete_model, view_opinion_results, save_delete_snapshots, use_opinion_prediction"
-					+ "FROM `sentimentanalysis`.`access_rights`" + "WHERE role = " + Settings.lmtable;
-			stmt = cnlocal.createStatement();
-			System.out.println("TEST****** - " + query);
-			rs = stmt.executeQuery(query);
-
-			for (; rs.next();) {
-//				Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
-//						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
-//						rs.getString(Settings.lmtable_uri), rs.getString(Settings.lmtable_pss),
-//						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-//						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
-//				Data.modeldb.put(model.getId(), model);
-
-			}
+			query = "SELECT "/*+Settings.latable_viewopinion+"*/+"view_opinion_model, create_edit_delete_model, view_opinion_results, save_delete_snapshots, use_opinion_prediction"
+					+ " FROM `sentimentanalysis`.`access_rights`" + " WHERE role = ?";
+			stmt = cnlocal.prepareStatement(query);
+			stmt.setString(1, Role);
+			rs = stmt.executeQuery();
+			
+			if(rs.next()){
+			obj.put("Op","Rights");
+			obj.put("view_OM", rs.getBoolean("view_opinion_model"));		
+			obj.put("create_edit_delete_model", rs.getBoolean("create_edit_delete_model"));
+			obj.put("view_opinion_results", rs.getBoolean("view_opinion_results"));
+			obj.put("view_use_opinion_prediction", rs.getBoolean("use_opinion_prediction"));
+			obj.put("save_delete_snapshots", rs.getBoolean("save_delete_snapshots"));
+			//System.out.println(Role +" - " + obj);
+			result.put(obj);
 			rs.close();
 			stmt.close();
 			cnlocal.close();
-
+			}
+			else{ //in case the role dosen't exist on the database it gives the user no rights
+				
+				obj.put("Op","Rights");
+				obj.put("view_OM",false);
+				obj.put("create_edit_delete_model", false);
+				obj.put("view_opinion_results", false);
+				obj.put("view_use_opinion_prediction", false);
+				obj.put("save_delete_snapshots", false);
+				result.put(obj);
+				
+			}
+			
 		} catch (ClassNotFoundException | SQLException e2) {
 			//
 			e2.printStackTrace();

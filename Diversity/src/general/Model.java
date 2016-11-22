@@ -45,7 +45,7 @@ public class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(",,") : null;
+		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(";") : null;
 		products = "";
 		Product product=null;
 		PSS pss1=null;
@@ -138,12 +138,14 @@ public class Model {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		if (msg.get("Name") != this.name || Data.pssdb.get(msg.getString("PSS")).getID() != this.pss) {
+		if (!msg.get("Name").equals(this.name) || Data.pssdb.get(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
 			obj.put("id", msg.getInt("Id"));
 			obj.put("Op", "Error");
 			obj.put("Message", "Error updating model " + msg.getString("Name") + "updated attempt not allowed");
 			result.put(obj);
+			return result;
 		}
+		String product=new String();
 
 		String insert = "Update " + Settings.lmtable
 				+ " Set "/*
@@ -158,7 +160,13 @@ public class Model {
 			query1.setString(3, msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
 			query1.setBoolean(1, msg.getBoolean("Archive"));
-			query1.setString(2, msg.has("Final_Products") ? msg.getString("Final_Products") : null);
+			
+			if(msg.has("Final_Products")){
+				for (String a : msg.getString("Final_Products").split(";")){
+					product+=Data.identifyProduct(a)+",";
+				}
+			}
+			query1.setString(2, products);
 			query1.setInt(5, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
@@ -187,7 +195,7 @@ public class Model {
 		this.uri = msg.getString("URI");
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = msg.getString("Final_Product");
+		this.products = product.equals("") ? "," : product;
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");

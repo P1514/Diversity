@@ -186,6 +186,12 @@ public class Settings {
 	public static final String crrpssproducttable_pss="pss_id";
 	public static final String crrpssproducttable_product="product_id";
 	
+	// Access rights Table TODO:finish 
+	public static final String artable_vom="view_opinion_model";
+	public static final String arttable_pss="pss_id";
+	public static final String artable_product="product_id";	
+	
+	
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
 		Calendar cal = Calendar.getInstance();
