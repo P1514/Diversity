@@ -67,11 +67,8 @@ public class Backend {
 
 			switch (op) {
 			case 22:
-				return Roles.getRestrictions(msg.getString("Role")).toString();// TODO
-																				// função
-																				// retorna
-																				// JSONARRAy
-																				// ).toString();
+				return Roles.getRestrictions(msg.getString("Role")).toString();
+																				
 			case 21:
 				return GetProducts.getTree().toString();
 
