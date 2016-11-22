@@ -1067,15 +1067,6 @@ public class Data {
 	}
 
 	/**
-	 * Returns an Iterator of all Opinions
-	 * 
-	 * @return Iterator<Opinion>
-	 */
-	public Iterator<Opinion> getOpinion() {
-		return opiniondb.values().iterator();
-	}
-
-	/**
 	 * Returns an Author Object based on id
 	 * 
 	 * @param id

@@ -11,13 +11,42 @@ import org.json.JSONObject;
 import general.Data;
 import general.Model;
 import general.Settings;
-
+/**
+ * @author Uninova - IControl
+ *
+ */
 public class GetComments {
 
 	private Connection cnlocal;
 
+	/**
+	 * Class that fetches comments data.
+	 */
+
 	public GetComments() {
 	}
+
+	/**
+	 * User to fetch all comments to a specific parent post
+	 * <p>
+	 * Returns and JSONArray with all comments for a specific post referring to
+	 * the the entry JSONObject.
+	 * <p>Examples:
+	 * <ul>
+	 * <li>Input:{"Values":"70182","Id":"820"}, it will then fetch comments from
+	 * the Database regarding the parent posts with id "70182" and model with
+	 * the id "820".</li>
+	 * <li>Output: [{"Op":"comments"},{"Message":"They launched the new Austin
+	 * Cricket! These are average
+	 * sneakers!","Influence":"1.0","Polarity":"50.0","Gender":"Male","Age":"35","Name":"David
+	 * Jones","Location":"Europe"},{...}]</li>
+	 * </ul>
+	 * <p>
+	 * 
+	 * @param msg JSONObject with the information o request
+	 * @throws JSONException is case input is not in correct format
+	 * @return JSONArray
+	 */
 
 	public JSONArray getAll(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();

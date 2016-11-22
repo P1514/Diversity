@@ -16,14 +16,29 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+/**
+ * @author Uninova - IControl
+ *
+ */
 public class GetPosts {
 
 	private Connection cnlocal;
 	private int MAXTOP = 5;
 
+	/**
+	 * Class that handles getting Top Parent Posts, and the ammout of Posts
+	 */
 	public GetPosts() {
 	}
 
+	/**
+	 * Method that uses the input to get Top 5 parent posts, uses value 
+	 * @param param
+	 * @param value
+	 * @param id
+	 * @return
+	 * @throws JSONException
+	 */
 	public JSONArray getTop(String param, String value, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];

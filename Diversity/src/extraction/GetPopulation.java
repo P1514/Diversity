@@ -12,14 +12,29 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+/**
+ * @author Uninova - IControl
+ *
+ */
+@Deprecated
 public class GetPopulation {
 
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
-
+	/**
+	 * Class that manages population information request
+	 */
 	public GetPopulation() {
 	}
-
+	
+	/**
+	 * This methor returns 
+	 * @param param
+	 * @param id
+	 * @return
+	 * @throws JSONException
+	 */
+	
 	public JSONArray getAll(String param, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
