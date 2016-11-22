@@ -63,6 +63,7 @@ public class GetModels {
 		//obj.put("Age", model.getAge());
 		//obj.put("Gender", model.getGender());
 		String Products = new String();
+		if(!model.getProducts().isEmpty())
 		for(String a : model.getProducts().split(",")){
 			Products+=Data.productdb.get(Long.valueOf(a)).get_Name()+";";
 		}

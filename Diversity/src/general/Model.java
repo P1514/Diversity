@@ -238,6 +238,7 @@ public class Model {
 	}
 
 	public String getProducts() {
+		if(this.products.isEmpty()) return "";
 		return this.products.substring(0, this.products.length()-1);
 	}
 
