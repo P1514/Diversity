@@ -74,7 +74,7 @@ function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
       var role;
-      //document.getElementById("dropdown").style.display = 'none';//hides dropdown
+      document.getElementById("dropdown").style.display = 'none';//hides dropdown
        if(typeof type[1] != 'undefined'){
           type = type[1].split("&");
           role = type[0];
