@@ -41,11 +41,13 @@ public class Data {
 	}
 
 	public static long identifyPSSbyproduct(long product) {
+		if (product == 0)
+			return 0;
 
 		return productdb.get(product).get_PSS();
 
 	}
-	
+
 	public static long identifyPSSbyname(String name) {
 
 		for (PSS a : pssdb.values()) {
@@ -1014,7 +1016,7 @@ public class Data {
 		try {
 			cnlocal.commit();
 			cnlocal.close();
-			cnlocal=Settings.connlocal();
+			cnlocal = Settings.connlocal();
 			cnlocal.setAutoCommit(true);
 		} catch (SQLException e2) {
 			try {
@@ -1227,13 +1229,14 @@ public class Data {
 					;
 					String message = remote ? rs.getString(Settings.rptable_message)
 							: rs.getString(Settings.lptable_message);
+					long product = identifyProduct(message);
+					if (product == 0)
+						return;
 					Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
 							: new Post(postid, user_id, null, likes, views, message);
 					if (!(users.contains(user_id))) {
 						users.add(user_id);
 					}
-
-					long product = identifyProduct(message);
 
 					opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product));
 					if (rs != null)
@@ -1285,6 +1288,9 @@ public class Data {
 					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
+					long product = identifyProduct(message);
+					if (product == 0)
+						return;
 					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
 																								// create
 																								// constructor
@@ -1301,8 +1307,6 @@ public class Data {
 					if (!(users2.contains(author))) {
 						users2.add(author);
 					}
-
-					long product = identifyProduct(message);
 					opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product, "google.pt"));// TODO
 					// find
 					// url
@@ -1337,16 +1341,18 @@ public class Data {
 
 		public Tposts(long _id) {
 			id = _id;
-			_opin = opiniondb.get(id);
+			_opin = opiniondb.containsKey(id) ? opiniondb.get(id) : null;
 
 		}
 
 		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
-			_opin = opiniondb.get(_obj.getLong(Settings.JSON_postid));
+			_opin = opiniondb.containsKey(_obj.getLong(Settings.JSON_postid))
+					? opiniondb.get(_obj.getLong(Settings.JSON_postid)) : null;
 		}
 
 		public void run() {
+			if(_opin==null) return;
 			if (obj == null) {
 				try {
 					// System.out.println("HELLO1");
