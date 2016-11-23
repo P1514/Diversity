@@ -13,16 +13,22 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+/**
+ * The Class SentimentChart.
+ */
+@Deprecated
 public class SentimentChart {
 
 	private Connection cnlocal;
-	private Settings dbc = new Settings();
 
+	/**
+	 * Instantiates a new sentiment chart.
+	 */
 	public SentimentChart() {
 
 	}
 
-	public JSONArray chartrequest(String param, String value, long id) {
+	private JSONArray chartrequest(String param, String value, long id) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;
@@ -133,7 +139,7 @@ public class SentimentChart {
 					}
 				}
 			}
-			System.out.print(result.toString());
+			//System.out.print(result.toString());
 			return result;
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -234,7 +240,7 @@ public class SentimentChart {
 					i++;
 				}
 			}
-			System.out.print(query1);
+			//System.out.print(query1);
 			rs = query1.executeQuery();
 
 			for (i = 0; rs.next(); i++) {

@@ -9,15 +9,32 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Settings;
+// TODO: Auto-generated Javadoc
 
+/**
+ * The Class GetLastPost.
+ *
+ * @author Uninova - IControl
+ */
+@Deprecated
 public class GetLastPost {
-// No longer used, it was used for influence graphs to get last post
-	private Settings dbc = new Settings();
+	// No longer used, it was used for influence graphs to get last post
 	private Connection cnlocal;
 
+	/**
+	 * Get Last Post from a specific author.
+	 */
 	public GetLastPost() {
 	}
 
+	/**
+	 * Search database for an opinion from a specific author and returns it as a
+	 * JSONArray.
+	 *
+	 * @param name - Author's name to search for
+	 * @return JSONArray - with all the information regarding that specific post
+	 * @throws JSONException in case and error occured while building the JSON
+	 */
 	public JSONArray get(String name) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -42,7 +59,7 @@ public class GetLastPost {
 			rs.close();
 			query1.close();
 			cnlocal.close();
-			
+
 			dbconnect();
 			insert = "SELECT Sum(likes), Sum(views), count(*), message FROM posts where opinions_id=?";
 			query1 = cnlocal.prepareStatement(insert);
@@ -54,8 +71,6 @@ public class GetLastPost {
 			obj.put("Nviews", rs.getInt("Sum(views)"));
 			obj.put("Message", rs.getString("message"));
 			result.put(obj);
-			
-			
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -84,6 +99,7 @@ public class GetLastPost {
 		return result;
 
 	}
+
 	private String trunc(String number) {
 		double result = 0;
 		try {

@@ -6,6 +6,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PSS.
+ */
 //Post individual Object
 public class PSS {
 	private long id;
@@ -13,6 +17,16 @@ public class PSS {
 	private String name;
 	private long user_id;
 	private String type;
+	
+	/**
+	 * Instantiates a new pss.
+	 *
+	 * @param _id the id
+	 * @param _company the company
+	 * @param _name the name
+	 * @param _user_id the user id
+	 * @param _type the type
+	 */
 	public PSS(long _id, long _company, String _name, long _user_id, String _type) {
 		this.id=_id;
 		this.company=_company;
@@ -30,22 +44,47 @@ public class PSS {
 		products.put("Austin Soccer", 3);*/
 	}
 
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public long getID(){
 		return id;
 	}
 	
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName(){
 		return name;
 	}
 	
+	/**
+	 * Gets the type.
+	 *
+	 * @return the type
+	 */
 	public String getType(){
 		return type;
 	}
 	
+	/**
+	 * Gets the company.
+	 *
+	 * @return the company
+	 */
 	public long getCompany(){
 		return company;
 	}
 	
+	/**
+	 * Gets the author.
+	 *
+	 * @return the author
+	 */
 	public long getAuthor(){
 		return this.user_id;
 	}

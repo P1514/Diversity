@@ -1,12 +1,5 @@
 package general;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,21 +8,21 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.mysql.jdbc.Connection;
+import monitoring.Oversight;
 
-import modeling.GetModels;
-import monitoring.Overwatch;
-
+/**
+ * The Class Startup runs every time the server boots up.
+ */
 @WebListener
 public class Startup implements ServletContextListener {
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+	 */
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		CleanDB clean = new CleanDB();
+		//CleanDB clean = new CleanDB();
 		/*try {
 			clean.clean();
 		} catch (JSONException e1) {
@@ -37,9 +30,9 @@ public class Startup implements ServletContextListener {
 			e1.printStackTrace();
 		}*/
 		System.out.println("Starting up!");
-		Overwatch o = new Overwatch(true);
+		Oversight o = new Oversight(true);
 		o.run();
-		new Overwatch();
+		new Oversight();
 		try {
 			Connection cnlocal = Settings.connlocal();
 			String select = "Select * from general WHERE id=1";
@@ -109,12 +102,15 @@ public class Startup implements ServletContextListener {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
 		System.out.println("Shutting down!");
 	}
 
-	private static String readUrl(String urlString) throws Exception {
+	/*private static String readUrl(String urlString) throws Exception {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
@@ -130,5 +126,5 @@ public class Startup implements ServletContextListener {
 			if (reader != null)
 				reader.close();
 		}
-	}
+	}*/
 }

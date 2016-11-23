@@ -8,8 +8,16 @@ import java.net.URL;
 
 
 
+/**
+ * The Class Monitor.
+ */
 public class Monitor {
 
+	/**
+	 * Update.
+	 *
+	 * @param uri the uri from the remote API to get posts
+	 */
 	public static void update(String uri) {
 		String[] urilists = uri.split(";");
 		String account, source, url;
@@ -45,6 +53,11 @@ public class Monitor {
 		
 	}
 	
+	/**
+	 * Delete.
+	 *
+	 * @param uri the uri
+	 */
 	public static void delete(String uri) {
 		// TODO By Francisco Silva
 		

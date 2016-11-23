@@ -16,15 +16,39 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GetPosts.
+ *
+ * @author Uninova - IControl
+ */
 public class GetPosts {
 
 	private Connection cnlocal;
 	private int MAXTOP = 5;
 
+	/**
+	 * Instantiates a new gets the posts.
+	 */
 	public GetPosts() {
 	}
 
-	public JSONArray getTop(String param, String value, long id) throws JSONException {
+	/**
+	 * Method that uses the input to get Top 5 parent posts information, uses
+	 * month for the month requested, param defines if any filtering is
+	 * expected, the id is the model ID requested.
+	 * 
+	 * @param param
+	 *            String any value
+	 * @param month
+	 *            String representing month: anything from Jan to December
+	 * @param id
+	 *            long int
+	 * @return JSONArray with all the information
+	 * @throws JSONException
+	 *             in case creating json error occurs
+	 */
+	public JSONArray getTop(String param, String month, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -47,7 +71,7 @@ public class GetPosts {
 			return result;
 		}
 		if (model.getProducts() != null) {
-			insert += " in ("+ model.getProducts() + ")";
+			insert += " in (" + model.getProducts() + ")";
 		} else {
 			insert += "=0";
 		}
@@ -56,7 +80,7 @@ public class GetPosts {
 
 			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
 			try {
-				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + value));
+				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + month));
 			} catch (ParseException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -84,7 +108,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			// System.out.print(query1);
+			//System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 
@@ -119,13 +143,15 @@ public class GetPosts {
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] += rs.getDate(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity) + ",,"
-						+ rs.getDouble(Settings.lotable_reach) + ",," + rs.getInt(Settings.lotable_comments) + ",,";
+				pre_result[i] += rs.getDate(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity)
+						+ ",," + rs.getDouble(Settings.lotable_reach) + ",," + rs.getInt(Settings.lotable_comments)
+						+ ",,";
 				rs.close();
 				query1.close();
 			}
 
-			insert = "Select "+Settings.lptable_message+" from "+Settings.lptable+" where "+Settings.lptable_id+" = ?";
+			insert = "Select " + Settings.lptable_message + " from " + Settings.lptable + " where "
+					+ Settings.lptable_id + " = ?";
 			for (i = 0; i < n_tops; i++) {
 
 				query1 = cnlocal.prepareStatement(insert);
@@ -183,6 +209,23 @@ public class GetPosts {
 
 	}
 
+	/**
+	 * Method that returns the amount of parent post that exist to the specific
+	 * model, with the filtering specified. The Value param expects a String
+	 * with parameters to filter separated by ',', same with value but regarding
+	 * values to that specific parameters. Filter specifies what are you
+	 * filtering by, for the output JSON. Id is reference to the model that we
+	 * want the results for.
+	 * <p>
+	 * Filtering
+	 * 
+	 * @param param Example: [Age,Age,Gender]
+	 * @param value Example: [15,50,Female]
+	 * @param filter Anything can be entered
+	 * @param id - Reference to Model
+	 * @return JSONArray with all the information requested
+	 * @throws JSONException when creating JSON fails to execute
+	 */
 	public JSONArray getAmmount(String param, String value, String filter, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -205,7 +248,7 @@ public class GetPosts {
 			return result;
 		}
 		if (model.getProducts() != null) {
-			insert += " in ("+ model.getProducts() + ")";
+			insert += " in (" + model.getProducts() + ")";
 		} else {
 			insert += "=0";
 		}
@@ -244,7 +287,7 @@ public class GetPosts {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			int rangeindex = 2;
-			query1.setLong(1,model.getPSS());
+			query1.setLong(1, model.getPSS());
 
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
@@ -261,7 +304,7 @@ public class GetPosts {
 			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
 			rangeindex++;
 
-			System.out.print(query1);
+			//System.out.print(query1);
 			rs = query1.executeQuery();
 			rs.next();
 			obj.put("Filter", "Global");

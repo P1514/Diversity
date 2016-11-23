@@ -21,7 +21,10 @@ import extraction.Globalsentiment;
 import general.Data;
 import general.Settings;
 
-public class Overwatch extends TimerTask {
+/**
+ * The Class Oversight.
+ */
+public class Oversight extends TimerTask {
 
 	private Connection cnlocal;
 	private ArrayList<String> sourcelist = new ArrayList<String>();
@@ -32,7 +35,10 @@ public class Overwatch extends TimerTask {
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
 
-	public Overwatch() {
+	/**
+	 * Instantiates a new oversight.
+	 */
+	public Oversight() {
 		Timer timer = new Timer();
 		Calendar date = Calendar.getInstance();
 		date.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
@@ -47,13 +53,22 @@ public class Overwatch extends TimerTask {
 		
 		timer.scheduleAtFixedRate(this, c.getTime(), 24*60*60*1000);
 	}
-	public Overwatch(boolean a) {
+	
+	/**
+	 * Instantiates a new oversight one run only.
+	 *
+	 * @param a the a
+	 */
+	public Oversight(boolean a) {
 		Calendar date = Calendar.getInstance();
 		date.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
 		// timer.scheduleAtFixedRate(this, date.getTime(),
 		// 24*60*60*1000);//h/d*m/d*s/m*ms/s = ms/d (runs once a day)
 	}
 
+	/* (non-Javadoc)
+	 * @see java.util.TimerTask#run()
+	 */
 	@Override
 	public void run() {
 		

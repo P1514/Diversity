@@ -121,6 +121,7 @@ function setCookie2(name, id, pss) {
 }
 
 ws.onopen = function() {
+	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
   getRole();
 }
 

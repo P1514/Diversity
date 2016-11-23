@@ -10,12 +10,15 @@ import org.json.JSONObject;
 
 import com.mysql.jdbc.Connection;
 
+/**
+ * The Class Settings.
+ */
 public class Settings {
 	// To be replaced by properties file
 	// Data Origin DB Specs
-	public static final String rurl = "jdbc:mysql://127.0.0.1:3306/sentimentposts?autoReconnect=true&useSSL=false";
-	public static final String ruser = "diversity";
-	public static final String rpass = "!diversity!";
+	private static final String rurl = "jdbc:mysql://127.0.0.1:3306/sentimentposts?autoReconnect=true&useSSL=false";
+	private static final String ruser = "diversity";
+	private static final String rpass = "!diversity!";
 
 	// Post Table
 	public static final String rptable = "post"; // Table Name
@@ -52,9 +55,9 @@ public class Settings {
 	private static final String dbip="127.0.0.1";
 	private static final String dbport="3306";
 	private static final String dbname = "sentimentanalysis";
-	public static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
-	public static final String user2 = "diversity";
-	public static final String pass2 = "!diversity!";
+	private static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
+	private static final String user2 = "diversity";
+	private static final String pass2 = "!diversity!";
 	public static final Integer dbversion = 8;
 
 	// Author Table
@@ -192,6 +195,13 @@ public class Settings {
 	public static final String artable_product="product_id";	
 	
 	
+	/**
+	 * Conndata.
+	 *
+	 * @return the connection
+	 * @throws ClassNotFoundException the class not found exception
+	 * @throws SQLException the SQL exception
+	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
 		Calendar cal = Calendar.getInstance();
@@ -200,6 +210,12 @@ public class Settings {
 		return (Connection) DriverManager.getConnection(rurl, ruser, rpass);
 	}
 
+	/**
+	 * Connlocal.
+	 *
+	 * @return the connection
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public static Connection connlocal() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
 		while (true) {
@@ -217,6 +233,12 @@ public class Settings {
 		}
 	}
 	
+	/**
+	 * Conncr.
+	 *
+	 * @return the connection
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public static Connection conncr() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
 		while (true) {
@@ -234,6 +256,13 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Gets the conf.
+	 *
+	 * @param id the id
+	 * @return the conf
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray getConf(long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -290,6 +319,13 @@ public class Settings {
 
 	}
 
+	/**
+	 * Sets the conf.
+	 *
+	 * @param msg the msg
+	 * @return the JSON object
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONObject setConf(JSONObject msg) throws JSONException {
 		String edited = new String();
 		if (msg.has("Gender")) {
