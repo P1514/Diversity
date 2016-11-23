@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CleanDB {
+public final class CleanDB {
 	Settings dbc = new Settings();
 	Connection cndata = null;
 	Connection cnlocal = null;

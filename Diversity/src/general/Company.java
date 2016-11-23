@@ -1,6 +1,6 @@
 package general;
 
-public class Company {
+public final class Company {
 	private long id;
 	private String name;
 	private String type;

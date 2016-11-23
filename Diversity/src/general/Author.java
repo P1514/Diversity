@@ -1,7 +1,10 @@
 package general;
 
-//Author Individual Object
-public class Author {
+/**
+ * @author Uninova - IControl
+ *
+ */
+public final class Author {
 
 	private long id; // Keys
 	private String id2; // Keys String
@@ -16,6 +19,13 @@ public class Author {
 	private long likes;
 	private long views;
 
+	/**Object that represents an author
+	 * @param _id
+	 * @param _name
+	 * @param _age
+	 * @param _gender
+	 * @param _location
+	 */
 	public Author(long _id, String _name, long _age, String _gender, String _location) {
 		this.id = _id;
 		this.age = _age;
@@ -42,6 +52,9 @@ public class Author {
 
 	}
 
+	/**
+	 * @return name
+	 */
 	public String getName() {
 		return name;
 	}

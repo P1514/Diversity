@@ -13,12 +13,12 @@ import general.Settings;
  * @author Uninova - IControl
  *
  */
+@Deprecated
 public class GetLastPost {
 	// No longer used, it was used for influence graphs to get last post
 	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
-	@Deprecated
 	/**
 	 * Get Last Post from a specific author
 	 * 

@@ -15,7 +15,7 @@ import extraction.Globalsentiment;
 import extraction.SentimentChart;
 import modeling.GetModels;
 
-public class Backend {
+public final class Backend {
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -103,7 +103,7 @@ public class Backend {
 				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalreach(1, param + "," + filtering,
+							gr.globalreach(1, param + "," + filtering,
 									values + "," + (filtering.equals("Product")
 											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
@@ -131,15 +131,15 @@ public class Backend {
 						"Top_Middle");
 				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
-				result = convert(result, gs.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
+				result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
 				result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph", "Bottom_Right");
 				return result.toString();
-			case 1:
+			/*case 1:
 				SentimentChart sc = new SentimentChart();
 				result = new JSONArray();
 				result = convert(result, sc.chartrequest(param, values, id), "Graph", "Bottom_Right");
 				System.out.println("YELLO");
-				return result.toString();
+				return result.toString();*/
 			case 2:
 				Data dat = new Data();
 				return dat.load();

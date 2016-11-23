@@ -27,14 +27,6 @@ public class GetPopulation {
 	public GetPopulation() {
 	}
 	
-	/**
-	 * This methor returns 
-	 * @param param
-	 * @param id
-	 * @return
-	 * @throws JSONException
-	 */
-	
 	public JSONArray getAll(String param, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();

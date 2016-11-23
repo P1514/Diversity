@@ -2,7 +2,7 @@ package general;
 
 import java.util.HashMap;
 
-public class Operations {
+class Operations {
 	private HashMap<String,Integer> op;
 	
 	

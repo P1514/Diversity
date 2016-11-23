@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import general.Data;
 import general.Model;
 import general.Settings;
-
+@Deprecated
 public class SentimentChart {
 
 	private Connection cnlocal;
@@ -22,7 +22,7 @@ public class SentimentChart {
 
 	}
 
-	public JSONArray chartrequest(String param, String value, long id) {
+	private JSONArray chartrequest(String param, String value, long id) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String[] params = (param != null) ? param.split(",") : null;

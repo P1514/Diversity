@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 import monitoring.Monitor;;
 
-public class Model {
+public final class Model {
 	Connection cnlocal;
 	private long id = 0, pss;
 	private long frequency, user;

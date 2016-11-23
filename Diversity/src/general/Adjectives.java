@@ -2,7 +2,12 @@ package general;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Adjectives {
+/**
+ * @author Uninova - IControl
+ *
+ */
+@Deprecated
+public final class Adjectives {
 
 	private final ConcurrentHashMap<String, Double> adjectives;
 	public Adjectives() {

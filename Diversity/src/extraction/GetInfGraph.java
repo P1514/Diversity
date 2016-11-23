@@ -14,6 +14,7 @@ import general.Settings;
  * @author Uninova - IControl
  *
  */
+@Deprecated
 public class GetInfGraph {
 	// So far unused since no more influence graphs will be shown
 	private Settings dbc = new Settings();
