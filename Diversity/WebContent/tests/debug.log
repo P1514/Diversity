@@ -1,0 +1,6 @@
+[1123/161046:ERROR:crash_report_database_win.cc(562)] CreateDirectory C:\Users\FÂ bio Mano\AppData\Local\Google\Chrome\User Data\Crashpad: O sistema não conseguiu localizar o caminho especificado. (0x3)
+[1123/161046:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: O encaminhamento (pipe) foi terminado. (0x6D)
+[1123/161046:ERROR:crash_report_database_win.cc(562)] CreateDirectory C:\Users\FÂ bio Mano\AppData\Local\Google\Chrome\User Data\Crashpad: O sistema não conseguiu localizar o caminho especificado. (0x3)
+[1123/161122:ERROR:crash_report_database_win.cc(562)] CreateDirectory C:\Users\FÂ bio Mano\AppData\Local\Google\Chrome\User Data\Crashpad: O sistema não conseguiu localizar o caminho especificado. (0x3)
+[1123/161122:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: O encaminhamento (pipe) foi terminado. (0x6D)
+[1123/161122:ERROR:crash_report_database_win.cc(562)] CreateDirectory C:\Users\FÂ bio Mano\AppData\Local\Google\Chrome\User Data\Crashpad: O sistema não conseguiu localizar o caminho especificado. (0x3)
