@@ -15,13 +15,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Data.
+ */
 public class Data {
 	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
+	
+	/** The modeldb. */
 	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
+	
+	/** The pssdb. */
 	public static ConcurrentHashMap<Long, PSS> pssdb = new ConcurrentHashMap<Long, PSS>();
+	
+	/** The productdb. */
 	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
+	
+	/** The companydb. */
 	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
 	private long totalposts;
 	private long totalviews;
@@ -37,9 +49,18 @@ public class Data {
 	private Connection cnlocal = null;
 	private Connection cncr = null;
 
+	/**
+	 * Instantiates a new data.
+	 */
 	public Data() {
 	}
 
+	/**
+	 * Identify PSS byproduct.
+	 *
+	 * @param product the product id
+	 * @return the long id
+	 */
 	public static long identifyPSSbyproduct(long product) {
 		if (product == 0)
 			return 0;
@@ -48,6 +69,12 @@ public class Data {
 
 	}
 
+	/**
+	 * Identify PSS byname.
+	 *
+	 * @param name the name of the pss
+	 * @return the long id
+	 */
 	public static long identifyPSSbyname(String name) {
 
 		for (PSS a : pssdb.values()) {
@@ -58,6 +85,12 @@ public class Data {
 
 	}
 
+	/**
+	 * Identify product by message.
+	 *
+	 * @param message the message
+	 * @return the long id
+	 */
 	public static long identifyProduct(String message) {
 
 		for (Product a : productdb.values()) {
@@ -127,12 +160,18 @@ public class Data {
 		}
 	}
 
+	/**
+	 * Loads the program
+	 *
+	 * @param json the json with the information
+	 * @return the string to check if successfull or not
+	 * @throws JSONException the JSON exception
+	 */
 	public String load(JSONArray json) throws JSONException {
 
 		return loadJSON(json);
 	}
-
-	public String loadJSON(JSONArray json) throws JSONException {
+	private String loadJSON(JSONArray json) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
@@ -577,6 +616,12 @@ public class Data {
 		return result.toString();
 	}
 
+	/**
+	 * Load from local database
+	 *
+	 * @return the string if successful or not
+	 * @throws JSONException the JSON exception
+	 */
 	public String load() throws JSONException {
 
 		JSONArray result = new JSONArray();
@@ -1067,10 +1112,9 @@ public class Data {
 	}
 
 	/**
-	 * Returns an Author Object based on id
-	 * 
-	 * @param id
-	 *            User id to search for
+	 * Returns an Author Object based on id.
+	 *
+	 * @param id            User id to search for
 	 * @return Object
 	 */
 	public Author getAuthor(int id) {
@@ -1078,10 +1122,9 @@ public class Data {
 	}
 
 	/**
-	 * Returns an Author Object based on Opinion
-	 * 
-	 * @param op
-	 *            Opinion Object
+	 * Returns an Author Object based on Opinion.
+	 *
+	 * @param op            Opinion Object
 	 * @return Object
 	 */
 	public Author getAuthor(Opinion op) {
@@ -1089,41 +1132,71 @@ public class Data {
 	}
 
 	/**
-	 * Returns an Author Object based on Post
-	 * 
-	 * @param comment
-	 *            Post Object
+	 * Returns an Author Object based on Post.
+	 *
+	 * @param comment            Post Object
 	 * @return Object
 	 */
 	public Author getAuthor(Post comment) {
 		return authordb.get(comment.getUID());
 	}
 
+	/**
+	 * Gets the total comments.
+	 *
+	 * @return the total comments
+	 */
 	public long getTotalComments() {
 		return this.totalcomments;
 	}
 
+	/**
+	 * Gets the total views.
+	 *
+	 * @return the total views
+	 */
 	public long getTotalViews() {
 		return this.totalviews;
 	}
 
+	/**
+	 * Gets the total likes.
+	 *
+	 * @return the total likes
+	 */
 	public long getTotalLikes() {
 		return this.totallikes;
 	}
 
+	/**
+	 * Gets the total posts.
+	 *
+	 * @return the total posts
+	 */
 	public long getTotalPosts() {
 		return this.totalposts;
 	}
 
 	// Runnables for multithreading
 
+	/**
+	 * The Class Tauthors.
+	 */
 	class Tauthors implements Runnable {
 		private Author a;
 
+		/**
+		 * Instantiates a new tauthors.
+		 *
+		 * @param _a the a
+		 */
 		public Tauthors(Author _a) {
 			a = _a;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		public void run() {
 			try {
 				cnlocal = Settings.connlocal();
@@ -1171,21 +1244,37 @@ public class Data {
 		}
 	}
 
+	/**
+	 * The Class Topinions.
+	 */
 	class Topinions implements Runnable {
 		private long id;
 		private Connection condata;
 		private Connection conlocal;
 		private JSONObject obj = null;
 
+		/**
+		 * Instantiates a new topinions referenced to local data.
+		 *
+		 * @param _id the id of the opinion
+		 */
 		public Topinions(long _id) {
 			id = _id;
 
 		}
 
+		/**
+		 * Instantiates a new topinions referenced to remote.
+		 *
+		 * @param _obj the json object from remote
+		 */
 		public Topinions(JSONObject _obj) {
 			obj = _obj;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		public void run() {
 			if (obj == null) {
 				try {
@@ -1333,6 +1422,9 @@ public class Data {
 
 	}
 
+	/**
+	 * The Class Tposts.
+	 */
 	class Tposts implements Runnable {
 		private long id;
 		private Opinion _opin;
@@ -1340,18 +1432,32 @@ public class Data {
 		private Connection conlocal;
 		private JSONObject obj = null;
 
+		/**
+		 * Instantiates a new tposts referenced to local data.
+		 *
+		 * @param _id the id of the opinion
+		 */
 		public Tposts(long _id) {
 			id = _id;
 			_opin = opiniondb.containsKey(id) ? opiniondb.get(id) : null;
 
 		}
 
+		/**
+		 * Instantiates a new tposts referenced to remote data.
+		 *
+		 * @param _obj the json object from remote
+		 * @throws JSONException the JSON exception
+		 */
 		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
 			_opin = opiniondb.containsKey(_obj.getLong(Settings.JSON_postid))
 					? opiniondb.get(_obj.getLong(Settings.JSON_postid)) : null;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		public void run() {
 			if(_opin==null) return;
 			if (obj == null) {
@@ -1474,6 +1580,9 @@ public class Data {
 			}
 		}
 
+		/**
+		 * Tmodels Multithreading for model
+		 */
 		/*
 		 * class Tmodels implements Runnable { private Model model; private
 		 * Connection conlocal;
@@ -1503,6 +1612,8 @@ public class Data {
 				cnlocal.close();
 			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
+			} finally {
+				
 			}
 		}
 	}

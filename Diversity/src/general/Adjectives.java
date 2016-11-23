@@ -3,13 +3,18 @@ package general;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author Uninova - IControl
+ * The Class Adjectives.
  *
+ * @author Uninova - IControl
  */
 @Deprecated
 public final class Adjectives {
 
 	private final ConcurrentHashMap<String, Double> adjectives;
+	
+	/**
+	 * Instantiates a new adjectives.
+	 */
 	public Adjectives() {
 		adjectives = new ConcurrentHashMap<String, Double>();
 		adjectives.put("phenomenal", 97.0);
@@ -66,10 +71,22 @@ public final class Adjectives {
 		adjectives.put("abysmal", 13.0);
 	}
 
+	/**
+	 * Matches.
+	 *
+	 * @param adj the adj
+	 * @return true, if successful
+	 */
 	public boolean matches(String adj) {
 		return adjectives.containsKey(adj);
 	}
 
+	/**
+	 * Gets the sentiment.
+	 *
+	 * @param adj1 the adj 1
+	 * @return the sentiment
+	 */
 	public double getSentiment(String adj1) {
 		return adjectives.get(adj1);
 	}

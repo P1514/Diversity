@@ -16,16 +16,18 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+// TODO: Auto-generated Javadoc
 /**
- * @author Uninova - IControl
+ * The Class GetReach.
  *
+ * @author Uninova - IControl
  */
 public class GetReach {
 
 	private Connection cnlocal;
 
 	/**
-	 * Responsible for handling Reach requests
+	 * Responsible for handling Reach requests.
 	 */
 	public GetReach() {
 	}
@@ -49,7 +51,7 @@ public class GetReach {
 				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
-		System.out.println(select);
+		//System.out.println(select);
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(select);
@@ -275,19 +277,14 @@ public class GetReach {
 	 * filtering values separated by ',' , index are expected to math from both
 	 * Strings after split, output is the string that is going to be returned
 	 * referencing the type of filtering applied.
-	 * 
+	 *
 	 * @param timespan whole numbers only
-	 * @param param
-	 *            Example: [Age,Age,Location]
-	 * @param values
-	 *            Example:[0-30,30-60,Asia]
-	 * @param id
-	 *            PSS id
-	 * @param output
-	 *            String representing what filtering was applied
+	 * @param param            Example: [Age,Age,Location]
+	 * @param values            Example:[0-30,30-60,Asia]
+	 * @param output            String representing what filtering was applied
+	 * @param id            PSS id
 	 * @return JSONArray with all the values requested
-	 * @throws JSONException
-	 *             in case creating a JSON fails
+	 * @throws JSONException             in case creating a JSON fails
 	 */
 	public JSONArray globalreach(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {

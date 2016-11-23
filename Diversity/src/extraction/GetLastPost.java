@@ -9,27 +9,28 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Settings;
+// TODO: Auto-generated Javadoc
+
 /**
- * @author Uninova - IControl
+ * The Class GetLastPost.
  *
+ * @author Uninova - IControl
  */
 @Deprecated
 public class GetLastPost {
 	// No longer used, it was used for influence graphs to get last post
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
 	/**
-	 * Get Last Post from a specific author
-	 * 
+	 * Get Last Post from a specific author.
 	 */
 	public GetLastPost() {
 	}
 
 	/**
 	 * Search database for an opinion from a specific author and returns it as a
-	 * JSONArray
-	 * 
+	 * JSONArray.
+	 *
 	 * @param name - Author's name to search for
 	 * @return JSONArray - with all the information regarding that specific post
 	 * @throws JSONException in case and error occured while building the JSON

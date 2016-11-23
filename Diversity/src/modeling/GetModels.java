@@ -6,10 +6,23 @@ import org.json.JSONObject;
 import general.Data;
 import general.Model;
 
+/**
+ * The Class GetModels.
+ */
 public class GetModels {
+	
+	/**
+	 * Instantiates a new gets the models.
+	 */
 	public GetModels() {
 	}
 
+	/**
+	 * Gets the all models.
+	 *
+	 * @return the models
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray get_models() throws JSONException {
 
 		JSONArray result = new JSONArray();
@@ -33,6 +46,13 @@ public class GetModels {
 		return result;
 	}
 
+	/**
+	 * Creates new model.
+	 *
+	 * @param msg the msg
+	 * @return the JSON array
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray create_model(JSONObject msg) throws JSONException {
 		Model add = new Model();
 		JSONArray result;
@@ -48,6 +68,13 @@ public class GetModels {
 
 	}
 
+	/**
+	 * Gets one model.
+	 *
+	 * @param msg the msg from the frontend with model id
+	 * @return the model
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray get_model(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -79,6 +106,13 @@ public class GetModels {
 		return result;
 	}
 
+	/**
+	 * Update the model requested.
+	 *
+	 * @param msg the msg from the frontend with the ip
+	 * @return the JSON array
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray update_model(JSONObject msg) throws JSONException {
 		JSONArray result=new JSONArray();
 		JSONObject obj = new JSONObject();

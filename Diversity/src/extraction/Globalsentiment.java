@@ -16,17 +16,18 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+// TODO: Auto-generated Javadoc
 /**
- * @author Uninova - IControl
+ * The Class Globalsentiment.
  *
+ * @author Uninova - IControl
  */
 public class Globalsentiment {
 
 	private Connection cnlocal;
 
 	/**
-	 * Class that handles sentiment Requests
-	 * 
+	 * Class that handles sentiment Requests.
 	 */
 	public Globalsentiment() {
 
@@ -78,8 +79,8 @@ public class Globalsentiment {
 	}
 
 	/**
-	 * Returns the string in the database with the top reach pss global sentiment
-	 * 
+	 * Returns the string in the database with the top reach pss global sentiment.
+	 *
 	 * @return String
 	 */
 	public String Topreachglobalsentiment() {
@@ -106,13 +107,12 @@ public class Globalsentiment {
 	 * defines the ammount of years to evaluate, Param and Values are expected
 	 * string with filtering values separated by ',' , index are expected to
 	 * math from both Strings after split.
-	 * 
-	 * 
+	 *
 	 * @param timespan In years and whole numbers only
 	 * @param param Example: [Age,Age,Location]
 	 * @param values Example:[0-30,30-60,Asia]
-	 * @param id PSS id
 	 * @param output String with filter information
+	 * @param id PSS id
 	 * @return JSONArray with all the values requested
 	 * @throws JSONException in case creating a JSON fails
 	 */
@@ -372,11 +372,10 @@ public class Globalsentiment {
 	 * <li>61-80 -&gt; '+'</li>
 	 * <li>81-100 -&gt; '++'</li>
 	 * </ul>
-	 * 
-	 * 
+	 *
+	 * @param id PSS id
 	 * @param param Example: [Age,Age,Location]
 	 * @param value Example:[0-30,30-60,Asia]
-	 * @param id PSS id
 	 * @param output String representing what filtering was applied
 	 * @return JSONArray with all the values requested
 	 * @throws JSONException in case creating a JSON fails
@@ -463,7 +462,7 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, location);
 			// System.out.println(query1);
 
-			System.out.print(query1 + "\n");
+			//System.out.print(query1 + "\n");
 			rs = query1.executeQuery();
 			rs.next();
 

@@ -2,10 +2,17 @@ package general;
 
 import java.util.HashMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Operations.
+ */
 class Operations {
 	private HashMap<String,Integer> op;
 	
 	
+	/**
+	 * Instantiates a new operations.
+	 */
 	public Operations(){
 		op = new HashMap<String,Integer>();
 		op.put("chartrequest", 1);
@@ -34,6 +41,12 @@ class Operations {
 		
 	}
 
+	/**
+	 * Gets the op.
+	 *
+	 * @param msg the msg
+	 * @return the op
+	 */
 	public int getOP(String msg){
 		if(op.containsKey(msg))
 		return op.get(msg);

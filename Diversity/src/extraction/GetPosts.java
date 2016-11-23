@@ -16,9 +16,11 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+// TODO: Auto-generated Javadoc
 /**
- * @author Uninova - IControl
+ * The Class GetPosts.
  *
+ * @author Uninova - IControl
  */
 public class GetPosts {
 
@@ -26,7 +28,7 @@ public class GetPosts {
 	private int MAXTOP = 5;
 
 	/**
-	 * Class that handles getting Top Parent Posts, and the ammount of Posts
+	 * Instantiates a new gets the posts.
 	 */
 	public GetPosts() {
 	}
@@ -106,7 +108,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			// System.out.print(query1);
+			//System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 
@@ -208,7 +210,7 @@ public class GetPosts {
 	}
 
 	/**
-	 * Methos that returns the ammount of parent post that exist to the specific
+	 * Method that returns the amount of parent post that exist to the specific
 	 * model, with the filtering specified. The Value param expects a String
 	 * with parameters to filter separated by ',', same with value but regarding
 	 * values to that specific parameters. Filter specifies what are you
@@ -302,7 +304,7 @@ public class GetPosts {
 			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
 			rangeindex++;
 
-			System.out.print(query1);
+			//System.out.print(query1);
 			rs = query1.executeQuery();
 			rs.next();
 			obj.put("Filter", "Global");

@@ -12,21 +12,29 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
+// TODO: Auto-generated Javadoc
 /**
- * @author Uninova - IControl
- *
+ * The Class GetPopulation.
  */
 @Deprecated
 public class GetPopulation {
 
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
+	
 	/**
-	 * Class that manages population information request
+	 * Instantiates a new gets the population.
 	 */
 	public GetPopulation() {
 	}
 	
+	/**
+	 * Gets the all.
+	 *
+	 * @param param the param
+	 * @param id the id
+	 * @return the all
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray getAll(String param, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();

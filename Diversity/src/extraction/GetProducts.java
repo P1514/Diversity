@@ -8,14 +8,16 @@ import general.Data;
 import general.PSS;
 import general.Product;
 
+// TODO: Auto-generated Javadoc
 /**
- * @author Uninova - IControl
+ * The Class GetProducts.
  *
+ * @author Uninova - IControl
  */
 public class GetProducts {
 
 	/**
-	 * Class that handles Product Requests
+	 * Class that handles Product Requests.
 	 */
 	public GetProducts() {
 

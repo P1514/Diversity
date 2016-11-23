@@ -15,17 +15,32 @@ import extraction.Globalsentiment;
 import extraction.SentimentChart;
 import modeling.GetModels;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Backend.
+ */
 public final class Backend {
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
 
+	/**
+	 * Instantiates a new backend.
+	 *
+	 * @param _op the op
+	 * @param _msg the msg
+	 */
 	public Backend(int _op, JSONObject _msg) {
 		op = _op;
 		msg = _msg;
 
 	}
 
+	/**
+	 * Resolves the query asked by the front-end.
+	 *
+	 * @return the string
+	 */
 	public String resolve() {
 		String param;
 		String values;

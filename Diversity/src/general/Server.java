@@ -11,18 +11,39 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.json.*;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Server.
+ */
 @ServerEndpoint("/server")
 public class Server {
+	
+	/** The isloading. */
 	public static boolean isloading = false;
 	private Session session;
 	private Operations op = new Operations();
+	
+	/** The Assyncronous variable. */
 	Async as;
 	
+	/**
+	 * Open.
+	 *
+	 * @param session the session
+	 */
 	@OnOpen
 	public void open(Session session){
 		as = session.getAsyncRemote();
 		this.session=session;
 	}
+	
+	/**
+	 * Received message.
+	 *
+	 * @param session the session
+	 * @param msg the msg
+	 * @param last the last
+	 */
 	@OnMessage
 	public void receivedMessage(Session session, String msg, boolean last) {
 
@@ -39,6 +60,11 @@ public class Server {
 
 	}
 
+	/**
+	 * On close.
+	 *
+	 * @param session the session
+	 */
 	@OnClose
 	public void onClose(Session session) {
 		try {
@@ -50,12 +76,23 @@ public class Server {
 
 	}
 	
+	/**
+	 * Send message.
+	 *
+	 * @param msg the msg
+	 */
 	public void send_message(String msg) {
 			System.out.println("\r\nOUT: "+ msg);
 			as.sendText(msg);
 			return;
 	}
 
+	/**
+	 * On error.
+	 *
+	 * @param session the session
+	 * @param thr the thr
+	 */
 	@OnError
 	public void onError(Session session, Throwable thr) {
 		try {
@@ -66,6 +103,11 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Runn.
+	 *
+	 * @param msg the msg
+	 */
 	/*public void Assistantimplements Runnable {
 		private Session session;
 		private JSONObject msg;

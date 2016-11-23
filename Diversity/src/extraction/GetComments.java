@@ -8,15 +8,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import general.Data;
-import general.Model;
 import general.Settings;
+// TODO: Auto-generated Javadoc
+
 /**
- * @author Uninova - IControl
+ * The Class GetComments.
  *
+ * @author Uninova - IControl
  */
 public class GetComments {
 
+	/** The cnlocal. */
 	private Connection cnlocal;
 
 	/**
@@ -42,22 +44,22 @@ public class GetComments {
 	 * Jones","Location":"Europe"},{...}]</li>
 	 * </ul>
 	 * <p>
-	 * 
+	 *
 	 * @param msg JSONObject with the information o request
-	 * @throws JSONException is case input is not in correct format
 	 * @return JSONArray
+	 * @throws JSONException is case input is not in correct format
 	 */
 
 	public JSONArray getAll(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[50];
-		String[] genders = Settings.genders.split(",,");
+		//String[] genders = Settings.genders.split(",,");
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "comments");
 		result.put(obj);
 		String insert = new String();
 		PreparedStatement query1 = null;
-		Model model = Data.modeldb.get(msg.getLong("Id"));
+		//Model model = Data.modeldb.get(msg.getLong("Id"));
 		int n_tops = 0;
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + "," + Settings.lptable_polarity + ","
@@ -82,7 +84,7 @@ public class GetComments {
 			 * query1.setString(3+1+i, model.getGender()); i++; }
 			 */
 			query1.setInt(1 + i + 1, msg.getInt("Values"));
-			System.out.print(query1);
+			//System.out.print(query1);
 
 			rs = query1.executeQuery();
 
@@ -132,12 +134,18 @@ public class GetComments {
 			result.put(obj);
 
 		}
-		System.out.print(result);
+		//System.out.print(result);
 
 		return result;
 
 	}
 
+	/**
+	 * Trunc.
+	 *
+	 * @param number the number
+	 * @return the string
+	 */
 	private String trunc(String number) {
 		double result = 0;
 		try {
@@ -155,6 +163,9 @@ public class GetComments {
 
 	}
 
+	/**
+	 * Dbconnect.
+	 */
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();

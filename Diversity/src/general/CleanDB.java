@@ -6,14 +6,33 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CleanDB.
+ */
 public final class CleanDB {
-	Settings dbc = new Settings();
-	Connection cndata = null;
-	Connection cnlocal = null;
+	
+	/** The dbc. */
+	private Settings dbc = new Settings();
+	
+	/** The cndata. */
+	private Connection cndata = null;
+	
+	/** The cnlocal. */
+	private Connection cnlocal = null;
 
+	/**
+	 * Instantiates a new clean DB.
+	 */
 	public CleanDB() {
 	}
 
+	/**
+	 * Clean.
+	 *
+	 * @return the string
+	 * @throws JSONException the JSON exception
+	 */
 	public String clean() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();

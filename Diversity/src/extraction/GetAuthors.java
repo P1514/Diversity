@@ -9,16 +9,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Settings;
+// TODO: Auto-generated Javadoc
+
 /**
- * @author Uninova - IControl
- *
+ * The Class GetAuthors.
  */
 public class GetAuthors {
 
+	/** The cnlocal. */
 	private Connection cnlocal;
 
 	/**
-	 * Class to fecth data from all authors
+	 * Class to fetch data from all authors.
 	 */
 	public GetAuthors() {
 	}
@@ -30,9 +32,9 @@ public class GetAuthors {
 	 * influence.
 	 * <p>Example : [{"Name":"John", "Gender":"Male", "Age":"Location",
 	 *      "Nposts":"10", "Avgcomms":"12.22", "Avglikes":"122.25", "Influence":"1.7"},{...}]
-	 * 
-	 * @throws JSONException is case the json is not created successfully
+	 *
 	 * @return JSONArray with the information in the Database
+	 * @throws JSONException is case the json is not created successfully
 	 */
 	public JSONArray getAll() throws JSONException {
 		JSONArray result = new JSONArray();

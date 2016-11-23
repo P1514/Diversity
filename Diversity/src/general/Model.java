@@ -12,13 +12,32 @@ import org.json.JSONObject;
 
 import monitoring.Monitor;;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Model.
+ */
 public final class Model {
-	Connection cnlocal;
+	
+	private Connection cnlocal;
 	private long id = 0, pss;
 	private long frequency, user;
 	private String name, uri, age, gender, products;
 	private boolean archived;
 
+	/**
+	 * Instantiates a new model.
+	 *
+	 * @param _id the id of the model
+	 * @param _frequency the frequency of update
+	 * @param _user the user id
+	 * @param _name the name of the model
+	 * @param _uri the uri of the source and account list Example:"facebook,shop;twitter,run"
+	 * @param _pss the pss id
+	 * @param _age the age range wanted
+	 * @param _gender the gender wanted
+	 * @param _products the products wanted
+	 * @param _archived the archived if deleted or not
+	 */
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
 			String _gender, String _products, Boolean _archived) {
 		this.id = _id;
@@ -33,9 +52,19 @@ public final class Model {
 		this.archived = _archived;
 	}
 
+	/**
+	 * Instantiates a new model.
+	 */
 	public Model() {
 	}
 
+	/**
+	 * Adds the model.
+	 *
+	 * @param msg the msg
+	 * @return the JSON array with information if successful or not
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray add_model(JSONObject msg) throws JSONException {
 		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
@@ -134,6 +163,13 @@ public final class Model {
 
 	}
 
+	/**
+	 * Update model.
+	 *
+	 * @param msg the msg query from the front_end
+	 * @return the JSON array
+	 * @throws JSONException the JSON exception
+	 */
 	public JSONArray update_model(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -205,40 +241,85 @@ public final class Model {
 		return result;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * Gets the pss.
+	 *
+	 * @return the pss
+	 */
 	public Long getPSS() {
 		return this.pss;
 	}
 
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public Long getId() {
 		return this.id;
 	}
 
+	/**
+	 * Gets the archived.
+	 *
+	 * @return the archived
+	 */
 	public boolean getArchived() {
 		return this.archived;
 	}
 
+	/**
+	 * Gets the age.
+	 *
+	 * @return the age
+	 */
 	public String getAge() {
 		return this.age;
 	}
 
+	/**
+	 * Gets the uri.
+	 *
+	 * @return the uri
+	 */
 	public String getURI() {
 		return this.uri;
 	}
 
+	/**
+	 * Gets the frequency.
+	 *
+	 * @return the frequency
+	 */
 	public long getFrequency() {
 		return this.frequency;
 	}
 
+	/**
+	 * Gets the gender.
+	 *
+	 * @return the gender
+	 */
 	public String getGender() {
 		return this.gender;
 	}
 
+	/**
+	 * Gets the products.
+	 *
+	 * @return the products
+	 */
 	public String getProducts() {
-		if(this.products.isEmpty()) return "";
+		if(this.products.isEmpty()) return null;
 		return this.products.substring(0, this.products.length()-1);
 	}
 

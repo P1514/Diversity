@@ -10,16 +10,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Settings;
+// TODO: Auto-generated Javadoc
+
 /**
- * @author Uninova - IControl
+ * The Class GetInfGraph.
  *
+ * @author Uninova - IControl
  */
 @Deprecated
 public class GetInfGraph {
 	// So far unused since no more influence graphs will be shown
-	private Settings dbc = new Settings();
 	private Connection cnlocal;
 
+	/**
+	 * Instantiates a new gets the inf graph.
+	 */
 	@Deprecated
 	/**
 	 * Function that evalutes author's influence over time
@@ -29,8 +34,8 @@ public class GetInfGraph {
 
 	/**
 	 * This Method return the requested author named 'name' influence
-	 * information over time
-	 * 
+	 * information over time.
+	 *
 	 * @param name - Author's name to evaluate
 	 * @return JSONArray with all the information present about that specific author
 	 * @throws JSONException if an error occured creating a JSON
