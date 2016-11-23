@@ -17,18 +17,26 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
-## [2.3] Not yet closed
+## [2.3.1] 23-11-2016
+###
+- Minor Fixes
+
+## [2.3] 2016-11-19
 ### Refactoring
 - Program now able to store more data
 
 ### Extraction
-- Final product filtering implemented( Waiting for Testing)
+- Final product filtering implemented
 
 ### Modeling
 - Now can select final products from tree list that are supposed to be monitored
 
 ### Pages
 - Home page Redesigned
+- Model page Redesigned
+
+### Security
+- Access Rights Implemented
 
 
 ## [2.2] 2016-11-06
