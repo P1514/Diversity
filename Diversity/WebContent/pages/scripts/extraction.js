@@ -133,6 +133,7 @@ function connect() {
 					x.add(option);
 				}
 			}
+			
 			json = {
 				"Op" : "opinion_extraction",
 				"Id" : window.sessionStorage.id
