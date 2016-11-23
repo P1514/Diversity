@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
       alert(json[0].Message);
       if(json[0].hasOwnProperty('id')){
         sessionStorage.Id="model="+json[0].id;
-        location.reload();
+        location.href ='index.html';
       }
     return;
     }
@@ -378,7 +378,6 @@ function checknumber(field) {
   } else if (field.value < 0) {
     field.value = '0';
   }
-
 }
 
 var minSliderValue = $("#ex1").data("slider-min");
