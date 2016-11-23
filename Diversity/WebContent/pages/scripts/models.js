@@ -214,7 +214,7 @@ function addline2(name, value) {
   if (name == "" || value == "")
     return;
   $('#table_div2').append(
-      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
+      '<div class="checkbox"><label name="user"><input type="checkbox" value="'+name+","+value+'"">'
           + name + " / " + value +  '</label></div>');
   document.getElementById("new_name").value = "";
   document.getElementById("new_URI").value = "";
