@@ -99,9 +99,7 @@ input[type=radio] {
 }
 /*#globalgauge path:nth-child(2){ fill:#FFFFFF ; }*/
 
-#globalgauge circle:nth-child(1){
-	fill:#DDDDDD;
-	}
 #globalgauge circle:nth-child(3){
 	fill:#DDDDDD;
+	stroke:#DDDDDD;
 	}
