@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("pss").disabled = true;
     document.getElementById("final").checked=json2[0].Final_products;
     document.getElementById("final").disabled = true;
-
+    $('#ex1').slider('disable')
     var uris = json2[0].URI.split(";");
     for(i=0; i<uris.length; i++){
       //console.log("HELLO "+uris[i]+"\r\n");
