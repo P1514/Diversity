@@ -3,8 +3,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -20,7 +22,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ChromeTests  {
 	
-	// Variables for Create Model tests
+	static final int NUM_TESTS = 5; // UPDATE THIS NUMBER WHEN MORE TESTS ARE CREATED
+	
     static String pss = "";
     static String modelName  = "";
     static String products = "";
@@ -31,32 +34,69 @@ public class ChromeTests  {
     static File log;
     static FileWriter w;
     static boolean pass = true;
-    public static void main(String[] args) throws IOException {
-    	
-    	log = new File("log.txt");
-    	w = new FileWriter(log, true);
-    	
-    	w.write("===============================================\n");
-    	w.write("Running Chrome Tests\n\n");
-    	// Uses chromedriver to run tests on Google Chrome.
-    	System.setProperty("webdriver.chrome.driver","chromedriver.exe");
-    	WebDriver driver = new ChromeDriver();
-    	
-    	// Set the website URL
-        driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DESIGNER");
+    
+	public static void main(String[] args) throws IOException {
 
-        
-       testCreate(driver);
-       testEdit(driver);
-       testView(driver);
-       testDelete(driver);
-       testExtraction(driver);
-       
-       w.close();
-       
-       driver.close();
-       
-    }
+		log = new File("log.txt");
+		w = new FileWriter(log, true);
+
+		w.write("===============================================\n");
+		w.write("Starting test run - Chrome Tests " + new Date() +  "\n\n");
+		
+		long start = System.nanoTime();
+		
+		// Uses chromedriver to run tests on Google Chrome.
+		System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+
+		// Set the website URL
+		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DESIGNER");
+
+		boolean create = testCreate(driver);
+		boolean edit = testEdit(driver);
+		boolean view = testView(driver);
+		boolean extract = testExtraction(driver);
+		boolean delete = testDelete(driver);
+		
+		long elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+
+		w.write("-----------------------------------------------\n");
+		w.write("Test run finished. Results: \n");
+		w.write("Test 1 - Create Opinion Model: " + (create ? "passed\n" : "failed\n"));
+		w.write("Test 2 - Edit Opinion Model: " + (edit ? "passed\n" : "failed\n"));
+		w.write("Test 3 - View Opinion Model: " + (view ? "passed\n" : "failed\n"));
+		w.write("Test 4 - View Opinion Extraction: " + (extract ? "passed\n" : "failed\n"));
+		w.write("Test 5 - Delete Opinion Model: " + (delete ? "passed\n" : "failed\n"));
+		
+		int passed = 0;
+		
+		if (create) {
+			passed++;
+		}
+		
+		if (edit) {
+			passed++;
+		}
+		
+		if (view) {
+			passed++;
+		}
+		
+		if (extract) {
+			passed++;
+		}
+		
+		if (delete) {
+			passed++;
+		}
+		
+		w.write("\nTests passed: " + passed);
+		w.write("\nTests failed: " + (NUM_TESTS - passed));
+		w.write("\nElapsed time: " + elapsed + " milliseconds");
+		
+		w.close();
+		driver.close();
+	}
 
 	/** Test 1 - Create new model
      * Steps: 
@@ -304,7 +344,40 @@ public class ChromeTests  {
             	return true;
             }});
         
-        driver.findElement(By.linkText("Delete Opinion Model")).click();
+        
+        w.write("Test Create Opinion Model reached the end.\n");
+        if (pass) {
+        	w.write("All steps were completed successfully. \n");
+        	return true;
+        } else {
+        	w.write("Errors ocurred during the execution of this test. Please check this log for additional details.\n");
+        	return false;
+        }
+        
+    }
+    
+    private static boolean testExtraction(WebDriver driver) {
+    	
+    	driver.findElement(By.id("model_box")).click();
+    	
+    	(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver d) {
+				if (!d.getCurrentUrl().contains("opinion_extraction")) {
+					pass = false;
+					return false;
+				}
+				return true;
+			}
+		});
+    	
+    	driver.findElement(By.id("home")).click();
+		return pass;
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static boolean testDelete(WebDriver driver) {
+		driver.findElement(By.linkText("Delete Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
         for (WebElement model : modelsList2.getOptions()) {
@@ -334,7 +407,58 @@ public class ChromeTests  {
     			}
     		});
         }
-        w.write("Test Create Opinion Model reached the end.\n");
+		return pass;
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static boolean testView(WebDriver driver) throws IOException {
+		driver.findElement(By.linkText("View Opinion Model")).click();
+        Select modelsList2 = new Select(driver.findElement(By.id("Models")));
+        WebElement el2 = null;
+        for (WebElement model : modelsList2.getOptions()) {
+        	if (model.getText().equals(modelName)) {
+        		el2 = model;
+        		break;
+        	}
+        }
+        if (el2 != null) {	
+            modelsList2.selectByIndex(modelsList2.getOptions().indexOf(el2));
+            driver.findElement(By.id("view_select")).click();
+        
+    		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+    			public Boolean apply(WebDriver d) {
+    				if (!d.getCurrentUrl().contains("models.html")) {
+    					try {
+							w.write("Page was not redirected successfully. Stopping test run.\n");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+    					pass = false;
+    					return false;
+    				}
+    				
+    				if (d.findElement(By.tagName("h1")).getText().contains("View")) {
+    					try {
+							w.write("View opinion model page was opened successfully.\n");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+    					pass = true;
+    					return true;
+    				}
+    				
+    				
+    				return false;
+    			}
+    		});
+        }
+        
+        driver.findElement(By.id("submit2")).click();
+        
+        w.write("Test View Opinion Model reached the end.\n");
         if (pass) {
         	w.write("All steps were completed successfully. \n");
         	return true;
@@ -342,28 +466,63 @@ public class ChromeTests  {
         	w.write("Errors ocurred during the execution of this test. Please check this log for additional details.\n");
         	return false;
         }
+	}
+
+	private static boolean testEdit(WebDriver driver) throws IOException {
+		driver.findElement(By.linkText("Edit Opinion Model")).click();
+        Select modelsList2 = new Select(driver.findElement(By.id("Models")));
+        WebElement el2 = null;
+        for (WebElement model : modelsList2.getOptions()) {
+        	if (model.getText().equals(modelName)) {
+        		el2 = model;
+        		break;
+        	}
+        }
+        if (el2 != null) {	
+            modelsList2.selectByIndex(modelsList2.getOptions().indexOf(el2));
+            driver.findElement(By.id("view_edit")).click();
         
-    }
-    
-    private static boolean testExtraction(WebDriver driver) {
-		// TODO Auto-generated method stub
-		
+    		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+    			public Boolean apply(WebDriver d) {
+    				if (!d.getCurrentUrl().contains("models.html")) {
+    					try {
+							w.write("Page was not redirected successfully. Stopping test run.\n");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+    					pass = false;
+    					return false;
+    				}
+    				
+    				if (d.findElement(By.tagName("h1")).getText().contains("Edit")) {
+    					try {
+							w.write("Edit opinion model page was opened successfully.\n");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+    					pass = true;
+    					return true;
+    				}
+    				
+    				
+    				return false;
+    			}
+    		});
+        }
+        
+        driver.findElement(By.id("submit2")).click();
+        
+        w.write("Test View Opinion Model reached the end.\n");
+        if (pass) {
+        	w.write("All steps were completed successfully. \n");
+        	return true;
+        } else {
+        	w.write("Errors ocurred during the execution of this test. Please check this log for additional details.\n");
+        	return false;
+        }
 	}
-
-	private static boolean testDelete(WebDriver driver) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static boolean testView(WebDriver driver) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static boolean testEdit(WebDriver driver) {
-		// TODO Auto-generated method stub
-		
-	}
+}
 
  
-}

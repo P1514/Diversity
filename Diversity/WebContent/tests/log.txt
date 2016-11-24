@@ -1,11 +1,28 @@
 ===============================================
-Running Chrome Tests
+Starting test run - Chrome Tests Thu Nov 24 12:26:13 GMT 2016
 
 Starting Create Opinion Model Test
 
-Model 3999001228 created. The test will now attempt to edit the model to check if the data is correct.
+Model 3469043788 created. The test will now attempt to edit the model to check if the data is correct.
 Attempting to open edit page...
 Edit page opened successfully. Now checking if data matches...
 All fields match the input data.
 Test Create Opinion Model reached the end.
 All steps were completed successfully. 
+Edit opinion model page was opened successfully.
+Test View Opinion Model reached the end.
+All steps were completed successfully. 
+View opinion model page was opened successfully.
+Test View Opinion Model reached the end.
+All steps were completed successfully. 
+-----------------------------------------------
+Test run finished. Results: 
+Test 1 - Create Opinion Model: passed
+Test 2 - Edit Opinion Model: passed
+Test 3 - View Opinion Model: passed
+Test 4 - View Opinion Extraction: passed
+Test 5 - Delete Opinion Model: passed
+
+Tests passed: 5
+Tests failed: 0
+Elapsed time: 14 seconds
