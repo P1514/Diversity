@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("start_date").disabled = true;
     document.getElementById("new_name").disabled = true;
     document.getElementById("new_URI").disabled = true;
-    $("#ex1").slider("disable");
+
     makeTree();
     var prods = json2[0].Final_products.split(";");
     $("#final_input").bind('ready.jstree', function(event, data) {

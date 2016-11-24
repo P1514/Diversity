@@ -1,0 +1,11 @@
+===============================================
+Running Chrome Tests
+
+Starting Create Opinion Model Test
+
+Model 3999001228 created. The test will now attempt to edit the model to check if the data is correct.
+Attempting to open edit page...
+Edit page opened successfully. Now checking if data matches...
+All fields match the input data.
+Test Create Opinion Model reached the end.
+All steps were completed successfully. 
