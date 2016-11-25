@@ -72,5 +72,15 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 
 	}
+	
+	@Test
+	public void resolve() throws JSONException {
+		o.run();
+		obj = new JSONObject();
+		tester = new Backend(1, obj);
+		result = "";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
 
 }
