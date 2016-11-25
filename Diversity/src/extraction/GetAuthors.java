@@ -36,6 +36,7 @@ public class GetAuthors {
 	 * @return JSONArray with the information in the Database
 	 * @throws JSONException is case the json is not created successfully
 	 */
+	@Deprecated
 	public JSONArray getAll() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
