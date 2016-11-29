@@ -12,11 +12,6 @@ import org.json.JSONObject;
  */
 public final class CleanDB {
 	
-	/** The dbc. */
-	private Settings dbc = new Settings();
-	
-	/** The cndata. */
-	private Connection cndata = null;
 	
 	/** The cnlocal. */
 	private Connection cnlocal = null;
