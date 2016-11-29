@@ -58,7 +58,7 @@ function connect() {
 		} else {
 			json = {
 				"Op" : "getposts",
-				"Pss" : sessionStorage.pss
+				"Id" : sessionStorage.id
 			}
 
 			ws.send(JSON.stringify(json));
