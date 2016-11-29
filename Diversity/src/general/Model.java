@@ -19,7 +19,7 @@ import monitoring.Monitor;;
 public final class Model {
 	
 	private Connection cnlocal;
-	private long id = 0, pss;
+	private long id, pss;
 	private long frequency, user;
 	private String name, uri, age, gender, products;
 	private boolean archived;

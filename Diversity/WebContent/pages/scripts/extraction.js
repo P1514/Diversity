@@ -15,6 +15,7 @@ var needlecolor = '#604460';
 var animationend = false;
 function connect() {
 	var css = /* Needle */"#globalgauge path:nth-child(2){ fill:" + needlecolor
+			+ " ; stroke-width:0; } #globalgauge circle:nth-child(1){ fill:" + needlecolor
 			+ " ; stroke-width:0; }", head = document.head
 			|| document.getElementsByTagName('head')[0], style = document
 			.createElement('style');
@@ -58,7 +59,7 @@ function connect() {
 		} else {
 			json = {
 				"Op" : "getposts",
-				"Pss" : sessionStorage.pss
+				"Id" : sessionStorage.id
 			}
 
 			ws.send(JSON.stringify(json));
