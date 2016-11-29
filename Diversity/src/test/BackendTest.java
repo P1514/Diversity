@@ -22,6 +22,7 @@ public class BackendTest {
 		o.run();
 		
 	}
+	
 	@Test
 	public void resolveRole() throws JSONException {
 
@@ -154,14 +155,7 @@ public class BackendTest {
 	}
 	
 	
-	@Test
-	public void resolveClean() throws JSONException {
-	
-//		obj = new JSONObject();
-//		tester = new Backend(7, obj);
-//		result = "[{\"Op\":\"Error\",\"Message\":\"Cleaned Successfully\"}]";
-//		assertEquals("Should be equal to the string", result, tester.resolve());
-	}
+
 	
 	@Test
 	public void resolveGetconfig() throws JSONException {
@@ -173,6 +167,84 @@ public class BackendTest {
 		result = "[{\"Op\":\"Configs\"},{\"Size\":3,\"Param\":\"Age\"},{\"Min\":\"0\",\"Max\":\"30\"},{\"Min\":\"31\",\"Max\":\"60\"},{\"Min\":\"61\",\"Max\":\"90\"},{\"Size\":2,\"Param\":\"Gender\"},{\"Gender\":\"Female\"},{\"Gender\":\"Male\"},{\"Size\":2,\"Param\":\"Location\"},{\"Location\":\"Asia\"},{\"Location\":\"Europe\"},{\"Size\":1,\"Param\":\"Product\"},{\"Product\":\"Morris Ground 1\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
+	
+	
+	@Test
+	public void resolveGetModel() throws JSONException{
+		
+		obj = new JSONObject();
+		obj.put("Op", "get_model");
+		obj.put("Id", "806");
+		tester = new Backend(15, obj);
+		result = "[{\"Op\":\"Model\",\"PSS\":\"D522-1 PSS\",\"Final_products\":\"Morris Ground 1;\",\"Archive\":false,\"Update\":6,\"URI\":\"Facebook,adidas;\",\"Name\":\"Morris Ground 1\"}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
+	
+
+	
+	@Test
+	public void resolveGetPSS() throws JSONException{
+		
+		obj = new JSONObject();
+		obj.put("Op", "getpss");
+		tester = new Backend(17, obj);
+		result = "[{\"Op\":\"pss\"},{\"Pss\":\"D522-1 PSS\"},{\"Pss\":\"D522-2 PSS\"},{\"Pss\":\"D341-1 PSS\"},{\"Pss\":\"D231-1 PSS\"},{\"Pss\":\"D231-2 PSS\"}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
+	
+	@Test
+	public void resolveOpinionExtraction() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "opinion_extraction");
+		obj.put("Id", "806");
+		tester = new Backend(18, obj);
+		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Left\",\"Filter\":\"Global\"},{\"Gra"
+				+ "ph\":\"Top_Left\",\"Value\":87},{\"Graph\":\"Top_Middle\",\"Filter\":\"Glo"
+				+ "bal\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":24},{\"Gr"
+				+ "aph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":111},{\"Graph\":\"Top_Mi"
+				+ "ddle\",\"Param\":\"0\",\"Value\":105},{\"Graph\":\"Top_Middle\",\"Par"
+				+ "am\":\"+\",\"Value\":195},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Valu"
+				+ "e\":942},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":82},{\"Gra"
+				+ "ph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1.17},{\"Graph\":\"Botto"
+				+ "m_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Midd"
+				+ "le\",\"Value\":1.12},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":"
+				+ "1.22},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":1.12},{\"Mon"
+				+ "th\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.11},{\"Month\":\"APR\",\"G"
+				+ "raph\":\"Bottom_Middle\",\"Value\":1.23},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Mi"
+				+ "ddle\",\"Value\":1.13},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1"
+				+ ".17},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":1.19},{\"Month\":\"A"
+				+ "UG\",\"Graph\":\"Bottom_Middle\",\"Value\":1.31},{\"Month\":\"SEP\",\"Graph\":\"Bott"
+				+ "om_Middle\",\"Value\":1.17},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1"
+				+ ".04},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Graph\":\"Botto"
+				+ "m_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84"
+				+ ".91},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":88.52},{\"Month\":\"FEB\",\"Gr"
+				+ "aph\":\"Bottom_Right\",\"Value\":91.97},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Val"
+				+ "ue\":86.78},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":85.7},{\"Month\":\"MA"
+				+ "Y\",\"Graph\":\"Bottom_Right\",\"Value\":85.01},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"V"
+				+ "alue\":82.67},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":74.79},{\"Month\":\"AUG\",\"Gr"
+				+ "aph\":\"Bottom_Right\",\"Value\":72.76},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":70."
+				+ "39},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":70.98},{\"Month\":\"NOV\",\"Graph\":\"Bo"
+				+ "ttom_Right\",\"Value\":84.5}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
+	
+	
+	@Test
+	public void resolveOeRefresh() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Param", "Global");
+		obj.put("Values", "");
+		obj.put("Filter", "");
+		obj.put("Id", "806");
+		tester = new Backend(19, obj);
+		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
+	
+	
+	
 	
 	@Test
 	public void resolveCreateModel() throws JSONException {
@@ -193,68 +265,34 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
 	
-	@Test
-	public void resolveGetModel() throws JSONException{
-		
-		obj = new JSONObject();
-		obj.put("Op", "get_model");
-		obj.put("Id", "806");
-		tester = new Backend(15, obj);
-		result = "[{\"Op\":\"Model\",\"PSS\":\"D522-1 PSS\",\"Final_products\":\"Morris Ground 1;\",\"Archive\":false,\"Update\":6,\"URI\":\"Facebook,adidas;\",\"Name\":\"Morris Ground 1\"}]";
-		assertEquals("Should be equal to the string", result, tester.resolve());
-	}
+	
 	
 	@Test
 	public void resolveUpdateModel() throws JSONException{
-//		
-//		obj = new JSONObject();
-//		obj.put("Op", "update_model");
-//		obj.put("PSS", "D522-1 PSS");
-//		obj.put("Products", "Morris Ground 1;");
-//		obj.put("Archive", "false");
-//		obj.put("User", "1");
-//		obj.put("Final_Products", "Morris Ground 1;");
-//		obj.put("Update", "10");
-//		obj.put("URI", "Facebook,adidas;");
-//		obj.put("Start_date", "0");
-//		obj.put("Name", "Morris Ground 1");
-//		obj.put("Id", "806");
-//		tester = new Backend(16, obj);
-//		result="[{\"Op\":\"Error\",\"Message\":\"Successfully updated model Morris Ground 1\",\"id\":806}]";
-//		assertEquals("Should be equal to the string", result, tester.resolve());
-	}
-	
-	@Test
-	public void resolveGetPSS() throws JSONException{
 		
 		obj = new JSONObject();
-		obj.put("Op", "getpss");
-		tester = new Backend(17, obj);
-		result = "[{\"Op\":\"pss\"},{\"Pss\":\"D522-1 PSS\"},{\"Pss\":\"D522-2 PSS\"},{\"Pss\":\"D341-1 PSS\"},{\"Pss\":\"D231-1 PSS\"},{\"Pss\":\"D231-2 PSS\"}]";
+		obj.put("Op", "update_model");
+		obj.put("PSS", "D522-1 PSS");
+		obj.put("Products", "Morris Ground 1;");
+		obj.put("Archive", "false");
+		obj.put("User", "1");
+		obj.put("Final_Products", "Morris Ground 1;");
+		obj.put("Update", "10");
+		obj.put("URI", "Facebook,adidas;");
+		obj.put("Start_date", "0");
+		obj.put("Name", "Morris Ground 1");
+		obj.put("Id", "806");
+		tester = new Backend(16, obj);
+		result="[{\"Op\":\"Error\",\"Message\":\"Successfully updated model Morris Ground 1\",\"id\":806}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
 	
 	@Test
-	public void resolveOpinionExtraction() throws JSONException {
-		
-		obj = new JSONObject();
-		obj.put("Op", "opinion_extraction");
-		obj.put("Id", "806");
-		tester = new Backend(18, obj);
-		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Left\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Left\",\"Value\":88},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":24},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":111},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":105},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":195},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":942},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":82},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1.17},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1.12},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.22},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":1.12},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.11},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.23},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1.13},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":1.19},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":1.31},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.91},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":88.52},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":91.97},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":86.78},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":85.7},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":85.01},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":82.67},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":74.79},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":72.76},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":70.39},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":70.98},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":84.5}]";
-		assertEquals("Should be equal to the string", result, tester.resolve());
-	}
+	public void resolveClean() throws JSONException {
 	
-	@Test
-	public void resolveOeRefresh() throws JSONException {
-		
 		obj = new JSONObject();
-		obj.put("Param", "Global");
-		obj.put("Values", "");
-		obj.put("Filter", "");
-		obj.put("Id", "806");
-		tester = new Backend(19, obj);
-		result = "[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":24},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":111},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":105},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":195},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":942},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":82},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1.17},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1.12},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.22},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":1.12},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.11},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.23},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1.13},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":1.19},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":1.31},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":1.17},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.91},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":88.52},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":91.97},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":86.78},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":85.7},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":85.01},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":82.67},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":74.79},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":72.76},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":70.39},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":70.98},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":84.5}]";
+		tester = new Backend(7, obj);
+		result = "[{\"Op\":\"Error\",\"Message\":\"Cleaned Successfully\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
 	
