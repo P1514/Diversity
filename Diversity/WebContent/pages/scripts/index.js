@@ -69,12 +69,11 @@ function giveAcessRights(json){
       }
       
       if(!json[0].create_edit_delete_model && !json[0].view_OM ){
-          document.getElementById("_define").style.display = 'block';//show
-          document.getElementById("define_gray").style.display = 'none';//hide
+          document.getElementById("_define").style["background-color"]= "#666666";
+          console.log('test');
         }
         else{
-            document.getElementById("_define_gray").style.display = 'block';//show
-            document.getElementById("_define").style.display = 'none';//hide
+
         }
 }
 
