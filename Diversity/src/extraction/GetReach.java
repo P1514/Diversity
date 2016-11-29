@@ -51,7 +51,7 @@ public class GetReach {
 				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
-		//System.out.println(select);
+		System.out.println("HEELOO" + select);
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(select);
