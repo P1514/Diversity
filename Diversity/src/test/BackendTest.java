@@ -22,7 +22,7 @@ public class BackendTest {
 		o.run();
 		
 	}
-	
+	//before running test, import test.db from the test directory
 	@Test
 	public void resolveRole() throws JSONException {
 
