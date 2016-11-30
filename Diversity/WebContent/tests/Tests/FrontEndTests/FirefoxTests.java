@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -11,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -22,7 +20,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class ChromeTests  {
+public class FirefoxTests  {
 	
 	static final int NUM_TESTS = 5; // UPDATE THIS NUMBER WHEN MORE TESTS ARE CREATED
 	
@@ -43,13 +41,12 @@ public class ChromeTests  {
 		w = new FileWriter(log, true);
 
 		w.write("===============================================\n");
-		w.write("Starting test run - Chrome Tests - " + new Date() +  "\n\n");
+		w.write("Starting test run - Chrome Tests " + new Date() +  "\n\n");
 		
 		long start = System.nanoTime();
 		
-		// Uses chromedriver to run tests on Google Chrome.
-		System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-		WebDriver driver = new ChromeDriver();
+		System.setProperty("webdriver.gecko.driver","geckodriver.exe");
+		WebDriver driver = new FirefoxDriver();
 
 		// Set the website URL
 		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DESIGNER");
@@ -94,7 +91,7 @@ public class ChromeTests  {
 		
 		w.write("\nTests passed: " + passed);
 		w.write("\nTests failed: " + (NUM_TESTS - passed));
-		w.write("\nElapsed time: " + elapsed + " milliseconds\n");
+		w.write("\nElapsed time: " + elapsed + " milliseconds");
 		
 		w.close();
 		driver.close();
@@ -358,108 +355,27 @@ public class ChromeTests  {
         
     }
     
-    private static boolean testExtraction(WebDriver driver) throws IOException {
-    	w.write("Starting View Opinion Extraction test.\n");
+    private static boolean testExtraction(WebDriver driver) {
+    	
     	driver.findElement(By.id("model_box")).click();
     	
     	(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver d) {
 				if (!d.getCurrentUrl().contains("opinion_extraction")) {
-					try {
-						w.write("Failed to open Opinion Extraction Page.");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 					pass = false;
 					return false;
 				}
-				try {
-					w.write("Opinion Extraction page opened successfully.\nChecking if dropdowns disable correctly.\n");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				List<String> ids = new ArrayList<String>();
-				
-				ids.add("Gender");
-				ids.add("Location");
-				ids.add("Age_radio");
-				ids.add("Final");
-				
-				for (String id : ids) {
-					d.findElement(By.id(id)).click();
-					if (id.equals("Age_radio")) {
-						pass = Boolean.parseBoolean(d.findElement(By.id("agefilt")).getAttribute("disabled"));
-					} else {
-						pass = Boolean.parseBoolean(d.findElement(By.id(id.toLowerCase() + "filt")).getAttribute("disabled"));
-					}
-
-					if (!pass) {
-						try {
-							w.write(id + " dropdown was not disabled after selecting " + id + " filter. Stopping test run\n");
-							return pass;
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-				
-				if (pass) {
-					try {
-						w.write("All dropdowns behave as expected.\nStarting Top 5 table tests.\n");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				if (d instanceof JavascriptExecutor) {
-					try {
-						w.write("Selecting chart point...\n");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					((JavascriptExecutor) d).executeScript("bottom_right.setSelection([{column:1, row:3}]);google.visualization.events.trigger(bottom_right, 'select');");
-				}
-				
-				WebElement table = d.findElement(By.id("posts"));
-				
-				List<WebElement> tableCells= table.findElements(By.xpath("//table/tbody/tr/td[count(//table/thead/tr/th[.=\"Date\"]/preceding-sibling::th)+1]"));
-				
-				for (WebElement t : tableCells) {
-					
-					if (!t.getText().split("-")[1].equals("03")) { 
-						try {
-							w.write("Top 5 table did not update correctly after clicking chart. Stopping test run.\n");
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						pass = false;
-						return false;
-					}
-				}
-				
-				try {
-					w.write("Top 5 table updated successfully.\n");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
 				return true;
 			}
 		});
-    	w.write("Test View Opinion Extraction reached the end.\n All steps completed successfully.\n");
+    	
     	driver.findElement(By.id("home")).click();
 		return pass;
+		// TODO Auto-generated method stub
 		
 	}
 
-	private static boolean testDelete(WebDriver driver) throws IOException {
+	private static boolean testDelete(WebDriver driver) {
 		driver.findElement(By.linkText("Delete Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -489,12 +405,9 @@ public class ChromeTests  {
             		return true;
     			}
     		});
-        } else {
-        	w.write("Test Delete Opinion Model failed.");
-        	return false;
         }
-        w.write("Test Delete Opinion Model reached the end.\nAll steps completed successfully.\n");
-		return true;
+		return pass;
+		// TODO Auto-generated method stub
 		
 	}
 
@@ -591,6 +504,8 @@ public class ChromeTests  {
     					pass = true;
     					return true;
     				}
+    				
+    				
     				return false;
     			}
     		});
@@ -598,7 +513,7 @@ public class ChromeTests  {
         
         driver.findElement(By.id("submit2")).click();
         
-        w.write("Test Edit Opinion Model reached the end.\n");
+        w.write("Test View Opinion Model reached the end.\n");
         if (pass) {
         	w.write("All steps were completed successfully. \n");
         	return true;

@@ -41,7 +41,7 @@ public class FirefoxTests  {
 		w = new FileWriter(log, true);
 
 		w.write("===============================================\n");
-		w.write("Starting test run - Chrome Tests " + new Date() +  "\n\n");
+		w.write("Starting test run - Firefox Tests " + new Date() +  "\n\n");
 		
 		long start = System.nanoTime();
 		
