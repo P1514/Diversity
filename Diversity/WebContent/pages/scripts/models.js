@@ -58,9 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onopen = function() {
       json = {
         "Op" : "getpss",
-        "Pss" : getPss()
       }
-    
+
     ws.send(JSON.stringify(json));
   }
 
