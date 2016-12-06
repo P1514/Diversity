@@ -453,7 +453,7 @@ public class ChromeTests  {
 				return true;
 			}
 		});
-    	w.write("Test View Opinion Extraction reached the end.\n All steps completed successfully.\n");
+    	w.write("Test View Opinion Extraction reached the end.\nAll steps completed successfully.\n");
     	driver.findElement(By.id("home")).click();
 		return pass;
 		
