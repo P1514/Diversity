@@ -34,19 +34,22 @@ public class Roles {
 
 		try {
 			cnlocal = Settings.connlocal();
-			query = "SELECT "/*+Settings.latable_viewopinion+"*/+"view_opinion_model, create_edit_delete_model, view_opinion_results, save_delete_snapshots, use_opinion_prediction"
-					+ " FROM `sentimentanalysis`.`access_rights`" + " WHERE role = ?";
+			query = "SELECT "+Settings.artable_vom+", " +Settings.artable_create_edit_delete_model+", "
+					+Settings.artable_view_opinion_results+", "
+					+Settings.artable_save_delete_snapshots+", "
+					+Settings.artable_use_opinion_prediction
+					+ " FROM `sentimentanalysis`.`access_rights`" + " WHERE "+ Settings.artable_role + " = ?";
 			stmt = cnlocal.prepareStatement(query);
 			stmt.setString(1, Role);
 			rs = stmt.executeQuery();
 			
 			if(rs.next()){
 			obj.put("Op","Rights");
-			obj.put("view_OM", rs.getBoolean("view_opinion_model"));		
-			obj.put("create_edit_delete_model", rs.getBoolean("create_edit_delete_model"));
-			obj.put("view_opinion_results", rs.getBoolean("view_opinion_results"));
-			obj.put("view_use_opinion_prediction", rs.getBoolean("use_opinion_prediction"));
-			obj.put("save_delete_snapshots", rs.getBoolean("save_delete_snapshots"));
+			obj.put("view_OM", rs.getBoolean(Settings.artable_vom));		
+			obj.put("create_edit_delete_model", rs.getBoolean(Settings.artable_create_edit_delete_model));
+			obj.put("view_opinion_results", rs.getBoolean(Settings.artable_view_opinion_results));
+			obj.put("view_use_opinion_prediction", rs.getBoolean(Settings.artable_use_opinion_prediction));
+			obj.put("save_delete_snapshots", rs.getBoolean(Settings.artable_save_delete_snapshots));
 			//System.out.println(Role +" - " + obj);
 			result.put(obj);
 			rs.close();
