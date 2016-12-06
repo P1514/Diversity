@@ -56,18 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
     + window.location.port + '/Diversity/server');
 
   ws.onopen = function() {
-
-    if (getPss() != "") {
-      sessionStorage.internal = false;
       json = {
         "Op" : "getpss",
         "Pss" : getPss()
       }
-    } else {
-      json = {
-        "Op" : "getpss",
-      }
-    }
+    
     ws.send(JSON.stringify(json));
   }
 
@@ -89,9 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "pss") {
       jsonData = JSON.parse(JSON.stringify(json));
       populatePSS();
-      var jsonData2 = {
-        'Op' : 'gettree',
+      if (getPss() != "") {
+        sessionStorage.internal = false;
+        var jsonData2 = {
+          "Op" : "gettree",
+          "Pss" : getPss()
+        }
+      } else {
+        var jsonData2 = {
+          "Op" : "gettree",
+        }
       }
+
       ws.send(JSON.stringify(jsonData2));
 
     }
