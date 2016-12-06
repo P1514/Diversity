@@ -67,6 +67,14 @@ function giveAcessRights(json){
       else{
 
       }
+      
+      if(!json[0].create_edit_delete_model && !json[0].view_OM ){
+          document.getElementById("_define").style["background-color"]= "#666666";
+          console.log('test');
+        }
+        else{
+
+        }
 }
 
 
@@ -74,7 +82,7 @@ function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
       var role;
-      //document.getElementById("dropdown").style.display = 'none';//hides dropdown
+      document.getElementById("dropdown").style.display = 'block';//hides dropdown
        if(typeof type[1] != 'undefined'){
           type = type[1].split("&");
           role = type[0];
