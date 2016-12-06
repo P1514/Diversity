@@ -53,6 +53,18 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 
 	}
+	
+	@Test
+	public void resolveGetTreePss() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "gettree");
+		obj.put("Pss", "D231-2 PSS");
+		tester = new Backend(21, obj);
+		result = "[{\"Op\":\"Tree\"},{\"PSS\":\"D231-2 PSS\",\"Products\":[{\"Name\":\"Austin XC\"},{\"Name\":\"Austin Base\"}]}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
 
 	@Test
 	public void resolveTopreachglobalsentiment() throws JSONException {
