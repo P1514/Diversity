@@ -35,6 +35,9 @@ $(document).ready(function () {
   });
 });
 
+/*
+* Checks if the URL contains a pss=XXX tag; XXX is the desired PSS name and can contain spaces
+*/
 function getPss() {
   var url = window.location.href.toString();
   var pss = "";
@@ -108,10 +111,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (sessionStorage.internal == "false") {
-      document.getElementById('pss').value = getPss();
-      document.getElementById('pss').text = getPss();
-      document.getElementById('pss').disabled = true;
-      console.log(getPss());
+      var box = document.getElementById('pss');
+      var found = false;
+
+      for (var i = 0; i < box.length; i++) {
+        if (box[i].text == getPss()) {
+          found = true;
+          break;
+        }
+      }
+
+      if (found) {
+        document.getElementById('pss').value = getPss();
+        document.getElementById('pss').text = getPss();
+        document.getElementById('pss').disabled = true;
+      } else {
+        alert("Selected PSS does not exist.");
+      }
     }
 
     if(json2 != null && json2[0].Op=="Model"){
@@ -418,6 +434,10 @@ $('#ex1').slider({
 });
 
 // change number box when sliding
+$('#ex1').on('slideStop', function(slider){
+  $("#frequency").val(slider.value);
+});
+
 $('#ex1').on('slide', function(slider){
   $("#frequency").val(slider.value);
 });
