@@ -84,7 +84,11 @@ public final class Backend {
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
 			case 21:
-				return GetProducts.getTree().toString();
+				//System.out.println(msg.getString("Pss"));
+				if(msg.has("Pss"))
+					return GetProducts.getTree(msg.getString("Pss")).toString();
+				else
+					return GetProducts.getTree().toString();
 
 			case 20:
 				result = new JSONArray();
