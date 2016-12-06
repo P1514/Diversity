@@ -35,6 +35,16 @@ $(document).ready(function () {
   });
 });
 
+function getPss() {
+  var url = window.location.href.toString();
+  var pss = "";
+  if (url.indexOf("pss=") != -1) {
+    pss = url.split("pss=")[1].split("&")[0];
+  }
+
+  return pss.replace("%20"," ");
+}
+
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
@@ -43,8 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
     + window.location.port + '/Diversity/server');
 
   ws.onopen = function() {
-    json = {
-      "Op" : "getpss",
+
+    if (getPss() != "") {
+      sessionStorage.internal = false;
+      json = {
+        "Op" : "getpss",
+        "Pss" : getPss()
+      }
+    } else {
+      json = {
+        "Op" : "getpss",
+      }
     }
     ws.send(JSON.stringify(json));
   }
@@ -87,6 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
         }
     }
+
+    if (sessionStorage.internal == "false") {
+      document.getElementById('pss').value = getPss();
+      document.getElementById('pss').text = getPss();
+      document.getElementById('pss').disabled = true;
+      console.log(getPss());
+    }
+
     if(json2 != null && json2[0].Op=="Model"){
       //console.log(json2[0]);
       document.getElementById("page_title").innerHTML = "<h1>Edit Opinion Model</h1>"
