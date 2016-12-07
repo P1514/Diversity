@@ -67,7 +67,7 @@ function giveAcessRights(json){
       else{
 
       }
-      
+
       if(!json[0].create_edit_delete_model && !json[0].view_OM ){
           document.getElementById("_define").style["background-color"]= "#666666";
           console.log('test');
@@ -173,6 +173,7 @@ function new_model(){
   var role = sessionStorage.session;
   sessionStorage.clear();
   sessionStorage.session = role;
+  sessionStorage.internal = true; // true if the new model request comes from the homepage
 }
 
 function populatePSS() {

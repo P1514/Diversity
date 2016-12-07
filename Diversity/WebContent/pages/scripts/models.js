@@ -35,6 +35,19 @@ $(document).ready(function () {
   });
 });
 
+/*
+* Checks if the URL contains a pss=XXX tag; XXX is the desired PSS name and can contain spaces
+*/
+function getPss() {
+  var url = window.location.href.toString();
+  var pss = "";
+  if (url.indexOf("pss=") != -1) {
+    pss = url.split("pss=")[1].split("&")[0];
+  }
+
+  return pss.replace("%20"," ");
+}
+
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
@@ -43,9 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
     + window.location.port + '/Diversity/server');
 
   ws.onopen = function() {
-    json = {
-      "Op" : "getpss",
-    }
+      json = {
+        "Op" : "getpss",
+      }
+
     ws.send(JSON.stringify(json));
   }
 
@@ -67,9 +81,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "pss") {
       jsonData = JSON.parse(JSON.stringify(json));
       populatePSS();
-      var jsonData2 = {
-        'Op' : 'gettree',
+      if (getPss() != "") {
+        sessionStorage.internal = false;
+        var jsonData2 = {
+          "Op" : "gettree",
+          "Pss" : getPss()
+        }
+      } else {
+        var jsonData2 = {
+          "Op" : "gettree",
+        }
       }
+
       ws.send(JSON.stringify(jsonData2));
 
     }
@@ -87,6 +110,27 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
         }
     }
+
+    if (sessionStorage.internal == "false") {
+      var box = document.getElementById('pss');
+      var found = false;
+
+      for (var i = 0; i < box.length; i++) {
+        if (box[i].text == getPss()) {
+          found = true;
+          break;
+        }
+      }
+
+      if (found) {
+        document.getElementById('pss').value = getPss();
+        document.getElementById('pss').text = getPss();
+        document.getElementById('pss').disabled = true;
+      } else {
+        alert("Selected PSS does not exist.");
+      }
+    }
+
     if(json2 != null && json2[0].Op=="Model"){
       //console.log(json2[0]);
       document.getElementById("page_title").innerHTML = "<h1>Edit Opinion Model</h1>"
@@ -145,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("pss").disabled = true;
     document.getElementById("final").checked=json2[0].Final_products;
     document.getElementById("final").disabled = true;
-
+    $('#ex1').slider('disable')
     var uris = json2[0].URI.split(";");
     for(i=0; i<uris.length; i++){
       //console.log("HELLO "+uris[i]+"\r\n");
@@ -214,7 +258,7 @@ function addline2(name, value) {
   if (name == "" || value == "")
     return;
   $('#table_div2').append(
-      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
+      '<div class="checkbox"><label name="user"><input type="checkbox" value="'+name+","+value+'"">'
           + name + " / " + value +  '</label></div>');
   document.getElementById("new_name").value = "";
   document.getElementById("new_URI").value = "";
@@ -391,6 +435,10 @@ $('#ex1').slider({
 });
 
 // change number box when sliding
+$('#ex1').on('slideStop', function(slider){
+  $("#frequency").val(slider.value);
+});
+
 $('#ex1').on('slide', function(slider){
   $("#frequency").val(slider.value);
 });
