@@ -1,5 +1,5 @@
 var shade = 0;
-
+var filteredByProduct = false;
 var json;
 var jsonData;
 var sentimentdata;
@@ -47,7 +47,7 @@ function connect() {
 			var month = sentimentdata.getValue(row, 0);
       var product = sentimentdata.getColumnLabel(selection[0].column);
 
-      if (product != "Global") {
+      if (product != "Global" && filteredByProduct) {
         json = {
           "Op" : "getposts",
           "Id" : sessionStorage.id,
@@ -659,7 +659,6 @@ function changeRequest() {
 			json.Filter = "Gender";
 		}
 		if (locationradio == false) {
-
 			if (location == "All") {
 				json.Param += "Location,";
 				json.Values += "All,";
@@ -673,6 +672,7 @@ function changeRequest() {
 			json.Filter = "Location";
 		}
 		if (finalradio == false) {
+			filteredByProduct = false;
 			if (products == "All") {
 				json.Param += "Product,";
 				json.Values += "All,";
@@ -685,6 +685,7 @@ function changeRequest() {
 		} else {
 			needlecolor = '#FFC00C';
 			json.Filter = "Product";
+			filteredByProduct = true;
 		}
 	}
 	/*
