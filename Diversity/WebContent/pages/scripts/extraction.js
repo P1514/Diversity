@@ -45,14 +45,24 @@ function connect() {
 			var row = selection[0].row;
 			var col = selection[0].column;
 			var month = sentimentdata.getValue(row, 0);
+      var product = sentimentdata.getColumnLabel(selection[0].column);
 
-			json = {
-				"Op" : "getposts",
-				"Id" : sessionStorage.id,
-				"Param" : "Month",
-				"Values" : month,
-			}
-			// console.log(json);
+      if (product != "Global") {
+        json = {
+          "Op" : "getposts",
+          "Id" : sessionStorage.id,
+          "Param" : "Month",
+          "Values" : month,
+          "Product" : product,
+        }
+      } else {
+        json = {
+          "Op" : "getposts",
+          "Id" : sessionStorage.id,
+          "Param" : "Month",
+          "Values" : month,
+        }
+      }
 
 			ws.send(JSON.stringify(json));
 
@@ -134,7 +144,7 @@ function connect() {
 					x.add(option);
 				}
 			}
-			
+
 			json = {
 				"Op" : "opinion_extraction",
 				"Id" : window.sessionStorage.id
@@ -147,11 +157,12 @@ function connect() {
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			drawChart();
-			var json = {
-					"Op" : "getposts",
-					"Id" : sessionStorage.id,
-				}
-				ws.send(JSON.stringify(json));
+      var json = {
+            "Op" : "getposts",
+            "Id" : sessionStorage.id,
+      }
+
+			ws.send(JSON.stringify(json));
 			return;
 		}
 
@@ -402,6 +413,15 @@ function drawChart() {
 			colors.push(chartcolor(data.getColumnLabel(color)));
 		}
 
+    function midSelectHandler() {
+      var selectedItem = bottom_middle.getSelection()[0];
+      if (selectedItem) {
+        if (bottom_right.getSelection()[0] == undefined || selectedItem.row != bottom_right.getSelection()[0].row) {
+          bottom_right.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
+          google.visualization.events.trigger(bottom_right, 'select');
+        }
+      }
+    }
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
@@ -425,6 +445,7 @@ function drawChart() {
 				easing : 'out',
 			},
 		};
+    google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
 
 		bottom_middle.draw(data, options);
 	}
@@ -451,6 +472,15 @@ function drawChart() {
 			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
 		}
 
+    function rightSelectHandler() {
+      var selectedItem = bottom_right.getSelection()[0];
+      if (selectedItem) {
+        if (bottom_middle.getSelection()[0] == undefined || selectedItem.row != bottom_middle.getSelection()[0].row) {
+          bottom_middle.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
+          google.visualization.events.trigger(bottom_middle, 'select');
+        }
+      }
+    }
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
@@ -474,6 +504,7 @@ function drawChart() {
 				easing : 'out',
 			},
 		};
+    google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		bottom_right.draw(sentimentdata, options);
 	}
@@ -627,7 +658,7 @@ function changeRequest() {
 	}
 	/*
 	 * if (ageradio == "false") { if (age == "All") {
-	 * 
+	 *
 	 * json.Param += "Age,"; json.Values += "All,"; } else { json.Param +=
 	 * "Age,"; var select = document .getElementById('agefilt');
 	 * console.log(age); json.Values += age + ","; } } else {
