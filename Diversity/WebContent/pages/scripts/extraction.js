@@ -413,6 +413,7 @@ function drawChart() {
 			colors.push(chartcolor(data.getColumnLabel(color)));
 		}
 
+
     function midSelectHandler() {
       var selectedItem = bottom_middle.getSelection()[0];
       if (selectedItem) {
@@ -422,6 +423,18 @@ function drawChart() {
         }
       }
     }
+
+		function midSelectHandler() {
+			var selectedItem = bottom_middle.getSelection()[0];
+			if (selectedItem) {
+				if (bottom_right.getSelection()[0] == undefined || selectedItem.row != bottom_right.getSelection()[0].row) {
+					bottom_right.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
+					google.visualization.events.trigger(bottom_right, 'select');
+				}
+			}
+		}
+
+
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
@@ -445,7 +458,11 @@ function drawChart() {
 				easing : 'out',
 			},
 		};
+
     google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
+
+
+		google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
 
 		bottom_middle.draw(data, options);
 	}
@@ -472,6 +489,7 @@ function drawChart() {
 			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
 		}
 
+
     function rightSelectHandler() {
       var selectedItem = bottom_right.getSelection()[0];
       if (selectedItem) {
@@ -481,6 +499,18 @@ function drawChart() {
         }
       }
     }
+
+		function rightSelectHandler() {
+			var selectedItem = bottom_right.getSelection()[0];
+			if (selectedItem) {
+				if (bottom_middle.getSelection()[0] == undefined || selectedItem.row != bottom_middle.getSelection()[0].row) {
+					bottom_middle.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
+					google.visualization.events.trigger(bottom_middle, 'select');
+				}
+			}
+		}
+
+
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
@@ -506,6 +536,7 @@ function drawChart() {
 		};
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
+		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, options);
 	}
 
