@@ -58,6 +58,9 @@ public final class Backend {
 
 				id = msg.getLong("Id");
 			}
+			
+
+			
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
@@ -167,7 +170,11 @@ public final class Backend {
 			 * param, values, id).toString(); return tmp;
 			 */
 			case 4:
-				tmp = gp.getTop(param, values, id).toString();
+				if(msg.has("Product"))
+				tmp = gp.getTop(param, values, id, msg.getString("Product")).toString();
+				else
+					tmp = gp.getTop(param, values, id,"noproduct").toString();
+
 				return tmp;
 			case 5:
 				model = new GetModels();

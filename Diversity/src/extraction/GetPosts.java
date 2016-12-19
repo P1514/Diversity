@@ -48,7 +48,7 @@ public class GetPosts {
 	 * @throws JSONException
 	 *             in case creating json error occurs
 	 */
-	public JSONArray getTop(String param, String month, long id) throws JSONException {
+	public JSONArray getTop(String param, String month, long id, String product) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -59,9 +59,14 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		PreparedStatement query1 = null;
 		int n_tops = 0;
+		System.out.print("TEST:"+product);
+		
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
 				+ "=? AND " + Settings.lotable_product;
+
 		Model model = Data.modeldb.get(id);
+
+		
 		if (model == null) {
 			result = new JSONArray();
 			obj = new JSONObject();
@@ -71,7 +76,10 @@ public class GetPosts {
 			return result;
 		}
 		if (model.getProducts() != null) {
+			if(product=="noproduct")
 			insert += " in (" + model.getProducts() + ")";
+			else
+				insert += "="+Data.identifyProduct(product);
 		} else {
 			insert += "=0";
 		}
@@ -108,7 +116,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			//System.out.print(query1);
+			System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 

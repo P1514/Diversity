@@ -93,6 +93,7 @@ public class BackendTest {
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
 		obj.put("Id", "806");
+		obj.put("Product", "Morris Ground 1");
 		tester = new Backend(4, obj);
 		result = "[{\"Op\":\"table\"},{\"Reach\":\"1.93\",\"Mes"
 				+ "sage\":\"Check the new Morris Ground 1! I say phen"
@@ -124,6 +125,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "getmodels");
+		
 		tester = new Backend(5, obj);
 		result ="[{\"Op\":\"Models\"},{\"PSS\":\"D522-1 PSS\",\"Id\":806,\"Name\":\"Morris "
 				+ "Ground 1\"},{\"PSS\":\"D522-2 PSS\",\"Id\":807,\"Name\":\"D522-2 PSS\"},{\"P"
