@@ -40,22 +40,29 @@ public class Globalsentiment {
 	 * Timespan specifies ammount of year to calculate, String param and values
 	 * the filtering wanted, top5 the Arraylist with the id's wanted.
 	 * 
-	 * @param timespan whole number that represent years
-	 * @param param Example:[Age,Age,Gender]
-	 * @param values Example:[0-30,30-60,Female]
-	 * @param top5 ArrayList with id's
-	 * @throws JSONException is case JSON creation fails
+	 * @param timespan
+	 *            whole number that represent years
+	 * @param param
+	 *            Example:[Age,Age,Gender]
+	 * @param values
+	 *            Example:[0-30,30-60,Female]
+	 * @param top5
+	 *            ArrayList with id's
+	 * @throws JSONException
+	 *             is case JSON creation fails
 	 */
 	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
 			ArrayList<Long> top5) throws JSONException {
 		if (top5.isEmpty())
 			return;
+		PreparedStatement query1 = null;
 		try {
 			dbconnect();
 			String delete = "Delete from reach";
-			PreparedStatement query1 = cnlocal.prepareStatement(delete);
+			query1 = cnlocal.prepareStatement(delete);
 			query1.execute();
 			String result = "";
+			query1.close();
 			cnlocal.close();
 
 			for (long k : top5) {
@@ -66,20 +73,30 @@ public class Globalsentiment {
 			}
 			dbconnect();
 			result = result.replaceAll("\\]\\[", ",");
-			String insert = "Insert into " + Settings.lrtable + " values (?)";
+			String insert = new String("Insert into " + Settings.lrtable + " values (?)");
 			query1 = cnlocal.prepareStatement(insert);
 			query1.setString(1, result);
 			query1.execute();
-			cnlocal.close();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (query1 != null)
+					query1.close();
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/**
-	 * Returns the string in the database with the top reach pss global sentiment.
+	 * Returns the string in the database with the top reach pss global
+	 * sentiment.
 	 *
 	 * @return String
 	 */
@@ -87,34 +104,56 @@ public class Globalsentiment {
 
 		String select = "Select * from " + Settings.lrtable;
 		ArrayList<String> result = new ArrayList<String>();
+		PreparedStatement query1 = null;
+		ResultSet rs = null;
 		try {
 			dbconnect();
-			PreparedStatement query1 = cnlocal.prepareStatement(select);
-			ResultSet rs = query1.executeQuery();
+			query1 = cnlocal.prepareStatement(select);
+			rs = query1.executeQuery();
 			while (rs.next()) {
-				return rs.getString(1);
+				String output = rs.getString(1);
+				rs.close();
+				query1.close();
+				cnlocal.close();
+				return output;
 			}
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (query1 != null)
+					query1.close();
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return "";
 
 	}
 
 	/**
-	 * Calculates Sentiment over the time for the pss with the id provided, timespan
-	 * defines the ammount of years to evaluate, Param and Values are expected
-	 * string with filtering values separated by ',' , index are expected to
-	 * math from both Strings after split.
+	 * Calculates Sentiment over the time for the pss with the id provided,
+	 * timespan defines the ammount of years to evaluate, Param and Values are
+	 * expected string with filtering values separated by ',' , index are
+	 * expected to math from both Strings after split.
 	 *
-	 * @param timespan In years and whole numbers only
-	 * @param param Example: [Age,Age,Location]
-	 * @param values Example:[0-30,30-60,Asia]
-	 * @param output String with filter information
-	 * @param id PSS id
+	 * @param timespan
+	 *            In years and whole numbers only
+	 * @param param
+	 *            Example: [Age,Age,Location]
+	 * @param values
+	 *            Example:[0-30,30-60,Asia]
+	 * @param output
+	 *            String with filter information
+	 * @param id
+	 *            PSS id
 	 * @return JSONArray with all the values requested
-	 * @throws JSONException in case creating a JSON fails
+	 * @throws JSONException
+	 *             in case creating a JSON fails
 	 */
 	public JSONArray globalsentiment(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {
@@ -266,6 +305,9 @@ public class Globalsentiment {
 				auxcalc += (double) rs.getDouble(Settings.lptable_polarity) * rs.getDouble(Settings.lotable_reach);
 				totalreach += rs.getDouble(Settings.lotable_reach);
 			}
+			rs.close();
+			query1.close();
+			cnlocal.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -303,18 +345,23 @@ public class Globalsentiment {
 	}
 
 	/**
-	 * Calculates Average Sentiment over the time for the pss with the id provided, timespan
-	 * defines the ammount of years to evaluate, Param and Values are expected
-	 * string with filtering values separated by ',' , index are expected to
-	 * math from both Strings after split.
+	 * Calculates Average Sentiment over the time for the pss with the id
+	 * provided, timespan defines the ammount of years to evaluate, Param and
+	 * Values are expected string with filtering values separated by ',' , index
+	 * are expected to math from both Strings after split.
 	 * 
 	 * 
-	 * @param timespan In years and whole numbers only
-	 * @param param Example: [Age,Age,Location]
-	 * @param values Example:[0-30,30-60,Asia]
-	 * @param id PSS id
+	 * @param timespan
+	 *            In years and whole numbers only
+	 * @param param
+	 *            Example: [Age,Age,Location]
+	 * @param values
+	 *            Example:[0-30,30-60,Asia]
+	 * @param id
+	 *            PSS id
 	 * @return JSONArray with the value requested
-	 * @throws JSONException in case creating a JSON fails
+	 * @throws JSONException
+	 *             in case creating a JSON fails
 	 */
 	public JSONArray getAvgSentiment(int timespan /* years */, String param, String values, long id)
 			throws JSONException {
@@ -344,7 +391,7 @@ public class Globalsentiment {
 			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
 			avg++;
 		}
-		value = value / avg;
+		value = value / ((avg != 0) ? avg : 1);
 		String temp;
 		temp = String.format("%.0f", value);
 		try {
@@ -361,10 +408,13 @@ public class Globalsentiment {
 	}
 
 	/**
-	 * Calculates Polarity Distribution over the time for the pss with the id provided, Param and Values are expected
-	 * string with filtering values separated by ',' , index are expected to
-	 * math from both Strings after split, output is the string that is going to be returned referencing the type of filtering applied.
-	 * <p>Distribution agregates values:
+	 * Calculates Polarity Distribution over the time for the pss with the id
+	 * provided, Param and Values are expected string with filtering values
+	 * separated by ',' , index are expected to math from both Strings after
+	 * split, output is the string that is going to be returned referencing the
+	 * type of filtering applied.
+	 * <p>
+	 * Distribution agregates values:
 	 * <ul>
 	 * <li>0-20 -&gt; '--'</li>
 	 * <li>21-40 -&gt; '-'</li>
@@ -373,12 +423,17 @@ public class Globalsentiment {
 	 * <li>81-100 -&gt; '++'</li>
 	 * </ul>
 	 *
-	 * @param id PSS id
-	 * @param param Example: [Age,Age,Location]
-	 * @param value Example:[0-30,30-60,Asia]
-	 * @param output String representing what filtering was applied
+	 * @param id
+	 *            PSS id
+	 * @param param
+	 *            Example: [Age,Age,Location]
+	 * @param value
+	 *            Example:[0-30,30-60,Asia]
+	 * @param output
+	 *            String representing what filtering was applied
 	 * @return JSONArray with all the values requested
-	 * @throws JSONException in case creating a JSON fails
+	 * @throws JSONException
+	 *             in case creating a JSON fails
 	 */
 	public JSONArray getPolarityDistribution(long id, String param, String value, String output) throws JSONException {
 		JSONArray result = new JSONArray();
@@ -462,7 +517,7 @@ public class Globalsentiment {
 				query1.setString(rangeindex++, location);
 			// System.out.println(query1);
 
-			//System.out.print(query1 + "\n");
+			// System.out.print(query1 + "\n");
 			rs = query1.executeQuery();
 			rs.next();
 
@@ -493,6 +548,18 @@ public class Globalsentiment {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if(rs!=null)
+				rs.close();
+				if(query1!=null)
+				query1.close();
+				if(cnlocal!=null)
+				cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return result;

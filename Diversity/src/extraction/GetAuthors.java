@@ -3,6 +3,7 @@ package extraction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,8 +23,8 @@ public class GetAuthors {
 	/**
 	 * Class to fetch data from all authors.
 	 */
-	public GetAuthors() {
-	}
+	/*public GetAuthors() {
+	}*/
 
 	/**
 	 * Returns a JSONArray with all the information from all authors, regarding
@@ -42,7 +43,7 @@ public class GetAuthors {
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "authtable");
 		result.put(obj);
-		String insert = new String();
+		String insert;
 		PreparedStatement query1 = null;
 		insert = "Select * FROM " + Settings.latable + " where id in (Select " + Settings.lotable_author + " from "
 				+ Settings.lotable + ")";
@@ -52,7 +53,7 @@ public class GetAuthors {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			rs = query1.executeQuery();
-			for (; rs.next();) {
+			while(rs.next()){
 				obj = new JSONObject();
 				obj.put("Name", rs.getString(Settings.latable_name));
 				obj.put("Gender", rs.getString(Settings.latable_gender));
@@ -71,27 +72,22 @@ public class GetAuthors {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error Loading from Database");
 		} finally {
 			try {
 				if (rs != null)
 					rs.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
+			
 				if (query1 != null)
 					query1.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
+
+			
 				if (cnlocal != null)
-					cnlocal.close();
-			} catch (Exception e) {
-			}
-			;
+					
+						cnlocal.close();
+					} catch (SQLException e) {
+						System.out.println("Error Closing Connections");
+					}
 		}
 
 		return result;

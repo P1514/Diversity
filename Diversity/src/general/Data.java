@@ -23,16 +23,16 @@ public class Data {
 	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
-	
+
 	/** The modeldb. */
 	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
-	
+
 	/** The pssdb. */
 	public static ConcurrentHashMap<Long, PSS> pssdb = new ConcurrentHashMap<Long, PSS>();
-	
+
 	/** The productdb. */
 	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
-	
+
 	/** The companydb. */
 	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
 	private long totalposts;
@@ -58,7 +58,8 @@ public class Data {
 	/**
 	 * Identify PSS byproduct.
 	 *
-	 * @param product the product id
+	 * @param product
+	 *            the product id
 	 * @return the long id
 	 */
 	public static long identifyPSSbyproduct(long product) {
@@ -72,7 +73,8 @@ public class Data {
 	/**
 	 * Identify PSS byname.
 	 *
-	 * @param name the name of the pss
+	 * @param name
+	 *            the name of the pss
 	 * @return the long id
 	 */
 	public static long identifyPSSbyname(String name) {
@@ -88,7 +90,8 @@ public class Data {
 	/**
 	 * Identify product by message.
 	 *
-	 * @param message the message
+	 * @param message
+	 *            the message
 	 * @return the long id
 	 */
 	public static long identifyProduct(String message) {
@@ -101,12 +104,14 @@ public class Data {
 		return 0;
 	}
 
+	@SuppressWarnings("resource")
 	private void LoadPSS() {
+		PreparedStatement query = null;
+		ResultSet rs = null;
 		try {
 			String select = "Select * from " + Settings.crpsstable;
 			cncr = Settings.conncr();
-			PreparedStatement query = cncr.prepareStatement(select);
-			ResultSet rs;
+			query = cncr.prepareStatement(select);
 			rs = query.executeQuery();
 			while (rs.next()) {
 				pssdb.put(rs.getLong(Settings.crpsstable_id),
@@ -157,20 +162,35 @@ public class Data {
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("ERROR: Settings class not found inside LoadPSS() on Data class");
+		} finally {
+			try {
+				if(rs!= null)
+					rs.close();
+				if(query != null)
+				query.close();
+				if(cncr!=null)
+				cncr.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/**
 	 * Loads the program
 	 *
-	 * @param json the json with the information
+	 * @param json
+	 *            the json with the information
 	 * @return the string to check if successfull or not
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public String load(JSONArray json) throws JSONException {
 
 		return loadJSON(json);
 	}
+
 	private String loadJSON(JSONArray json) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -334,7 +354,9 @@ public class Data {
 								auth);
 					}
 				}
+				stmt2.close();
 			}
+
 			rs.close();
 			stmt.close();
 			cnlocal.close();
@@ -598,12 +620,17 @@ public class Data {
 		} catch (SQLException e1) {
 			// Auto-generated catch block
 			e1.printStackTrace();
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (query1 != null)
+					query1.close();
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		;
 
@@ -620,7 +647,8 @@ public class Data {
 	 * Load from local database
 	 *
 	 * @return the string if successful or not
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public String load() throws JSONException {
 
@@ -717,6 +745,15 @@ public class Data {
 			cnlocal.close();
 		} catch (ClassNotFoundException | SQLException e2) {
 			e2.printStackTrace();
+		} finally {
+			try {
+				rs.close();
+				stmt.close();
+				cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// Load PSS
@@ -1114,7 +1151,8 @@ public class Data {
 	/**
 	 * Returns an Author Object based on id.
 	 *
-	 * @param id            User id to search for
+	 * @param id
+	 *            User id to search for
 	 * @return Object
 	 */
 	public Author getAuthor(int id) {
@@ -1124,7 +1162,8 @@ public class Data {
 	/**
 	 * Returns an Author Object based on Opinion.
 	 *
-	 * @param op            Opinion Object
+	 * @param op
+	 *            Opinion Object
 	 * @return Object
 	 */
 	public Author getAuthor(Opinion op) {
@@ -1134,7 +1173,8 @@ public class Data {
 	/**
 	 * Returns an Author Object based on Post.
 	 *
-	 * @param comment            Post Object
+	 * @param comment
+	 *            Post Object
 	 * @return Object
 	 */
 	public Author getAuthor(Post comment) {
@@ -1188,13 +1228,16 @@ public class Data {
 		/**
 		 * Instantiates a new tauthors.
 		 *
-		 * @param _a the a
+		 * @param _a
+		 *            the a
 		 */
 		public Tauthors(Author _a) {
 			a = _a;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
@@ -1256,7 +1299,8 @@ public class Data {
 		/**
 		 * Instantiates a new topinions referenced to local data.
 		 *
-		 * @param _id the id of the opinion
+		 * @param _id
+		 *            the id of the opinion
 		 */
 		public Topinions(long _id) {
 			id = _id;
@@ -1266,25 +1310,30 @@ public class Data {
 		/**
 		 * Instantiates a new topinions referenced to remote.
 		 *
-		 * @param _obj the json object from remote
+		 * @param _obj
+		 *            the json object from remote
 		 */
 		public Topinions(JSONObject _obj) {
 			obj = _obj;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
 			if (obj == null) {
+				Statement stmt = null;
+				ResultSet rs = null;
 				try {
 					condata = Settings.conndata();
 					conlocal = Settings.connlocal();
 					boolean remote = true;
 					String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_postid + " = "
 							+ id);
-					Statement stmt = condata.createStatement();
-					ResultSet rs = stmt.executeQuery(query);
+					stmt = condata.createStatement();
+					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
 						query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
 						stmt = conlocal.createStatement();
@@ -1310,7 +1359,7 @@ public class Data {
 					String message = remote ? rs.getString(Settings.rptable_message)
 							: rs.getString(Settings.lptable_message);
 					long product = identifyProduct(message);
-					if (product == 0){
+					if (product == 0) {
 						rs.close();
 						stmt.close();
 						conlocal.close();
@@ -1335,15 +1384,33 @@ public class Data {
 				} catch (SQLException | ClassNotFoundException e) {
 					System.out.println("ERROR loading Opinions");
 					e.printStackTrace();
+				} finally {
+					try {
+						if (rs != null)
+							rs.close();
+						if (stmt != null)
+							stmt.close();
+						if (condata != null)
+							condata.close();
+						if (conlocal != null)
+							conlocal.close();
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 			} else {
 				// Run this if importing from JSON
+				Statement stmt = null;
+				ResultSet rs = null;
 				try {
 					conlocal = Settings.connlocal();
 					boolean remote = false;
 					String query = ("Select * from " + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
-					Statement stmt = conlocal.createStatement();
-					ResultSet rs = stmt.executeQuery(query);
+					stmt = conlocal.createStatement();
+					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
 						remote = true;
 						rs.close();
@@ -1374,7 +1441,7 @@ public class Data {
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
 					long product = identifyProduct(message);
-					if (product == 0){
+					if (product == 0) {
 						rs.close();
 						stmt.close();
 						conlocal.close();
@@ -1415,6 +1482,22 @@ public class Data {
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} finally {
+					try {
+						if (rs != null)
+							rs.close();
+						if (stmt != null)
+							stmt.close();
+						if (condata != null)
+							condata.close();
+						if (conlocal != null)
+							conlocal.close();
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 
 			}
@@ -1435,7 +1518,8 @@ public class Data {
 		/**
 		 * Instantiates a new tposts referenced to local data.
 		 *
-		 * @param _id the id of the opinion
+		 * @param _id
+		 *            the id of the opinion
 		 */
 		public Tposts(long _id) {
 			id = _id;
@@ -1446,8 +1530,10 @@ public class Data {
 		/**
 		 * Instantiates a new tposts referenced to remote data.
 		 *
-		 * @param _obj the json object from remote
-		 * @throws JSONException the JSON exception
+		 * @param _obj
+		 *            the json object from remote
+		 * @throws JSONException
+		 *             the JSON exception
 		 */
 		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
@@ -1455,11 +1541,16 @@ public class Data {
 					? opiniondb.get(_obj.getLong(Settings.JSON_postid)) : null;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
-			if(_opin==null) return;
+			if (_opin == null)
+				return;
+			Statement stmt=null;
+			ResultSet rs = null;
 			if (obj == null) {
 				try {
 					// System.out.println("HELLO1");
@@ -1467,9 +1558,9 @@ public class Data {
 					conlocal = Settings.connlocal();
 					String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = "
 							+ id);
-					Statement stmt = condata.createStatement();
+					 stmt = condata.createStatement();
 					// System.out.println(query);
-					ResultSet rs = stmt.executeQuery(query);
+					 rs = stmt.executeQuery(query);
 					if (rs.next()) {
 						do {
 							// System.out.println("HELLO2");
@@ -1514,15 +1605,32 @@ public class Data {
 						condata.close();
 					if (conlocal != null)
 						conlocal.close();
+					opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
 					System.out.println("ERROR loading Posts");
 					e.printStackTrace();
 				} catch (SQLException e) {
 					//
 					e.printStackTrace();
+				} finally {
+					try {
+						if (rs != null)
+							rs.close();
+						if (stmt != null)
+							stmt.close();
+						if (condata != null)
+							condata.close();
+						if (conlocal != null)
+							conlocal.close();
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 
-				opiniondb.put(id, _opin);
+				
 			} else {
 				try {
 
@@ -1575,6 +1683,22 @@ public class Data {
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				} finally {
+					try {
+						if (rs != null)
+							rs.close();
+						if (stmt != null)
+							stmt.close();
+						if (condata != null)
+							condata.close();
+						if (conlocal != null)
+							conlocal.close();
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 
 			}
@@ -1591,12 +1715,14 @@ public class Data {
 		 */
 		public void Tmodels() {
 			// System.out.println("HELLO1");
+			Statement stmt =null;
+			ResultSet rs = null;
 			try {
 				cnlocal = Settings.connlocal();
 				String query = ("Select * from " + Settings.lmtable);
-				Statement stmt = cnlocal.createStatement();
+				stmt = cnlocal.createStatement();
 				// System.out.println(query);
-				ResultSet rs = stmt.executeQuery(query);
+				rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
 						Model model = new Model(rs.getLong(Settings.latable_id), rs.getLong(Settings.lmtable_update),
@@ -1613,7 +1739,21 @@ public class Data {
 			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
 			} finally {
-				
+				try {
+					if (rs != null)
+						rs.close();
+					if (stmt != null)
+						stmt.close();
+					if (condata != null)
+						condata.close();
+					if (conlocal != null)
+						conlocal.close();
+
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 			}
 		}
 	}

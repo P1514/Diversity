@@ -40,6 +40,7 @@ public class GetInfGraph {
 	 * @return JSONArray with all the information present about that specific author
 	 * @throws JSONException if an error occured creating a JSON
 	 */
+	@Deprecated
 	public JSONArray getAll(String name) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -67,6 +68,8 @@ public class GetInfGraph {
 			e.printStackTrace();
 		} finally {
 			try {
+				if(rs != null)
+					rs.close();
 				if (query != null)
 					if (rs != null)
 						rs.close();
@@ -81,6 +84,7 @@ public class GetInfGraph {
 
 		return result;
 	}
+	@Deprecated
 
 	private void dbconnect() {
 		try {

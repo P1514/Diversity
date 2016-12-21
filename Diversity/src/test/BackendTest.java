@@ -16,7 +16,6 @@ public class BackendTest {
 	Backend tester;
 	String result;
 	Oversight o = new Oversight(true);
-	public Connection cnlocal;
 
 	public BackendTest(){
 		o.run();

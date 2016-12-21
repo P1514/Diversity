@@ -33,11 +33,12 @@ public class Startup implements ServletContextListener {
 		Oversight o = new Oversight(true);
 		o.run();
 		new Oversight();
+		Connection cnlocal = null;
+		Statement stmt = null;
+		ResultSet rs = null;
 		try {
-			Connection cnlocal = Settings.connlocal();
+			cnlocal = Settings.connlocal();
 			String select = "Select * from general WHERE id=1";
-			Statement stmt = null;
-			ResultSet rs = null;
 			stmt=cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
@@ -66,6 +67,20 @@ public class Startup implements ServletContextListener {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (stmt != null)
+					stmt.close();
+				if (cnlocal != null)
+					cnlocal.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 		/*GetModels model = new GetModels();

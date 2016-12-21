@@ -65,6 +65,16 @@ public class GetReach {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				if (query1 != null)
+					query1.close();
+				if (cnlocal != null)
+					cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return tops;
@@ -124,7 +134,7 @@ public class GetReach {
 			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
 			avg++;
 		}
-		value = value / avg;
+		value = value / ((avg != 0) ? avg : 1);
 		String temp;
 		temp = String.format("%.2f", value);
 		try {
