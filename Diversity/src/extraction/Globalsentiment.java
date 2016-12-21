@@ -85,6 +85,11 @@ public class Globalsentiment {
 			try {
 				if (query1 != null)
 					query1.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
@@ -103,7 +108,6 @@ public class Globalsentiment {
 	public String Topreachglobalsentiment() {
 
 		String select = "Select * from " + Settings.lrtable;
-		ArrayList<String> result = new ArrayList<String>();
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
 		try {
@@ -124,6 +128,11 @@ public class Globalsentiment {
 			try {
 				if (query1 != null)
 					query1.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
@@ -550,12 +559,22 @@ public class Globalsentiment {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(rs!=null)
-				rs.close();
-				if(query1!=null)
-				query1.close();
-				if(cnlocal!=null)
-				cnlocal.close();
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (query1 != null)
+					query1.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (cnlocal != null)
+					cnlocal.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

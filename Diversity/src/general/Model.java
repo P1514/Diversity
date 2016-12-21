@@ -145,6 +145,9 @@ public final class Model {
 			try {
 				if (query1 != null)
 					query1.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
@@ -218,6 +221,9 @@ public final class Model {
 			try {
 				if (query1 != null)
 					query1.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
 				if (cnlocal != null)
 
 					cnlocal.close();

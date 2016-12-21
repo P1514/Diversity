@@ -13,12 +13,6 @@ import general.Model;
 public class GetModels {
 
 	/**
-	 * Instantiates a new gets the models.
-	 */
-	public GetModels() {
-	}
-
-	/**
 	 * Gets the all models.
 	 *
 	 * @return the models

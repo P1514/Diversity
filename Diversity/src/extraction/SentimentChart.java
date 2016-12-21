@@ -20,14 +20,6 @@ import general.Settings;
 public class SentimentChart {
 
 	private Connection cnlocal;
-
-	/**
-	 * Instantiates a new sentiment chart.
-	 */
-	public SentimentChart() {
-
-	}
-
 	private JSONArray chartrequest(String param, String value, long id) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();

@@ -17,13 +17,6 @@ import general.Product;
 public class GetProducts {
 
 	/**
-	 * Class that handles Product Requests.
-	 */
-	public GetProducts() {
-
-	}
-
-	/**
 	 * Returns a JSONArray with information about all products present in the
 	 * database, and their respective relation to other products or pss's.
 	 * 

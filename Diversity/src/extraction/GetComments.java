@@ -29,7 +29,8 @@ public class GetComments {
 	 * <p>
 	 * Returns and JSONArray with all comments for a specific post referring to
 	 * the the entry JSONObject.
-	 * <p>Examples:
+	 * <p>
+	 * Examples:
 	 * <ul>
 	 * <li>Input:{"Values":"70182","Id":"820"}, it will then fetch comments from
 	 * the Database regarding the parent posts with id "70182" and model with
@@ -41,9 +42,11 @@ public class GetComments {
 	 * </ul>
 	 * <p>
 	 *
-	 * @param msg JSONObject with the information o request
+	 * @param msg
+	 *            JSONObject with the information o request
 	 * @return JSONArray
-	 * @throws JSONException is case input is not in correct format
+	 * @throws JSONException
+	 *             is case input is not in correct format
 	 */
 
 	public JSONArray getAll(JSONObject msg) throws JSONException {
@@ -72,17 +75,16 @@ public class GetComments {
 
 			rs = query1.executeQuery();
 
-			for (i = 0; ; i++) {
-				if(!rs.next())break; 
+			for (i = 0;; i++) {
+				if (!rs.next())
+					break;
 				ntops++;
 				preresult[i] = rs.getString(Settings.latable_name) + ",," + rs.getDouble(Settings.latable_influence)
-				+ ",," + rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
-				+ ",," + rs.getInt(Settings.latable_age) + ",,";
+						+ ",," + rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
+						+ ",," + rs.getInt(Settings.latable_age) + ",,";
 				preresult[i] += rs.getDouble(Settings.lptable_polarity) + ",,";
 				preresult[i] += rs.getString(Settings.lptable_message);
 			}
-			rs.close();
-			query1.close();
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -91,10 +93,16 @@ public class GetComments {
 			try {
 				if (rs != null)
 					rs.close();
-
+			} catch (Exception e) {
+				System.out.println("Error Closing Connections");
+			}
+			try {
 				if (query1 != null)
 					query1.close();
-
+			} catch (Exception e) {
+				System.out.println("Error Closing Connections");
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
@@ -123,11 +131,12 @@ public class GetComments {
 	/**
 	 * Trunc.
 	 *
-	 * @param number the number
+	 * @param number
+	 *            the number
 	 * @return the string
 	 */
 	private String trunc(String number) {
-		
+
 		double result = Double.valueOf(number);
 		number = String.format("%.1f", result);
 		result = Double.parseDouble(number.replaceAll(",", "."));

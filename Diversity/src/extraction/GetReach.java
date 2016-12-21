@@ -27,13 +27,6 @@ public class GetReach {
 	private Connection cnlocal;
 
 	/**
-	 * Responsible for handling Reach requests.
-	 */
-	public GetReach() {
-	}
-	// TODO Redo this piece of code
-
-	/**
 	 * Returns an array list with the nTOP number of pss's with higher reach on
 	 * the of the last 12 months.
 	 * 
@@ -67,8 +60,20 @@ public class GetReach {
 			e.printStackTrace();
 		} finally {
 			try {
+				if (rs != null)
+					rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
 				if (query1 != null)
 					query1.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
@@ -288,13 +293,19 @@ public class GetReach {
 	 * Strings after split, output is the string that is going to be returned
 	 * referencing the type of filtering applied.
 	 *
-	 * @param timespan whole numbers only
-	 * @param param            Example: [Age,Age,Location]
-	 * @param values            Example:[0-30,30-60,Asia]
-	 * @param output            String representing what filtering was applied
-	 * @param id            PSS id
+	 * @param timespan
+	 *            whole numbers only
+	 * @param param
+	 *            Example: [Age,Age,Location]
+	 * @param values
+	 *            Example:[0-30,30-60,Asia]
+	 * @param output
+	 *            String representing what filtering was applied
+	 * @param id
+	 *            PSS id
 	 * @return JSONArray with all the values requested
-	 * @throws JSONException             in case creating a JSON fails
+	 * @throws JSONException
+	 *             in case creating a JSON fails
 	 */
 	public JSONArray globalreach(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {

@@ -164,12 +164,22 @@ public class Data {
 			System.out.println("ERROR: Settings class not found inside LoadPSS() on Data class");
 		} finally {
 			try {
-				if(rs!= null)
+				if (rs != null)
 					rs.close();
-				if(query != null)
-				query.close();
-				if(cncr!=null)
-				cncr.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (query != null)
+					query.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (cncr != null)
+					cncr.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -517,10 +527,12 @@ public class Data {
 				e.printStackTrace();
 				return;
 			} finally {
-				/*
-				 * try { if (query1 != null) query1.close(); } catch (Exception
-				 * e) { }
-				 */
+				try {
+					if (query1 != null)
+						query1.close();
+				} catch (Exception e) {
+				}
+
 			}
 		});
 
@@ -624,8 +636,14 @@ public class Data {
 			try {
 				if (rs != null)
 					rs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
 				if (query1 != null)
 					query1.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
@@ -747,8 +765,17 @@ public class Data {
 			e2.printStackTrace();
 		} finally {
 			try {
+				if(rs!=null)
 				rs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
+				if(stmt!=null)
 				stmt.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}try{
+				if(cnlocal!=null)
 				cnlocal.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -1388,10 +1415,19 @@ public class Data {
 					try {
 						if (rs != null)
 							rs.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (stmt != null)
 							stmt.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (condata != null)
 							condata.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1486,10 +1522,19 @@ public class Data {
 					try {
 						if (rs != null)
 							rs.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (stmt != null)
 							stmt.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (condata != null)
 							condata.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1549,7 +1594,7 @@ public class Data {
 		public void run() {
 			if (_opin == null)
 				return;
-			Statement stmt=null;
+			Statement stmt = null;
 			ResultSet rs = null;
 			if (obj == null) {
 				try {
@@ -1558,9 +1603,9 @@ public class Data {
 					conlocal = Settings.connlocal();
 					String query = ("Select * from " + Settings.rptable + " Where " + Settings.rptable_rpostid + " = "
 							+ id);
-					 stmt = condata.createStatement();
+					stmt = condata.createStatement();
 					// System.out.println(query);
-					 rs = stmt.executeQuery(query);
+					rs = stmt.executeQuery(query);
 					if (rs.next()) {
 						do {
 							// System.out.println("HELLO2");
@@ -1616,10 +1661,19 @@ public class Data {
 					try {
 						if (rs != null)
 							rs.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (stmt != null)
 							stmt.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (condata != null)
 							condata.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1630,7 +1684,6 @@ public class Data {
 
 				}
 
-				
 			} else {
 				try {
 
@@ -1687,10 +1740,19 @@ public class Data {
 					try {
 						if (rs != null)
 							rs.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (stmt != null)
 							stmt.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (condata != null)
 							condata.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}try{
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1715,7 +1777,7 @@ public class Data {
 		 */
 		public void Tmodels() {
 			// System.out.println("HELLO1");
-			Statement stmt =null;
+			Statement stmt = null;
 			ResultSet rs = null;
 			try {
 				cnlocal = Settings.connlocal();
@@ -1742,10 +1804,19 @@ public class Data {
 				try {
 					if (rs != null)
 						rs.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}try{
 					if (stmt != null)
 						stmt.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}try{
 					if (condata != null)
 						condata.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}try{
 					if (conlocal != null)
 						conlocal.close();
 

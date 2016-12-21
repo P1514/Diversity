@@ -72,9 +72,19 @@ public class Roles {
 			try {
 				if (rs != null)
 					rs.close();
-				if(stmt != null)
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (stmt != null)
 					stmt.close();
-				if(cnlocal!= null)
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block

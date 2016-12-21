@@ -23,19 +23,23 @@ public class GetAuthors {
 	/**
 	 * Class to fetch data from all authors.
 	 */
-	/*public GetAuthors() {
-	}*/
+	/*
+	 * public GetAuthors() { }
+	 */
 
 	/**
 	 * Returns a JSONArray with all the information from all authors, regarding
 	 * each author Name, Gender, Age, Location, Number of Posts, Average
 	 * Comments, Likes and Views for the posts each one created, and also their
 	 * influence.
-	 * <p>Example : [{"Name":"John", "Gender":"Male", "Age":"Location",
-	 *      "Nposts":"10", "Avgcomms":"12.22", "Avglikes":"122.25", "Influence":"1.7"},{...}]
+	 * <p>
+	 * Example : [{"Name":"John", "Gender":"Male", "Age":"Location",
+	 * "Nposts":"10", "Avgcomms":"12.22", "Avglikes":"122.25",
+	 * "Influence":"1.7"},{...}]
 	 *
 	 * @return JSONArray with the information in the Database
-	 * @throws JSONException is case the json is not created successfully
+	 * @throws JSONException
+	 *             is case the json is not created successfully
 	 */
 	@Deprecated
 	public JSONArray getAll() throws JSONException {
@@ -53,7 +57,7 @@ public class GetAuthors {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
 			rs = query1.executeQuery();
-			while(rs.next()){
+			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString(Settings.latable_name));
 				obj.put("Gender", rs.getString(Settings.latable_gender));
@@ -77,17 +81,23 @@ public class GetAuthors {
 			try {
 				if (rs != null)
 					rs.close();
-			
+			} catch (SQLException e) {
+				System.out.println("Error Closing Connections");
+			}
+			try {
 				if (query1 != null)
 					query1.close();
 
-			
+			} catch (SQLException e) {
+				System.out.println("Error Closing Connections");
+			}
+			try {
 				if (cnlocal != null)
-					
-						cnlocal.close();
-					} catch (SQLException e) {
-						System.out.println("Error Closing Connections");
-					}
+
+					cnlocal.close();
+			} catch (SQLException e) {
+				System.out.println("Error Closing Connections");
+			}
 		}
 
 		return result;

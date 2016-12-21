@@ -27,11 +27,6 @@ public class GetPosts {
 	private Connection cnlocal;
 	private int MAXTOP = 5;
 
-	/**
-	 * Instantiates a new gets the posts.
-	 */
-	public GetPosts() {
-	}
 
 	/**
 	 * Method that uses the input to get Top 5 parent posts information, uses
