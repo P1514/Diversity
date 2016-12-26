@@ -9,17 +9,18 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-// TODO: Auto-generated Javadoc
 /**
  * The Class Data.
  */
 public class Data {
+	private static final Logger LOGGER = Logger.getLogger( Data.class.getName() );
 	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
@@ -157,32 +158,27 @@ public class Data {
 			cncr.close();
 
 		} catch (SQLException e1) {
-			System.out.println("ERROR: Connecting do Common Repository Database");
-			e1.printStackTrace();
+			LOGGER.log(Level.SEVERE,"ERROR: Cannot connect to Common Repository Check setup");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("ERROR: Settings class not found inside LoadPSS() on Data class");
+			LOGGER.log(Level.FINE,"ERROR: Settings class not found inside LoadPSS() on Data class");
 		} finally {
 			try {
 				if (rs != null)
 					rs.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}
 			try {
 				if (query != null)
 					query.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}
 			try {
 				if (cncr != null)
 					cncr.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}
 		}
 	}
@@ -241,7 +237,7 @@ public class Data {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			e1.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Local database either missing or not on last version please update");
 			return result.toString();
 
 		} finally {
@@ -249,19 +245,19 @@ public class Data {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "Nothing can be done here error closing");
 			}
 			try {
 				if (rs != null)
 					rs.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "Nothing can be done here error closing");
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "Nothing can be done here error closing");
 			}
 		}
 		// Load PSS
@@ -278,8 +274,7 @@ public class Data {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			} catch (InterruptedException e) {
-				System.out.println("ERROR THREAD OP");
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Error on Thread Opinions while loading data");
 			}
 			// System.out.println("HELLO");
 			es = Executors.newFixedThreadPool(50);
@@ -289,8 +284,7 @@ public class Data {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			} catch (InterruptedException e) {
-				System.out.println("ERROR THREAD Posts");
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Error on Thread Posts while loading data");
 			}
 			System.out.println(" Load posts from remote " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
@@ -319,14 +313,12 @@ public class Data {
 			// Fetch local DB for users
 			rs.close();
 			stmt.close();
-			cnlocal.close();// TODO tirar a parte de ir buscar users to remote
-							// daqui pois passa a ir buscar ao JSON
+			cnlocal.close();
 			cnlocal = Settings.connlocal();
 			String querycond = "";
 			for (Author user : users2) {
 				if (user == null)
-					continue;// TODO find the error in here sometimes null
-								// appears
+					continue;
 				System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
 				System.out.println(" RESULT STRING " + querycond);
 				querycond += user.getUID() + ",";
@@ -394,12 +386,7 @@ public class Data {
 				if (authordb2.containsKey(user.getUID() + "," + user.getSource())) {
 					Author luser = authordb2.get(user.getUID() + "," + user.getSource());
 					boolean gender = false, location = false, age = false;
-					location = luser.getLocation().equals("");// TODO see issue
-																// regarding
-																// people
-																// changing
-																// their
-																// location
+					location = luser.getLocation().equals("");
 					gender = luser.getGender().equals("");
 					age = luser.getAge() == -1;
 					if (gender || location || age) {
@@ -416,38 +403,38 @@ public class Data {
 				;
 			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.out.print(e.getMessage());
+			LOGGER.log(Level.FINE, e.toString());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
 			obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
 			result.put(obj);
+			LOGGER.log(Level.SEVERE, "Remote Database Error, Please Check if Populated");
 			return result.toString();
 		} finally {
 			if (rs != null)
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 				}
 			if (stmt != null)
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 				}
 			if (cndata != null)
 				try {
 					cndata.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 				}
 			if (cnlocal != null)
 				try {
 					cnlocal.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 				}
 		}
 
@@ -495,7 +482,7 @@ public class Data {
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
+			LOGGER.log(Level.FINE, "Settings Static Class Not Found");
 		}
 		authordb2.forEach((k, author) -> {
 			String insert = "INSERT INTO " + Settings.latable + " "
@@ -524,13 +511,14 @@ public class Data {
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, e.toString(), e);
 				return;
 			} finally {
 				try {
 					if (query1 != null)
 						query1.close();
 				} catch (Exception e) {
+					LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 				}
 
 			}
@@ -584,23 +572,24 @@ public class Data {
 								if (query2 != null)
 									query2.close();
 							} catch (Exception e) {
-								e.printStackTrace();
+								LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 							} finally {
 								try {
 									if (query2 != null)
 										query2.close();
 								} catch (Exception e) {
+									LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 								}
 							}
 						});
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.FINE, e.toString(), e);
 					} finally {
 						try {
 							if (query1 != null)
 								query1.close();
 						} catch (Exception e) {
-							e.printStackTrace();
+							LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 						}
 					}
 
@@ -612,8 +601,7 @@ public class Data {
 		try {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
-			System.out.println("ERROR THREAD OP");
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error on Thread that adds Post to Local Database", e);
 		}
 		System.out.println(" insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
@@ -630,24 +618,23 @@ public class Data {
 			query1.setDate(5, (Date) LastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
-			// Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.log(Level.FINE, "SQL Error", e1);
 		} finally {
 			try {
 				if (rs != null)
 					rs.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}try{
 				if (query1 != null)
 					query1.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}try{
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
 			}
 		}
 		;
@@ -701,16 +688,21 @@ public class Data {
 				if (rs != null)
 
 					rs.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+			}try{
 
 				if (stmt != null)
 					stmt.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+			}try{
 				if (cndata != null)
 					cndata.close();
 			} catch (SQLException e) {
-				//
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
-			e1.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Local database either missing or not on last version please update");
 			return result.toString();
 
 		} finally {
@@ -718,19 +710,19 @@ public class Data {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 			try {
 				if (rs != null)
 					rs.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 		}
 
@@ -762,24 +754,23 @@ public class Data {
 			stmt.close();
 			cnlocal.close();
 		} catch (ClassNotFoundException | SQLException e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error on SQL Input", e2);
 		} finally {
 			try {
 				if(rs!=null)
 				rs.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}try{
 				if(stmt!=null)
 				stmt.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}try{
 				if(cnlocal!=null)
 				cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 		}
 
@@ -801,26 +792,29 @@ public class Data {
 						+ " > \'" + LastUpdated + "\' && " + Settings.ptime + " <= \'" + LastUpdated2
 						+ "\' ORDER BY ID ASC");
 				stmt = cndata.createStatement();
-				// System.out.println(query);
 				rs = stmt.executeQuery(query);
-
-				// TODO refactor after this read post
-				/*
-				 * query = ("Select * from " + Settings.posttn + " Where " +
-				 * Settings.ptime + " > \'" + LastUpdated + "\' && " +
-				 * Settings.ptime + " <= \'" + LastUpdated2 +
-				 * "\' ORDER BY ID ASC"); //System.out.println(query); stmt =
-				 * cndata.createStatement(); rs = stmt.executeQuery(query);
-				 */
 				if (!rs.next()) {
 					obj.put("Op", "Error");
 					obj.put("Message", "Loaded Successfully");
 					result.put(obj);
+					try{
 					rs.close();
+					}catch(Exception e){
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}try{
 					stmt.close();
+					}catch(Exception e){
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}try{
 					cndata.close();
-					return result
-							.toString();/*
+					}catch(Exception e){
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}try{
+					cnlocal.close();
+					}catch(Exception e){
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}
+					return result.toString();/*
 										 * LastUpdated = LastUpdated2; if
 										 * (LastUpdated.after(new
 										 * java.sql.Date(Calendar.getInstance().
@@ -846,8 +840,7 @@ public class Data {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			} catch (InterruptedException e) {
-				System.out.println("ERROR THREAD OP");
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, "Error on Thread that loads Opinions");
 			}
 			rs.beforeFirst();
 			// System.out.println("HELLO");
@@ -858,8 +851,7 @@ public class Data {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			} catch (InterruptedException e) {
-				System.out.println("ERROR THREAD Posts");
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, "Error on Thread that Loads posts");
 			}
 			rs.close();
 			stmt.close();
@@ -912,35 +904,34 @@ public class Data {
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.out.print(e.getMessage());
+			LOGGER.log(Level.FINE,e.toString(), e);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
 			obj.put("Message", "Error (2): Remote Database Error\r\n Please check if populated");
 			result.put(obj);
+			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
 			return result.toString();
 		} finally {
 			if (rs != null)
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 				}
 			if (stmt != null)
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 				}
 			if (cndata != null)
 				try {
 					cndata.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 				}
 		}
-
 		System.out.println(" Load users remote " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
@@ -986,10 +977,9 @@ public class Data {
 			cnlocal = Settings.connlocal();
 			cnlocal.setAutoCommit(false);
 		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
+			LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 		}
 		authordb.forEach((k, author) -> {
 			String insert = "INSERT INTO " + Settings.latable + " "
@@ -1018,13 +1008,14 @@ public class Data {
 				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				return;
 			} finally {
 				try {
 					if (query1 != null)
 						query1.close();
 				} catch (Exception e) {
+					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 				}
 			}
 		});
@@ -1035,17 +1026,17 @@ public class Data {
 			cnlocal.setAutoCommit(false);
 		} catch (SQLException | ClassNotFoundException e2) {
 			try {
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 				cnlocal.rollback();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
-			e2.printStackTrace();
+			LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 		}
 
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
-
+		//TODO
 		ExecutorService es = Executors.newFixedThreadPool(50);
 
 		opiniondb.forEach((k, opinion) -> {
