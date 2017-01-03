@@ -304,7 +304,7 @@ public class Data {
 							rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 							rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
 					Data.modeldb.put(model.getId(), model);
 
 				}
@@ -746,7 +746,7 @@ public class Data {
 						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 						rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
 				Data.modeldb.put(model.getId(), model);
 
 			}
@@ -1782,7 +1782,7 @@ public class Data {
 								rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 								rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived));
+								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}

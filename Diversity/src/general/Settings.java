@@ -112,6 +112,7 @@ public class Settings {
 	public static final String lmtable_creator="created_by_user";
 	public static final String lmtable_age="age_range";
 	public static final String lmtable_gender="gender";
+	public static final String lmtable_date = "next_update";
 	
 	// Sources Table
 	public static final String lutable="sources";
