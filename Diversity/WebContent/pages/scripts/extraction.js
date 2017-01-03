@@ -269,6 +269,9 @@ function drawChart() {
 				duration : 1000,
 				easing : 'out',
 			},
+			backgroundColor: {
+				fill:'transparent'
+			},
 		};
 
 		top_left.draw(data, options);
@@ -303,6 +306,9 @@ function drawChart() {
 				gridlines : {
 					count : 6,
 				}
+			},
+			backgroundColor: {
+				fill:'transparent'
 			},
 			hAxis : {
 
@@ -383,6 +389,9 @@ function drawChart() {
 				duration : 1000,
 				easing : 'out',
 			},
+			backgroundColor: {
+				fill:'transparent'
+			},
 		};
 
 		bottom_left.draw(data, options);
@@ -456,6 +465,9 @@ function drawChart() {
 			animation : {
 				duration : 1000,
 				easing : 'out',
+			},
+			backgroundColor: {
+				fill:'transparent'
 			},
 		};
 
@@ -532,6 +544,9 @@ function drawChart() {
 			animation : {
 				duration : 1000,
 				easing : 'out',
+			},
+			backgroundColor: {
+				fill:'transparent'
 			},
 		};
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);

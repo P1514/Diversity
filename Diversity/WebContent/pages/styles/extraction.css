@@ -22,7 +22,8 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 
 #dashboard {
 	position: relative;
-	width: 80%;
+	padding-top: 15px;
+	padding-left: 0;
 }
 
 #tag {
@@ -46,9 +47,6 @@ product {
 	font-weight: normal;
 }
 
-table {
-	width: 100%;
-}
 
 .graph1 {
 	width: 40%;
@@ -103,3 +101,60 @@ input[type=radio] {
 	fill:#DDDDDD;
 	stroke:#DDDDDD;
 	}
+
+#filters {
+	background-color: #DDDDDD;
+	margin-top: 20px;
+	min-width: 90%;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	padding-bottom: 20px;
+	min-height: 200px;
+	overflow: hidden;
+}
+
+#graphs {
+	background-color: #DDDDDD;
+	margin-top: 20px;
+	min-width: 90%;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	padding-bottom: 20px;
+	min-height: 200px;
+	overflow: hidden;
+}
+
+#table_container {
+	background-color: #DDDDDD;
+	margin-top: 20px;
+	min-width: 90%;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+	padding-bottom: 20px;
+	min-height: 200px;
+	overflow: hidden;
+}
+
+body {
+    color: #604460;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+
+h1 {
+  margin-left:50px;
+  padding-top: 0px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 24;
+}
+
+h2 {
+  font-weight: normal;
+  text-align: left;
+  font-size: 24;
+}
+
+#Cookie {
+  margin-left:50px;
+  padding-top: 0px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 24;
+}

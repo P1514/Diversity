@@ -12,12 +12,6 @@
 <body>
 	<!-- POPUP -->
 	<div id="displaybox" style="display: none;"></div>
-	<!-- Logotipo -->
-
-	<center> <img src="../images/Diversity-Logo-120x62.png"
-		alt="Diversity Logo" align="top"></img> </center>
-
-
 	<!-- Gráfico + filtros-->
 	<div class="container" id="dashboard">
 		<product>
@@ -25,127 +19,134 @@
 		</product>
 		<button onclick="location.href = 'index.html';" id="home"
 			class="btn btn-default">Home</button>
-		<hr>
 			<center>
-			<table id="segmentation">
-				<tr>
-					<th><input type="radio" name="field" id="Gender"
-						value="Gender" onclick="fixbuttons('Gender');"> &nbsp
-							Gender</th>
-					<th><input type="radio" name="field" id="Location"
-						value="Location" onclick="fixbuttons('Location');"> &nbsp
-							Location </th>
-					<th><input type="radio" name="field" id="Age_radio"
-						value="Age" onclick="fixbuttons('Age');"> &nbsp
-							Age </th>
-					<th><input type="radio" name="field" id="Final"
-						value="Final" onclick="fixbuttons('Final');"> &nbsp
-							Final Product </th>
-					<th><input type="radio" name="field" id="Global"
-						value="Global" onclick="fixbuttons('Global');" checked>
-							&nbsp All </th>
-				</tr>
-				<tr>
-					<th><select id="genderfilt">
-							<option value="All">All Genders
-					</select></th>
-					<th><select id="locationfilt">
-							<option value="All">All Locations
-					</select></th>
-					<th><select id="agefilt">
-							<option value="All">All Ages
-					</select></th>
-					<th><select id="finalfilt">
-							<option value="All">All Products
-					</select></th>
-				</tr>
-			</table>
-			<table id="refresh_table">
-				<tr>
-					<th></th>
-					<th>
+				<div class="container" id="filters">
+					<h2>Filters</h2>
+					<table id="segmentation">
+						<tr>
+							<th><input type="radio" name="field" id="Gender"
+								value="Gender" onclick="fixbuttons('Gender');"> &nbsp
+									Gender</th>
+							<th><input type="radio" name="field" id="Location"
+								value="Location" onclick="fixbuttons('Location');"> &nbsp
+									Location </th>
+							<th><input type="radio" name="field" id="Age_radio"
+								value="Age" onclick="fixbuttons('Age');"> &nbsp
+									Age </th>
+							<th><input type="radio" name="field" id="Final"
+								value="Final" onclick="fixbuttons('Final');"> &nbsp
+									Final Product </th>
+							<th><input type="radio" name="field" id="Global"
+								value="Global" onclick="fixbuttons('Global');" checked>
+									&nbsp All </th>
+						</tr>
+						<tr>
+							<th><select id="genderfilt">
+									<option value="All">All Genders
+							</select></th>
+							<th><select id="locationfilt">
+									<option value="All">All Locations
+							</select></th>
+							<th><select id="agefilt">
+									<option value="All">All Ages
+							</select></th>
+							<th><select id="finalfilt">
+									<option value="All">All Products
+							</select></th>
+						</tr>
+					</table>
+					<table id="refresh_table">
+						<tr>
+							<th></th>
+							<th>
 
-						<button class="btn btn-default" id="refresh"
-							onclick="changeRequest()">Update</button>
-					</th>
-					<th></th>
+								<button class="btn btn-default" id="refresh"
+									onclick="changeRequest()">Update</button>
+							</th>
+							<th></th>
 
-				</tr>
-			</table>
-			<table id="global" class="graphst">
-				<tr>
-					<td>
-						<table id="left">
-							<tr>
-								<td>
-									<div id="opinionpie"></div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div id="reachpie"></div>
-								</td>
-							</tr>
-						</table>
-					</td>
+						</tr>
+					</table>
+			</div>
+			<div class="container" id="graphs">
+				<h2>Charts</h2>
+				<table id="global" class="graphst">
+					<tr>
+						<td>
+							<table id="left">
+								<tr>
+									<td>
+										<div id="opinionpie"></div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div id="reachpie"></div>
+									</td>
+								</tr>
+							</table>
+						</td>
 
-					<td class="graph1">
-						<table id="middle">
-							<tr>
-								<td>
-									<div id="polaritybar"></div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div id="reachline"></div>
-								</td>
-							</tr>
+						<td class="graph1">
+							<table id="middle">
+								<tr>
+									<td>
+										<div id="polaritybar"></div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div id="reachline"></div>
+									</td>
+								</tr>
 
-						</table>
-					</td>
-					<td class="graph2">
-						<table id="right">
-							<tr>
-								<td>
-									<div id="globalgauge"></div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div id="globalline"></div>
-								</td>
-							</tr>
+							</table>
+						</td>
+						<td class="graph2">
+							<table id="right">
+								<tr>
+									<td>
+										<div id="globalgauge"></div>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div id="globalline"></div>
+									</td>
+								</tr>
 
-						</table>
-					</td>
-				</tr>
-			</table>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
 
-			</center>
 	<!-- Tabela Posts-->
 	<div class="container" id="dashboard">
-		<h2>Top 5</h2>
-		<hr>
-			<table id="posts" class="table sortable">
-				<thead>
-					<tr>
-						<th>Original Author</th>
-						<th>Post</th>
-						<th># Comments</th>
-						<th>Date</th>
-						<th>Polarity</th>
-						<th>Reach</th>
-						<th>Influence</th>
-						<th>Location</th>
-						<th>Gender</th>
-						<th>Age</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+		<div class="container" id="table_container">
+			<h2>Top 5</h2>
+			<hr>
+				<table id="posts" class="table sortable">
+					<thead>
+						<tr>
+							<th>Original Author</th>
+							<th>Post</th>
+							<th># Comments</th>
+							<th>Date</th>
+							<th>Polarity</th>
+							<th>Reach</th>
+							<th>Influence</th>
+							<th>Location</th>
+							<th>Gender</th>
+							<th>Age</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
 	</div>
+	</center>
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	<link rel="stylesheet" href="styles/extraction.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
