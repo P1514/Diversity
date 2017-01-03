@@ -69,12 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if(json[0].Op=="Model"){
       var json2 = JSON.parse(event.data);}
     //console.log(json);
-
     if (json[0].Op == "Error") {
-      alert(json[0].Message);
       if(json[0].hasOwnProperty('id')){
-        sessionStorage.Id="model="+json[0].id;
-        location.href ='index.html';
+        alert(json[0].Message);
+        if (confirm("Do you want to create another model?")) {
+          location.href = "models.html"
+        } else {
+          sessionStorage.Id="model="+json[0].id;
+          location.href ='index.html';
+        }
+      } else {
+        alert(json[0].Message);
       }
     return;
     }
