@@ -1,3 +1,4 @@
+
 #displaybox {
 	z-index: 10000;
 	filter: alpha(opacity = 90); /*older IE*/
@@ -145,23 +146,43 @@ input[type=radio] {
 	overflow: hidden;
 }
 
+b {
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
+}
+
 body {
-    color: #604460;
-    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
 }
 
 h1 {
-  margin-left:50px;
-  padding-top: 0px;
-  text-align: left;
-  font-weight: bold;
-  font-size: 24;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
+	margin-left: 50px;
+	padding-top: 0px;
+	text-align: left;
+	font-weight: bold;
+	font-size: 24;
+	padding-left:50px;
 }
 
 h2 {
-  font-weight: normal;
-  text-align: left;
-  font-size: 24;
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
+	font-weight: normal;
+	text-align: left;
+	font-size: 24;
+}
+
+h3 {
+	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
+		"AppleGothic", sans-serif;
+	font-weight: normal;
+	margin-top: 0px;
+	text-align: center;
+	font-size: 18;
+	color: white;
 }
 
 #overlay-back {
