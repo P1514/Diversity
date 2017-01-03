@@ -8,8 +8,28 @@
 <meta http-equiv="Expires" content="0" />
 <title>Opinion Extraction</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script>
+$(window).load(function(){
+  $('#overlay').fadeOut(2000);
+	$('#overlay-back').fadeOut(2000);
+});
+</script>
 </head>
 <body>
+	<center>
+		<div id="overlay-back"></div>
+		<div id="overlay">
+			<span>
+				<div id="loading" style="padding-top:60px;">
+					<i class="fa fa-ellipsis-h fa-3x" aria-hidden="true"></i>
+					<br>
+					Loading, please wait...
+				</div>
+			</span>
+		</div>
+	</center>
 	<!-- POPUP -->
 	<div id="displaybox" style="display: none;"></div>
 	<!-- Gráfico + filtros-->
@@ -150,7 +170,6 @@
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 	<link rel="stylesheet" href="styles/extraction.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	<script	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script src="sorttable.js"></script>

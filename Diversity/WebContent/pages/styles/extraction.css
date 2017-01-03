@@ -37,6 +37,19 @@ table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	top: 20px;
 }
 
+#loading {
+	text-align: center;
+   background:#fff;
+   height: 20%;
+   width: 40%;
+   position: absolute;
+   z-index: 1000;
+   top: 40%;
+	 left: 30%;
+   margin: -25px 0 0 -25px;
+	 border-radius: 5px;
+}
+
 product {
 	display: block;
 	font-size: 20px;
@@ -149,6 +162,29 @@ h2 {
   font-weight: normal;
   text-align: left;
   font-size: 24;
+}
+
+#overlay-back {
+    position   : absolute;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity    : 0.6;
+    filter     : alpha(opacity=60);
+    z-index    : 5;
+    display    : block;
+}
+
+#overlay {
+    position : absolute;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+    display  : block;
 }
 
 #Cookie {
