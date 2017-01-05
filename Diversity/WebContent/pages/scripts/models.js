@@ -409,7 +409,7 @@ function send_config() {
     "Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
     "User" : 1,//TODO find this field
     "Id":sessionStorage.id,
-    "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :0,
+    "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
 
   };
   if (erro == true) {

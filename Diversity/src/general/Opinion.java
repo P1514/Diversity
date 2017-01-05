@@ -19,7 +19,7 @@ public class Opinion {
 	private double reach = 0;
 	private double polarity = 0;
 	private double total_inf = 0;
-	private Date timestamp;
+	private long timestamp;
 	private long pss;
 	private long product;
 
@@ -165,7 +165,7 @@ public class Opinion {
 	 *
 	 * @return the time
 	 */
-	public java.sql.Date getTime() {
+	public Long getTime() {
 		return timestamp;
 	}
 
@@ -206,7 +206,7 @@ public class Opinion {
 		int newcomm = 0;
 
 		for (Post i : comments) {
-			if (i.getTime() != null)
+			if (i.getTime() != 0)
 				newcomm++;
 		}
 
@@ -237,7 +237,7 @@ public class Opinion {
 		int newlike = 0;
 
 		for (Post i : comments) {
-			if (i.getTime() != null)
+			if (i.getTime() != 0)
 				newlike+=i.getLikes();
 		}
 
@@ -268,7 +268,7 @@ public class Opinion {
 		int newview = 0;
 
 		for (Post i : comments) {
-			if (i.getTime() != null)
+			if (i.getTime() != 0)
 				newview+=i.getViews();
 		}
 

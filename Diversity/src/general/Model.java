@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +26,7 @@ public final class Model {
 	private long frequency, user;
 	private String name, uri, age, gender, products;
 	private boolean archived;
-	private long nextupdate;
+	private long nextupdate, cdate;
 
 	/**
 	 * Instantiates a new model.
@@ -40,7 +43,7 @@ public final class Model {
 	 * @param _archived the archived if deleted or not
 	 */
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
-			String _gender, String _products, Boolean _archived, long _nextupdate) {
+			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate) {
 		this.id = _id;
 		this.frequency = _frequency;
 		this.user = _user;
@@ -51,6 +54,7 @@ public final class Model {
 		this.gender = _gender;
 		this.products = _products;
 		this.archived = _archived;
+		this.cdate = _created_date;
 		this.nextupdate = _nextupdate;
 	}
 
@@ -76,7 +80,25 @@ public final class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		nextupdate= msg.has("Start_date") ? msg.getLong("Start_date") : System.currentTimeMillis();
+		if(msg.has("Start_date")){
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			Date date=null;
+			try {
+				date = df.parse(msg.getString("Start_date"));
+			} catch (ParseException e) {
+				System.out.print("Error Parsing Date from Browser");
+			}
+		    nextupdate = date.getTime();
+		    if(nextupdate<0) {
+		    	obj.put("Op", "Error");
+				obj.put("Message", "Bad Date");
+				result.put(obj);
+		    	return result;
+		    
+		    }
+		}else{
+		nextupdate= System.currentTimeMillis();
+		}
 		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(";") : null;
 		products = "";
 		Product product=null;
@@ -110,10 +132,10 @@ public final class Model {
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
 				+ Settings.lmtable_monitorfinal + ","
-				+ Settings.lmtable_creator + "," + Settings.lmtable_date /*
+				+ Settings.lmtable_creator + "," + Settings.lmtable_cdate + "," + Settings.lmtable_udate /*
 											 * + "," + Settings.lmtable_age +
 											 * "," + Settings.lmtable_gender
-											 */ + ") values (?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
+											 */ + ") values (?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -124,6 +146,8 @@ public final class Model {
 			query1.setBoolean(5, archived);
 			query1.setString(6, products);
 			query1.setLong(7, user);
+			query1.setLong(8, nextupdate);
+			query1.setLong(9, nextupdate);
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
 			query1.executeUpdate();
@@ -277,6 +301,13 @@ public final class Model {
 		return this.id;
 	}
 
+	public Long getDate(){
+		return this.cdate;
+	}
+	
+	public Long getUpdate(){
+		return this.nextupdate;
+	}
 	/**
 	 * Gets the archived.
 	 *

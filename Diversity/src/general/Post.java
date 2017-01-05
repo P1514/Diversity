@@ -11,7 +11,7 @@ public class Post {
 	private long id;
 	private long userid;
 	private String userid2 = null;
-	private Date time;
+	private long time = 0;
 	private String message = new String();
 	private long likes = 0;
 	private long views = 0;
@@ -28,7 +28,7 @@ public class Post {
 	 * @param _views the amount of views
 	 * @param _message the message
 	 */
-	public Post(long _id, long _userid, Date _time, long _likes, long _views, String _message) {
+	public Post(long _id, long _userid, long _time, long _likes, long _views, String _message) {
 		this.id = _id;
 		this.userid = _userid;
 		this.time = _time;
@@ -66,7 +66,7 @@ public class Post {
 	 * @param _views the amount of views
 	 * @param _message the message
 	 */
-	public Post(long _id, String _source, String _userid, Date _time, long _likes, long _views, String _message) {
+	public Post(long _id, String _source, String _userid, long _time, long _likes, long _views, String _message) {
 		this.id = _id;
 		this.userid2 = _userid;
 		this.time = _time;
@@ -137,7 +137,7 @@ public class Post {
 	 *
 	 * @return the time
 	 */
-	public Date getTime() {
+	public long getTime() {
 		return time;
 	}
 

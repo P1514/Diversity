@@ -16,11 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 /**
  * The Class Data.
  */
 public class Data {
-	private static final Logger LOGGER = Logger.getLogger( Data.class.getName() );
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
@@ -158,9 +159,9 @@ public class Data {
 			cncr.close();
 
 		} catch (SQLException e1) {
-			LOGGER.log(Level.SEVERE,"ERROR: Cannot connect to Common Repository Check setup");
+			LOGGER.log(Level.SEVERE, "ERROR: Cannot connect to Common Repository Check setup");
 		} catch (ClassNotFoundException e) {
-			LOGGER.log(Level.FINE,"ERROR: Settings class not found inside LoadPSS() on Data class");
+			LOGGER.log(Level.FINE, "ERROR: Settings class not found inside LoadPSS() on Data class");
 		} finally {
 			try {
 				if (rs != null)
@@ -304,7 +305,8 @@ public class Data {
 							rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 							rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
+							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
+							rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
 					Data.modeldb.put(model.getId(), model);
 
 				}
@@ -545,7 +547,7 @@ public class Data {
 						query1.setDouble(3, opinion.getPolarity());
 						query1.setDouble(4, opinion.getTotalInf());
 						query1.setString(5, opinion.getUID(true));
-						query1.setDate(6, opinion.getTime());
+						query1.setLong(6, opinion.getTime());
 						query1.setLong(7, opinion.getPSS());
 						query1.setLong(8, opinion.ncomments());
 						query1.setLong(9, opinion.getProduct());
@@ -625,12 +627,14 @@ public class Data {
 					rs.close();
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
-			}try{
+			}
+			try {
 				if (query1 != null)
 					query1.close();
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
-			}try{
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
@@ -690,13 +694,15 @@ public class Data {
 					rs.close();
 			} catch (SQLException e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}try{
+			}
+			try {
 
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}try{
+			}
+			try {
 				if (cndata != null)
 					cndata.close();
 			} catch (SQLException e) {
@@ -746,7 +752,8 @@ public class Data {
 						rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 						rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 						rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
+						rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
+						rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
 				Data.modeldb.put(model.getId(), model);
 
 			}
@@ -757,18 +764,20 @@ public class Data {
 			LOGGER.log(Level.SEVERE, "Error on SQL Input", e2);
 		} finally {
 			try {
-				if(rs!=null)
-				rs.close();
+				if (rs != null)
+					rs.close();
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}try{
-				if(stmt!=null)
-				stmt.close();
+			}
+			try {
+				if (stmt != null)
+					stmt.close();
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}try{
-				if(cnlocal!=null)
-				cnlocal.close();
+			}
+			try {
+				if (cnlocal != null)
+					cnlocal.close();
 			} catch (SQLException e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
@@ -797,24 +806,28 @@ public class Data {
 					obj.put("Op", "Error");
 					obj.put("Message", "Loaded Successfully");
 					result.put(obj);
-					try{
-					rs.close();
-					}catch(Exception e){
-						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-					}try{
-					stmt.close();
-					}catch(Exception e){
-						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-					}try{
-					cndata.close();
-					}catch(Exception e){
-						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-					}try{
-					cnlocal.close();
-					}catch(Exception e){
+					try {
+						rs.close();
+					} catch (Exception e) {
 						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 					}
-					return result.toString();/*
+					try {
+						stmt.close();
+					} catch (Exception e) {
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}
+					try {
+						cndata.close();
+					} catch (Exception e) {
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}
+					try {
+						cnlocal.close();
+					} catch (Exception e) {
+						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+					}
+					return result
+							.toString();/*
 										 * LastUpdated = LastUpdated2; if
 										 * (LastUpdated.after(new
 										 * java.sql.Date(Calendar.getInstance().
@@ -904,7 +917,7 @@ public class Data {
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			LOGGER.log(Level.FINE,e.toString(), e);
+			LOGGER.log(Level.FINE, e.toString(), e);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
@@ -1036,7 +1049,7 @@ public class Data {
 
 		System.out.println(" insert " + Settings.latable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
-		//TODO
+		// TODO
 		ExecutorService es = Executors.newFixedThreadPool(50);
 
 		opiniondb.forEach((k, opinion) -> {
@@ -1055,7 +1068,7 @@ public class Data {
 						query1.setDouble(3, opinion.getPolarity());
 						query1.setDouble(4, opinion.getTotalInf());
 						query1.setLong(5, opinion.getUID());
-						query1.setDate(6, opinion.getTime());
+						query1.setLong(6, opinion.getTime());
 						query1.setLong(7, opinion.getPSS());
 						query1.setLong(8, opinion.ncomments());
 						query1.setLong(9, opinion.getProduct());
@@ -1370,7 +1383,18 @@ public class Data {
 					long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 					// System.out.println(id);
 					long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
-					java.sql.Date time = remote ? rs.getDate(Settings.rptable_date) : null;
+					long time = 0;
+					if (remote) {
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						java.util.Date date = null;
+						try {
+							date = df.parse(rs.getString(Settings.rptable_date));
+						} catch (ParseException e) {
+							System.out.print("Error Parsing Date from Local DB");
+						}
+						time = date.getTime();
+
+					}
 					long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
 					long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
 					;
@@ -1385,7 +1409,7 @@ public class Data {
 						return;
 					}
 					Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
-							: new Post(postid, user_id, null, likes, views, message);
+							: new Post(postid, user_id, 0, likes, views, message);
 					if (!(users.contains(user_id))) {
 						users.add(user_id);
 					}
@@ -1408,17 +1432,20 @@ public class Data {
 							rs.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (condata != null)
 							condata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1457,8 +1484,18 @@ public class Data {
 					// System.out.println(id);
 					String source = obj.getString("source");
 					String user_id = obj.getString("account");
-					java.sql.Date time = remote ? new java.sql.Date(parsed.getTime())
-							: rs.getDate(Settings.lptable_timestamp);
+					long time = parsed.getTime();
+					if (!remote) {
+						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						date = null;
+						try {
+							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
+						} catch (ParseException e) {
+							System.out.print("Error Parsing Date from Local DB");
+						}
+						time = date.getTime();
+
+					}
 					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
@@ -1515,17 +1552,20 @@ public class Data {
 							rs.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (condata != null)
 							condata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1602,7 +1642,17 @@ public class Data {
 							// System.out.println("HELLO2");
 							long postid = rs.getLong(Settings.rptable_postid);
 							long user_id = rs.getLong(Settings.rptable_userid);
-							java.sql.Date time = rs.getDate(Settings.rptable_date);
+							long time = 0;
+
+							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							java.util.Date date = null;
+							try {
+								date = df.parse(rs.getString(Settings.rptable_date));
+							} catch (ParseException e) {
+								System.out.print("Error Parsing Date from Local DB");
+							}
+							time = date.getTime();
+
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
@@ -1627,7 +1677,7 @@ public class Data {
 							long likes = rs.getLong(Settings.lptable_likes);
 							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
-							Post _post = new Post(postid, user_id, null, likes, views, message);
+							Post _post = new Post(postid, user_id, 0, likes, views, message);
 							if (!(users.contains(user_id)))
 								users.add(user_id);
 							_opin.addcomment(_post);
@@ -1654,17 +1704,20 @@ public class Data {
 							rs.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (condata != null)
 							condata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1698,7 +1751,7 @@ public class Data {
 
 							long postid = reply.getLong(Settings.JSON_postid);
 							String user_id = reply.getString(Settings.JSON_userid);
-							java.sql.Date time = new java.sql.Date(parsed.getTime());
+							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
 									? reply.has("likes") ? reply.getLong("likes") : 0 : 0;
 							long views = reply.has("mediaSpecificInfo")
@@ -1733,17 +1786,20 @@ public class Data {
 							rs.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (condata != null)
 							condata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
-					}try{
+					}
+					try {
 						if (conlocal != null)
 							conlocal.close();
 
@@ -1782,7 +1838,8 @@ public class Data {
 								rs.getLong(Settings.lmtable_creator), rs.getString(Settings.lmtable_name),
 								rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
-								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived), rs.getLong(Settings.lmtable_date));
+								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
+								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}
@@ -1797,17 +1854,20 @@ public class Data {
 						rs.close();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}try{
+				}
+				try {
 					if (stmt != null)
 						stmt.close();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}try{
+				}
+				try {
 					if (condata != null)
 						condata.close();
 				} catch (Exception e) {
 					e.printStackTrace();
-				}try{
+				}
+				try {
 					if (conlocal != null)
 						conlocal.close();
 

@@ -67,7 +67,7 @@ public class Globalsentiment {
 
 			for (long k : top5) {
 
-				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false));
+				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false,0,0));
 				result += globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString();
 				Data.modeldb.remove((long) -1);
 			}
@@ -248,13 +248,8 @@ public class Globalsentiment {
 		PreparedStatement query1 = null;
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
-				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
+				+ Settings.lotable + " WHERE  "+Settings.lotable + "."+Settings.lotable_timestamp+">=? AND " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
 				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?"
-				// TODO
-				// Check
-				// if
-				// this
-				// works
 				+ " AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
 				+ Settings.latable_id;
 		if (age != null)
@@ -284,12 +279,13 @@ public class Globalsentiment {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			query1.setDate(1, new java.sql.Date(data.getTimeInMillis()));
+			query1.setLong(1, model.getDate());
+			query1.setLong(2, data.getTimeInMillis());
 			data.add(Calendar.MONTH, 1);
 			data.add(Calendar.DAY_OF_MONTH, -1);
-			query1.setDate(2, new java.sql.Date(data.getTimeInMillis()));
-			query1.setLong(3, model.getPSS());
-			int rangeindex = 4;
+			query1.setLong(3, data.getTimeInMillis());
+			query1.setLong(4, model.getPSS());
+			int rangeindex = 5;
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
 				query1.setString(rangeindex++, age.split("-")[0]);
@@ -494,7 +490,7 @@ public class Globalsentiment {
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
 				+ "=?" + " AND " + Settings.lotable_product
-				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + ") AND " + Settings.lptable_authorid
+				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "+Settings.lotable_timestamp+">?) AND " + Settings.lptable_authorid
 				+ " in (Select " + Settings.latable_id + " from " + Settings.latable;
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
@@ -515,6 +511,7 @@ public class Globalsentiment {
 			if (products != null) {
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
 			}
+			query1.setLong(rangeindex++, model.getDate());
 			if (age != null) {
 				query1.setString(rangeindex++, age.split("-")[1]);
 				query1.setString(rangeindex++, age.split("-")[0]);

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import org.json.JSONArray;
@@ -57,7 +58,7 @@ public class GetPosts {
 		System.out.print("TEST:"+product);
 		
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_product;
+				+ "=? AND "+Settings.lotable_timestamp+">=? AND " + Settings.lotable_product;
 
 		Model model = Data.modeldb.get(id);
 
@@ -97,17 +98,18 @@ public class GetPosts {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert);
-			int rangeindex = 2;
+			int rangeindex = 3;
 			int i = 0;
 			query1.setLong(1, model.getPSS());
+			query1.setLong(2, model.getDate());
 			if (param != null) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
 					inputdate.add(Calendar.YEAR, -1);
-				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				query1.setLong(rangeindex, inputdate.getTimeInMillis());
 				inputdate.add(Calendar.MONTH, 1);
 				rangeindex++;
-				query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+				query1.setLong(rangeindex, inputdate.getTimeInMillis());
 				rangeindex++;
 
 			}
@@ -146,7 +148,7 @@ public class GetPosts {
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
 				rs.next();
-				pre_result[i] += rs.getDate(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity)
+				pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity)
 						+ ",," + rs.getDouble(Settings.lotable_reach) + ",," + rs.getInt(Settings.lotable_comments)
 						+ ",,";
 				rs.close();
@@ -189,7 +191,7 @@ public class GetPosts {
 			}
 			;
 		}
-
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		for (int i = 0; i < n_tops; i++) {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
@@ -199,7 +201,9 @@ public class GetPosts {
 			obj.put("Location", pre_results[3]);
 			obj.put("Gender", pre_results[4]);
 			obj.put("Age", pre_results[5]);
-			obj.put("Date", pre_results[6]);
+			
+			Date date = new Date(Long.parseLong(pre_results[6]));
+			obj.put("Date", df.format(date));
 			obj.put("Polarity", trunc(pre_results[7]));
 			obj.put("Reach", trunc(pre_results[8]));
 			obj.put("Comments", pre_results[9]);
@@ -240,7 +244,7 @@ public class GetPosts {
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
 		PreparedStatement query1 = null;
-		insert = "Select count(*) FROM " + Settings.lotable + " where (" + Settings.lotable_pss + "=? AND "
+		insert = "Select count(*) FROM " + Settings.lotable + " where ( "+ Settings.lotable_pss + "=? AND "
 				+ Settings.lotable_product;
 		Model model = Data.modeldb.get(id);
 		if (model == null) {
@@ -283,7 +287,7 @@ public class GetPosts {
 			insert += " AND gender=?";
 		if (location != null)
 			insert += " AND location=?";
-		insert += " AND timestamp<? AND timestamp>=?)";
+		insert += " AND timestamp<? AND timestamp>=? AND "+Settings.lotable_timestamp+">=?)";
 		ResultSet rs = null;
 
 		try {
@@ -301,11 +305,12 @@ public class GetPosts {
 			if (location != null)
 				query1.setString(rangeindex++, location.substring(0, location.length()));
 			inputdate.add(Calendar.MONTH, 1);
-			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
 			inputdate.add(Calendar.YEAR, -1);
-			query1.setDate(rangeindex, new java.sql.Date(inputdate.getTimeInMillis()));
+			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
+			query1.setLong(rangeindex, model.getDate());
 
 			//System.out.print(query1);
 			rs = query1.executeQuery();

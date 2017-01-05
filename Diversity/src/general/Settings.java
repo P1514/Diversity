@@ -58,7 +58,7 @@ public class Settings {
 	private static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
-	public static final Integer dbversion = 8;
+	public static final Integer dbversion = 9;
 
 	// Author Table
 	public static final String latable = "authors";
@@ -112,7 +112,8 @@ public class Settings {
 	public static final String lmtable_creator="created_by_user";
 	public static final String lmtable_age="age_range";
 	public static final String lmtable_gender="gender";
-	public static final String lmtable_date = "next_update";
+	public static final String lmtable_udate = "next_update";
+	public static final String lmtable_cdate = "created_date";
 	
 	// Sources Table
 	public static final String lutable="sources";
