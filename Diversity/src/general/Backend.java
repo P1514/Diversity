@@ -7,12 +7,10 @@ import org.json.*;
 
 import extraction.GetAuthors;
 import extraction.GetComments;
-import extraction.GetLastPost;
 import extraction.GetPosts;
 import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
-import extraction.SentimentChart;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -187,14 +185,14 @@ public final class Backend {
 				CleanDB cdb = new CleanDB();
 				tmp = cdb.clean();
 				return tmp;
-			case 8:
+			/*case 8:
 				GetAuthors ga = new GetAuthors();
 				tmp = ga.getAll().toString();
-				return tmp;
-			case 9:
+				return tmp;*/
+			/*case 9:
 				GetLastPost glp = new GetLastPost();
 				tmp = glp.get(msg.getString("Author")).toString();
-				return tmp;
+				return tmp;*/
 			/*
 			 * case 10: GetInfGraph gig = new GetInfGraph(); tmp =
 			 * gig.getAll(msg.getString("Author")).toString(); return tmp; case

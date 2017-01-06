@@ -17,6 +17,14 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
+## [2.5] Ongoing
+### Modeling
+- Date setting should now be fully implemented.
+
+### Integration
+- Polarity calculations taken out of this module.
+
+
 ## [2.3.1] 23-11-2016
 ###
 - Minor Fixes
