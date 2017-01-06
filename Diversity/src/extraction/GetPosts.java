@@ -191,7 +191,7 @@ public class GetPosts {
 			}
 			;
 		}
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < n_tops; i++) {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
