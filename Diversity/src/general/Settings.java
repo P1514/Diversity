@@ -58,7 +58,7 @@ public class Settings {
 	private static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
-	public static final Integer dbversion = 9;
+	public static final Integer dbversion = 10;
 
 	// Author Table
 	public static final String latable = "authors";
