@@ -112,6 +112,7 @@ form {
 	margin-left: 0;
 	margin-right: 0;
 	text-align: center;
+	z-index: 4;
 }
 
 /* Dropdown Button */
@@ -163,4 +164,40 @@ form {
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {
 	display: block;
+}
+
+#overlay-back {
+    position   : absolute;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity    : 0.6;
+    filter     : alpha(opacity=60);
+    z-index    : 9;
+    display    : block;
+}
+
+#overlay {
+    position : absolute;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+    display  : block;
+}
+
+#alert {
+	text-align: center;
+   background:#fff;
+   height: 20%;
+   width: 40%;
+   position: absolute;
+   z-index: 1000;
+   top: 40%;
+	 left: 30%;
+   margin: -25px 0 0 -25px;
+	 border-radius: 5px;
 }

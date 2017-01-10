@@ -34,7 +34,6 @@ $(document).ready(function () {
     }
   });
 });
-
 /*
 * Checks if the URL contains a pss=XXX tag; XXX is the desired PSS name and can contain spaces
 */
@@ -71,16 +70,25 @@ document.addEventListener('DOMContentLoaded', function() {
     //console.log(json);
     if (json[0].Op == "Error") {
       if(json[0].hasOwnProperty('id')){
+		  var id = json[0].id;
+		  var code = json[0].Message +  '<br> Do you want to create another model? <br><br><button class="btn btn-default" id="yes" onclick="location.href =\'models.html\'">Yes</button> <button class="btn btn-default" id="no" onclick="sessionStorage.Id=\'model=\'+id;location.href =\'index.html\';">No</button>';
+		  $('#alert').html(code);
+		  $('#overlay').show();
+		  $('#overlay-back').show();
+		 /* $('alert').text()
         alert(json[0].Message);
         if (confirm("Do you want to create another model?")) {
           location.href = "models.html"
         } else {
           sessionStorage.Id="model="+json[0].id;
           location.href ='index.html';
-        }
+        }*/
       } else {
-        alert(json[0].Message);
-      }
+		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'models.html\'">OK</button>';
+		  $('#alert').html(code);
+		  $('#overlay').show();
+		  $('#overlay-back').show();
+	 }
     return;
     }
     if (json[0].Op == "pss") {
@@ -132,7 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pss').text = getPss();
         document.getElementById('pss').disabled = true;
       } else {
-        alert("Selected PSS does not exist.");
+		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'models.html\'">OK</button>';
+		  $('#alert').html(code);
+		  $('#overlay').show();
+        //alert("Selected PSS does not exist.");
       }
     }
 
@@ -388,7 +399,10 @@ function send_config() {
   var date = new Date(document.getElementById("date_input").value);
       //console.log("TESTE***********"+date);
       if(date.toString() == "Invalid Date" && document.getElementById('start_date').checked){//checks for invalid date
-        alert("Invalid Date");
+        var code = 'Invalid date. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
+		  $('#alert').html(code);
+		  $('#overlay').show();
+		  $('#overlay-back').show();
     return;
     }
   var jsonData = {
@@ -413,7 +427,11 @@ function send_config() {
 
   };
   if (erro == true) {
-    alert("All Fields must be filled");
+      var code = 'All fields must be filled. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
+		  $('#alert').html(code);
+		  $('#overlay').show();
+		  $('#overlay-back').show();
+    //alert("All Fields must be filled");
     return;
   }
 

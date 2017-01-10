@@ -10,11 +10,12 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
 <link rel='stylesheet' href='styles/index.css'>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
+<script>
 
-
+</script>
 </head>
 <body>
-
 	<div class="dropdown" id="dropdown">
 		<button onclick="myFunction()" class="dropbtn">Role</button>
 		<div id="myDropdown" class="dropdown-content">
@@ -31,6 +32,13 @@
 
 
 	<h1>Sentiment Analysis</h1>
+	<div id="overlay-back" style="display: none"></div>
+	<div id="overlay" style="display: none">
+		<span>
+			<div id="alert" style="padding-top:60px;">
+			</div>
+		</span>
+	</div>
 	<center>
 		<div class="container" id="container">
 			<h2>Options</h2>
@@ -139,7 +147,7 @@
 									id='view_edit' class='btn btn-default' onclick='setCookie()'
 									type='submit' value='Edit Model' /> <input id='view_delete'
 									class='btn btn-default' formaction="" ; onclick='deleteModel()'
-									type='submit' value='Delete Model' /> <input id='view_select'
+									 value='Delete Model' /> <input id='view_select'
 									class='btn btn-default' formaction="models.html"
 									onclick='viewModel();setCookie();' type='submit'
 									value='View Model' />
@@ -255,7 +263,7 @@
 		</table>
 	</center>
 -->
-<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
+
 <script type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
 <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
 <script type='text/javascript' src ='scripts/index.js'></script>

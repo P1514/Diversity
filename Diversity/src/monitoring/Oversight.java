@@ -29,7 +29,7 @@ public class Oversight extends TimerTask {
 	private Connection cnlocal;
 	private ArrayList<String> sourcelist = new ArrayList<String>();
 	private Data dat = new Data();
-	private ArrayList<String> updatelist = new ArrayList<String>();
+	private HashMap<String,update> updatelist = new HashMap<String,update>();
 	private String uri = "http://diversity.euprojects.net/";
 	private HashMap<String, url> requesturl = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
@@ -51,7 +51,7 @@ public class Oversight extends TimerTask {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.AM_PM, Calendar.AM);
 		
-		timer.scheduleAtFixedRate(this, c.getTime(), 30*1000/*24*60*60*1000*/);
+		timer.scheduleAtFixedRate(this, c.getTime(), 24*60*60*1000);
 	}
 	
 	/**
@@ -75,13 +75,13 @@ public class Oversight extends TimerTask {
 		
 		// TODO Introduce here loading PSS's and Products and save them on static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
-		updatelist = new ArrayList<String>();
+		updatelist = new HashMap<String,update>();
 		requesturl = new HashMap<String, url>();
 		now = Calendar.getInstance();
 
 		// TODO This is the method that run at 00:00 each 24h to update
 		// everything
-		String getsources = "Select "+Settings.lmtable_uri+" from " + Settings.lmtable + " where "+Settings.lmtable_udate+"<=? AND "+Settings.lmtable_uri+" LIKE ?";
+		String getsources = "Select "+Settings.lmtable_uri+","+Settings.lmtable_pss+" from " + Settings.lmtable + " where "+Settings.lmtable_udate+"<=? AND "+Settings.lmtable_uri+" LIKE ?";
 		String getpss = "Select distinct( " + Settings.lutable_source + "),"+Settings.lutable_lastupdate+" from " + Settings.lutable;
 
 		if(local==true){
@@ -94,7 +94,7 @@ public class Oversight extends TimerTask {
 				sourcelist.add(rs.getString(Settings.lutable_source)+";;;"+rs.getString(Settings.lutable_lastupdate));
 			}
 			for (String a : sourcelist) {
-				updatelist = new ArrayList<String>();
+				updatelist = new HashMap<String,update>();
 				requesturl = new HashMap<String, url>();
 
 				query = cnlocal.prepareStatement(getsources);
@@ -108,23 +108,30 @@ public class Oversight extends TimerTask {
 				while (rs.next()) {
 					c.setTimeInMillis(Long.valueOf(date));
 					if (now.after(c)) {
-						updatelist.add(rs.getString(Settings.lutable_account) + ";."
-								+ rs.getString(Settings.lutable_lastupdate) + ";."
-								+ rs.getString(Settings.lutable_pss));
+						String[] uri= rs.getString(Settings.lmtable_uri).split(";");
+						for(String b : uri){
+							if(updatelist.containsKey(b.split(",")[1])){
+								update tmp = updatelist.get(b.split(",")[1]);
+								if (tmp.date>Long.valueOf(date))tmp.date=Long.valueOf(date);
+							}else{
+								update tmp = new update();
+								tmp.account=b.split(",")[1];
+								tmp.date=Long.valueOf(date);
+								tmp.pss=Long.valueOf(rs.getString(Settings.lmtable_pss));
+								updatelist.put(tmp.account,tmp);
+							}
+						}
 					}
 				}
 
-				for (String k : updatelist) {
-					String[] split = k.split(";.");
-
-					url local = requesturl.containsKey(split[2]) ? requesturl.get(split[2]) : new url();
-					local.accounts += "&accounts[]=\"" + split[0] + "\"";
-					local.epochs += "&epochFrom[]=" + split[1] + "&epochTo[]=" + now.getTimeInMillis();
-					requesturl.put(split[2], local);
-				}
-				;
+				for(update d : updatelist.values()) {
+					url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString()) : new url();
+					local.accounts += "&accounts[]=\"" + d.account + "\"";
+					local.epochs += "&epochFrom[]=" + d.date + "&epochTo[]=" + now.getTimeInMillis();
+					requesturl.put(d.pss.toString(), local);
+				};
 				requesturl.forEach((k, v) -> {
-					String request = uri + a + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\""
+					String request = uri + a.split(";;;")[0] + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\""
 							+ k + "\"";
 					System.out.println(request);
 					try {
@@ -153,9 +160,9 @@ public class Oversight extends TimerTask {
 						cc.add(Calendar.DAY_OF_MONTH, 1);
 						PreparedStatement query1 = cnlocal.prepareStatement(update);
 						query1.setLong(1, now.getTimeInMillis());
-						query1.setString(3, k);
-						query1.setString(4, a);
-						int i=5;
+						query1.setString(2, k);
+						query1.setString(3, a.split(";;;")[0]);
+						int i=4;
 						for (String acc : account) {
 							query1.setString(i++, acc.split("=")[1]);
 						}
@@ -199,6 +206,12 @@ public class Oversight extends TimerTask {
 	private class url {
 		public String accounts = "";
 		public String epochs = "";
+	}
+	
+	private class update {
+		public String account;
+		public Long date;
+		public Long pss;
 	}
 
 	private void dbconnect() {
