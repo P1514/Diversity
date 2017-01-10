@@ -154,7 +154,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=829 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=832 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -259,7 +259,7 @@ DROP TABLE IF EXISTS `sources`;
 CREATE TABLE `sources` (
   `source` varchar(45) NOT NULL,
   `account` varchar(45) NOT NULL,
-  `last_updated` longtext,
+  `last_updated` bigint(45) DEFAULT '0',
   `pss` varchar(45) NOT NULL,
   PRIMARY KEY (`source`,`account`,`pss`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -283,4 +283,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-10 16:24:50
+-- Dump completed on 2017-01-10 16:31:04
