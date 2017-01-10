@@ -157,8 +157,8 @@ function connect() {
 		}
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
-			if ( json[0].hasOwnProperty("Error")) {
-				if (json[0].Error == "No_data" ) {
+			if ( json[1].hasOwnProperty("Error")) {
+				if (json[1].Error == "No_data" ) {
 						$('#loading').html('No data to display.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
 						$('#overlay').show();
 						$('#overlay-back').show();
@@ -563,7 +563,8 @@ function drawChart() {
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, options);
 	}
-
+	 $('#overlay').fadeOut(2000);
+	 $('#overlay-back').fadeOut(2000);
 }
 
 // create trigger to resizeEnd event
