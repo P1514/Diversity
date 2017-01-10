@@ -50,10 +50,9 @@ function getPss() {
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
-	$('#final').click();
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
-
+	$('#tree_div').hide();
   ws.onopen = function() {
       json = {
         "Op" : "getpss",
@@ -156,23 +155,34 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('pss').value=json2[0].PSS;
       document.getElementById('pss').text=json2[0].PSS;
       document.getElementById("pss").disabled = true;
+	  
       makeTree();
-      var prods = json2[0].Final_products.split(";");
-      $("#final_input").bind('ready.jstree', function(event, data) {
-        var $tree = $(this);
-        $($tree.jstree().get_json($tree, {
-          flat: true
-        }))
-        .each(function(index, value) {
-          var node = $("#final_input").jstree().get_node(this.id);
-
-          if (prods.indexOf(node.text) != -1) {
-            $("#final_input").jstree().select_node(node);
-          }
-          });
-      });
+	  console.log(json2[0]);
+	  if (json2[0].hasOwnProperty('Final_products')) {
+		  var prods = json2[0].Final_products.split(";");
+			  if(prods.length > 0) {
+			  $('#final').click();
+		  }
+		  $("#final_input").bind('ready.jstree', function(event, data) {
+			var $tree = $(this);
+			$($tree.jstree().get_json($tree, {
+			  flat: true
+			}))
+			.each(function(index, value) {
+			  var node = $("#final_input").jstree().get_node(this.id);
+				$("#final_input").jstree().disable_node(node);
+			  if (prods.indexOf(node.text) != -1) {
+				$("#final_input").jstree().select_node(node);
+			  }
+			  });
+		  });
+	  } else {
+		$('#final').hide();
+		$('#tree_div').hide();
+	  }
 
       //document.getElementById("gender").value=json2[0].Gender;
+
       document.getElementById("final").checked=json2[0].Final_products;
       //console.log(json2[0].Archive);
       //console.log(json2[0].Final_products);
@@ -339,7 +349,6 @@ function makeTree() {
 
   $('#final_input').jstree(true).refresh();
 }
-
 
 function showTree() {
   var checkbox = document.getElementById('final');
