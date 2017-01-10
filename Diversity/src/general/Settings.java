@@ -52,10 +52,11 @@ public class Settings {
 	public static final double aWcomments = (double) 1 / 3;
 
 	// Local DB Specs
-	private static final String dbip="127.0.0.1";
-	private static final String dbport="3306";
+	private static final String dbip = "127.0.0.1";
+	private static final String dbport = "3306";
 	private static final String dbname = "sentimentanalysis";
-	private static final String url2 = "jdbc:mysql://"+dbip+":"+dbport+"/"+dbname+"?autoReconnect=true&useSSL=false";
+	private static final String url2 = "jdbc:mysql://" + dbip + ":" + dbport + "/" + dbname
+			+ "?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
 	public static final Integer dbversion = 10;
@@ -72,13 +73,13 @@ public class Settings {
 	public static final String latable_views = "views";
 	public static final String latable_influence = "influence";
 	public static final String latable_id = "id";
-	//public static final String latable_Uid = "Username";
+	// public static final String latable_Uid = "Username";
 	public static final String latable_source = "source";
 
 	// Post Table
 	public static final String lptable = "posts";
 	public static final String lptable_id = "id";
-	public static final String lptable_message= "message";
+	public static final String lptable_message = "message";
 	public static final String lptable_authorid = "authors_id";
 	public static final String lptable_likes = "likes";
 	public static final String lptable_views = "views";
@@ -88,54 +89,53 @@ public class Settings {
 	public static final String lptable_timestamp = "timestamp";
 
 	// Opinion table
-	public static final String lotable= "opinions";
-	public static final String lotable_id="id";
-	public static final String lotable_reach="reach";
-	public static final String lotable_polarity="polarity";
-	public static final String lotable_influence="total_inf";
-	public static final String lotable_author="authors_id";
-	public static final String lotable_timestamp="timestamp";
-	public static final String lotable_pss="pss";
-	public static final String lotable_product="product";
-	public static final String lotable_comments="comments";
-	
+	public static final String lotable = "opinions";
+	public static final String lotable_id = "id";
+	public static final String lotable_reach = "reach";
+	public static final String lotable_polarity = "polarity";
+	public static final String lotable_influence = "total_inf";
+	public static final String lotable_author = "authors_id";
+	public static final String lotable_timestamp = "timestamp";
+	public static final String lotable_pss = "pss";
+	public static final String lotable_product = "product";
+	public static final String lotable_comments = "comments";
+
 	// Models table
-	
-	public static final String lmtable="models";
-	public static final String lmtable_id="id";
-	public static final String lmtable_name="name";
-	public static final String lmtable_uri="uri";
-	public static final String lmtable_pss="pss";
-	public static final String lmtable_update="update_frequency";
-	public static final String lmtable_archived="archived";
-	public static final String lmtable_monitorfinal="products";
-	public static final String lmtable_creator="created_by_user";
-	public static final String lmtable_age="age_range";
-	public static final String lmtable_gender="gender";
+
+	public static final String lmtable = "models";
+	public static final String lmtable_id = "id";
+	public static final String lmtable_name = "name";
+	public static final String lmtable_uri = "uri";
+	public static final String lmtable_pss = "pss";
+	public static final String lmtable_update = "update_frequency";
+	public static final String lmtable_archived = "archived";
+	public static final String lmtable_monitorfinal = "products";
+	public static final String lmtable_creator = "created_by_user";
+	public static final String lmtable_age = "age_range";
+	public static final String lmtable_gender = "gender";
 	public static final String lmtable_udate = "next_update";
 	public static final String lmtable_cdate = "created_date";
-	
+
 	// Sources Table
-	public static final String lutable="sources";
-	public static final String lutable_source="source";
-	public static final String lutable_account="account";
-	public static final String lutable_lastupdate="last_updated";
-	public static final String lutable_pss="pss";
-	
-	
+	public static final String lutable = "sources";
+	public static final String lutable_source = "source";
+	public static final String lutable_account = "account";
+	public static final String lutable_lastupdate = "last_updated";
+	public static final String lutable_pss = "pss";
+
 	// Reach table
-	public static final String lrtable="reach";
+	public static final String lrtable = "reach";
 	// PSS File
 	public static final String DATA_FOLDER = "data";
 	public static final String FILENAME_PRODUCTS = "ListProducts.dat";
 
-	// General  Settings
+	// General Settings
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
 	public static Boolean JSON_use = false;
 	public static String JSON_uri = "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
-	
+
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
 	public static final String JSON_replies = "replies";
@@ -151,64 +151,63 @@ public class Settings {
 	public static final String JSON_location = "location";
 	public static final String JSON_fname = "Fname";
 	public static final String JSON_lname = "Lname";
-	
+
 	// Common Repository DB Specs
-	private static final String crdbip="127.0.0.1";
-	private static final String crdbport="3306";
+	private static final String crdbip = "127.0.0.1";
+	private static final String crdbport = "3306";
 	private static final String crdbname = "diversity_common_repository";
-	private static final String crurl = "jdbc:mysql://"+crdbip+":"+crdbport+"/"+crdbname+"?autoReconnect=true&useSSL=false";
+	private static final String crurl = "jdbc:mysql://" + crdbip + ":" + crdbport + "/" + crdbname
+			+ "?autoReconnect=true&useSSL=false";
 	private static final String cruser = "diversity";
 	private static final String crpass = "!diversity!";
-	
+
 	// PSS Table
-	public static final String crpsstable ="pss";
-	public static final String crpsstable_id="id";
-	public static final String crpsstable_type="type";
-	public static final String crpsstable_company="sold_by_company_id";
-	public static final String crpsstable_author="user_id";
-	public static final String crpsstable_name ="name";
-	
-	
+	public static final String crpsstable = "pss";
+	public static final String crpsstable_id = "id";
+	public static final String crpsstable_type = "type";
+	public static final String crpsstable_company = "sold_by_company_id";
+	public static final String crpsstable_author = "user_id";
+	public static final String crpsstable_name = "name";
+
 	// Product Table
-	public static final String crproducttable="product";
-	public static final String crproducttable_id="id";
-	public static final String crproducttable_name="name";
-	public static final String crproducttable_type="type";
-	public static final String crproducttable_parent="parent_product_id";
-	public static final String crproducttable_supplied_by="supplied_by_company_id";
-	public static final String crproducttable_isfinal="is_final_product";
-	
+	public static final String crproducttable = "product";
+	public static final String crproducttable_id = "id";
+	public static final String crproducttable_name = "name";
+	public static final String crproducttable_type = "type";
+	public static final String crproducttable_parent = "parent_product_id";
+	public static final String crproducttable_supplied_by = "supplied_by_company_id";
+	public static final String crproducttable_isfinal = "is_final_product";
+
 	// Company Table
-	public static final String crcompanytable="company";
-	public static final String crcompanytable_id="id";
-	public static final String crcompanytable_name="name";
-	public static final String crcompanytable_type="type";
+	public static final String crcompanytable = "company";
+	public static final String crcompanytable_id = "id";
+	public static final String crcompanytable_name = "name";
+	public static final String crcompanytable_type = "type";
 	public static final String crcompanytable_belongs_to = "belongs_to_company_id";
-	
+
 	// PSS has Product Table
-	public static final String crpssproducttable="pss_has_product";
-	public static final String crrpssproducttable_pss="pss_id";
-	public static final String crrpssproducttable_product="product_id";
-	
+	public static final String crpssproducttable = "pss_has_product";
+	public static final String crrpssproducttable_pss = "pss_id";
+	public static final String crrpssproducttable_product = "product_id";
+
 	// Access rights Table
-	public static final String artable_vom="view_opinion_model";
-	public static final String arttable_pss="pss_id";
-	public static final String artable_product="product_id";
-	public static final String artable_create_edit_delete_model="create_edit_delete_model";
-	public static final String artable_view_opinion_results="view_opinion_results";
-	public static final String artable_save_delete_snapshots="save_delete_snapshots";
-	public static final String artable_use_opinion_prediction="use_opinion_prediction";
-	public static final String artable_role="role";
+	public static final String artable_vom = "view_opinion_model";
+	public static final String arttable_pss = "pss_id";
+	public static final String artable_product = "product_id";
+	public static final String artable_create_edit_delete_model = "create_edit_delete_model";
+	public static final String artable_view_opinion_results = "view_opinion_results";
+	public static final String artable_save_delete_snapshots = "save_delete_snapshots";
+	public static final String artable_use_opinion_prediction = "use_opinion_prediction";
+	public static final String artable_role = "role";
 
-
-	
-	
 	/**
 	 * Conndata.
 	 *
 	 * @return the connection
-	 * @throws ClassNotFoundException the class not found exception
-	 * @throws SQLException the SQL exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 * @throws SQLException
+	 *             the SQL exception
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 
@@ -222,7 +221,8 @@ public class Settings {
 	 * Connlocal.
 	 *
 	 * @return the connection
-	 * @throws ClassNotFoundException the class not found exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 */
 	public static Connection connlocal() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
@@ -240,12 +240,13 @@ public class Settings {
 			}
 		}
 	}
-	
+
 	/**
 	 * Conncr.
 	 *
 	 * @return the connection
-	 * @throws ClassNotFoundException the class not found exception
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 */
 	public static Connection conncr() throws ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
@@ -267,9 +268,11 @@ public class Settings {
 	/**
 	 * Gets the conf.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the conf
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public JSONArray getConf(long id) throws JSONException {
 		JSONArray result = new JSONArray();
@@ -309,19 +312,20 @@ public class Settings {
 			result.put(obj);
 		}
 		obj = new JSONObject();
-		String[] values4 = Data.modeldb.get(id).getProducts().split(",");
-		obj.put("Size", values4.length);
-		obj.put("Param", "Product");
-		result.put(obj);
-		for (int i = 0; i < values4.length; i++) {
-			if(!Data.productdb.containsKey(Long.valueOf(values4[i]))) continue;
-			obj = new JSONObject();
-			obj.put("Product", Data.productdb.get(Long.valueOf(values4[i])).get_Name());
+		if (!Data.modeldb.get(id).getProducts().isEmpty()) {
+			String[] values4 = Data.modeldb.get(id).getProducts().split(",");
+			obj.put("Size", values4.length);
+			obj.put("Param", "Product");
 			result.put(obj);
+			for (int i = 0; i < values4.length; i++) {
+				if (!Data.productdb.containsKey(Long.valueOf(values4[i])))
+					continue;
+				obj = new JSONObject();
+				obj.put("Product", Data.productdb.get(Long.valueOf(values4[i])).get_Name());
+				result.put(obj);
+			}
 		}
-		
-		
-		
+
 		System.out.print(result.toString());
 		return result;
 
@@ -330,9 +334,11 @@ public class Settings {
 	/**
 	 * Sets the conf.
 	 *
-	 * @param msg the msg
+	 * @param msg
+	 *            the msg
 	 * @return the JSON object
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public JSONObject setConf(JSONObject msg) throws JSONException {
 		String edited = new String();

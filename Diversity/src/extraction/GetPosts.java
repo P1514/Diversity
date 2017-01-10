@@ -71,7 +71,7 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (model.getProducts() != null) {
+		if (!model.getProducts().isEmpty()) {
 			if(product=="noproduct")
 			insert += " in (" + model.getProducts() + ")";
 			else
@@ -254,7 +254,7 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (model.getProducts() != null) {
+		if (!model.getProducts().isEmpty()) {
 			insert += " in (" + model.getProducts() + ")";
 		} else {
 			insert += "=0";
