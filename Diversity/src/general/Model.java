@@ -188,8 +188,10 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
+		
+		
 
-		Monitor.update(msg.getString("URI"));
+		Monitor.update(msg.getString("URI"),pss);
 		return result;
 
 	}
@@ -271,7 +273,7 @@ public final class Model {
 		obj.put("Op", "Error");
 		obj.put("Message", "Successfully updated model " + msg.getString("Name"));
 		result.put(obj);
-		Monitor.update(msg.getString("URI"));
+		Monitor.update(msg.getString("URI"),pss);
 		return result;
 	}
 
