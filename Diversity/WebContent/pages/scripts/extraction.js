@@ -86,6 +86,7 @@ function connect() {
 
 		json = {
 			"Op" : "getconfig",
+			
 			"Id" : sessionStorage.id,
 		}
 
@@ -156,7 +157,15 @@ function connect() {
 		}
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
-			drawChart();
+			if ( json[0].hasOwnProperty("Error")) {
+				if (json[0].Error == "No_data" ) {
+						$('#loading').html('No data to display.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+						$('#overlay').show();
+						$('#overlay-back').show();
+				}
+			} else {
+				drawChart();
+			}
       var json = {
             "Op" : "getposts",
             "Id" : sessionStorage.id,

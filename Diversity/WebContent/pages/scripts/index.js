@@ -137,7 +137,10 @@ ws.onopen = function() {
 ws.onmessage = function(event) {
   json = JSON.parse(event.data);
   if (json[0].Op == 'Error') {
-    alert(json[0].Message);
+    //alert(json[0].Message);
+	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	$('#overlay').show();
+	$('#overlay-back').show();
   }
   if (json[0].Op == 'Models') {
     populatePSS();
@@ -373,13 +376,9 @@ function displayModels() {
   $('#_view').append(form);
 }
 
-function deleteModel() {
-
-  var name = $('#Models :selected').text();
-
-  var confirm = window.confirm("Do you really want to delete model " + name + "?");
-
-  if (confirm) {
+function ok(val) {
+	
+	 if (val) {
     var model_data = document.getElementById('Models').value.split(';');
     var jsonData = {
       "Op" : "update_model",//create or update
@@ -398,10 +397,26 @@ function deleteModel() {
       "Start_date": 0,
     };
     ws.send(JSON.stringify(jsonData));
-    window.alert("Model " + name + " deleted.");
+	$('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+    $('#overlay').show();
+	$('#overlay-back').show();
+	//window.alert("Model " + name + " deleted.");
   } else {
-    window.alert("No models were deleted.");
+    $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	$('#overlay').show();
+	$('#overlay-back').show();
   }
+}
+
+function deleteModel() {
+
+	var name = $('#Models :selected').text();
+
+	//var confirm = window.confirm("Do you really want to delete model " + name + "?");
+	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
+    $('#overlay').show();
+	$('#overlay-back').show();
+ 
 }
 
 /* When the user clicks on the button,
