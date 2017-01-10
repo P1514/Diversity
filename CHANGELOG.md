@@ -17,13 +17,20 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
-## [2.5] Ongoing
+## [2.5] 10-01-2017
+
+### Backend
+- Various Fixes
+
 ### Modeling
 - Date setting should now be fully implemented.
 
 ### Integration
-- Polarity calculations taken out of this module.
+- Polarity calculations can be taken out of this module
 
+### Front-end
+- New pop up windows.
+- Various Fixes
 
 ## [2.3.1] 23-11-2016
 ###

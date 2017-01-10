@@ -226,7 +226,7 @@ public final class Model {
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
-			query1.setString(3, msg.getString("URI"));
+			query1.setString(3, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
 			query1.setInt(4, msg.getInt("Update"));
 			query1.setBoolean(1, msg.getBoolean("Archive"));
 			
