@@ -362,7 +362,7 @@ public final class Model {
 	 * @return the products
 	 */
 	public String getProducts() {
-		if(this.products.isEmpty()) return null;
+		if(this.products.isEmpty()) return "";
 		return this.products.substring(0, this.products.length()-1);
 	}
 
