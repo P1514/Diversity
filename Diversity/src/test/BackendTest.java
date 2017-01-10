@@ -246,7 +246,7 @@ public class BackendTest {
 		obj.put("Final_Products", "Morris Ground 1;");
 		obj.put("Update", "1");
 		obj.put("URI", "Facebook,abcd;");
-		obj.put("Start_date", "0");
+		obj.put("Start_date", "1970-01-02");
 		obj.put("Name", "dsfgdsfg");
 		tester = new Backend(14, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully added model dsfgdsfg to monitor module\",\"id\":820}]";
@@ -267,7 +267,7 @@ public class BackendTest {
 		obj.put("Final_Products", "Morris Ground 1;");
 		obj.put("Update", "10");
 		obj.put("URI", "Facebook,adidas;");
-		obj.put("Start_date", "0");
+		obj.put("Start_date", "1970-01-02");
 		obj.put("Name", "Morris Ground 1");
 		obj.put("Id", "806");
 		tester = new Backend(16, obj);
@@ -275,14 +275,14 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
 	
-	@Test
+	/*@Test
 	public void resolveClean() throws JSONException {
 	
 		obj = new JSONObject();
 		tester = new Backend(7, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Cleaned Successfully\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
-	}
+	}*/
 	
 	
 	

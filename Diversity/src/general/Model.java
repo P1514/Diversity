@@ -88,8 +88,8 @@ public final class Model {
 			} catch (ParseException e) {
 				System.out.print("Error Parsing Date from Browser");
 			}
-		    nextupdate = date.getTime();
-		    if(nextupdate<0) {
+		    cdate = date.getTime();
+		    if(cdate<0) {
 		    	obj.put("Op", "Error");
 				obj.put("Message", "Bad Date");
 				result.put(obj);
@@ -97,7 +97,7 @@ public final class Model {
 		    
 		    }
 		}else{
-		nextupdate= System.currentTimeMillis();
+		cdate= System.currentTimeMillis();
 		}
 		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(";") : null;
 		products = "";
@@ -125,6 +125,7 @@ public final class Model {
 		}
 		// products = msg.getString("Final_Product");
 		user = msg.getInt("User");
+		nextupdate=cdate;
 		// age = msg.getString("Age");
 		// gender = msg.getString("Gender");
 		dbconnect();
@@ -146,7 +147,7 @@ public final class Model {
 			query1.setBoolean(5, archived);
 			query1.setString(6, products);
 			query1.setLong(7, user);
-			query1.setLong(8, nextupdate);
+			query1.setLong(8, cdate);
 			query1.setLong(9, nextupdate);
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
