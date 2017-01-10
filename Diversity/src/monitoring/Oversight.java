@@ -51,7 +51,7 @@ public class Oversight extends TimerTask {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.AM_PM, Calendar.AM);
 		
-		timer.scheduleAtFixedRate(this, c.getTime(), 24*60*60*1000);
+		timer.scheduleAtFixedRate(this, c.getTime(), 30*1000/*24*60*60*1000*/);
 	}
 	
 	/**
@@ -60,6 +60,7 @@ public class Oversight extends TimerTask {
 	 * @param a the a
 	 */
 	public Oversight(boolean a) {
+		local = false;
 		Calendar date = Calendar.getInstance();
 		date.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
 		// timer.scheduleAtFixedRate(this, date.getTime(),
@@ -80,8 +81,8 @@ public class Oversight extends TimerTask {
 
 		// TODO This is the method that run at 00:00 each 24h to update
 		// everything
-		String getsources = "Select * from " + Settings.lutable + " where "+Settings.lutable_source+"=? AND "+Settings.lutable_nextupdate+"<?";
-		String getpss = "Select distinct( " + Settings.lutable_source + ") from " + Settings.lutable;
+		String getsources = "Select "+Settings.lmtable_uri+" from " + Settings.lmtable + " where "+Settings.lmtable_udate+"<=? AND "+Settings.lmtable_uri+" LIKE ?";
+		String getpss = "Select distinct( " + Settings.lutable_source + "),"+Settings.lutable_lastupdate+" from " + Settings.lutable;
 
 		if(local==true){
 		dbconnect();
@@ -90,20 +91,22 @@ public class Oversight extends TimerTask {
 			ResultSet rs;
 			rs = query.executeQuery();
 			while (rs.next()) {
-				sourcelist.add(rs.getString(Settings.lutable_source));
+				sourcelist.add(rs.getString(Settings.lutable_source)+";;;"+rs.getString(Settings.lutable_lastupdate));
 			}
 			for (String a : sourcelist) {
 				updatelist = new ArrayList<String>();
 				requesturl = new HashMap<String, url>();
 
 				query = cnlocal.prepareStatement(getsources);
-				query.setString(1, a);
-				query.setLong(2, now.getTimeInMillis());
+				query.setLong(1, now.getTimeInMillis());
+				String source = a.split(";;;")[0];
+				String date = a.split(";;;")[1];
+				query.setString(2, "%"+source+",%");
 				rs = query.executeQuery();
 
 				Calendar c = Calendar.getInstance();
 				while (rs.next()) {
-					c.setTimeInMillis(Long.valueOf(rs.getString(Settings.lutable_nextupdate)));
+					c.setTimeInMillis(Long.valueOf(date));
 					if (now.after(c)) {
 						updatelist.add(rs.getString(Settings.lutable_account) + ";."
 								+ rs.getString(Settings.lutable_lastupdate) + ";."
@@ -123,7 +126,7 @@ public class Oversight extends TimerTask {
 				requesturl.forEach((k, v) -> {
 					String request = uri + a + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\""
 							+ k + "\"";
-					//System.out.println(request);
+					System.out.println(request);
 					try {
 						// dat.load(new JSONArray(readUrl(request)));
 					} catch (Exception e) {
@@ -131,8 +134,7 @@ public class Oversight extends TimerTask {
 						e.printStackTrace();
 						System.out.println("ERROR ON JSON OVERWATCH");
 					}
-					String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate + "=?,"
-							+ Settings.lutable_nextupdate + "=? where (" + Settings.lutable_pss + "=? AND "
+					String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate + "=? where (" + Settings.lutable_pss + "=? AND "
 							+ Settings.lutable_source + "=?) AND (";
 					try {
 						/*
@@ -151,7 +153,6 @@ public class Oversight extends TimerTask {
 						cc.add(Calendar.DAY_OF_MONTH, 1);
 						PreparedStatement query1 = cnlocal.prepareStatement(update);
 						query1.setLong(1, now.getTimeInMillis());
-						query1.setLong(2, cc.getTimeInMillis());
 						query1.setString(3, k);
 						query1.setString(4, a);
 						int i=5;

@@ -19,7 +19,7 @@ public class Monitor {
 	 * @param uri the uri from the remote API to get posts
 	 */
 	public static void update(String uri) {
-		String[] urilists = uri.split(";");
+		/*String[] urilists = uri.split(";");
 		String account, source, url;
 		url ="http://diversity.euprojects.net/socialfeedbackextraction/registerSFE?accounts[]=\"";
 		
