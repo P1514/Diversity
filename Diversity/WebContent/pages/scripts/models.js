@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
           location.href ='index.html';
         }*/
       } else {
-		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'models.html\'">OK</button>';
+		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>';
 		  $('#alert').html(code);
 		  $('#overlay').show();
 		  $('#overlay-back').show();
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('pss').text = getPss();
         document.getElementById('pss').disabled = true;
       } else {
-		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'models.html\'">OK</button>';
+		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="window.history.back();">OK</button>';
 		  $('#alert').html(code);
 		  $('#overlay').show();
         //alert("Selected PSS does not exist.");
@@ -157,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById("pss").disabled = true;
 	  
       makeTree();
-	  console.log(json2[0]);
 	  if (json2[0].hasOwnProperty('Final_products')) {
 		  var prods = json2[0].Final_products.split(";");
 			  if(prods.length > 0) {
@@ -178,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		  });
 	  } else {
 		$('#final').hide();
+		$('#check_label').hide();
 		$('#tree_div').hide();
 	  }
 
@@ -228,21 +228,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("new_URI").disabled = true;
 
     makeTree();
-    var prods = json2[0].Final_products.split(";");
-    $("#final_input").bind('ready.jstree', function(event, data) {
-      var $tree = $(this);
-      $($tree.jstree().get_json($tree, {
-          flat: true
-        }))
-        .each(function(index, value) {
-          var node = $("#final_input").jstree().get_node(this.id);
-          $("#final_input").jstree().disable_node(node);
-          if (prods.indexOf(node.text) != -1) {
-            $("#final_input").jstree().select_node(node);
-          }
-        });
-    });
-
+	if (json2[0].hasOwnProperty('Final_products')) {
+		var prods = json2[0].Final_products.split(";");
+		$("#final_input").bind('ready.jstree', function(event, data) {
+		  var $tree = $(this);
+		  $($tree.jstree().get_json($tree, {
+			  flat: true
+			}))
+			.each(function(index, value) {
+			  var node = $("#final_input").jstree().get_node(this.id);
+			  $("#final_input").jstree().disable_node(node);
+			  if (prods.indexOf(node.text) != -1) {
+				$("#final_input").jstree().select_node(node);
+			  }
+			});
+		});
+	}
   }
   }
 
