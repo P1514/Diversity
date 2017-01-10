@@ -50,7 +50,7 @@ function getPss() {
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
-
+	$('#final').click();
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
 
