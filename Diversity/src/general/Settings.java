@@ -135,7 +135,8 @@ public class Settings {
 	public static String locations = "Asia,,Europe";
 	public static Boolean JSON_use = false;
 	public static String JSON_uri = "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
-
+	public static final boolean LocalPolarity=true;
+	
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
 	public static final String JSON_replies = "replies";

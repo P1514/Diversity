@@ -1084,7 +1084,11 @@ public class Data {
 								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
 								query2.setLong(1, post.getID());
-								query2.setDouble(2, post.getPolarity());
+								if (Settings.LocalPolarity) {
+									query2.setDouble(2, post.getPolarity());
+								} else {
+									query2.setNull(2, java.sql.Types.DOUBLE);
+								}
 								query2.setString(3, post.getComment());
 								query2.setLong(4, post.getLikes());
 								query2.setLong(5, post.getViews());
