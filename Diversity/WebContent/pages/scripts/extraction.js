@@ -75,6 +75,7 @@ function connect() {
 			ws.send(JSON.stringify(json));
 		}
 	})
+
 	document.getElementById("Cookie").innerHTML = "Model: "
 			+ window.sessionStorage.model + "; PSS: "
 			+ window.sessionStorage.pss;
@@ -425,6 +426,8 @@ function drawChart() {
 				if (jsonData[i].Value != 0) {
 					data.setCell(ii, 0, jsonData[i].Month);
 					data.setCell(ii, filt, jsonData[i].Value)
+				} else {
+					data.setCell(ii, 0, jsonData[i].Month);
 				}
 			}
 		}
@@ -506,6 +509,8 @@ function drawChart() {
 				if (jsonData[i].Value != 0) {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 					sentimentdata.setCell(ii, filt, jsonData[i].Value);
+				} else {
+					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 				}
 			}
 		}
