@@ -20,7 +20,7 @@ import monitoring.Monitor;;
  * The Class Model.
  */
 public final class Model {
-	
+
 	private Connection cnlocal;
 	private long id, pss;
 	private long frequency, user;
@@ -31,16 +31,27 @@ public final class Model {
 	/**
 	 * Instantiates a new model.
 	 *
-	 * @param _id the id of the model
-	 * @param _frequency the frequency of update
-	 * @param _user the user id
-	 * @param _name the name of the model
-	 * @param _uri the uri of the source and account list Example:"facebook,shop;twitter,run"
-	 * @param _pss the pss id
-	 * @param _age the age range wanted
-	 * @param _gender the gender wanted
-	 * @param _products the products wanted
-	 * @param _archived the archived if deleted or not
+	 * @param _id
+	 *            the id of the model
+	 * @param _frequency
+	 *            the frequency of update
+	 * @param _user
+	 *            the user id
+	 * @param _name
+	 *            the name of the model
+	 * @param _uri
+	 *            the uri of the source and account list
+	 *            Example:"facebook,shop;twitter,run"
+	 * @param _pss
+	 *            the pss id
+	 * @param _age
+	 *            the age range wanted
+	 * @param _gender
+	 *            the gender wanted
+	 * @param _products
+	 *            the products wanted
+	 * @param _archived
+	 *            the archived if deleted or not
 	 */
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
 			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate) {
@@ -67,9 +78,11 @@ public final class Model {
 	/**
 	 * Adds the model.
 	 *
-	 * @param msg the msg
+	 * @param msg
+	 *            the msg
 	 * @return the JSON array with information if successful or not
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public JSONArray add_model(JSONObject msg) throws JSONException {
 		// TODO Verify data that exists in sources to be updated
@@ -80,44 +93,44 @@ public final class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		if(msg.has("Start_date")){
+		if (msg.has("Start_date")) {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			Date date=null;
+			Date date = null;
 			try {
 				date = df.parse(msg.getString("Start_date"));
 			} catch (ParseException e) {
 				System.out.print("Error Parsing Date from Browser");
 			}
-		    cdate = date.getTime();
-		    if(cdate<0) {
-		    	obj.put("Op", "Error");
+			cdate = date.getTime();
+			if (cdate < 0) {
+				obj.put("Op", "Error");
 				obj.put("Message", "Bad Date");
 				result.put(obj);
-		    	return result;
-		    
-		    }
-		}else{
-		cdate= System.currentTimeMillis();
+				return result;
+
+			}
+		} else {
+			cdate = System.currentTimeMillis();
 		}
 		String[] productsbyname = msg.has("Final_Products") ? msg.getString("Final_Products").split(";") : null;
 		products = "";
-		Product product=null;
-		PSS pss1=null;
+		Product product = null;
+		PSS pss1 = null;
 		for (String a : productsbyname) {
 			product = null;
-			pss1=null;
+			pss1 = null;
 			for (Product product2 : Data.productdb.values())
 				if (product2.get_Name().equals(a)) {
 					product = product2;
 					break;
 				}
-			for(PSS pss2 : Data.pssdb.values()){
-				if(pss2.getID() == pss){
-					pss1=pss2;
+			for (PSS pss2 : Data.pssdb.values()) {
+				if (pss2.getID() == pss) {
+					pss1 = pss2;
 					break;
 				}
 			}
-			if (product == null || pss1==null)
+			if (product == null || pss1 == null)
 				continue;
 			if (product.get_PSS() != pss1.getID())
 				continue;
@@ -125,18 +138,19 @@ public final class Model {
 		}
 		// products = msg.getString("Final_Product");
 		user = msg.getInt("User");
-		nextupdate=cdate;
+		nextupdate = cdate;
 		// age = msg.getString("Age");
 		// gender = msg.getString("Gender");
 		dbconnect();
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
-				+ Settings.lmtable_monitorfinal + ","
-				+ Settings.lmtable_creator + "," + Settings.lmtable_cdate + "," + Settings.lmtable_udate /*
+				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator + "," + Settings.lmtable_cdate + ","
+				+ Settings.lmtable_udate /*
 											 * + "," + Settings.lmtable_age +
 											 * "," + Settings.lmtable_gender
-											 */ + ") values (?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
+											 */
+				+ ") values (?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -175,7 +189,8 @@ public final class Model {
 					query1.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}try{
+			}
+			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
@@ -188,10 +203,8 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-		
-		
 
-		Monitor.update(msg.getString("URI"),pss);
+		Monitor.update(msg.getString("URI"), pss);
 		return result;
 
 	}
@@ -199,44 +212,52 @@ public final class Model {
 	/**
 	 * Update model.
 	 *
-	 * @param msg the msg query from the front_end
+	 * @param msg
+	 *            the msg query from the front_end
 	 * @return the JSON array
-	 * @throws JSONException the JSON exception
+	 * @throws JSONException
+	 *             the JSON exception
 	 */
 	public JSONArray update_model(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
-		if (!msg.get("Name").equals(this.name) || Data.pssdb.get(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
+		Boolean delete = msg.getBoolean("Archive");
+		int rangeindex=1;
+		if (!msg.get("Name").equals(this.name)
+				|| Data.pssdb.get(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
 			obj.put("id", msg.getInt("Id"));
 			obj.put("Op", "Error");
 			obj.put("Message", "Error updating model " + msg.getString("Name") + "updated attempt not allowed");
 			result.put(obj);
 			return result;
 		}
-		String product=new String();
+		String product = new String();
 
 		String insert = "Update " + Settings.lmtable
 				+ " Set "/*
 							 * + Settings.lmtable_age + "=?, " +
 							 * Settings.lmtable_gender + "=?, "
-							 */ + Settings.lmtable_archived + "=?, " + Settings.lmtable_monitorfinal + "=?, "
-				+ Settings.lmtable_uri + "=?, " + Settings.lmtable_update + "=? Where " + Settings.lmtable_id + "=?";
+							 */ + Settings.lmtable_archived + "=? " + (delete ? "" : Settings.lmtable_monitorfinal + "=?, "
+				+ Settings.lmtable_uri + "=?, " + Settings.lmtable_update + "=? " )+ "Where " + Settings.lmtable_id + "=?";
 		PreparedStatement query1 = null;
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
-			query1.setString(3, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
-			query1.setInt(4, msg.getInt("Update"));
-			query1.setBoolean(1, msg.getBoolean("Archive"));
-			
-			if(msg.has("Final_Products")){
-				for (String a : msg.getString("Final_Products").split(";")){
-					product+=Data.identifyProduct(a)+",";
+			query1.setBoolean(rangeindex++, msg.getBoolean("Archive"));
+
+			if (msg.has("Final_Products")) {
+				for (String a : msg.getString("Final_Products").split(";")) {
+					product += Data.identifyProduct(a) + ",";
 				}
 			}
-			query1.setString(2, products);
-			query1.setInt(5, msg.getInt("Id"));
+			
+			if (!delete) {
+				query1.setString(rangeindex++, products);
+				query1.setString(rangeindex++, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
+				query1.setInt(rangeindex++, msg.getInt("Update"));
+			}
+			
+			query1.setInt(rangeindex++, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
 			System.out.println(query1);
@@ -253,7 +274,8 @@ public final class Model {
 					query1.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			}try{
+			}
+			try {
 				if (cnlocal != null)
 
 					cnlocal.close();
@@ -273,7 +295,7 @@ public final class Model {
 		obj.put("Op", "Error");
 		obj.put("Message", "Successfully updated model " + msg.getString("Name"));
 		result.put(obj);
-		Monitor.update(msg.getString("URI"),pss);
+		Monitor.update(msg.getString("URI"), pss);
 		return result;
 	}
 
@@ -304,13 +326,14 @@ public final class Model {
 		return this.id;
 	}
 
-	public Long getDate(){
+	public Long getDate() {
 		return this.cdate;
 	}
-	
-	public Long getUpdate(){
+
+	public Long getUpdate() {
 		return this.nextupdate;
 	}
+
 	/**
 	 * Gets the archived.
 	 *
@@ -362,8 +385,9 @@ public final class Model {
 	 * @return the products
 	 */
 	public String getProducts() {
-		if(this.products.isEmpty()) return "";
-		return this.products.substring(0, this.products.length()-1);
+		if (this.products.isEmpty())
+			return "";
+		return this.products.substring(0, this.products.length() - 1);
 	}
 
 	private void dbconnect() {
