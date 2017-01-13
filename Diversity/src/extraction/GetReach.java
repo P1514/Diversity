@@ -44,7 +44,7 @@ public class GetReach {
 				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
-		System.out.println("HEELOO" + select);
+		//System.out.println("HEELOO" + select);
 		try {
 			dbconnect();
 			query1 = cnlocal.prepareStatement(select);
@@ -238,7 +238,7 @@ public class GetReach {
 				query1.setString(rangeindex++, location.substring(0, location.length()));
 			if (products != null)
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
-			System.out.println(query1);
+			//System.out.println(query1);
 			/*
 			 * if (param != null) { if (!value.contains("-")) {
 			 * query1.setString(4, value); } else { query1.setString(4,

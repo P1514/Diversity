@@ -2,35 +2,32 @@
 All notable changes to this project will be documented in this file.
 
 ##[Unreleased]
-### 
-- Integration with outside modules
-- Code refactoring on latest added code (1.1.7+)
-
-### Modeling
-- Create and use Extra DB table to keep info of last time updated
 
 ### Extraction
 - Snapshoting values to be saved on local DB
 - Request Extrapolation using prediction
-- Able to filter and see all products related to each PSS
 
 ### Prediction Model
 - Everything
 
-## [2.5] 10-01-2017
+## [2.5] 13-01-2017
 
 ### Backend
 - Various Fixes
 
 ### Modeling
-- Date setting should now be fully implemented.
+- Date setting should now be fully implemented
+- Various Fixes on deletion
 
 ### Integration
-- Polarity calculations can be taken out of this module
+- Polarity calculation locally or remote can be controlled from Settings
 
 ### Front-end
 - New pop up windows.
 - Various Fixes
+- Graph not showing points when do data is available
+- No data information shown when no data is present on that specific model
+
 
 ## [2.3.1] 23-11-2016
 ###

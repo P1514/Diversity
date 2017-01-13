@@ -55,7 +55,7 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		PreparedStatement query1 = null;
 		int n_tops = 0;
-		System.out.print("TEST:"+product);
+		//System.out.print("TEST:"+product);
 		
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
 				+ "=? AND "+Settings.lotable_timestamp+">=? AND " + Settings.lotable_product;
@@ -113,7 +113,7 @@ public class GetPosts {
 				rangeindex++;
 
 			}
-			System.out.print(query1);
+			//System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
 			rs = query1.executeQuery();
 

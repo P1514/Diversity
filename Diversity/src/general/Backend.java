@@ -146,7 +146,7 @@ public final class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				System.out.println("TEST:"+gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value"));
+				//System.out.println("TEST:"+gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value"));
 				if(gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value")!=0){
 				result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
 				result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
