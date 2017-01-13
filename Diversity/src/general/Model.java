@@ -221,7 +221,7 @@ public final class Model {
 	public JSONArray update_model(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		Boolean delete = msg.getBoolean("Archive");
+		Boolean delete = msg.has("Archive") ? msg.getBoolean("Archive") : false;
 		int rangeindex=1;
 		if (!msg.get("Name").equals(this.name)
 				|| Data.pssdb.get(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
