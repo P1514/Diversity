@@ -86,7 +86,7 @@ function connect() {
 
 		json = {
 			"Op" : "getconfig",
-			
+
 			"Id" : sessionStorage.id,
 		}
 
@@ -419,13 +419,15 @@ function drawChart() {
 			for (ii = 0; i < jsonData.length
 					&& jsonData[i].Graph == 'Bottom_Middle'
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
-				if (filt == 1)
-					data.addRow();
-				data.setCell(ii, 0, jsonData[i].Month);
-				data.setCell(ii, filt, jsonData[i].Value)
+				if (filt == 1) {
+						data.addRow();
+				}
+				if (jsonData[i].Value != 0) {
+					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii, filt, jsonData[i].Value)
+				}
 			}
 		}
-
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(data.getColumnLabel(color)));
@@ -501,8 +503,10 @@ function drawChart() {
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
 					sentimentdata.addRow();
-				sentimentdata.setCell(ii, 0, jsonData[i].Month);
-				sentimentdata.setCell(ii, filt, jsonData[i].Value)
+				if (jsonData[i].Value != 0) {
+					sentimentdata.setCell(ii, 0, jsonData[i].Month);
+					sentimentdata.setCell(ii, filt, jsonData[i].Value);
+				}
 			}
 		}
 		colors = new Array();
