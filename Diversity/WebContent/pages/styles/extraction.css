@@ -1,4 +1,8 @@
 
+#filters, #graphs, #table_container {
+	width: 100%;
+}
+
 #displaybox {
 	z-index: 10000;
 	filter: alpha(opacity = 90); /*older IE*/

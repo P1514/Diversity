@@ -551,10 +551,10 @@ function drawChart() {
 			sentimentdata.setColumnProperties(series[k], {'lineDashStyle': '[4, 4]'})
 		}
 
-colors = new Array();
-for (var color = 1; color < filt; color++) {
-	colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
-}
+		colors = new Array();
+		for (var color = 1; color < filt; color++) {
+			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
+		}
 
 
     function rightSelectHandler() {
