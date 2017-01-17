@@ -143,6 +143,7 @@ public final class Backend {
 							"Graph", "Bottom_Right");
 				if(msg.has("Extrapolate")){
 					//System.out.println("EXTRAPOLATING...");
+					if(msg.getInt("Extrapolate")==1)
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
 							ex.extrapolate(1, param + "," + filtering,
