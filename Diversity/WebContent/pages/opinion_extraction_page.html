@@ -59,25 +59,28 @@
 									&nbsp All </th>
 						</tr>
 						<tr>
-							<th><select id="genderfilt">
+							<th><select style="margin-left: 0;" id="genderfilt">
 									<option value="All">All Genders
 							</select></th>
-							<th><select id="locationfilt">
+							<th><select style="margin-left: 0;" id="locationfilt">
 									<option value="All">All Locations
 							</select></th>
-							<th><select id="agefilt">
+							<th><select style="margin-left: 0;" id="agefilt">
 									<option value="All">All Ages
 							</select></th>
-							<th><select id="finalfilt">
+							<th><select style="margin-left: 0;" id="finalfilt">
 									<option value="All">All Products
 							</select></th>
 						</tr>
 					</table>
-					<table id="refresh_table">
+					<div style="min-height:15px"></div>
+					<table style ="padding-top:25px;" id="refresh_table">
+						<tr>
+							<label id="extrapolate_label"><input style="padding-top:15px;" type="checkbox" name="extrapolation" id="extrapolate" value="Extrapolate" onClick="setExtra();"> Extrapolate Results </label>
+						</tr>
 						<tr>
 							<th></th>
 							<th>
-
 								<button class="btn btn-default" id="refresh"
 									onclick="changeRequest()">Update</button>
 							</th>
@@ -110,7 +113,7 @@
 						<div id="globalline"></div>
 					</div>
 				</div>
-	<!--				
+	<!--
 				<table id="global" class="graphst">
 					<tr>
 						<td>

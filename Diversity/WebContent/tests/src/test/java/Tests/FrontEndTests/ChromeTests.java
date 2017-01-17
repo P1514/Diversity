@@ -13,6 +13,8 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -118,8 +120,18 @@ public class ChromeTests  {
      * @throws IOException - if an error occurs with the log.txt file
      */
     public static boolean testCreate(WebDriver driver) throws IOException {
-    	w.write("Starting Create Opinion Model Test\n\n");
-        driver.findElement(By.linkText("Create Opinion Model")).click();
+    	w.write("Starting Create Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
+    	w.write("Clicking: 'Create Opinion Model'...\n");
+    	try {
+    		driver.findElement(By.linkText("Create Opinion Model")).click();
+    	} catch (NoSuchElementException e) {
+    		w.write("ERROR: 'Create Opinion Model' link was not found.\n");
+    		return false;
+    	}
+        
+    	w.write("Waiting for page to redirect to 'models.html'...\n");
+    	
         (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
             /* (non-Javadoc)
              * @see com.google.common.base.Function#apply(java.lang.Object)
@@ -135,38 +147,92 @@ public class ChromeTests  {
 					}
             		return false;
             	}
+            	try {
+					w.write("Page redirected to 'models.html'.\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             	//Find and set the PSS dropdown
-            	WebElement pssBox = d.findElement(By.id("pss"));
-            	Select pssList = new Select(pssBox);
-            	pssList.selectByIndex(2);
-            	pss = pssList.getFirstSelectedOption().getText();
             	
-            	//Generate a random 32 bit integer name for the model name to avoid duplicates
-            	WebElement modelNameBox = d.findElement(By.id("model_name"));
-            	modelName = (new BigInteger(32,new Random())).toString();
-            	modelNameBox.sendKeys(modelName);
+            	try {
+	            	WebElement pssBox = d.findElement(By.id("pss"));
+	            	Select pssList = new Select(pssBox);
+	            	pssList.selectByIndex(2);
+	            	pss = pssList.getFirstSelectedOption().getText();
+            	} catch (NoSuchElementException e2) {
+            		try {
+						w.write("ERROR: Failed to select PSS from dropdown.\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	}
             	
+            	try {
+            		//Generate a random 32 bit integer name for the model name to avoid duplicates
+	            	WebElement modelNameBox = d.findElement(By.id("model_name"));
+	            	modelName = (new BigInteger(32,new Random())).toString();
+	            	modelNameBox.sendKeys(modelName);
+            	} catch (NoSuchElementException e3) {
+            		try {
+						w.write("ERROR: Failed to type model name (text box not found).\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	}
             	//Select the first two options from the product selection tree
-            	WebElement product1 = d.findElement(By.id("j2_1"));
-            	WebElement product2 = d.findElement(By.id("j2_2"));
-            	product1.click();
-            	product2.click();
-            	products = product1.getText() + ";" + product2.getText() + ";";
+            	try {
+            		d.findElement(By.id("final")).click();
+	            	WebElement product1 = d.findElement(By.id("j2_1"));
+	            	WebElement product2 = d.findElement(By.id("j2_2"));
+	            	product1.click();
+	            	product2.click();
+	            	products = product1.getText() + ";" + product2.getText() + ";";
+            	} catch (NoSuchElementException e) {
+            		try {
+						w.write("ERROR: Failed to select final product from tree view.\n");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	} catch (StaleElementReferenceException e) {
+            		try {
+						w.write("ERROR: Tree view is no longer accessible.\n");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	}
             	
                	// Select social network and type a name twice (add two accounts)
-            	WebElement socialNetworkBox = d.findElement(By.id("new_name"));
-            	WebElement userNameBox = d.findElement(By.id("new_URI"));
-            	WebElement button = d.findElement(By.className("glyphicon"));
-            	userNameBox.sendKeys("First User");
-            	Select socialNetworkList = new Select(socialNetworkBox);
-            	socialNetworkList.selectByIndex(0);
-            	accounts += socialNetworkList.getFirstSelectedOption().getAttribute("value") + " / " + userNameBox.getAttribute("value") + ";";
-            	button.click();
-            	userNameBox.sendKeys("Second User");
-            	socialNetworkList.selectByIndex(1);
-            	accounts += socialNetworkList.getFirstSelectedOption().getAttribute("value") + " / " + userNameBox.getAttribute("value") + ";";
-            	button.click();
-            	
+            	try {
+	            	WebElement socialNetworkBox = d.findElement(By.id("new_name"));
+	            	WebElement userNameBox = d.findElement(By.id("new_URI"));
+	            	WebElement button = d.findElement(By.className("glyphicon"));
+	            	userNameBox.sendKeys("First User");
+	            	Select socialNetworkList = new Select(socialNetworkBox);
+	            	socialNetworkList.selectByIndex(0);
+	            	accounts += socialNetworkList.getFirstSelectedOption().getAttribute("value") + " / " + userNameBox.getAttribute("value") + ";";
+	            	button.click();
+	            	userNameBox.sendKeys("Second User");
+	            	socialNetworkList.selectByIndex(1);
+	            	accounts += socialNetworkList.getFirstSelectedOption().getAttribute("value") + " / " + userNameBox.getAttribute("value") + ";";
+	            	button.click();
+            	} catch (NoSuchElementException e) {
+            		try {
+						w.write("ERROR: Failed add account.\n");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	}
             	// Select the checkboxes added by the account definition
             	boolean tmp = false; // to ignore the first checkbox (final product)
             	String checkboxes = "//*[@type='checkbox']";
@@ -180,38 +246,48 @@ public class ChromeTests  {
             	}
             	
             	// Set the update frequency to 13 days
-            	WebElement frequencyBox = d.findElement(By.id("frequency"));
-            	frequencyBox.clear();
-            	frequencyBox.sendKeys("3");
-            	frequency = Integer.parseInt(frequencyBox.getAttribute("value"));
+            	try {
+	            	WebElement frequencyBox = d.findElement(By.id("frequency"));
+	            	frequencyBox.clear();
+	            	frequencyBox.sendKeys("3");
+	            	frequency = Integer.parseInt(frequencyBox.getAttribute("value"));
+            	} catch (NoSuchElementException e) {
+            		try {
+						w.write("ERROR: Failed to find update frequency box.\n");
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            		return false;
+            	}
             	
             	// Set a start date
+            	try {
             	WebElement dateCheck = d.findElement(By.id("start_date"));
             	WebElement dateBox = d.findElement(By.id("date_input"));
             	dateBox.sendKeys("12152017");
             	date = dateBox.getAttribute("value");
-            	// Submit the form
-        		d.findElement(By.id("submit")).click();
-        		(new WebDriverWait(d, 10)).until(new ExpectedCondition<Boolean>() {
-        			public Boolean apply(WebDriver d) {
-        				Alert alert = d.switchTo().alert();
-        				text = alert.getText();
-                		alert.accept();
-                		return true;
-        			}
-        		});
-            	
-            	if (text.contains("Successfully added model")) {
+            	} catch (NoSuchElementException e) {
             		try {
-						w.write("Model " + modelName + " created. The test will now attempt to edit the model to check if the data is correct.\n");
-					} catch (IOException e) {
+						w.write("ERROR: Failed to find start date box.\n");
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-            	  	return true;
-            	} else {
             		return false;
             	}
+            	// Submit the form
+        		d.findElement(By.id("submit")).click();
+        		d.findElement(By.id("no"));
+
+        		try {
+					w.write("Model " + modelName + " created.\n");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	  	return true;
+
             }
         });
         
