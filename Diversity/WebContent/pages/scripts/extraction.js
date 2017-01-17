@@ -503,7 +503,6 @@ function drawChart() {
 	}
 	// Bottom Right
 	if (jsonData[i].Graph == "Bottom_Right") {
-
 		var date = new Date();
     var locale = "en-us";
     var month = date.toLocaleString(locale, { month: "short" }).toUpperCase;
@@ -515,7 +514,6 @@ function drawChart() {
 
 		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-
 		sentimentdata = new google.visualization.DataTable();
 		sentimentdata.addColumn('string', 'Month');
 		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
@@ -533,23 +531,22 @@ function drawChart() {
 						sentimentdata.setCell(ii, 0, jsonData[i].Month);
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 					}
-					if (!extra) {
-						if (jsonData[i].Graph == 'Bottom_Right') {
+					if (extra) {
+						if (jsonData[i].Graph == 'Bottom_Right_Ex') {
 							sentimentdata.setCell(ii, 0, jsonData[i].Month);
 							sentimentdata.setCell(ii, filt, jsonData[i].Value);
 						}
 					}
+
 				} else {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 				}
 			}
 		}
-
-
-colors = new Array();
-for (var color = 1; color < filt; color++) {
-	colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
-}
+		colors = new Array();
+		for (var color = 1; color < filt; color++) {
+			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
+		}
 
 
     function rightSelectHandler() {
@@ -679,6 +676,7 @@ function changeRequest() {
 	var ageradio = document.getElementById('Age_radio').checked;
 	var finalradio = document.getElementById('Final').checked;
 	var extrapolate = document.getElementById('extrapolate').checked;
+
 	var json = {
 		"Op" : "oe_refresh",// OE_Filter
 		"Param" : "",
@@ -686,6 +684,7 @@ function changeRequest() {
 		"Filter" : "",
 		"Id" : sessionStorage.id,
 		"Extrapolate" : extrapolate ? 1 : undefined,
+		"Id" : sessionStorage.id
 	};
 	if (globalradio == true)
 		needlecolor = '#604460';

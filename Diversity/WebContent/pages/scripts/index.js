@@ -377,9 +377,9 @@ function displayModels() {
 }
 
 function ok(val) {
-
+	
 	 if (val) {
-
+		 
 	var name = $('#Models :selected').text();
     var model_data = document.getElementById('Models').value.split(';');
     var jsonData = {
@@ -412,13 +412,13 @@ function ok(val) {
 
 function deleteModel() {
 
-
+	
 
 	//var confirm = window.confirm("Do you really want to delete model " + name + "?");
 	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
     $('#overlay').show();
 	$('#overlay-back').show();
-
+ 
 }
 
 /* When the user clicks on the button,
