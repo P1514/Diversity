@@ -43,6 +43,7 @@ public class Extrapolation {
 		final WeightedObservedPoints obs = new WeightedObservedPoints();
 
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
+			if(gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
 			obs.add(month % 12,gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 		}
 		// Instantiate a Second-degree polynomial fitter.
