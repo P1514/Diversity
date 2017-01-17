@@ -3,6 +3,7 @@ package general;
 import java.util.ArrayList;
 import security.*;
 
+import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 import extraction.Extrapolation;
@@ -22,6 +23,7 @@ public final class Backend {
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
+	static WeightedObservedPoints obs;
 
 	/**
 	 * Instantiates a new backend.
@@ -52,7 +54,7 @@ public final class Backend {
 		GetModels model;
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
-		Extrapolation extra = new Extrapolation(gs); // Trocar por extends
+		final Extrapolation extra = new Extrapolation(gs); // Trocar por extends
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -142,7 +144,7 @@ public final class Backend {
 									id),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
-					// System.out.println("EXTRAPOLATING...");
+					System.out.println("EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(1, param + "," + filtering,
@@ -152,9 +154,10 @@ public final class Backend {
 														: filter[i]),
 										(filtering.equals("Product")
 												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										id),
+										id,obs),
 								"Graph", "Bottom_Right_Ex");
 				}
+				System.out.println(result.toString());
 				return result.toString();
 
 			case 18:

@@ -1,20 +1,22 @@
 package extraction;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.commons.math3.fitting.*;
 
-public class Extrapolation {
+public final class Extrapolation {
 	private Globalsentiment gs;
 	
 	public Extrapolation(Globalsentiment _gs) {
 		gs=_gs;
 	}
 	
-	public JSONArray extrapolate(int timespan /* years */, String param, String values, String output, long id)
+	public JSONArray extrapolate(int timespan /* years */, String param, String values, String output, long id, WeightedObservedPoints obs)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -40,17 +42,17 @@ public class Extrapolation {
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
 		int month;
-		final WeightedObservedPoints obs = new WeightedObservedPoints();
-
+		obs = new WeightedObservedPoints();
+		
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			if(gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
 			obs.add(month % 12,gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 		}
 		// Instantiate a Second-degree polynomial fitter.
-		final PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
+		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
-		final double[] coeff = fitter.fit(obs.toList());
-		
+		double[] coeff = fitter.fit(obs.toList());
+		//double[] coeff = {1,1,1};
 		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3); month++) {
 			try {
 				obj = new JSONObject();
