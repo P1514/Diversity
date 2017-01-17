@@ -443,6 +443,12 @@ public class Globalsentiment {
 	public JSONArray getPolarityDistribution(long id, String param, String value, String output) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		if(!Data.modeldb.containsKey(id)){
+			obj.put("Op", "ERROR");
+			obj.put("Message", "Model not Found");
+			result.put(obj);
+			return result;
+		}
 		String[] params = null;
 		String[] values = null;
 		String gender = null;

@@ -35,6 +35,9 @@ public class Data {
 	/** The productdb. */
 	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
 
+	/** The servicedb. */
+	public static ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<Long, Product>();
+
 	/** The companydb. */
 	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
 	private long totalposts;

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import security.*;
 
 import org.json.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import extraction.Extrapolation;
 import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -18,6 +21,7 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -81,6 +85,13 @@ public final class Backend {
 			}
 
 			switch (op) {
+			
+			case 99:
+				LOGGER.log(Level.INFO, "Similarity Rubber and Aluminium="+Extrapolation.Get_similarity(14, 15));
+				LOGGER.log(Level.INFO, "Similarity Rubber and Rubber="+Extrapolation.Get_similarity(14, 14));
+				LOGGER.log(Level.INFO, "Similarity Rubber and Glueing Machine="+Extrapolation.Get_similarity(14, 16));
+				LOGGER.log(Level.INFO, "Similarity Rubber and 21="+Extrapolation.Get_similarity(14, 21));
+				break;
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
