@@ -151,7 +151,7 @@ public final class Backend {
 									(filtering.equals("Product")
 											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									id),
-							"Graph", "Bottom_Right");
+							"Graph", "Bottom_Right_Ex");
 				}
 				return result.toString();
 
