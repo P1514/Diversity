@@ -50,6 +50,7 @@ public class Extrapolation {
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		final double[] coeff = fitter.fit(obs.toList());
 		
+		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3); month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
