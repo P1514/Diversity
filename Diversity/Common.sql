@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `diversity_common_repository` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `diversity_common_repository`;
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: diversity_common_repository
 -- ------------------------------------------------------
--- Server version	5.7.13-log
+-- Server version	5.7.16-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -646,7 +646,7 @@ CREATE TABLE `product` (
   KEY `fk_product_product_idx` (`parent_product_id`),
   CONSTRAINT `fk_product_company` FOREIGN KEY (`supplied_by_company_id`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_product_product` FOREIGN KEY (`parent_product_id`) REFERENCES `product` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -655,7 +655,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES (1,'Morris Ground 1',NULL,NULL,NULL,1),(2,'Austin Basket',NULL,NULL,NULL,1),(3,'Austin Soccer',NULL,NULL,NULL,1),(4,'Morris Sea 1000',NULL,NULL,NULL,1),(5,'Morris Sea 2099',NULL,NULL,NULL,1),(6,'Morris Wind',NULL,NULL,NULL,1),(7,'Austin Polo',NULL,NULL,NULL,1),(8,'Austin Cricket',NULL,NULL,NULL,1),(9,'Austin XC',NULL,NULL,NULL,1),(10,'Austin Base',NULL,NULL,NULL,1);
+INSERT INTO `product` VALUES (1,'Morris Ground 1',NULL,NULL,NULL,1),(2,'Austin Basket',NULL,NULL,NULL,1),(3,'Austin Soccer',NULL,NULL,NULL,1),(4,'Morris Sea 1000',NULL,NULL,NULL,1),(5,'Morris Sea 2099',NULL,NULL,NULL,1),(6,'Morris Wind',NULL,NULL,NULL,1),(7,'Austin Polo',NULL,NULL,NULL,1),(8,'Austin Cricket',NULL,NULL,NULL,1),(9,'Austin XC',NULL,NULL,NULL,1),(10,'Austin Base',NULL,NULL,NULL,1),(11,'Sole Machine',NULL,NULL,NULL,0),(12,'Sewing Machine',NULL,NULL,NULL,0),(13,'Cleat Applier',NULL,NULL,NULL,0),(14,'Rubber',NULL,13,NULL,0),(15,'Aluminium',NULL,13,NULL,0),(16,'Glueing Machine',NULL,NULL,NULL,0),(17,'Neoprene Cutting Machine',NULL,NULL,NULL,0);
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -714,7 +714,7 @@ CREATE TABLE `pss_has_product` (
 
 LOCK TABLES `pss_has_product` WRITE;
 /*!40000 ALTER TABLE `pss_has_product` DISABLE KEYS */;
-INSERT INTO `pss_has_product` VALUES (1,1),(2,2),(2,3),(3,4),(3,5),(3,6),(4,7),(4,8),(5,9),(5,10);
+INSERT INTO `pss_has_product` VALUES (1,1),(2,2),(2,3),(3,4),(3,5),(3,6),(4,7),(4,8),(5,9),(5,10),(1,11),(4,11),(1,12),(3,12),(2,13),(5,13),(2,14),(5,15),(2,16),(4,16),(5,16),(3,17);
 /*!40000 ALTER TABLE `pss_has_product` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -741,6 +741,7 @@ CREATE TABLE `pss_has_service` (
 
 LOCK TABLES `pss_has_service` WRITE;
 /*!40000 ALTER TABLE `pss_has_service` DISABLE KEYS */;
+INSERT INTO `pss_has_service` VALUES (1,1),(2,1),(5,1),(5,2),(1,3),(2,3),(2,4),(4,4),(3,5);
 /*!40000 ALTER TABLE `pss_has_service` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -815,7 +816,7 @@ CREATE TABLE `service` (
   UNIQUE KEY `uq_service_id` (`id`),
   KEY `ix_service_company_id` (`provided_by_company_id`),
   CONSTRAINT `fk_service_company` FOREIGN KEY (`provided_by_company_id`) REFERENCES `company` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -824,6 +825,7 @@ CREATE TABLE `service` (
 
 LOCK TABLES `service` WRITE;
 /*!40000 ALTER TABLE `service` DISABLE KEYS */;
+INSERT INTO `service` VALUES (1,'Call Center English',1),(2,'Call Center French',1),(3,'Call Center Chinese',1),(4,'Sports Magazine Discount',1),(5,'Sea Academy Discount',NULL);
 /*!40000 ALTER TABLE `service` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -952,4 +954,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-12  0:14:09
+-- Dump completed on 2017-01-13 17:57:18
