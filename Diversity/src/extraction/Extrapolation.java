@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.apache.commons.math3.fitting.*;
 
 public class Extrapolation {
 	private Globalsentiment gs;
@@ -38,13 +39,21 @@ public class Extrapolation {
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
+		int month;
+		final WeightedObservedPoints obs = new WeightedObservedPoints();
 
-		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
+		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
+			obs.add(month % 12,gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+		}
+		// Instantiate a Second-degree polynomial fitter.
+		final PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
+		// Retrieve fitted parameters (coefficients of the polynomial function).
+		final double[] coeff = fitter.fit(obs.toList());
+		
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",
-						gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+				obj.put("Value",getFutureValue(coeff,month % 12));
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -54,6 +63,12 @@ public class Extrapolation {
 		}
 
 		return result;
+	}
+	
+	private double getFutureValue(double [] coeff,int x){
+		
+		return coeff[0]+coeff[1]*x+coeff[2]*coeff[2]*x;
+		
 	}
 
 }

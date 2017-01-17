@@ -5,6 +5,7 @@ import security.*;
 
 import org.json.*;
 
+import extraction.Extrapolation;
 import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -49,6 +50,7 @@ public final class Backend {
 		GetModels model;
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
+		Extrapolation ex = new Extrapolation(gs);
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
