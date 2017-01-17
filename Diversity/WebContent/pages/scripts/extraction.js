@@ -171,6 +171,7 @@ function connect() {
 						$('#overlay-back').show();
 				}
 			} else {
+				console.log("redone");
 				drawChart();
 			}
       var json = {
@@ -517,45 +518,26 @@ function drawChart() {
 
 		sentimentdata = new google.visualization.DataTable();
 		sentimentdata.addColumn('string', 'Month');
-		for (filt = 1; i < jsonData.length && jsonData[i].Graph == "Bottom_Right"; filt++) {
+		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
 			sentimentdata.addColumn('number', jsonData[i].Filter);
 			if (extra) {
-				sentimentdata.addColumn('number', 'Extrapolation for ' + jsonData[i].Filter);
+				sentimentdata.addColumn('number', 'Extrapolation for ' + jsonData[i].Filter,jsonData[i].Filter);
 			}
 			i++;
-			for (ii = 0; i < jsonData.length && jsonData[i].Graph == 'Bottom_Right'
+			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right' || jsonData[i].Graph == "Bottom_Right_Ex")
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
 					sentimentdata.addRow();
 				if (jsonData[i].Value != 0) {
-					if (first == -1) {
-						first = monthNames.indexOf(jsonData[i].Month);
-					}
-					if ((first - monthNames.indexOf(jsonData[i].Month)) % 12 == 0) {
-						if (trigger) {
-							ext = true;
-						}
-						trigger = !trigger;
-					}
-
-					if (ext) {
-						if (first != -1 && document.getElementById('extrapolate').checked) {
-							console.log("here");
-							sentimentdata.setCell(ii, 0, jsonData[i].Month);
-							sentimentdata.setCell(ii, filt+1, jsonData[i].Value);
-							if (monthNames.indexOf(jsonData[i].Month) - prev == 1) {
-								prev = monthNames.indexOf(jsonData[i].Month);
-							} else if (monthNames.indexOf(jsonData[i].Month) == 0 && prev == 11) {
-									prev = monthNames.indexOf(jsonData[i].Month);
-							} else {
-								prev = -1;
-								first = -1;
-								ext = false;
-							}
-						}
-					} else {
+					if (jsonData[i].Graph == 'Bottom_Right') {
 						sentimentdata.setCell(ii, 0, jsonData[i].Month);
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
+					}
+					if (!extra) {
+						if (jsonData[i].Graph == 'Bottom_Right') {
+							sentimentdata.setCell(ii, 0, jsonData[i].Month);
+							sentimentdata.setCell(ii, filt, jsonData[i].Value);
+						}
 					}
 				} else {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
@@ -697,16 +679,14 @@ function changeRequest() {
 	var ageradio = document.getElementById('Age_radio').checked;
 	var finalradio = document.getElementById('Final').checked;
 	var extrapolate = document.getElementById('extrapolate').checked;
-
 	var json = {
 		"Op" : "oe_refresh",// OE_Filter
 		"Param" : "",
 		"Values" : "",
 		"Filter" : "",
 		"Id" : sessionStorage.id,
-		"Extrapolate" : document.getElementById('extrapolate').checked ? 1 : undefined,
+		"Extrapolate" : extrapolate ? 1 : undefined,
 	};
-	console.log(json);
 	if (globalradio == true)
 		needlecolor = '#604460';
 
