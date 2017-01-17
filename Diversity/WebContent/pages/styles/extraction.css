@@ -216,3 +216,7 @@ h3 {
   font-weight: bold;
   font-size: 24;
 }
+
+table, th, tr {
+	text-align: left;
+}
