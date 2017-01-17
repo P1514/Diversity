@@ -5,6 +5,7 @@ import security.*;
 
 import org.json.*;
 
+import extraction.Extrapolation;
 import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -49,6 +50,7 @@ public final class Backend {
 		GetModels model;
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
+		Extrapolation ex = new Extrapolation(gs);
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -139,6 +141,18 @@ public final class Backend {
 											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									id),
 							"Graph", "Bottom_Right");
+				if(msg.has("Extrapolate")){
+					//System.out.println("EXTRAPOLATING...");
+				for (int i = 0; i < filter.length; i++)
+					result = convert(result,
+							ex.extrapolate(1, param + "," + filtering,
+									values + "," + (filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product")
+											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									id),
+							"Graph", "Bottom_Right");
+				}
 				return result.toString();
 
 			case 18:

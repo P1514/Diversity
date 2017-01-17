@@ -208,7 +208,7 @@ public class Globalsentiment {
 	}
 
 	// TODO change this do open and close opinions and check things inside
-	private double globalsentimentby(int month, int year, String param, String value, long id) {
+	public double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
