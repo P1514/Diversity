@@ -91,7 +91,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		obj.put("Product", "Morris Ground 1");
 		tester = new Backend(4, obj);
 		result = "[{\"Op\":\"table\"},{\"Reach\":\"1.93\",\"Mes"
@@ -126,7 +126,7 @@ public class BackendTest {
 		obj.put("Op", "getmodels");
 		
 		tester = new Backend(5, obj);
-		result ="[{\"Op\":\"Models\"},{\"PSS\":\"D522-1 PSS\",\"Id\":806,\"Name\":\"Morris "
+		result ="[{\"Op\":\"Models\"},{\"PSS\":\"D522-1 PSS\",\"Id\":838,\"Name\":\"Morris "
 				+ "Ground 1\"},{\"PSS\":\"D522-2 PSS\",\"Id\":807,\"Name\":\"D522-2 PSS\"},{\"P"
 				+ "SS\":\"D522-2 PSS\",\"Id\":808,\"Name\":\"Austin Basket\"},{\"PSS\":\"D522-"
 				+ "2 PSS\",\"Id\":809,\"Name\":\"Austin Soccer\"},{\"PSS\":\"D341-1 PSS\",\"Id\":8"
@@ -150,7 +150,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "getconfig");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		tester = new Backend(12, obj);
 		result = "[{\"Op\":\"Configs\"},{\"Size\":3,\"Param\":\"Age\"},{\"Min\":\"0\",\"Max\":\"30\"},{\"Min\":\"31\",\"Max\":\"60\"},{\"Min\":\"61\",\"Max\":\"90\"},{\"Size\":2,\"Param\":\"Gender\"},{\"Gender\":\"Female\"},{\"Gender\":\"Male\"},{\"Size\":2,\"Param\":\"Location\"},{\"Location\":\"Asia\"},{\"Location\":\"Europe\"},{\"Size\":1,\"Param\":\"Product\"},{\"Product\":\"Morris Ground 1\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -162,7 +162,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "get_model");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		tester = new Backend(15, obj);
 		result = "[{\"Op\":\"Model\",\"PSS\":\"D522-1 PSS\",\"Final_products\":\"Morris Ground 1;\",\"Archive\":false,\"Update\":6,\"URI\":\"Facebook,adidas;\",\"Name\":\"Morris Ground 1\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -185,7 +185,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "opinion_extraction");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		tester = new Backend(18, obj);
 		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Left\",\"Filter\":\"Global\"},{\"Gra"
 				+ "ph\":\"Top_Left\",\"Value\":87},{\"Graph\":\"Top_Middle\",\"Filter\":\"Glo"
@@ -225,7 +225,7 @@ public class BackendTest {
 		obj.put("Param", "Global");
 		obj.put("Values", "");
 		obj.put("Filter", "");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		tester = new Backend(19, obj);
 		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -269,11 +269,13 @@ public class BackendTest {
 		obj.put("URI", "Facebook,adidas;");
 		obj.put("Start_date", "1970-01-02");
 		obj.put("Name", "Morris Ground 1");
-		obj.put("Id", "806");
+		obj.put("Id", "838");
 		tester = new Backend(16, obj);
-		result="[{\"Op\":\"Error\",\"Message\":\"Successfully updated model Morris Ground 1\",\"id\":806}]";
+		result="[{\"Op\":\"Error\",\"Message\":\"Successfully updated model Morris Ground 1\",\"id\":838}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
+	
+	
 	
 	/*@Test
 	public void resolveClean() throws JSONException {
@@ -283,6 +285,20 @@ public class BackendTest {
 		result = "[{\"Op\":\"Error\",\"Message\":\"Cleaned Successfully\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}*/
+	
+	@Test
+	public void resolveOeRefreshExtrapolate() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Param", "Global");
+		obj.put("Values", "");
+		obj.put("Filter", "");
+		obj.put("Id", "838");
+		obj.put("Extrapolate", "");
+		tester = new Backend(19, obj);
+		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
 	
 	
 	
