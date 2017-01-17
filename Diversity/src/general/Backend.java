@@ -86,9 +86,9 @@ public final class Backend {
 
 			case 21:
 				//System.out.println(msg.getString("Pss"));
-				if(msg.has("Pss"))
+				/*if(msg.has("Pss"))
 					return GetProducts.getTree(msg.getString("Pss")).toString();
-				else
+				else*/
 					return GetProducts.getTree().toString();
 
 			case 20:
