@@ -146,6 +146,9 @@ input[type=radio] {
 	min-height: 200px;
 	overflow: hidden;
 	margin-bottom:20px;
+	width:100%;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 b {
