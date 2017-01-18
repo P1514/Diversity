@@ -89,7 +89,8 @@ public final class Backend {
 
 			switch (op) {
 			case 99:
-				LOGGER.log(Level.INFO, "Hashmapp" + Extrapolation.get_Similarity_Threshold("11;18;19;20;21", 55).toString());
+				Prediction ps = new Prediction();
+				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
 			case 23:
 				result = new JSONArray();
