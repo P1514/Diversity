@@ -79,7 +79,7 @@ public final class Extrapolation {
 		
 	}
 	
-	public static double Get_similarity(long product_id1, long product_id2) {
+	private static double Get_similarity(long product_id1, long product_id2) {
 		ArrayList<Long> commonid = new ArrayList<Long>();
 		if (product_id1 == product_id2)
 			return 1;
@@ -114,6 +114,17 @@ public final class Extrapolation {
 		}
 		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
 		return result;
+	}
+	
+	public ArrayList<Long> get_Similarity_Threshold(long product_id){
+		ArrayList<Long> id_list = new ArrayList<Long>();
+		
+		
+		
+		
+		return id_list;
+		
+		
 	}
 
 }
