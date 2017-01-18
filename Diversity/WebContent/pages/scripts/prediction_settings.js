@@ -1,63 +1,11 @@
-var testProducts = [
-   {
-      "Op":"Tree"
-   },
-   {
-      "PSS":"PSS D522-1",
-      "Products":[
-         {
-            "Products":[
-               {
-                  "Name":"Red Brush"
-               },
-               {
-                  "Name":"Blue Brush"
-               },
-               {
-                  "Name":"Super-Glue +9000"
-               },
-               {
-                  "Name":"Cheap-Glue 100"
-               }
-            ],
-            "Name":"Painting Machine"
-         },
-         {
-            "Products":[
-               {
-                  "Products":[
-                    {
-                      "Name" : "Brush Handle"
-                    },
-                    {
-                      "Name" : "Brush Head"
-                    }
-                  ],
-                  "Name":"Red Brush"
-               },
-               {
-                  "Name":"Blue Brush"
-               },
-               {
-                  "Name":"Super-Glue +9000"
-               },
-               {
-                  "Name":"Cheap-Glue 100"
-               }
-            ],
-            "Name":"Glueing Machine"
-         }
-      ]
-   }
-];
 
 var ws;
-var jsonData;
 var products;
 var services;
 var str = "";
 var start = true;
-
+var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Name":"Austin Basket"},{"Id":3,"Name":"Austin Soccer"},{"Id":4,"Name":"Morris Sea 1000"},{"Id":5,"Name":"Morris Sea 2099"},{"Id":6,"Name":"Morris Wind"},{"Id":7,"Name":"Austin Polo"},{"Id":8,"Name":"Austin Cricket"},{"Id":9,"Name":"Austin XC"},{"Id":10,"Name":"Austin Base"},{"Products":[{"Products":[{"Products":[{"Products":[{"Id":21,"Name":"21"}],"Id":20,"Name":"20"}],"Id":19,"Name":"19"}],"Id":18,"Name":"18"}],"Id":11,"Name":"Sole Machine"},{"Id":12,"Name":"Sewing Machine"},{"Products":[{"Id":14,"Name":"Rubber"},{"Id":15,"Name":"Aluminium"}],"Id":13,"Name":"Cleat Applier"},{"Id":16,"Name":"Glueing Machine"},{"Id":17,"Name":"Neoprene Cutting Machine"}];
+*/
 document.addEventListener('DOMContentLoaded', function() {
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
@@ -82,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
       start = true;
       makeTree("serv_list",jsonData);
       $('#serv_list').jstree(true).refresh();
+      console.log(jsonData);
     }
   }
 });
@@ -112,8 +61,6 @@ function makeTree(div,test) {
         r.push(data.instance.get_node(data.selected[i]).text);
         products += data.instance.get_node(data.selected[i]).text + ";" ;
     }
-    console.log(products);
-
   });
 
   $("#serv_list").on("changed.jstree", function (e, data) {
@@ -123,8 +70,6 @@ function makeTree(div,test) {
         r.push(data.instance.get_node(data.selected[i]).text);
         services += data.instance.get_node(data.selected[i]).text + ";" ;
     }
-    console.log(services);
-
   });
 
   $("#prod_list").on('ready.jstree', function() {
@@ -134,10 +79,20 @@ function makeTree(div,test) {
   $("#serv_list").on('ready.jstree', function() {
     $('#serv_list').jstree('open_all');
   });
-
 }
 
-
+function getObjects(obj, key, val) {
+    var objects = [];
+    for (var i in obj) {
+        if (!obj.hasOwnProperty(i)) continue;
+        if (typeof obj[i] == 'object') {
+            objects = objects.concat(getObjects(obj[i], key, val));
+        } else if (i == key && obj[key] == val) {
+            objects.push(obj);
+        }
+    }
+    return objects;
+}
 
 /*
 * Makes a HTML unordered list from a json array (uses recursion, requires a var start = true)
