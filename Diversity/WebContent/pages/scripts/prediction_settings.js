@@ -1,11 +1,13 @@
-
+var draw = false;
 var ws;
 var products;
 var services;
 var str = "";
 var start = true;
+var chartData;
 var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Name":"Austin Basket"},{"Id":3,"Name":"Austin Soccer"},{"Id":4,"Name":"Morris Sea 1000"},{"Id":5,"Name":"Morris Sea 2099"},{"Id":6,"Name":"Morris Wind"},{"Id":7,"Name":"Austin Polo"},{"Id":8,"Name":"Austin Cricket"},{"Id":9,"Name":"Austin XC"},{"Id":10,"Name":"Austin Base"},{"Products":[{"Products":[{"Products":[{"Products":[{"Id":21,"Name":"21"}],"Id":20,"Name":"20"}],"Id":19,"Name":"19"}],"Id":18,"Name":"18"}],"Id":11,"Name":"Sole Machine"},{"Id":12,"Name":"Sewing Machine"},{"Products":[{"Id":14,"Name":"Rubber"},{"Id":15,"Name":"Aluminium"}],"Id":13,"Name":"Cleat Applier"},{"Id":16,"Name":"Glueing Machine"},{"Id":17,"Name":"Neoprene Cutting Machine"}];
 */
+
 document.addEventListener('DOMContentLoaded', function() {
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
@@ -35,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     if (json[0].Op == "Prediction") {
+      draw = true;
+      //Assign values to chartData
       drawChart();
     }
 
@@ -148,7 +152,7 @@ function submit() {
 }
 
 function drawChart() {
-  if (json != undefined && json[0].Op == "Prediction") {
+  if (draw) {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Month');
     data.addColumn('number', 'Global Sentiment');
