@@ -3,6 +3,8 @@ package extraction;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -139,7 +141,11 @@ public final class Extrapolation extends  Globalsentiment{
 		return result;
 	}
 
-	public static ArrayList<Long> get_Similarity_Threshold(long product_id, double threshold) {
+	public static HashMap<Long, Long> get_Similarity_Threshold(String productsId, double threshold){
+		
+	}
+	
+	private static ArrayList<Long> get_Similarity_Threshold(long product_id, double threshold) {
 		ArrayList<Long> id_list = new ArrayList<Long>();
 		while (threshold > 1)
 			threshold = threshold / ((double) 100);
