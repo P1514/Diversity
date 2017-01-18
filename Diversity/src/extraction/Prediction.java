@@ -11,7 +11,7 @@ import org.json.JSONObject;
 
 public class Prediction extends Globalsentiment {
 	
-	public JSONArray predict(int timespan /* years */, String param, String values, String output, long id)
+	public JSONArray predict(int timespan /* years */, String productsId, String servicesId)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
