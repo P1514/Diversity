@@ -12,11 +12,11 @@ All notable changes to this project will be documented in this file.
 
 ## [2.6] 18-01-2017
 ###Added
--Backend
--- Extrapolation
--- Similarity between Products
--Front-end
--- Extrapolation Option and Graphs
+- Backend
+- - Extrapolation
+- - Similarity between Products
+- Front-end
+- - Extrapolation Option and Graphs
 
 ###Fixed
 - Calculations Adjusted so no impact is done in extrapolation when no values exist.
