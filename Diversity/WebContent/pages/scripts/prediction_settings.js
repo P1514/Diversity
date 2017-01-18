@@ -20,7 +20,7 @@ var testProducts = [
                   "Name":"Cheap-Glue 100"
                }
             ],
-            "Name":"Paiting Machine"
+            "Name":"Painting Machine"
          },
          {
             "Products":[
@@ -51,19 +51,40 @@ var testProducts = [
    }
 ];
 
+var ws;
+var jsonData;
 var products;
 var services;
 var str = "";
 var start = true;
-$(document).ready(function () {
-  makeTree("prod_list",testProducts);
-  $('#prod_list').jstree(true).refresh();
-  str = "";
-  start = true;
-  makeTree("serv_list",testProducts);
-  $('#serv_list').jstree(true).refresh();
-});
 
+document.addEventListener('DOMContentLoaded', function() {
+  ws = new WebSocket('ws://' + window.location.hostname + ":"
+    + window.location.port + '/Diversity/server');
+
+  ws.onopen = function () {
+    json = {
+      "Op" : "gettree",
+      "All" : 1
+    }
+
+    ws.send(JSON.stringify(json));
+  }
+
+  ws.onmessage = function(event) {
+    var json = JSON.parse(event.data);
+
+    if (json[0].Op == "Tree") {
+      jsonData = JSON.parse(JSON.stringify(json));
+      makeTree("prod_list",jsonData);
+      $('#prod_list').jstree(true).refresh();
+      str = "";
+      start = true;
+      makeTree("serv_list",jsonData);
+      $('#serv_list').jstree(true).refresh();
+    }
+  }
+});
 
 /*
 * Uses JSTree to make a tree view from an unordered HTML list
