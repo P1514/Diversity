@@ -54,8 +54,7 @@ public final class Extrapolation extends  Globalsentiment{
 		WeightedObservedPoints obs = new WeightedObservedPoints();
 		
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			if(globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
-
+			if(globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=-1)
 			obs.add(index,globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 			index++;
 
@@ -64,9 +63,10 @@ public final class Extrapolation extends  Globalsentiment{
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
-
-		//index=0;
-		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3); month++) {
+		month--;
+		index--;
+		
+		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3)-1; month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
