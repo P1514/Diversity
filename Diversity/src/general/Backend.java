@@ -2,6 +2,8 @@ package general;
 
 import java.util.ArrayList;
 import security.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
@@ -20,6 +22,7 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -32,7 +35,7 @@ public final class Backend {
 	 * @param _msg
 	 *            the msg
 	 */
-	public Backend(int _op, JSONObject _msg) {
+	public Backend(int _op, JSONObject _msg) {	
 		op = _op;
 		msg = _msg;
 
@@ -83,6 +86,9 @@ public final class Backend {
 			}
 
 			switch (op) {
+			case 99:
+				LOGGER.log(Level.INFO, "Get Big Tree" + GetProducts.getPSTree().toString());
+				break;
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -178,7 +184,7 @@ public final class Backend {
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
-					result.put(obj);
+					result.put(obj);	
 
 				}
 				return result.toString();
