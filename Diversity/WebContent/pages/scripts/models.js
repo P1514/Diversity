@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (json[0].Op == "Tree") {
       jsonData = JSON.parse(JSON.stringify(json))
+      console.log(jsonData);
       makeTree();
       if (sessionStorage.id != null) {
         var json2 = {
@@ -155,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('pss').value=json2[0].PSS;
       document.getElementById('pss').text=json2[0].PSS;
       document.getElementById("pss").disabled = true;
-	  
+
       makeTree();
 	  if (json2[0].hasOwnProperty('Final_products')) {
 		  var prods = json2[0].Final_products.split(";");
