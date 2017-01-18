@@ -102,7 +102,7 @@ public final class Extrapolation extends  Globalsentiment{
         return instance;
     }
 
-	public static double get_Similarity(long product_id1, long product_id2) {
+	private static double get_Similarity(long product_id1, long product_id2) {
 		ArrayList<Long> commonid = new ArrayList<Long>();
 		if (product_id1 == product_id2)
 			return 1;

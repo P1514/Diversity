@@ -15,6 +15,7 @@ import extraction.GetPosts;
 import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
+import extraction.Prediction;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -57,6 +58,7 @@ public final class Backend {
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
 		Extrapolation extra = Extrapolation.getInstance(); 
+		Prediction pre = new Prediction();
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -92,25 +94,12 @@ public final class Backend {
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
-				obj.put("Op", "OE_Redone");
+				obj.put("Op", "Prediction");
 				result.put(obj);
-				// System.out.println("TEST:"+gp.getAmmount(param, values,
-				// "Global", id).getJSONObject(1).getInt("Value"));
-				if (gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value") != 0) {
-					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
-					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
-							"Top_Middle");
-					result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
-					result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
-					result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph",
-							"Bottom_Right");
-				} else {
-					obj = new JSONObject();
-					obj.put("Error", "No_data");
-					result.put(obj);	
+				
+					result = convert(result, pre.predict(1, msg.getString("Products"), msg.getString("Services")), "Graph", "1");
+					//result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Average","1");
 
-				}
 				return result.toString();
 				
 			case 22:

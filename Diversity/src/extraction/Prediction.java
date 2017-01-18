@@ -11,10 +11,17 @@ import org.json.JSONObject;
 
 public class Prediction extends Globalsentiment {
 	
+	public Prediction(){
+		Extrapolation ex = new Extrapolation();
+		
+	}
+	
+	
 	public JSONArray predict(int timespan /* years */, String productsId, String servicesId)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -30,7 +37,6 @@ public class Prediction extends Globalsentiment {
 		time[10] = "NOV";
 		time[11] = "DEC";
 		obj = new JSONObject();
-		obj.put("Filter", output);
 		result.put(obj);
 
 		Calendar data = Calendar.getInstance();
@@ -42,7 +48,7 @@ public class Prediction extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",
-						globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+						obj);
 				result.put(obj);
 
 			} catch (JSONException e) {
