@@ -29,7 +29,7 @@ public final class Extrapolation extends  Globalsentiment{
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		Sigmoid sig = new Sigmoid(0,100);
+		Sigmoid sig = new Sigmoid(-100,100);
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -74,7 +74,9 @@ public final class Extrapolation extends  Globalsentiment{
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",sig.value(getFutureValue(coeff,index)/100));
+				obj.put("Value",sig.value((getFutureValue(coeff,index)/50)));
+				//obj.put("Value",sig.value(1.25));
+
 
 				result.put(obj);
 				index++;
