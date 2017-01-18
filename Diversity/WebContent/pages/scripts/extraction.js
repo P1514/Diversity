@@ -513,20 +513,27 @@ function drawChart() {
 		var ext = false;
 		var trigger = false;
 		var series = [];
+		var randomYear = 2000;
 
 		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
+		var columns = [];
+
 		sentimentdata = new google.visualization.DataTable();
 		sentimentdata.addColumn('string', 'Month');
+		columns.push('Month');
 		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
-			sentimentdata.addColumn('number', jsonData[i].Filter);
-			if (extra) {
-				sentimentdata.addColumn('number', 'Extrapolation for ' + jsonData[i].Filter,jsonData[i].Filter);
-				series.push(filt+1);
+			var name = jsonData[i].Filter;
+			if (jsonData[i].Graph == "Bottom_Right") {
+				if (columns.indexOf(name) == -1 ) {
+					sentimentdata.addColumn('number', name, name);
+					columns.push(name);
+				}
 			}
 			i++;
-			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right' || jsonData[i].Graph == "Bottom_Right_Ex")
+			var t = 0;
+			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right')
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
 					sentimentdata.addRow();
@@ -535,21 +542,27 @@ function drawChart() {
 						sentimentdata.setCell(ii, 0, jsonData[i].Month);
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 					}
-					if (extra) {
-						if (jsonData[i].Graph == 'Bottom_Right_Ex') {
-							sentimentdata.setCell(ii, 0, jsonData[i].Month);
-							sentimentdata.setCell(ii, filt+1, jsonData[i].Value);
-						}
-					}
 				} else {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 				}
+				t = ii;
+			}
+
+			for (var iii = 11; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right_Ex') && !jsonData[i].hasOwnProperty('Filter');iii++,ii++,i++) {
+				if (jsonData[i].Graph == 'Bottom_Right_Ex') {
+					if (columns.indexOf('Extrapolation for ' + name) == -1) {
+						sentimentdata.addColumn('number', 'Extrapolation for ' + name, 'Extrapolation for ' + name);
+						columns.push('Extrapolation for ' + name);
+						series.push(filt);
+					}
+					sentimentdata.addRow();
+					sentimentdata.setCell(iii, 0, jsonData[i].Month);
+					sentimentdata.setCell(iii, filt, jsonData[i].Value);
+				}
+				console.log(iii);
 			}
 		}
 
-		for (k = 0; k<series.length; k++) {
-			sentimentdata.setColumnProperties(series[k], {'lineDashStyle': '[4, 4]'})
-		}
 
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
@@ -578,8 +591,10 @@ function drawChart() {
 		}
 
 
+
 		var options = {
 			hAxis : {
+				format: 'MMM',
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
@@ -603,8 +618,14 @@ function drawChart() {
 			backgroundColor: {
 				fill:'transparent'
 			},
+			series: {},
 		};
 
+		for (var v = 0; v < series.length; v++) {
+			options["series"][series[v]] = { lineDashStyle: [4, 4] }
+		}
+
+		console.log(options);
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);

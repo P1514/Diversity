@@ -10,10 +10,19 @@ All notable changes to this project will be documented in this file.
 ### Prediction Model
 - Everything
 
-## [2.5] 13-01-2017
+## [2.6] 18-01-2017
+###Added
+- Extrapolation
+- Similarity between Products
 
-### Backend
-- Various Fixes
+###Fixed
+- Calculations Adjusted so no impact is done in extrapolation when no values exist.
+- Sentiment Graph doesn't show value if no value is present in the database
+
+
+## [2.5] 13-01-2017
+###Added
+
 
 ### Modeling
 - Date setting should now be fully implemented
@@ -77,7 +86,7 @@ Top 5 Reach PSS chart displayed on Sentiment Analysis home page
 - OE page now shows colors as intended
 
 ## [1.1.9] 2016-10-10
-## Added
+### Added
 - OE page fully Developed (Requires extensive tests)
 
 ## [1.1.8.6] 2016-10-10

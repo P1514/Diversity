@@ -12,6 +12,7 @@ import general.Product;
 
 import org.apache.commons.math3.fitting.*;
 
+
 public final class Extrapolation extends  Globalsentiment{
 	private static Extrapolation instance;
 	
@@ -49,23 +50,28 @@ public final class Extrapolation extends  Globalsentiment{
 		data.add(Calendar.YEAR, -1);
 		int month;
 		int index =0;
+
 		WeightedObservedPoints obs = new WeightedObservedPoints();
 		
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			if(globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
+
 			obs.add(index,globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 			index++;
+
 		}
 		// Instantiate a Second-degree polynomial fitter.
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
+
 		//index=0;
 		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3); month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",getFutureValue(coeff,index));
+
 				result.put(obj);
 				index++;
 
@@ -77,13 +83,14 @@ public final class Extrapolation extends  Globalsentiment{
 
 		return result;
 	}
+
 	
 	private double getFutureValue(double [] coeff,int x){
 		
 		return coeff[0]+coeff[1]*x+coeff[2]*x*x;
 		
+
 	}
-	
 
 	public static Extrapolation getInstance() {
         return instance;
@@ -111,12 +118,12 @@ public final class Extrapolation extends  Globalsentiment{
 		Product pro2 = Data.productdb.get(product_id2);
 		int depth2 = 2;
 		if (commonid.contains(product_id2))
-			founddepth = 1;
+			founddepth = 0;
 		if (pro2.getParent() != 0) {
 			do {
 				if (founddepth == -1) {
 					if (commonid.contains(pro2.getParent()))
-						founddepth = depth2-1;
+						founddepth = depth2 - 1;
 				}
 				pro2 = Data.productdb.get(pro2.getParent());
 				depth2++;
@@ -125,16 +132,22 @@ public final class Extrapolation extends  Globalsentiment{
 		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
 		return result;
 	}
-	
-	public ArrayList<Long> get_Similarity_Threshold(long product_id){
+
+	public static ArrayList<Long> get_Similarity_Threshold(long product_id, double threshold) {
 		ArrayList<Long> id_list = new ArrayList<Long>();
-		
-		
-		
-		
+		while (threshold > 1)
+			threshold = threshold / ((double) 10);
+
+		for (Product pro : Data.productdb.values()) {
+			if (pro.get_Id() == product_id)
+				continue;
+
+			if (get_Similarity(product_id, pro.get_Id()) >= threshold)
+				id_list.add(pro.get_Id());
+		}
+
 		return id_list;
-		
-		
+
 	}
 
 }
