@@ -512,6 +512,7 @@ function drawChart() {
 		var prev = -1;
 		var ext = false;
 		var trigger = false;
+		var series = [];
 
 		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -522,21 +523,22 @@ function drawChart() {
 			sentimentdata.addColumn('number', jsonData[i].Filter);
 			if (extra) {
 				sentimentdata.addColumn('number', 'Extrapolation for ' + jsonData[i].Filter,jsonData[i].Filter);
+				series.push(filt+1);
 			}
 			i++;
 			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right' || jsonData[i].Graph == "Bottom_Right_Ex")
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
 					sentimentdata.addRow();
-				if (jsonData[i].Value != 0) {
+				if (jsonData[i].Value != -1) {
 					if (jsonData[i].Graph == 'Bottom_Right') {
 						sentimentdata.setCell(ii, 0, jsonData[i].Month);
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 					}
-					if (!extra) {
-						if (jsonData[i].Graph == 'Bottom_Right') {
+					if (extra) {
+						if (jsonData[i].Graph == 'Bottom_Right_Ex') {
 							sentimentdata.setCell(ii, 0, jsonData[i].Month);
-							sentimentdata.setCell(ii, filt, jsonData[i].Value);
+							sentimentdata.setCell(ii, filt+1, jsonData[i].Value);
 						}
 					}
 				} else {
@@ -545,11 +547,14 @@ function drawChart() {
 			}
 		}
 
+		for (k = 0; k<series.length; k++) {
+			sentimentdata.setColumnProperties(series[k], {'lineDashStyle': '[4, 4]'})
+		}
 
-colors = new Array();
-for (var color = 1; color < filt; color++) {
-	colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
-}
+		colors = new Array();
+		for (var color = 1; color < filt; color++) {
+			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
+		}
 
 
     function rightSelectHandler() {
@@ -599,6 +604,7 @@ for (var color = 1; color < filt; color++) {
 				fill:'transparent'
 			},
 		};
+
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
@@ -778,6 +784,8 @@ function changeRequest() {
 		style.appendChild(document.createTextNode(css));
 	}
 	head.appendChild(style);
+	$('#overlay').show();
+	$('#overlay-back').show();
 	ws.send(JSON.stringify(json));
 }
 function fixbuttons(data) {

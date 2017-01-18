@@ -291,10 +291,10 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "oe_refresh");
-		obj.put("Param", "Global");
-		obj.put("Values", "");
-		obj.put("Filter", "");
-		obj.put("Id", "838");
+		obj.put("Param", "Age,Gender,Location,");
+		obj.put("Values", "All,All,All,");
+		obj.put("Filter", "Product");
+		obj.put("Id", "839");
 		obj.put("Extrapolate", 1);
 		tester = new Backend(19, obj);
 		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
