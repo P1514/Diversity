@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log(jsonData);
     }
 
+
     if (json[0].Op == "Prediction") {
       drawChart();
     }
@@ -143,6 +144,7 @@ function submit() {
   }
 
   ws.send(JSON.stringify(json));
+
 }
 
 function drawChart() {
