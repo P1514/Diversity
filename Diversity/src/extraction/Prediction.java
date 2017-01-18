@@ -15,7 +15,7 @@ public class Prediction extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
+		
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";
