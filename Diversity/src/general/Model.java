@@ -132,7 +132,7 @@ public final class Model {
 			}
 			if (product == null || pss1 == null)
 				continue;
-			if (Data.identifyPSSbyproduct(product.get_Id()) != pss1.getID())
+			if (product.get_PSS() != pss1.getID())
 				continue;
 			products += product.get_Id() + ",";
 		}

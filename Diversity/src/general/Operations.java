@@ -30,7 +30,6 @@ public class Operations {
 		op.put("Top5Reach", 20);
 		op.put("gettree", 21);
 		op.put("getrestrictions", 22);
-		op.put("Testing", 99);
 		
 		
 	}

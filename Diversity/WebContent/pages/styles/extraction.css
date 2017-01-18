@@ -1,4 +1,5 @@
 
+
 #displaybox {
 	z-index: 10000;
 	filter: alpha(opacity = 90); /*older IE*/
@@ -215,4 +216,8 @@ h3 {
   text-align: left;
   font-weight: bold;
   font-size: 24;
+}
+
+table, th, tr {
+	text-align: left;
 }

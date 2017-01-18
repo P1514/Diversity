@@ -3,9 +3,8 @@ package general;
 import java.util.ArrayList;
 import security.*;
 
+import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import extraction.Extrapolation;
 import extraction.GetAuthors;
@@ -21,16 +20,18 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
+	static WeightedObservedPoints obs;
 
 	/**
 	 * Instantiates a new backend.
 	 *
-	 * @param _op the op
-	 * @param _msg the msg
+	 * @param _op
+	 *            the op
+	 * @param _msg
+	 *            the msg
 	 */
 	public Backend(int _op, JSONObject _msg) {
 		op = _op;
@@ -53,7 +54,7 @@ public final class Backend {
 		GetModels model;
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
-		Extrapolation ex = new Extrapolation(gs);
+		final Extrapolation extra = new Extrapolation(gs); // Trocar por extends
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -61,9 +62,6 @@ public final class Backend {
 
 				id = msg.getLong("Id");
 			}
-			
-
-			
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;
 			values = (msg.has("Values")) ? msg.getString("Values") : null;
@@ -86,21 +84,15 @@ public final class Backend {
 			}
 
 			switch (op) {
-			
-			case 99:
-				LOGGER.log(Level.INFO, "Similarity Rubber and Aluminium="+Extrapolation.Get_similarity(14, 15));
-				LOGGER.log(Level.INFO, "Similarity Rubber and Rubber="+Extrapolation.Get_similarity(14, 14));
-				LOGGER.log(Level.INFO, "Similarity Rubber and Glueing Machine="+Extrapolation.Get_similarity(14, 16));
-				LOGGER.log(Level.INFO, "Similarity Rubber and 21="+Extrapolation.Get_similarity(14, 21));
-				break;
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
 			case 21:
+
 				//System.out.println(msg.getString("Pss"));
-				/*if(msg.has("Pss"))
+				if(msg.has("Pss"))
 					return GetProducts.getTree(msg.getString("Pss")).toString();
-				else*/
+				else
 					return GetProducts.getTree().toString();
 
 			case 20:
@@ -151,19 +143,21 @@ public final class Backend {
 											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									id),
 							"Graph", "Bottom_Right");
-				if(msg.has("Extrapolate")){
-					//System.out.println("EXTRAPOLATING...");
-					if(msg.getInt("Extrapolate")==1)
-				for (int i = 0; i < filter.length; i++)
-					result = convert(result,
-							ex.extrapolate(1, param + "," + filtering,
-									values + "," + (filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									(filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									id),
-							"Graph", "Bottom_Right_Ex");
+				if (msg.has("Extrapolate")) {
+					System.out.println("EXTRAPOLATING...");
+					for (int i = 0; i < filter.length; i++)
+						result = convert(result,
+								extra.extrapolate(1, param + "," + filtering,
+										values + ","
+												+ (filtering.equals("Product")
+														? Data.productdb.get(Long.valueOf(filter[i])).get_Name()
+														: filter[i]),
+										(filtering.equals("Product")
+												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+										id,obs),
+								"Graph", "Bottom_Right_Ex");
 				}
+				System.out.println(result.toString());
 				return result.toString();
 
 			case 18:
@@ -171,29 +165,30 @@ public final class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				//System.out.println("TEST:"+gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value"));
-				if(gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value")!=0){
-				result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
-				result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
-						"Top_Middle");
-				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
-				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
-				result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
-				result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph", "Bottom_Right");
-				}
-				else{
+				// System.out.println("TEST:"+gp.getAmmount(param, values,
+				// "Global", id).getJSONObject(1).getInt("Value"));
+				if (gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value") != 0) {
+					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
+					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
+							"Top_Middle");
+					result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
+					result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
+					result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
+					result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph",
+							"Bottom_Right");
+				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
 					result.put(obj);
-					
+
 				}
 				return result.toString();
-			/*case 1:
-				SentimentChart sc = new SentimentChart();
-				result = new JSONArray();
-				result = convert(result, sc.chartrequest(param, values, id), "Graph", "Bottom_Right");
-				System.out.println("YELLO");
-				return result.toString();*/
+			/*
+			 * case 1: SentimentChart sc = new SentimentChart(); result = new
+			 * JSONArray(); result = convert(result, sc.chartrequest(param,
+			 * values, id), "Graph", "Bottom_Right");
+			 * System.out.println("YELLO"); return result.toString();
+			 */
 			case 2:
 				Data dat = new Data();
 				return dat.load();
@@ -202,10 +197,10 @@ public final class Backend {
 			 * param, values, id).toString(); return tmp;
 			 */
 			case 4:
-				if(msg.has("Product"))
-				tmp = gp.getTop(param, values, id, msg.getString("Product")).toString();
+				if (msg.has("Product"))
+					tmp = gp.getTop(param, values, id, msg.getString("Product")).toString();
 				else
-					tmp = gp.getTop(param, values, id,"noproduct").toString();
+					tmp = gp.getTop(param, values, id, "noproduct").toString();
 
 				return tmp;
 			case 5:
@@ -219,14 +214,14 @@ public final class Backend {
 				CleanDB cdb = new CleanDB();
 				tmp = cdb.clean();
 				return tmp;
-			/*case 8:
-				GetAuthors ga = new GetAuthors();
-				tmp = ga.getAll().toString();
-				return tmp;*/
-			/*case 9:
-				GetLastPost glp = new GetLastPost();
-				tmp = glp.get(msg.getString("Author")).toString();
-				return tmp;*/
+			/*
+			 * case 8: GetAuthors ga = new GetAuthors(); tmp =
+			 * ga.getAll().toString(); return tmp;
+			 */
+			/*
+			 * case 9: GetLastPost glp = new GetLastPost(); tmp =
+			 * glp.get(msg.getString("Author")).toString(); return tmp;
+			 */
 			/*
 			 * case 10: GetInfGraph gig = new GetInfGraph(); tmp =
 			 * gig.getAll(msg.getString("Author")).toString(); return tmp; case

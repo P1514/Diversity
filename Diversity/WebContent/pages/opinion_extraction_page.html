@@ -31,14 +31,14 @@
 	<!-- POPUP -->
 	<div id="displaybox" style="display: none;"></div>
 	<!-- Gráfico + filtros-->
-	<div class="container" id="dashboard">
+	<div class="container" style="z-index: 1;width: 90%;" id="dashboard">
 		<product>
-		<div id="Cookie">Error no product to display</div>
+		<div id="Cookie">Error: no product to display</div>
 		</product>
 		<button onclick="location.href = 'index.html';" id="home"
 			class="btn btn-default">Home</button>
 			<center>
-				<div class="container" id="filters">
+				<div class="container" style = "width: 90%;" id="filters">
 					<h2>Filters</h2>
 					<table id="segmentation">
 						<tr>
@@ -59,25 +59,28 @@
 									&nbsp All </th>
 						</tr>
 						<tr>
-							<th><select id="genderfilt">
+							<th><select style="margin-left: 0;" id="genderfilt">
 									<option value="All">All Genders
 							</select></th>
-							<th><select id="locationfilt">
+							<th><select style="margin-left: 0;" id="locationfilt">
 									<option value="All">All Locations
 							</select></th>
-							<th><select id="agefilt">
+							<th><select style="margin-left: 0;" id="agefilt">
 									<option value="All">All Ages
 							</select></th>
-							<th><select id="finalfilt">
+							<th><select style="margin-left: 0;" id="finalfilt">
 									<option value="All">All Products
 							</select></th>
 						</tr>
 					</table>
-					<table id="refresh_table">
+					<div style="min-height:15px"></div>
+					<table style ="padding-top:25px;" id="refresh_table">
+						<tr>
+							<label id="extrapolate_label"><input style="padding-top:15px;" type="checkbox" name="extrapolation" id="extrapolate" value="Extrapolate" onClick="setExtra();"> Extrapolate Results </label>
+						</tr>
 						<tr>
 							<th></th>
 							<th>
-
 								<button class="btn btn-default" id="refresh"
 									onclick="changeRequest()">Update</button>
 							</th>
@@ -86,31 +89,31 @@
 						</tr>
 					</table>
 			</div>
-			<div class="container" id="graphs">
+			<div class="container" style = "width: 90%;" id="graphs">
 				<h2>Charts</h2>
 				<div class="row">
-					<div class="col-md-4">
+					<div style="width:20%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="opinionpie"></div>
 					</div>
-					<div class="col-md-4">
+					<div style="width:40%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="polaritybar"></div>
 					</div>
-					<div class="col-md-4">
+					<div style="width:40%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="globalgauge"></div>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-md-4">
+					<div style="width:20%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="reachpie"></div>
 					</div>
-					<div class="col-md-4">
+					<div style="width:40%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="reachline"></div>
 					</div>
-					<div class="col-md-4">
+					<div style="width:40%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="globalline"></div>
 					</div>
 				</div>
-	<!--				
+	<!--
 				<table id="global" class="graphst">
 					<tr>
 						<td>
@@ -164,7 +167,7 @@
 			</div>
 
 	<!-- Tabela Posts-->
-	<div class="container" id="dashboard">
+	<div class="container" style = "width: 90%;padding-right:0;padding-top:0;" id="dashboard">
 		<div class="container" id="table_container">
 			<h2>Top 5</h2>
 				<table id="posts" class="table sortable">

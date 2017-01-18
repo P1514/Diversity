@@ -13,6 +13,12 @@ var bottom_middle;
 var windowwidth = $(window).width();
 var needlecolor = '#604460';
 var animationend = false;
+var extra = false;
+
+function setExtra() {
+	extra = !extra;
+}
+
 function connect() {
 	var css = /* Needle */"#globalgauge path:nth-child(2){ fill:" + needlecolor
 			+ " ; stroke-width:0; } #globalgauge circle:nth-child(1){ fill:" + needlecolor
@@ -165,6 +171,7 @@ function connect() {
 						$('#overlay-back').show();
 				}
 			} else {
+				console.log("redone");
 				drawChart();
 			}
       var json = {
@@ -217,7 +224,9 @@ function connect() {
 google.charts.load('current', {
 	packages : [ 'corechart', 'bar', 'gauge' ]
 });
-google.charts.setOnLoadCallback(connect);
+$(document).ready(function () {
+	google.charts.setOnLoadCallback(connect);
+});
 // Detect table click
 
 function clicker(hidden) {
@@ -494,26 +503,54 @@ function drawChart() {
 	}
 	// Bottom Right
 	if (jsonData[i].Graph == "Bottom_Right") {
+
+		var date = new Date();
+    var locale = "en-us";
+    var month = date.toLocaleString(locale, { month: "short" }).toUpperCase;
+
+		var first = -1;
+		var prev = -1;
+		var ext = false;
+		var trigger = false;
+		var series = [];
+
+		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
 		sentimentdata = new google.visualization.DataTable();
 		sentimentdata.addColumn('string', 'Month');
-		for (filt = 1; i < jsonData.length
-				&& jsonData[i].Graph == "Bottom_Right"; filt++) {
+		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
 			sentimentdata.addColumn('number', jsonData[i].Filter);
+			if (extra) {
+				sentimentdata.addColumn('number', 'Extrapolation for ' + jsonData[i].Filter,jsonData[i].Filter);
+				series.push(filt+1);
+			}
 			i++;
-
-			for (ii = 0; i < jsonData.length
-					&& jsonData[i].Graph == 'Bottom_Right'
+			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right' || jsonData[i].Graph == "Bottom_Right_Ex")
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
 					sentimentdata.addRow();
-				if (jsonData[i].Value != 0) {
-					sentimentdata.setCell(ii, 0, jsonData[i].Month);
-					sentimentdata.setCell(ii, filt, jsonData[i].Value);
+				if (jsonData[i].Value != -1) {
+					if (jsonData[i].Graph == 'Bottom_Right') {
+						sentimentdata.setCell(ii, 0, jsonData[i].Month);
+						sentimentdata.setCell(ii, filt, jsonData[i].Value);
+					}
+					if (extra) {
+						if (jsonData[i].Graph == 'Bottom_Right_Ex') {
+							sentimentdata.setCell(ii, 0, jsonData[i].Month);
+							sentimentdata.setCell(ii, filt+1, jsonData[i].Value);
+						}
+					}
 				} else {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 				}
 			}
 		}
+
+		for (k = 0; k<series.length; k++) {
+			sentimentdata.setColumnProperties(series[k], {'lineDashStyle': '[4, 4]'})
+		}
+
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
@@ -567,6 +604,7 @@ function drawChart() {
 				fill:'transparent'
 			},
 		};
+
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
@@ -646,13 +684,14 @@ function changeRequest() {
 	var locationradio = document.getElementById('Location').checked;
 	var ageradio = document.getElementById('Age_radio').checked;
 	var finalradio = document.getElementById('Final').checked;
-
+	var extrapolate = document.getElementById('extrapolate').checked;
 	var json = {
 		"Op" : "oe_refresh",// OE_Filter
 		"Param" : "",
 		"Values" : "",
 		"Filter" : "",
-		"Id" : sessionStorage.id
+		"Id" : sessionStorage.id,
+		"Extrapolate" : extrapolate ? 1 : undefined,
 	};
 	if (globalradio == true)
 		needlecolor = '#604460';
@@ -745,6 +784,8 @@ function changeRequest() {
 		style.appendChild(document.createTextNode(css));
 	}
 	head.appendChild(style);
+	$('#overlay').show();
+	$('#overlay-back').show();
 	ws.send(JSON.stringify(json));
 }
 function fixbuttons(data) {
