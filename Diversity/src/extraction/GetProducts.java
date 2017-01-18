@@ -30,14 +30,16 @@ public class GetProducts {
 		JSONObject obj = new JSONObject();
 		result.put(new JSONObject().put("Op", "Tree"));
 		for (PSS pss : Data.pssdb.values()) {
-			if(pss_in!=null && !pss.getName().equals(pss_in)) continue;
+			if (pss_in != null && !pss.getName().equals(pss_in))
+				continue;
 			obj = new JSONObject();
 			obj.put("PSS", pss.getName());
 			JSONArray sub_products = new JSONArray();
 			for (Long id : pss.get_products()) {
 				JSONArray sub_products2 = new JSONArray();
 				Product product = Data.productdb.get(id);
-				if(!product.getFinal())continue;
+				if (!product.getFinal())
+					continue;
 				if (product.getParent() == 0) {
 					sub_products.put(new JSONObject().put("Name", product.get_Name()));
 					for (Product product2 : Data.productdb.values()) {
@@ -64,49 +66,47 @@ public class GetProducts {
 		return result;
 
 	}
-	
-	public static final JSONArray getTree(JSONObject obj) throws JSONException {
-		return (!obj.has("All")) ? getTree(new String()): getPSTree();
+
+	public static final JSONArray getTree(JSONObject msg) throws JSONException {
+		return (!msg.has("All")) ? getTree(msg.has("Pss") ? msg.getString("Pss") : (new String())) : getPSTree();
 	}
 
-	
-	public static final JSONArray getPSTree() throws JSONException{
+	public static final JSONArray getPSTree() throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Tree");
 		result.put(obj);
-		
-		for(Product pro : Data.productdb.values()){
-			if(pro.getParent()!=0)continue;
+
+		for (Product pro : Data.productdb.values()) {
+			if (pro.getParent() != 0)
+				continue;
 			obj = new JSONObject();
 			obj.put("Name", pro.get_Name());
 			obj.put("Id", pro.get_Id());
-			if(!pro.getsubproducts().isEmpty()){
+			if (!pro.getsubproducts().isEmpty()) {
 				JSONArray array = new JSONArray();
-				for(long id : pro.getsubproducts())
+				for (long id : pro.getsubproducts())
 					array.put(subproducts(id));
 				obj.put("Products", array);
 			}
-			result.put(obj);	
-			
-		}		
+			result.put(obj);
+
+		}
 		return result;
 	}
-	
-	private static final JSONObject subproducts(long id) throws JSONException{
+
+	private static final JSONObject subproducts(long id) throws JSONException {
 		JSONObject result = new JSONObject();
 		JSONArray array = new JSONArray();
 		Product pro = Data.productdb.get(id);
 		result.put("Name", pro.get_Name());
 		result.put("Id", pro.get_Id());
-		if(!pro.getsubproducts().isEmpty()){
-			for(long id2 : pro.getsubproducts())
+		if (!pro.getsubproducts().isEmpty()) {
+			for (long id2 : pro.getsubproducts())
 				array.put(subproducts(id2));
 			result.put("Products", array);
 		}
-		
-		
-		
+
 		return result;
 	}
 }
