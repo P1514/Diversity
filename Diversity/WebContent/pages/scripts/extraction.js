@@ -532,7 +532,6 @@ function drawChart() {
 				}
 			}
 			i++;
-			var t = 0;
 			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right')
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				if (filt == 1)
@@ -545,7 +544,6 @@ function drawChart() {
 				} else {
 					sentimentdata.setCell(ii, 0, jsonData[i].Month);
 				}
-				t = ii;
 			}
 
 			for (var iii = 11; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right_Ex') && !jsonData[i].hasOwnProperty('Filter');iii++,ii++,i++) {
@@ -553,13 +551,12 @@ function drawChart() {
 					if (columns.indexOf('Extrapolation for ' + name) == -1) {
 						sentimentdata.addColumn('number', 'Extrapolation for ' + name, 'Extrapolation for ' + name);
 						columns.push('Extrapolation for ' + name);
-						series.push(filt);
+						series.push(sentimentdata.getNumberOfColumns()-2);
 					}
 					sentimentdata.addRow();
 					sentimentdata.setCell(iii, 0, jsonData[i].Month);
 					sentimentdata.setCell(iii, filt, jsonData[i].Value);
 				}
-				console.log(iii);
 			}
 		}
 
@@ -675,20 +672,28 @@ function getColor() {
 function chartcolor(data) {
 	switch (data) {
 	case "Global":
+	case "Extrapolation for Global":
 		return "#604460";
 	case "Male":
+	case "Extrapolation for Male":
 		return "#00617F";
 	case "Female":
+	case "Extrapolation for Female":
 		return "#0093C8";
 	case "Asia":
+	case "Extrapolation for Asia":
 		return "#FF3C14";
 	case "Europe":
+	case "Extrapolation for Europe":
 		return "#A60202";
 	case "0-30":
+	case "Extrapolation for 0-30":
 		return "#BFD730";
 	case "31-60":
+	case "Extrapolation for 31-60":
 		return "#8CA122";
 	case "61-90":
+	case "Extrapolation for 61-90":
 		return "#5C6E0E";
 	default:
 		return getColor();
