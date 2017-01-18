@@ -1,6 +1,7 @@
 package general;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ public class PSS {
 	private String name;
 	private long user_id;
 	private String type;
+	private ArrayList<Long> list_products;
 	
 	/**
 	 * Instantiates a new pss.
@@ -33,6 +35,7 @@ public class PSS {
 		this.name=_name;
 		this.user_id=_user_id;
 		this.type=_type;
+		this.list_products = new ArrayList<Long>();
 		/*
 		tags.put("Morris Ground 1", "D522-1 PSS");// TODO Change this so that it all comes from DB
 		tags.put("Austin Basket", "D522-2 PSS");
@@ -87,5 +90,13 @@ public class PSS {
 	 */
 	public long getAuthor(){
 		return this.user_id;
+	}
+	
+	public void add_product(Long id){
+		this.list_products.add(id);
+	}
+	
+	public ArrayList<Long> get_products(){
+		return new ArrayList<>(this.list_products);
 	}
 }

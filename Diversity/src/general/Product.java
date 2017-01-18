@@ -1,5 +1,7 @@
 package general;
 
+import java.util.ArrayList;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Product.
@@ -8,10 +10,10 @@ public class Product {
 	
 	private long id;
 	private String name;
-	private long pss_id;
 	private boolean is_final_product;
 	private long supplied_by;
 	private long parent_product_id;
+	private ArrayList<Long> sub_products;
 	
 	/**
 	 * Instantiates a new product.
@@ -23,13 +25,13 @@ public class Product {
 	 * @param _supplied_by the supplied by
 	 * @param _parent_product_id the parent product id
 	 */
-	public Product(long _id, String _name, long _pss_id, boolean _is_final_product, long _supplied_by, long _parent_product_id){
+	public Product(long _id, String _name, boolean _is_final_product, long _supplied_by, long _parent_product_id){
 		this.id=_id;
 		this.name=_name;
-		this.pss_id=_pss_id;
 		this.is_final_product=_is_final_product;
 		this.supplied_by=_supplied_by;
 		this.parent_product_id=_parent_product_id;
+		this.sub_products = new ArrayList<Long>();
 		
 	}
 	
@@ -42,23 +44,6 @@ public class Product {
 		return name;
 	}
 	
-	/**
-	 * Sets the pss.
-	 *
-	 * @param id the new pss
-	 */
-	public void set_PSS(Long id){
-		this.pss_id=id;
-	}
-	
-	/**
-	 * Gets the  pss.
-	 *
-	 * @return the  pss
-	 */
-	public long get_PSS(){
-		return pss_id;
-	}
 	
 	/**
 	 * Gets the id.
@@ -96,6 +81,10 @@ public class Product {
 		return parent_product_id;
 	}
 	
+	public void setParent(long id){
+		sub_products.add(id);
+	}
+	
 	/**
 	 * Check message.
 	 *
@@ -107,6 +96,10 @@ public class Product {
 		if(message.toLowerCase().contains(this.name.toLowerCase()))
 			return true;
 		return false;
+	}
+	
+	public ArrayList<Long> getsubproducts(){
+		return new ArrayList<>(sub_products);
 	}
 
 }

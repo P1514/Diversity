@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Everything
 
 ## [2.6] 18-01-2017
+
 ###Added
 - Extrapolation
 - Similarity between Products
@@ -21,8 +22,6 @@ All notable changes to this project will be documented in this file.
 
 
 ## [2.5] 13-01-2017
-###Added
-
 
 ### Modeling
 - Date setting should now be fully implemented

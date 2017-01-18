@@ -142,7 +142,7 @@ public final class Extrapolation extends  Globalsentiment{
 	public static ArrayList<Long> get_Similarity_Threshold(long product_id, double threshold) {
 		ArrayList<Long> id_list = new ArrayList<Long>();
 		while (threshold > 1)
-			threshold = threshold / ((double) 10);
+			threshold = threshold / ((double) 100);
 
 		for (Product pro : Data.productdb.values()) {
 			if (pro.get_Id() == product_id)
