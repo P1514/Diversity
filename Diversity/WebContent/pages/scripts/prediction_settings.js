@@ -1,57 +1,117 @@
+var testProducts = [
+   {
+      "Op":"Tree"
+   },
+   {
+      "PSS":"PSS D522-1",
+      "Products":[
+         {
+            "Products":[
+               {
+                  "Name":"Red Brush"
+               },
+               {
+                  "Name":"Blue Brush"
+               },
+               {
+                  "Name":"Super-Glue +9000"
+               },
+               {
+                  "Name":"Cheap-Glue 100"
+               }
+            ],
+            "Name":"Paiting Machine"
+         },
+         {
+            "Products":[
+               {
+                  "Name":"Red Brush"
+               },
+               {
+                  "Name":"Blue Brush"
+               },
+               {
+                  "Name":"Super-Glue +9000"
+               },
+               {
+                  "Name":"Cheap-Glue 100"
+               }
+            ],
+            "Name":"Glueing Machine"
+         }
+      ]
+   }
+];
+
+var products;
+var services;
 var str = "";
+var start = true;
+$(document).ready(function () {
+  makeTree("prod_list",testProducts);
+  $('#prod_list').jstree(true).refresh();
+  str = "";
+  start = true;
+  makeTree("serv_list",testProducts);
+  $('#serv_list').jstree(true).refresh();
+});
+
+
 /*
 * Uses JSTree to make a tree view from an unordered HTML list
 */
-function makeTree() {
+function makeTree(div,test) {
   str = "";
-  $('#prod_list').jstree("destroy");
-  document.getElementById('prod_list').innerHTML = str;
+  $("#" + div).jstree("destroy");
+  document.getElementById(div).innerHTML = str;
   str += "<ul>";
-  var test = jsonData;
   //console.log(test);
   for (var i = 0; i < test.length; i++) {
-    if (test[i].PSS == document.getElementById("pss").value) {
-      makeList(test[i]);//makeList(jsonData[1]);
-      break;
-    }
+    makeList(test[i]);//makeList(jsonData[1]);
   }
   str += "</ul>"
-  document.getElementById('prod_list').innerHTML = str;
+  document.getElementById(div).innerHTML = str;
 
-  $('#prod_list').jstree({
+  $("#" + div).jstree({
   "plugins" : [ "checkbox" ]
   });
 
-  $('#prod_list').on("changed.jstree", function (e, data) {
-    final_products = "";
+  $("#prod_list").on("changed.jstree", function (e, data) {
+    products = "";
     var i, j, r = [];
     for (i = 0, j = data.selected.length; i < j; i++) {
         r.push(data.instance.get_node(data.selected[i]).text);
-        final_products += data.instance.get_node(data.selected[i]).text + ";" ;
+        products += data.instance.get_node(data.selected[i]).text + ";" ;
     }
-    //console.log(final_products);
+    console.log(products);
+
   });
 
-  $('#prod_list').jstree(true).refresh();
+  $("#serv_list").on("changed.jstree", function (e, data) {
+    services = "";
+    var i, j, r = [];
+    for (i = 0, j = data.selected.length; i < j; i++) {
+        r.push(data.instance.get_node(data.selected[i]).text);
+        services += data.instance.get_node(data.selected[i]).text + ";" ;
+    }
+    console.log(services);
+
+  });
+
+  $("#prod_list").on('ready.jstree', function() {
+    $('#prod_list').jstree('open_all');
+  });
+
+  $("#serv_list").on('ready.jstree', function() {
+    $('#serv_list').jstree('open_all');
+  });
+
 }
 
-function showTree() {
-  var checkbox = document.getElementById('final');
-  if (!checkbox.checked) {
-    document.getElementById('prod_list').style.display = 'none';
-    document.getElementById('tree_div').style.display = 'none';
-    $('#prod_list').jstree(true).deselect_all();
-    final_products = "";
-  } else {
-    document.getElementById('tree_div').style.display = 'block';
-    document.getElementById('prod_list').style.display = 'block';
-  }
-}
 
-var start = true;
 
 /*
-* Makes a HTML unordered list from a json array (uses recursion)
+* Makes a HTML unordered list from a json array (uses recursion, requires a var start = true)
 */
 function makeList(array) {
   if (typeof array == 'undefined') {
@@ -69,10 +129,11 @@ function makeList(array) {
       str += "<li>"+ array.Name;
       str += "<ul>";
     }
-    for (var i = 0; i < array.Products.length; i++) {
 
+    for (var i = 0; i < array.Products.length; i++) {
       makeList(array.Products[i]);
     }
+
     if (array.hasOwnProperty('Name')) {
       str += "</ul>";
       str += "</li>";
