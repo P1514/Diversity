@@ -8,7 +8,6 @@ public class Product {
 	
 	private long id;
 	private String name;
-	private long pss_id;
 	private boolean is_final_product;
 	private long supplied_by;
 	private long parent_product_id;
@@ -23,10 +22,9 @@ public class Product {
 	 * @param _supplied_by the supplied by
 	 * @param _parent_product_id the parent product id
 	 */
-	public Product(long _id, String _name, long _pss_id, boolean _is_final_product, long _supplied_by, long _parent_product_id){
+	public Product(long _id, String _name, boolean _is_final_product, long _supplied_by, long _parent_product_id){
 		this.id=_id;
 		this.name=_name;
-		this.pss_id=_pss_id;
 		this.is_final_product=_is_final_product;
 		this.supplied_by=_supplied_by;
 		this.parent_product_id=_parent_product_id;
@@ -42,23 +40,6 @@ public class Product {
 		return name;
 	}
 	
-	/**
-	 * Sets the pss.
-	 *
-	 * @param id the new pss
-	 */
-	public void set_PSS(Long id){
-		this.pss_id=id;
-	}
-	
-	/**
-	 * Gets the  pss.
-	 *
-	 * @return the  pss
-	 */
-	public long get_PSS(){
-		return pss_id;
-	}
 	
 	/**
 	 * Gets the id.

@@ -35,6 +35,9 @@ public class Data {
 	/** The productdb. */
 	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
 
+	/** The servicedb. */
+	public static ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<Long, Product>();
+
 	/** The companydb. */
 	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
 	private long totalposts;
@@ -67,8 +70,11 @@ public class Data {
 	public static long identifyPSSbyproduct(long product) {
 		if (product == 0)
 			return 0;
-
-		return productdb.get(product).get_PSS();
+		long id= productdb.get(product).get_Id();
+		for(PSS pss : pssdb.values()){
+			if(pss.get_products().contains(id)) return pss.getID();
+		}
+		return 0;
 
 	}
 
@@ -127,10 +133,11 @@ public class Data {
 			rs = query.executeQuery();
 
 			while (rs.next()) {
-				productdb.put(rs.getLong(Settings.crproducttable_id), new Product(
-						rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
-						rs.getLong(Settings.crproducttable_supplied_by), rs.getBoolean(Settings.crproducttable_isfinal),
-						rs.getLong(Settings.crproducttable_supplied_by), rs.getLong(Settings.crproducttable_parent)));
+				productdb.put(rs.getLong(Settings.crproducttable_id),
+						new Product(rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
+								rs.getBoolean(Settings.crproducttable_isfinal),
+								rs.getLong(Settings.crproducttable_supplied_by),
+								rs.getLong(Settings.crproducttable_parent)));
 			}
 
 			select = "Select * from " + Settings.crcompanytable;
@@ -150,8 +157,9 @@ public class Data {
 			rs = query.executeQuery();
 
 			while (rs.next()) {
-				productdb.get(rs.getLong(Settings.crrpssproducttable_product))
-						.set_PSS(rs.getLong(Settings.crrpssproducttable_pss));
+				pssdb.get(rs.getLong(Settings.crrpssproducttable_pss)).add_product(rs.getLong(Settings.crrpssproducttable_product));
+				/*productdb.get(rs.getLong(Settings.crrpssproducttable_product))
+						.set_PSS(rs.getLong(Settings.crrpssproducttable_pss));*/
 			}
 
 			rs.close();

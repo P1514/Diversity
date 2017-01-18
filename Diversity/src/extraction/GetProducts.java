@@ -21,24 +21,42 @@ public class GetProducts {
 	 * database, and their respective relation to other products or pss's.
 	 * 
 	 * @return JSONArray Example PSS:"D522", Products:[Name:"Brush",Name:"Iron"]
-	 * @throws JSONException in case creating a JSON fails to occur
+	 * @throws JSONException
+	 *             in case creating a JSON fails to occur
 	 */
-	public static final JSONArray getTree() throws JSONException {
+	public static final JSONArray getTree(String pss_in) throws JSONException {
 
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		result.put(new JSONObject().put("Op", "Tree"));
 		for (PSS pss : Data.pssdb.values()) {
+			if(pss_in!=null && !pss.getName().equals(pss_in)) continue;
 			obj = new JSONObject();
 			obj.put("PSS", pss.getName());
 			JSONArray sub_products = new JSONArray();
-			for (Product product : Data.productdb.values()) {
-				if (pss.getID() == product.get_PSS())
+			for (Long id : pss.get_products()) {
+				JSONArray sub_products2 = new JSONArray();
+				Product product = Data.productdb.get(id);
+				if(!product.getFinal())continue;
+				if (product.getParent() == 0) {
 					sub_products.put(new JSONObject().put("Name", product.get_Name()));
-				// TODO Replace this with recursive mode that can be done until
-				// the ammount of products
-				// reaches the end of infinity, and that also doesn't need to
-				// iterate over everything
+					for (Product product2 : Data.productdb.values()) {
+						if (product2.getParent() == product.get_Id()) {
+							sub_products2.put(new JSONObject().put("Name", product2.get_Name()));
+						}
+
+						if (sub_products2.length() != 0)
+							sub_products.put(new JSONObject().put("Products", sub_products2));
+						// TODO Replace this with recursive mode that can be
+						// done
+						// until
+						// the ammount of products
+						// reaches the end of infinity, and that also doesn't
+						// need
+						// to
+						// iterate over everything
+					}
+				}
 			}
 			obj.put("Products", sub_products);
 			result.put(obj);
@@ -47,29 +65,35 @@ public class GetProducts {
 
 	}
 	
-	public static final JSONArray getTree(String pss_in) throws JSONException {
+	public static final JSONArray getTree() throws JSONException {
+		return getTree(null);
+	}
+
+	/*public static final JSONArray getTree(String pss_in) throws JSONException {
 
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		result.put(new JSONObject().put("Op", "Tree"));
 		for (PSS pss : Data.pssdb.values()) {
-			if(pss.getName().equals(pss_in)){
-			obj = new JSONObject();
-			obj.put("PSS", pss.getName());
-			JSONArray sub_products = new JSONArray();
-			for (Product product : Data.productdb.values()) {
-				if (pss.getID() == product.get_PSS())
-					sub_products.put(new JSONObject().put("Name", product.get_Name()));
-				// TODO Replace this with recursive mode that can be done until
-				// the ammount of products
-				// reaches the end of infinity, and that also doesn't need to
-				// iterate over everything
+			if (pss.getName().equals(pss_in)) {
+				obj = new JSONObject();
+				obj.put("PSS", pss.getName());
+				JSONArray sub_products = new JSONArray();
+				for (Product product : Data.productdb.values()) {
+					if (pss.getID() == product.get_PSS())
+						sub_products.put(new JSONObject().put("Name", product.get_Name()));
+					// TODO Replace this with recursive mode that can be done
+					// until
+					// the ammount of products
+					// reaches the end of infinity, and that also doesn't need
+					// to
+					// iterate over everything
+				}
+				obj.put("Products", sub_products);
+				result.put(obj);
 			}
-			obj.put("Products", sub_products);
-			result.put(obj);
-			}
-			}
+		}
 		return result;
 
-	}
+	}*/
 }
