@@ -179,7 +179,7 @@ function drawChart() {
       },
       series: {
         0: {
-          color: '#FF4500',
+          color: '#6f9654',
           lineWidth: 3
         }
       },
