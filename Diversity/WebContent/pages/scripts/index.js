@@ -53,7 +53,7 @@ function giveAcessRights(json){
       if(json[0].view_use_opinion_prediction){
       document.getElementById("predict").style.display = 'block';//show
       document.getElementById("predict_gray").style.display = 'none';//hide
-
+      document.getElementById("create_prediction").style.display = 'block';
       }
       else{
       document.getElementById("predict").style.display = 'none';//hide

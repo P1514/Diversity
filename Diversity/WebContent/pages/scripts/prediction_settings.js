@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
       $('#serv_list').jstree(true).refresh();
       console.log(jsonData);
     }
+
+    if (json[0].Op == "Error") {
+      if (json[0].hasOwnProperty("Message")) {
+        console.log(json[0].Message);
+      }
+    }
   }
 });
 
@@ -44,7 +50,7 @@ function makeTree(div,test) {
   document.getElementById(div).innerHTML = str;
   str += "<ul>";
   //console.log(test);
-  for (var i = 0; i < test.length; i++) {
+  for (var i = 1; i < test.length; i++) {
     makeList(test[i]);//makeList(jsonData[1]);
   }
   str += "</ul>"
@@ -59,7 +65,7 @@ function makeTree(div,test) {
     var i, j, r = [];
     for (i = 0, j = data.selected.length; i < j; i++) {
         r.push(data.instance.get_node(data.selected[i]).text);
-        products += data.instance.get_node(data.selected[i]).text + ";" ;
+        products += getObjects(jsonData,'Name', data.instance.get_node(data.selected[i]).text)[0].Id + ";" ;
     }
   });
 
@@ -68,7 +74,7 @@ function makeTree(div,test) {
     var i, j, r = [];
     for (i = 0, j = data.selected.length; i < j; i++) {
         r.push(data.instance.get_node(data.selected[i]).text);
-        services += data.instance.get_node(data.selected[i]).text + ";" ;
+        services += getObjects(jsonData,'Name', data.instance.get_node(data.selected[i]).text)[0].Id + ";" ;
     }
   });
 
@@ -102,7 +108,7 @@ function makeList(array) {
     return;
   }
 
-  if (!array.hasOwnProperty('Products') && !start) {
+  if (!array.hasOwnProperty('Products') /*&& !start*/) {
     str += "<li>" + array.Name + "</li>";
     return null;
   }
@@ -123,4 +129,15 @@ function makeList(array) {
       str += "</li>";
     }
   }
+}
+
+function submit() {
+  var json = {
+    "Op" : "Prediction",
+    "Products" : products,
+    "Services" : services
+  }
+
+  ws.send(JSON.stringify(json));
+  window.location.href = "prediction.html"
 }
