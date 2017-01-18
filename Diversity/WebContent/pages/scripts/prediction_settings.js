@@ -25,6 +25,14 @@ var testProducts = [
          {
             "Products":[
                {
+                  "Products":[
+                    {
+                      "Name" : "Brush Handle"
+                    },
+                    {
+                      "Name" : "Brush Head"
+                    }
+                  ],
                   "Name":"Red Brush"
                },
                {
