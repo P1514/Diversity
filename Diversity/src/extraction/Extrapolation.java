@@ -1,22 +1,23 @@
 package extraction;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
+import java.util.Calendar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.commons.math3.fitting.*;
 
-public final class Extrapolation {
-	private Globalsentiment gs;
+public final class Extrapolation extends  Globalsentiment{
+	private static Extrapolation instance;
 	
-	public Extrapolation(Globalsentiment _gs) {
-		gs=_gs;
+	public Extrapolation() {
 	}
 	
-	public JSONArray extrapolate(int timespan /* years */, String param, String values, String output, long id, WeightedObservedPoints obs)
+	  static {
+	        instance = new Extrapolation();
+	    }
+	
+	public JSONArray extrapolate(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -42,11 +43,11 @@ public final class Extrapolation {
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
 		int month;
-		obs = new WeightedObservedPoints();
+		WeightedObservedPoints obs = new WeightedObservedPoints();
 		
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			if(gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
-			obs.add(month % 12,gs.globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+			if(globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
+			obs.add(month % 12,globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 		}
 		// Instantiate a Second-degree polynomial fitter.
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
@@ -74,5 +75,9 @@ public final class Extrapolation {
 		return coeff[0]+coeff[1]*x+coeff[2]*coeff[2]*x;
 		
 	}
+	
+	public static Extrapolation getInstance() {
+        return instance;
+    }
 
 }

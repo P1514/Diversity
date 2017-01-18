@@ -9,6 +9,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+
+import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 // TODO: Auto-generated Javadoc
