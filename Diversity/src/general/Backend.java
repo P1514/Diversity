@@ -1,6 +1,9 @@
 package general;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import security.*;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
@@ -20,6 +23,7 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -83,13 +87,21 @@ public final class Backend {
 			}
 
 			switch (op) {
+			case 99:
+				/*LOGGER.log(Level.INFO, "Similarity id 15, 0.75= " + Extrapolation.get_Similarity_Threshold(15, 0.75));
+				LOGGER.log(Level.INFO, "Similarity id 15, 30= " + Extrapolation.get_Similarity_Threshold(15, 30));
+				LOGGER.log(Level.INFO, "Similarity id 15, 1= " + Extrapolation.get_Similarity_Threshold(15, 1));*/
+				
+				for(int i = 0; i<22; i++)
+				LOGGER.log(Level.INFO, "Similarity 18, "+i+" = " + Extrapolation.get_Similarity(15, i));
+				break;
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
 			case 21:
 
-				//System.out.println(msg.getString("Pss"));
-				if(msg.has("Pss"))
+				// System.out.println(msg.getString("Pss"));
+				if (msg.has("Pss"))
 					return GetProducts.getTree(msg.getString("Pss")).toString();
 				else
 					return GetProducts.getTree().toString();
@@ -147,10 +159,8 @@ public final class Backend {
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(1, param + "," + filtering,
-										values + ","
-												+ (filtering.equals("Product")
-														? Data.productdb.get(Long.valueOf(filter[i])).get_Name()
-														: filter[i]),
+										values + "," + (filtering.equals("Product")
+												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										(filtering.equals("Product")
 												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										id),

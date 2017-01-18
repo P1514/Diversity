@@ -67,7 +67,7 @@ public class Globalsentiment {
 
 			for (long k : top5) {
 
-				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false,0,0));
+				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
 				result += globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString();
 				Data.modeldb.remove((long) -1);
 			}
@@ -248,10 +248,10 @@ public class Globalsentiment {
 		PreparedStatement query1 = null;
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
-				+ Settings.lotable + " WHERE  "+Settings.lotable + "."+Settings.lotable_timestamp+">=? AND " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
-				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?"
-				+ " AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
-				+ Settings.latable_id;
+				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
+				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
+				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 		if (age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
 					+ Settings.latable_age + ">?";
@@ -305,10 +305,13 @@ public class Globalsentiment {
 			 */
 			// System.out.println(query1);
 			rs = query1.executeQuery();
-
-			while (rs.next()) {
-				auxcalc += (double) rs.getDouble(Settings.lptable_polarity) * rs.getDouble(Settings.lotable_reach);
-				totalreach += rs.getDouble(Settings.lotable_reach);
+			if (rs.next()) {
+				do {
+					auxcalc += (double) rs.getDouble(Settings.lptable_polarity) * rs.getDouble(Settings.lotable_reach);
+					totalreach += rs.getDouble(Settings.lotable_reach);
+				} while (rs.next());
+			} else {
+				auxcalc = (double) -1;
 			}
 			rs.close();
 			query1.close();
@@ -490,8 +493,9 @@ public class Globalsentiment {
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
 				+ "=?" + " AND " + Settings.lotable_product
-				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "+Settings.lotable_timestamp+">?) AND " + Settings.lptable_authorid
-				+ " in (Select " + Settings.latable_id + " from " + Settings.latable;
+				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND " + Settings.lotable_timestamp
+				+ ">?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
+				+ Settings.latable;
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
 		if (age != null)
