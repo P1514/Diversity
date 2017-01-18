@@ -1,10 +1,9 @@
 package general;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import security.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
@@ -36,7 +35,7 @@ public final class Backend {
 	 * @param _msg
 	 *            the msg
 	 */
-	public Backend(int _op, JSONObject _msg) {
+	public Backend(int _op, JSONObject _msg) {	
 		op = _op;
 		msg = _msg;
 
@@ -95,8 +94,8 @@ public final class Backend {
 
 			case 21:
 
-				// System.out.println(msg.getString("Pss"));
-				if (msg.has("Pss"))
+				//System.out.println(msg.getString("Pss"));
+				if(msg.has("Pss"))
 					return GetProducts.getTree(msg.getString("Pss")).toString();
 				else
 					return GetProducts.getTree().toString();
@@ -154,8 +153,10 @@ public final class Backend {
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(1, param + "," + filtering,
-										values + "," + (filtering.equals("Product")
-												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+										values + ","
+												+ (filtering.equals("Product")
+														? Data.productdb.get(Long.valueOf(filter[i])).get_Name()
+														: filter[i]),
 										(filtering.equals("Product")
 												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										id),
