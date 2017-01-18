@@ -70,9 +70,10 @@ public class Data {
 	public static long identifyPSSbyproduct(long product) {
 		if (product == 0)
 			return 0;
-		long id= productdb.get(product).get_Id();
-		for(PSS pss : pssdb.values()){
-			if(pss.get_products().contains(id)) return pss.getID();
+		long id = productdb.get(product).get_Id();
+		for (PSS pss : pssdb.values()) {
+			if (pss.get_products().contains(id))
+				return pss.getID();
 		}
 		return 0;
 
@@ -128,7 +129,7 @@ public class Data {
 								rs.getString(Settings.crpsstable_type)));
 			}
 
-			select = "Select * from " + Settings.crproducttable;
+			select = "Select * from " + Settings.crproducttable + " ORDER BY " + Settings.crproducttable_id + " ASC";
 			query = cncr.prepareStatement(select);
 			rs = query.executeQuery();
 
@@ -138,6 +139,11 @@ public class Data {
 								rs.getBoolean(Settings.crproducttable_isfinal),
 								rs.getLong(Settings.crproducttable_supplied_by),
 								rs.getLong(Settings.crproducttable_parent)));
+				if (rs.getLong(Settings.crproducttable_parent) != 0) {
+					Product parent = productdb.get(rs.getLong(Settings.crproducttable_parent));
+					parent.setParent(rs.getLong(Settings.crproducttable_id));
+					productdb.put(rs.getLong(Settings.crproducttable_parent), parent);
+				}
 			}
 
 			select = "Select * from " + Settings.crcompanytable;
@@ -157,9 +163,12 @@ public class Data {
 			rs = query.executeQuery();
 
 			while (rs.next()) {
-				pssdb.get(rs.getLong(Settings.crrpssproducttable_pss)).add_product(rs.getLong(Settings.crrpssproducttable_product));
-				/*productdb.get(rs.getLong(Settings.crrpssproducttable_product))
-						.set_PSS(rs.getLong(Settings.crrpssproducttable_pss));*/
+				pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
+						.add_product(rs.getLong(Settings.crrpssproducttable_product));
+				/*
+				 * productdb.get(rs.getLong(Settings.crrpssproducttable_product)
+				 * ) .set_PSS(rs.getLong(Settings.crrpssproducttable_pss));
+				 */
 			}
 
 			rs.close();

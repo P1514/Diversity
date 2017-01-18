@@ -88,12 +88,7 @@ public final class Backend {
 
 			switch (op) {
 			case 99:
-				/*LOGGER.log(Level.INFO, "Similarity id 15, 0.75= " + Extrapolation.get_Similarity_Threshold(15, 0.75));
-				LOGGER.log(Level.INFO, "Similarity id 15, 30= " + Extrapolation.get_Similarity_Threshold(15, 30));
-				LOGGER.log(Level.INFO, "Similarity id 15, 1= " + Extrapolation.get_Similarity_Threshold(15, 1));*/
-				
-				for(int i = 0; i<22; i++)
-				LOGGER.log(Level.INFO, "Similarity 18, "+i+" = " + Extrapolation.get_Similarity(15, i));
+				LOGGER.log(Level.INFO, "Get Big Tree" + GetProducts.getPSTree().toString());
 				break;
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
@@ -188,7 +183,7 @@ public final class Backend {
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
-					result.put(obj);
+					result.put(obj);	
 
 				}
 				return result.toString();
