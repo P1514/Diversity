@@ -11,6 +11,8 @@ import general.Data;
 import general.Product;
 
 import org.apache.commons.math3.fitting.*;
+import org.apache.commons.math3.analysis.function.*;
+
 
 
 public final class Extrapolation extends  Globalsentiment{
@@ -27,6 +29,7 @@ public final class Extrapolation extends  Globalsentiment{
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		Sigmoid sig = new Sigmoid(0,100);
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -65,12 +68,13 @@ public final class Extrapolation extends  Globalsentiment{
 		double[] coeff = fitter.fit(obs.toList());
 		month--;
 		index--;
+		//index=0;
 		
-		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3)-1; month++) {
+		for (/*month = data.get(Calendar.MONTH)*/; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3)-1; month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",getFutureValue(coeff,index));
+				obj.put("Value",sig.value(getFutureValue(coeff,index)/100));
 
 				result.put(obj);
 				index++;
