@@ -1,6 +1,7 @@
 package extraction;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 
@@ -21,8 +22,9 @@ public class Prediction extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		
 
+		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75);
+		
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";
