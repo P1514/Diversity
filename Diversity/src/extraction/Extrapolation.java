@@ -48,23 +48,26 @@ public final class Extrapolation extends  Globalsentiment{
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
 		int month;
+		int index =0;
 		WeightedObservedPoints obs = new WeightedObservedPoints();
 		
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			if(globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id)!=0)
-			obs.add(month % 12,globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+			obs.add(index,globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+			index++;
 		}
 		// Instantiate a Second-degree polynomial fitter.
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
-		//double[] coeff = {1,1,1};
+		//index=0;
 		for (; month < timespan * 12 + data.get(Calendar.MONTH)+Math.floor((timespan * 12)/3); month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",getFutureValue(coeff,month % 12));
+				obj.put("Value",getFutureValue(coeff,index));
 				result.put(obj);
+				index++;
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -77,7 +80,7 @@ public final class Extrapolation extends  Globalsentiment{
 	
 	private double getFutureValue(double [] coeff,int x){
 		
-		return coeff[0]+coeff[1]*x+coeff[2]*coeff[2]*x;
+		return coeff[0]+coeff[1]*x+coeff[2]*x*x;
 		
 	}
 	
