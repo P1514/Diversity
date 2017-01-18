@@ -65,8 +65,8 @@ public class GetProducts {
 
 	}
 	
-	public static final JSONArray getTree() throws JSONException {
-		return getTree(null);
+	public static final JSONArray getTree(JSONObject obj) throws JSONException {
+		return (!obj.has("All")) ? getTree(new String()): getPSTree();
 	}
 
 	

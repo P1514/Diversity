@@ -97,6 +97,6 @@ public class PSS {
 	}
 	
 	public ArrayList<Long> get_products(){
-		return this.list_products;
+		return new ArrayList<>(this.list_products);
 	}
 }
