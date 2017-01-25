@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    if (json[0].Op == "prediction") {
+    if (json[0].Op == "Prediction") {
       draw = true;
       chartData = JSON.parse(JSON.stringify(json));
       drawChart();
