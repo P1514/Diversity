@@ -258,8 +258,8 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				if (msg.has("Id"))
-					tmp = conf.getConf(msg.getLong("Id")).toString();
+				//if (msg.has("Id"))
+					tmp = conf.getConf(845/*msg.getLong("Id")*/).toString();
 				return tmp;
 			case 13:
 				conf = new Settings();
