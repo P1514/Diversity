@@ -9,8 +9,13 @@ var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Nam
 */
 
 document.addEventListener('DOMContentLoaded', function() {
+
+  $('#overlay-back').hide();
+  $('#overlay').hide();
+
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
+
 
   ws.onopen = function () {
     json = {
@@ -44,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (json[0].Op == "Error") {
       if (json[0].hasOwnProperty("Message")) {
+        $('#overlay-back').show();
+        $('#overlay').show();
+        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay_back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />')
         console.log(json[0].Message);
       }
     }
@@ -143,8 +151,8 @@ function makeList(array) {
 function submit() {
   var json = {
     "Op" : "prediction",
-    "Products" : products,
-    "Services" : services
+    "Products" : products != "" ? products : undefined,
+    "Services" : services != "" ? services : undefined
   }
 
   ws.send(JSON.stringify(json));
