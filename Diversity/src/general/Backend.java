@@ -95,18 +95,22 @@ public final class Backend {
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
-				if (msg.has("Products") || msg.has("Services")) {
+				if (msg.has("Products") ||  msg.has("Services")) {
 					obj.put("Op", "Prediction");
 					result.put(obj);
 
-					result.put(pre.predict(1, msg.getString("Products"), msg.getString("Services")));
+					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "", msg.has("Services") ? msg.getString("Services"): ""));
 					// result = convert(result, pre.predict(1,
 					// msg.getString("Products"), msg.getString("Services")),
 					// "Graph", "1");
 					// result = convert(result, gs.getPolarityDistribution(id,
 					// param, values, "Global"), "Average","1");
+					if(result.getJSONArray(1).getJSONObject(0).has("Op")){
+						result.remove(0);
+					}
 
-				} else {
+				}
+				else {
 					obj.put("Message", "No products or services selected");
 					obj.put("Op", "Error");
 					result.put(obj);
