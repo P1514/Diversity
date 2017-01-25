@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class Prediction extends Globalsentiment {
 	
-	double totalSentiment, totalWeight, totalGsweight;
+	double totalSentiment, totalWeight, totalGsweight, variance;
 	int month;
 
 	
@@ -59,20 +59,22 @@ public class Prediction extends Globalsentiment {
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			totalWeight=0;
 			totalGsweight=0;
+			variance=0;
 			pssweights.forEach((k,v)->{
 				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
 				double tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
-				totalGsweight += tempvalue == -1 ? 0 : v*tempvalue;
+				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
 				Data.modeldb.remove((long) -1);
-				
-				totalWeight+=tempvalue == -1 ? 0 : v;
+				totalWeight+=(tempvalue == -1 ? 0 : v);
+				variance=(tempvalue>=Math.abs(variance)?Math.abs(tempvalue):Math.abs(variance));
 				});
 	
 				
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",totalGsweight/totalWeight);
+				obj.put("Value",totalGsweight/(totalWeight==0?1:totalWeight));
+				obj.put("Variance",variance-totalGsweight/(totalWeight==0?1:totalWeight));
 				result.put(obj);
 
 			} catch (JSONException e) {
