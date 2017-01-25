@@ -119,56 +119,28 @@ public class GetReach {
 
 	private double globalsentimentby(int month, int year, String param, String value, long id) {
 
-		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
-		String gender = null;
-		String location = null;
-		String age = null;
-		String products = null;
-		String[] params;
-		String[] values;
-		if (param != null) {
-
-			params = param.split(",");
-			values = value.split(",");
-			for (int i = 0; i < params.length; i++) {
-				if ("All".equals(values[i]))
-					continue;
-				switch (params[i]) {
-				case "Age":
-					age = values[i];
-					break;
-
-				case "Gender":
-					gender = values[i];
-					break;
-				case "Location":
-					location = values[i];
-					break;
-				case "Product":
-					products = values[i];
-					break;
-				default:
-					return -1;
-				}
-
-			}
-		}
+		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		if (age != null)
+	return calc_global_sentiment(insert, par, month, model, year);
+	}
+	
+	private double calc_global_sentiment(String insert, parameters par, int month, Model model, int year){
+		double result = (double)0;
+		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
 					+ Settings.latable_age + ">?";
-		if (gender != null)
+		if (par.gender != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		if (location != null)
+		if (par.location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (products != null) {
+		if (par.products != null) {
 			insert += " AND " + Settings.lotable_product + "=?";
 		} else {
 			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
@@ -180,8 +152,8 @@ public class GetReach {
 		long totalreach = 0;
 		try {
 			dbconnect();
-		} catch (ClassNotFoundException | SQLException e1) {
-			LOGGER.log(Level.SEVERE, "ERROR", e1);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setLong(1, model.getDate());
@@ -191,16 +163,16 @@ public class GetReach {
 			query1.setLong(3, data.getTimeInMillis());
 			query1.setLong(4, model.getPSS());
 			int rangeindex = 5;
-			if (age != null) {
-				query1.setString(rangeindex++, age.split("-")[1]);
-				query1.setString(rangeindex++, age.split("-")[0]);
+			if (par.age != null) {
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
-			if (gender != null)
-				query1.setString(rangeindex++, gender);
-			if (location != null)
-				query1.setString(rangeindex++, location.substring(0, location.length()));
-			if (products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location);
+			if (par.products != null)
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
 			try (ResultSet rs = query1.executeQuery()) {
 
 				while (rs.next()) {
@@ -209,7 +181,7 @@ public class GetReach {
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.INFO, "ERROR", e);
+			LOGGER.log(Level.SEVERE, "ERROR", e);
 		} finally {
 			try {
 				if (cnlocal != null)
@@ -218,7 +190,7 @@ public class GetReach {
 				LOGGER.log(Level.INFO, "ERROR", e);
 			}
 		}
-		result = auxcalc / (double) (totalreach == 0 ? 1 : totalreach);
+		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
 		String temp;
 		temp = String.format("%.2f", result);
 		try {
@@ -227,7 +199,6 @@ public class GetReach {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
 		return result;
-
 	}
 
 	/**
@@ -283,111 +254,52 @@ public class GetReach {
 		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
-		String gender = null;
-		String age = null;
-		String location = null;
-		String[] params = null;
-		String products = null;
-		String[] values = null;
-		if (param != null) {
-
-			params = param.split(",");
-			values = value.split(",");
-			for (int i = 0; i < params.length; i++) {
-				if ("All".equals(values[i]))
-					continue;
-				switch (params[i]) {
-				case "Age":
-					age = values[i];
-					break;
-				case "Gender":
-					gender = values[i];
-					break;
-				case "Location":
-					location = values[i];
-					break;
-				case "Product":
-					products = values[i];
-					break;
-				default:
-					return -1;
-				}
-			}
-		}
+		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.latable + ","
 				+ Settings.lptable + ", " + Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		if (age != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
-					+ Settings.latable_age + ">?";
-		if (gender != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		if (location != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (products != null) {
-			insert += " AND " + Settings.lotable_product + "=?";
-		} else {
-			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-		}
-		insert += ")";
-		Double auxcalc = (double) 0;
-		int nmonth = month - 1;
-		Calendar data = new GregorianCalendar(year, nmonth, 1);
-		long totalreach = 0;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.INFO, "ERROR", e);
-		}
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			query1.setLong(1, model.getDate());
-			query1.setLong(2, data.getTimeInMillis());
-			data.add(Calendar.MONTH, 1);
-			data.add(Calendar.DAY_OF_MONTH, -1);
-			query1.setLong(3, data.getTimeInMillis());
-			query1.setLong(4, model.getPSS());
-			int rangeindex = 5;
-			if (age != null) {
-				query1.setString(rangeindex++, age.split("-")[1]);
-				query1.setString(rangeindex++, age.split("-")[0]);
-			}
-			if (gender != null)
-				query1.setString(rangeindex++, gender);
-			if (location != null)
-				query1.setString(rangeindex++, location);
-			if (products != null)
-				query1.setLong(rangeindex++, Data.identifyProduct(products));
+		return calc_global_sentiment(insert, par, month, model, year);
 
-			try (ResultSet rs = query1.executeQuery()) {
+	}
 
-				while (rs.next()) {
-					auxcalc += rs.getDouble(Settings.lotable_reach);
-					totalreach++;
-				}
+	class parameters {
+		String age = null;
+		String gender = null;
+		String location = null;
+		String products = null;
+	}
+
+	private parameters split_params(String param, String value) {
+		if (param == null)
+			return new parameters();
+		String[] params = param.split(",");
+		String[] values = value.split(",");
+		parameters par = new parameters();
+		for (int i = 0; i < params.length; i++) {
+			if ("All".equals(values[i]))
+				continue;
+			switch (params[i]) {
+			case "Age":
+				par.age = values[i];
+				break;
+
+			case "Gender":
+				par.gender = values[i];
+				break;
+			case "Location":
+				par.location = values[i];
+				break;
+			case "Product":
+				par.products = values[i];
+				break;
+			default:
+				return new parameters();
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-		} finally {
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
-			}
-			;
+
 		}
-		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
-		String temp;
-		temp = String.format("%.2f", result);
-		try {
-			result = Double.valueOf(temp.replaceAll(",", "."));
-		} catch (Exception e) {
-			LOGGER.log(Level.INFO, "ERROR", e);
-			;
-		}
-		return result;
+		return par;
 
 	}
 

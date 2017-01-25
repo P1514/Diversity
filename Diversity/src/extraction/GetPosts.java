@@ -162,7 +162,7 @@ public class GetPosts {
 				query1 = cnlocal.prepareStatement(insert);
 				query1.setInt(1, topid[i]);
 				rs = query1.executeQuery();
-				rs.next();
+				if(rs.next())
 				pre_result[i] += rs.getString(Settings.lptable_message);
 				rs.close();
 				query1.close();

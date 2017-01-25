@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +53,7 @@ public class Globalsentiment {
 	 *             is case JSON creation fails
 	 */
 	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
-			ArrayList<Long> top5) throws JSONException {
+			List<Long> top5) throws JSONException {
 		if (top5.isEmpty())
 			return;
 		PreparedStatement query1 = null;
