@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (json[0].hasOwnProperty("Message")) {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay_back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />')
+        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />')
         console.log(json[0].Message);
       }
     }
