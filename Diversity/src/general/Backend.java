@@ -106,7 +106,7 @@ public final class Backend {
 					// result = convert(result, gs.getPolarityDistribution(id,
 					// param, values, "Global"), "Average","1");
 					if(result.getJSONArray(1).getJSONObject(0).has("Op")){
-						result.remove(0);
+						result=result.getJSONArray(1);
 					}
 
 				}
