@@ -1,9 +1,6 @@
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-
 <meta http-equiv="Cache-Control"
 	content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -50,11 +47,10 @@
 			if(json.Message.indexOf("updated") !== -1){
 				var jsonData = {
 						"Op" : "getconfig",
-					}
-					ws.send(JSON.stringify(jsonData));
+				}
+				ws.send(JSON.stringify(jsonData));
 			}
-				
-			return;
+		return;
 		}
 		if (json[0].Op == "Configs") {
 			json = JSON.parse(event.data);
@@ -64,7 +60,7 @@
 	}
 	function send_config() {
 		var gstring="", astring="",lstring="";
-		
+
 		for(var i=1;;i++){
 			if(document.getElementById("gender"+i) == null)break;
 			gstring+=document.getElementById("gender"+i).value+",,";
@@ -146,9 +142,9 @@
 		console.log(jsonData);
 		json=jsonData;
 		setConfig();
-		
+
 	}
-	
+
 	function delline(table, id){
 		var jsonData = new Array();
 		var ii=0;
@@ -207,10 +203,10 @@
 		console.log(jsonData);
 		json=jsonData;
 		setConfig();
-		
-		
-		
-		
+
+
+
+
 	}
 	function setConfig() {
 		var i=1;
