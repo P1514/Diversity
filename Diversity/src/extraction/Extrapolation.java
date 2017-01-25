@@ -141,7 +141,7 @@ public final class Extrapolation extends Globalsentiment {
 
 	public static HashMap<Long, Long> get_Similarity_Threshold(String productsId, double threshold) {
 		if (productsId.isEmpty())
-			return null;
+			return new HashMap<Long, Long>();
 
 		HashMap<Long, Long> pssweights = new HashMap<Long, Long>();
 		String[] products = productsId.split(";");
