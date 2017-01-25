@@ -35,7 +35,13 @@ public class Prediction extends Globalsentiment {
 		JSONObject obj = new JSONObject();
 
 		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75);
-		
+		if (pssweights.isEmpty())
+		{
+			obj.put("Op", "Error");
+			obj.put("Message", "No prediction available");
+			result.put(obj);
+			return result;
+		}
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";

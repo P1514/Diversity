@@ -36,7 +36,7 @@ public final class Backend {
 	 * @param _msg
 	 *            the msg
 	 */
-	public Backend(int _op, JSONObject _msg) {	
+	public Backend(int _op, JSONObject _msg) {
 		op = _op;
 		msg = _msg;
 
@@ -57,7 +57,7 @@ public final class Backend {
 		GetModels model;
 		GetPosts gp = new GetPosts();
 		Globalsentiment gs = new Globalsentiment();
-		Extrapolation extra = Extrapolation.getInstance(); 
+		Extrapolation extra = Extrapolation.getInstance();
 		Prediction pre = new Prediction();
 		GetReach gr = new GetReach();
 		long id = 0;
@@ -95,20 +95,24 @@ public final class Backend {
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
-				if(msg.has("Products")||msg.has("Services")){
-				obj.put("Op", "Prediction");
-				result.put(obj);
-					
-					result.put(pre.predict(1, msg.getString("Products"), msg.getString("Services")));
-					//result = convert(result, pre.predict(1, msg.getString("Products"), msg.getString("Services")), "Graph", "1");
-					//result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Average","1");
+				if (msg.has("Products") || msg.has("Services")) {
+					obj.put("Op", "Prediction");
+					result.put(obj);
 
-				
-				}
-				else
+					result.put(pre.predict(1, msg.getString("Products"), msg.getString("Services")));
+					// result = convert(result, pre.predict(1,
+					// msg.getString("Products"), msg.getString("Services")),
+					// "Graph", "1");
+					// result = convert(result, gs.getPolarityDistribution(id,
+					// param, values, "Global"), "Average","1");
+
+				} else {
+					obj.put("Message", "No products or services selected");
 					obj.put("Op", "Error");
+					result.put(obj);
+				}
 				return result.toString();
-				
+
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -169,10 +173,8 @@ public final class Backend {
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(1, param + "," + filtering,
-										values + ","
-												+ (filtering.equals("Product")
-														? Data.productdb.get(Long.valueOf(filter[i])).get_Name()
-														: filter[i]),
+										values + "," + (filtering.equals("Product")
+												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										(filtering.equals("Product")
 												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										id),
@@ -200,7 +202,7 @@ public final class Backend {
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
-					result.put(obj);	
+					result.put(obj);
 
 				}
 				return result.toString();
