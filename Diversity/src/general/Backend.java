@@ -106,7 +106,7 @@ public final class Backend {
 					// result = convert(result, gs.getPolarityDistribution(id,
 					// param, values, "Global"), "Average","1");
 					if(result.getJSONArray(1).getJSONObject(0).has("Op")){
-						result.remove(0);
+						result=result.getJSONArray(1);
 					}
 
 				}
@@ -258,8 +258,8 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				if (msg.has("Id"))
-					tmp = conf.getConf(msg.getLong("Id")).toString();
+				//if (msg.has("Id"))
+					tmp = conf.getConf(845/*msg.getLong("Id")*/).toString();
 				return tmp;
 			case 13:
 				conf = new Settings();

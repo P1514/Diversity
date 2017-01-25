@@ -281,7 +281,9 @@ function drawChart() {
           globaldata.addRows(12);													// add 12 rows for the 12 months
         }
         globaldata.setCell(j,0,counter[((i-1)*12) + i+j].Month);				// the first cell of each line is the name of the month
-        globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
+        if (counter[((i-1)*12) + i+j].Value != -1) {
+          globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
+        }
       }															// if it's the first iteration, the array position is i+j. for the other iterations it
     }																// adds 12 positions per iteration
   }

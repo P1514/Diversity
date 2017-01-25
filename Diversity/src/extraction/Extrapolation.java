@@ -31,7 +31,7 @@ public final class Extrapolation extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		Sigmoid sig = new Sigmoid(-100, 100);
+		Sigmoid sig = new Sigmoid(0, 100);
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -65,11 +65,14 @@ public final class Extrapolation extends Globalsentiment {
 
 		}
 		// Instantiate a Second-degree polynomial fitter.
-		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
+		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
 		month--;
 		index--;
+		double lastvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
+		if(lastvalue!=-1)
+		coeff[0] = lastvalue - (coeff[1] * index + coeff[2] * index * index + coeff[3] * index * index * index);
 		// index=0;
 
 		for (/* month = data.get(Calendar.MONTH) */; month < timespan * 12 + data.get(Calendar.MONTH)
@@ -77,7 +80,20 @@ public final class Extrapolation extends Globalsentiment {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value", sig.value((getFutureValue(coeff, index) / 50)));
+				if (getFutureValue(coeff, index) >= 0)
+					obj.put("Value",
+							getFutureValue(coeff, index) > 100 ? 100
+									: getFutureValue(coeff,
+											index)/*
+													 * sig.value((getFutureValue(
+													 * coeff, index) *20))
+													 */);
+				else
+					obj.put("Value",0/*
+													 * sig.value((getFutureValue(
+													 * coeff, index) *20))
+													 */);
+
 				// obj.put("Value",sig.value(1.25));
 
 				result.put(obj);
@@ -94,7 +110,7 @@ public final class Extrapolation extends Globalsentiment {
 
 	private double getFutureValue(double[] coeff, int x) {
 
-		return coeff[0] + coeff[1] * x + coeff[2] * x * x;
+		return coeff[0] + coeff[1] * x + coeff[2] * x * x + coeff[3] * x * x * x;
 
 	}
 
@@ -141,7 +157,7 @@ public final class Extrapolation extends Globalsentiment {
 
 	public static HashMap<Long, Long> get_Similarity_Threshold(String productsId, double threshold) {
 		if (productsId.isEmpty())
-			return null;
+			return new HashMap<Long, Long>();
 
 		HashMap<Long, Long> pssweights = new HashMap<Long, Long>();
 		String[] products = productsId.split(";");
@@ -154,17 +170,17 @@ public final class Extrapolation extends Globalsentiment {
 				return null;
 			}
 		}
-			for (Long id : simproducts) {
-				for (PSS pss : Data.pssdb.values()) {
-					if (pss.get_products().contains(id)) {
-						if (pssweights.containsKey(pss.getID())) {
-							pssweights.put(pss.getID(), pssweights.get(pss.getID()) + 1);
-						} else {
-							pssweights.put(pss.getID(), (long) 1);
-						}
+		for (Long id : simproducts) {
+			for (PSS pss : Data.pssdb.values()) {
+				if (pss.get_products().contains(id)) {
+					if (pssweights.containsKey(pss.getID())) {
+						pssweights.put(pss.getID(), pssweights.get(pss.getID()) + 1);
+					} else {
+						pssweights.put(pss.getID(), (long) 1);
 					}
 				}
 			}
+		}
 
 		return pssweights;
 
