@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    if (json[0].Op == "Prediction") {
+    if (json[0].Op == "prediction") {
       draw = true;
-      //Assign values to chartData
+      chartData = JSON.parse(JSON.stringify(json));
       drawChart();
     }
 
@@ -142,44 +142,59 @@ function makeList(array) {
 
 function submit() {
   var json = {
-    "Op" : "Prediction",
+    "Op" : "prediction",
     "Products" : products,
     "Services" : services
   }
 
   ws.send(JSON.stringify(json));
-
 }
 
 function drawChart() {
   if (draw) {
+    $("#wrapper").show();
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Month');
     data.addColumn('number', 'Global Sentiment');
     data.addColumn({id:'min', type:'number', role:'interval'});
-     data.addColumn({id:'max', type:'number', role:'interval'});
-    data.addRows([
-      ['JAN', 80 , 75, 83],
-      ['FEB', 77 , 70, 80],
-      ['MAR', 60 , 50, 70],
-      ['APR', 45 , 40, 50],
-      ['MAY', 46 , 40, 50],
-      ['JUN', 63 , 50, 76],
-      ['JUL', 69 , 50, 76],
-      ['AUG', 70 , 50, 76],
-      ['SEP', 65 , 50, 70],
-      ['OCT', 59 , 50, 70],
-      ['NOV', 49 , 30, 50],
-      ['DEC', 45 , 40, 50]
-    ]);
+    data.addColumn({id:'max', type:'number', role:'interval'});
+
+    var sum = 0;
+    var count = 0;
+
+    for (i = 0; i < chartData[1].length; i++) {
+      var month = "";
+      var value = -1;
+      var variance = -1;
+
+      if (chartData[1][i].hasOwnProperty('Month')) {
+        month = chartData[1][i].Month;
+      }
+
+      if (chartData[1][i].hasOwnProperty('Value')) {
+        value = chartData[1][i].Value;
+      }
+
+      if (chartData[1][i].hasOwnProperty('Variance')) {
+        variance = chartData[1][i].Variance;
+      }
+
+      if (month != "" && value != -1 && variance != -1) {
+        sum += value;
+        count += 1;
+
+        data.addRow([month, value, value - variance, value + variance]);
+      }
+    }
 
     var options = {
+      title : 'Predicted global sentiment over time',
       hAxis: {
         title: 'Time'
       },
       series: {
         0: {
-          color: '#6f9654',
+          color: '#604460',
           lineWidth: 3
         }
       },
@@ -200,6 +215,26 @@ function drawChart() {
 
     var chart = new google.visualization.LineChart(document.getElementById('graph'));
     chart.draw(data,options);
+
+    var data = google.visualization.arrayToDataTable([['Indicator', 'Value'], ['Average Global Sentiment', count != 0 ? sum/count : 0]]);
+
+    var options = {
+      title: 'Predicted average global sentiment',
+      legend: 'none',
+      pieSliceText: 'value',
+      pieSliceTextStyle: {
+        fontSize: 20,
+      },
+      colors:['#604460'],
+      backgroundColor: {
+        fill:'transparent'
+      },
+      tooltip: { trigger: 'none' },
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('pie'));
+    chart.draw(data, options);
+
   } else {
     return;
   }
