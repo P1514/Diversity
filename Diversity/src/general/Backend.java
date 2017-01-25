@@ -97,8 +97,9 @@ public final class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "Prediction");
 				result.put(obj);
-				
-					result = convert(result, pre.predict(1, msg.getString("Products"), msg.getString("Services")), "Graph", "1");
+					
+					result.put(pre.predict(1, msg.getString("Products"), msg.getString("Services")));
+					//result = convert(result, pre.predict(1, msg.getString("Products"), msg.getString("Services")), "Graph", "1");
 					//result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Average","1");
 
 				return result.toString();
