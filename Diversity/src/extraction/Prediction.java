@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class Prediction extends Globalsentiment {
 	
-	double totalSentiment, totalWeight, totalGsweight;
+	double totalSentiment, totalWeight, totalGsweight, variance;
 	int month;
 
 	
@@ -35,7 +35,13 @@ public class Prediction extends Globalsentiment {
 		JSONObject obj = new JSONObject();
 
 		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75);
-		
+		if (pssweights.isEmpty())
+		{
+			obj.put("Op", "Error");
+			obj.put("Message", "No prediction available");
+			result.put(obj);
+			return result;
+		}
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";
@@ -50,7 +56,6 @@ public class Prediction extends Globalsentiment {
 		time[10] = "NOV";
 		time[11] = "DEC";
 		obj = new JSONObject();
-		result.put(obj);
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
@@ -59,20 +64,22 @@ public class Prediction extends Globalsentiment {
 		for (month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			totalWeight=0;
 			totalGsweight=0;
+			variance=0;
 			pssweights.forEach((k,v)->{
 				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
 				double tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
-				totalGsweight += tempvalue == -1 ? 0 : v*tempvalue;
+				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
 				Data.modeldb.remove((long) -1);
-				
-				totalWeight+=tempvalue == -1 ? 0 : v;
+				totalWeight+=(tempvalue == -1 ? 0 : v);
+				variance=(tempvalue>=Math.abs(variance)?Math.abs(tempvalue):Math.abs(variance));
 				});
 	
 				
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",totalGsweight/totalWeight);
+				obj.put("Value",totalGsweight/(totalWeight==0?1:totalWeight));
+				obj.put("Variance",variance-totalGsweight/(totalWeight==0?1:totalWeight));
 				result.put(obj);
 
 			} catch (JSONException e) {
