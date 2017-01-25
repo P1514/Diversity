@@ -95,6 +95,7 @@ public final class Backend {
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
+				if(msg.has("Products")||msg.has("Services")){
 				obj.put("Op", "Prediction");
 				result.put(obj);
 					
@@ -102,6 +103,10 @@ public final class Backend {
 					//result = convert(result, pre.predict(1, msg.getString("Products"), msg.getString("Services")), "Graph", "1");
 					//result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Average","1");
 
+				
+				}
+				else
+					obj.put("Op", "Error");
 				return result.toString();
 				
 			case 22:

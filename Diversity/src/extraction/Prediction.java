@@ -50,7 +50,6 @@ public class Prediction extends Globalsentiment {
 		time[10] = "NOV";
 		time[11] = "DEC";
 		obj = new JSONObject();
-		result.put(obj);
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
