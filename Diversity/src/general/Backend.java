@@ -135,11 +135,8 @@ public final class Backend {
 					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[2]);
 					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[3]);
 					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[4]);
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[0]));
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[1]));
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[2]));
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[3]));
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[4]));
+					for(int i=0;i<msg.getString("PSS").split(";").length;i++)
+					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
 					gs.calc_TOPreachglobalsentiment(1, null, null, pss);
 
