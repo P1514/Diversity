@@ -31,7 +31,7 @@ public final class Extrapolation extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		Sigmoid sig = new Sigmoid(0, 100);
+		Sigmoid sig = new Sigmoid(-100, 100);
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -70,10 +70,17 @@ public final class Extrapolation extends Globalsentiment {
 		double[] coeff = fitter.fit(obs.toList());
 		month--;
 		index--;
-		double lastvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
-		if(lastvalue!=-1)
-		coeff[0] = lastvalue - (coeff[1] * index + coeff[2] * index * index + coeff[3] * index * index * index);
-		// index=0;
+		int monthaux = month;
+		int indexaux = index;
+		double lastvalue = globalsentimentby(monthaux % 12, data.get(Calendar.YEAR) + monthaux / 12, param, values, id);
+		while (lastvalue == -1 && monthaux > data.get(Calendar.MONTH)) {
+			lastvalue = globalsentimentby(monthaux % 12, data.get(Calendar.YEAR) + monthaux / 12, param, values, id);
+			monthaux--;
+			indexaux--;
+		}
+		if(lastvalue != -1)
+		coeff[0] = lastvalue
+				- (coeff[1] * indexaux + coeff[2] * indexaux * indexaux + coeff[3] * indexaux * indexaux * indexaux);
 
 		for (/* month = data.get(Calendar.MONTH) */; month < timespan * 12 + data.get(Calendar.MONTH)
 				+ Math.floor((timespan * 12) / 3) - 1; month++) {
@@ -81,18 +88,17 @@ public final class Extrapolation extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				if (getFutureValue(coeff, index) >= 0)
-					obj.put("Value",
-							getFutureValue(coeff, index) > 100 ? 100
-									: getFutureValue(coeff,
-											index)/*
-													 * sig.value((getFutureValue(
-													 * coeff, index) *20))
-													 */);
+					obj.put("Value", getFutureValue(coeff, index) > 100 ? 100
+							: getFutureValue(coeff,
+									index)/*
+											 * sig.value((getFutureValue( coeff,
+											 * index) *20))
+											 */);
 				else
-					obj.put("Value",0/*
-													 * sig.value((getFutureValue(
-													 * coeff, index) *20))
-													 */);
+					obj.put("Value", 0/*
+										 * sig.value((getFutureValue( coeff,
+										 * index) *20))
+										 */);
 
 				// obj.put("Value",sig.value(1.25));
 
