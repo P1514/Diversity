@@ -154,7 +154,8 @@ function send_config() {
     psslist += $('#pss4').find(":selected").text() != "Select PSS..." ? $('#pss4').find(":selected").text() + ";" : "";
     psslist += $('#pss5').find(":selected").text() != "Select PSS..." ? $('#pss5').find(":selected").text() + ";" : "";
 
-    localStorage.pss = psslist;
+
+    localStorage.pss = psslist.replace(/ ;/g,";");
   } else {
     localStorage.pss = "";
   }
