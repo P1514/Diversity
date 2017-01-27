@@ -128,6 +128,11 @@ public final class Backend {
 				result = new JSONArray();
 
 				result.put(new JSONObject().put("Op", "Graph"));
+				if(msg.has("PSS")){
+					
+
+				}
+				else{
 
 				System.out.println(gs.Topreachglobalsentiment());
 				try {
@@ -135,7 +140,7 @@ public final class Backend {
 				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
-
+				}
 				return result.toString();
 
 			case 19:
