@@ -129,9 +129,9 @@ public final class Backend {
 
 				result.put(new JSONObject().put("Op", "Graph"));
 
-				System.out.println(gs.Topreachglobalsentiment());
+				System.out.println(gs.globalsentiment());
 				try {
-					result.put(new JSONArray(gs.Topreachglobalsentiment()));
+					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
@@ -258,8 +258,11 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				//if (msg.has("Id"))
-					tmp = conf.getConf(845/*msg.getLong("Id")*/).toString();
+				if (msg.has("Id")){
+					tmp = conf.getConf(msg.getLong("Id")).toString();
+				}else{
+					tmp = conf.getConf(845).toString();
+				}
 				return tmp;
 			case 13:
 				conf = new Settings();

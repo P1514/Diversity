@@ -128,10 +128,10 @@ public class GetReach {
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-	return calc_global_sentiment(insert, par, month, model, year);
+	return calc_global(insert, par, month, model, year);
 	}
 	
-	private double calc_global_sentiment(String insert, parameters par, int month, Model model, int year){
+	protected double calc_global(String insert, parameters par, int month, Model model, int year){
 		double result = (double)0;
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -251,7 +251,6 @@ public class GetReach {
 
 	private double globalreachby(int month, int year, String param, String value, long id) {
 
-		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
 		String insert;
 		parameters par = split_params(param, value);
@@ -260,18 +259,18 @@ public class GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global_sentiment(insert, par, month, model, year);
+		return calc_global(insert, par, month, model, year);
 
 	}
 
-	class parameters {
+	protected class parameters {
 		String age = null;
 		String gender = null;
 		String location = null;
 		String products = null;
 	}
 
-	private parameters split_params(String param, String value) {
+	protected parameters split_params(String param, String value) {
 		if (param == null)
 			return new parameters();
 		String[] params = param.split(",");
@@ -295,7 +294,7 @@ public class GetReach {
 				par.products = values[i];
 				break;
 			default:
-				return new parameters();
+				break;
 			}
 
 		}
