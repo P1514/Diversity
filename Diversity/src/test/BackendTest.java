@@ -326,5 +326,23 @@ public class BackendTest {
 
 	}
 	
+	@Test
+	public void resolveSnapshotPrediction() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "Snapshot");
+		obj.put("Products", "13;14;15;");
+		obj.put("name", "testing");
+		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
+		obj.put("timespan", "6");
+		obj.put("type", "Prediction");
+		obj.put("user", "test");
+
+		tester= new Backend(24, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
+	
 
 }

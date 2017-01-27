@@ -31,6 +31,7 @@ public class Operations {
 		op.put("gettree", 21);
 		op.put("getrestrictions", 22);
 		op.put("prediction",23);
+		op.put("Snapshot",24);
 		op.put("testing", 99);
 		
 		

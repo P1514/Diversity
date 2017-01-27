@@ -16,6 +16,7 @@ import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
+import extraction.Snapshot;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -59,6 +60,7 @@ public final class Backend {
 		Globalsentiment gs = new Globalsentiment();
 		Extrapolation extra = Extrapolation.getInstance();
 		Prediction pre = new Prediction();
+		Snapshot snapshot = new Snapshot();
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -92,6 +94,21 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+
+			case 24:
+				obj = new JSONObject();
+				result = new JSONArray();
+				if (msg.getString("type") == "Prediction") {
+					snapshot.prediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
+							msg.has("Services") ? msg.getString("Services") : "");
+				}
+
+				obj.put("Message", "Snapshot Saved Successfully");
+				obj.put("Op", "Error");
+				result.put(obj);
+
+				return result.toString();
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
@@ -116,7 +133,6 @@ public final class Backend {
 					result.put(obj);
 				}
 				return result.toString();
-
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -130,13 +146,18 @@ public final class Backend {
 				ArrayList<Long> pss = new ArrayList<Long>();
 
 				if (msg.has("PSS")) {
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[0]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[1]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[2]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[3]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[4]);
-					for(int i=0;i<msg.getString("PSS").split(";").length;i++)
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[0]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[1]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[2]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[3]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[4]);
+					for (int i = 0; i < msg.getString("PSS").split(";").length; i++)
+						pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
 					gs.calc_TOPreachglobalsentiment(1, null, null, pss);
 
