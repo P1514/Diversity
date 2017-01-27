@@ -176,8 +176,8 @@ function load() {
 
 function send(val) {
   var json = {
-    "Op" : "prediction",
-    "Snapshot" : 1,
+    "Op" : "Snapshot",
+    "type" : "Prediction",
     "name" : val,
     "creation_date" : new Date(),
     "timespan" : count,
