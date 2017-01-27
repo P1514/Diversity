@@ -134,10 +134,12 @@ p {
 }
 
 table, th, td {
-  text-align: right;
+  text-align: left;
   padding-left: 10px;
   padding-bottom: 20px;
   margin-bottom: 0;
+  display: inline;
+  margin-left:40px;
 }
 
 #overlay-back {

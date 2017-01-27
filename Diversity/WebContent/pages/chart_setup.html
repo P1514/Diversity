@@ -9,7 +9,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="styles\models.css">
+<link rel="stylesheet" type="text/css" href="styles\setup.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
 <script>
 	//on alert: show overlay; set overlay contents;
@@ -37,6 +37,7 @@
 					<input type="radio" name="top_radio" id="custom_top_radio" value="custom"><label style="margin-left:5px;" for="custom_top_radio"> Use custom settings</label><br>
 				</div>
 				<div id="pss" class="col-md-6">
+					<p>Choose the PSSs to be displayed in the Sentiment Analysis home page:</p>
 					<label for="pss1" style="margin-right:20px;">PSS 1: </label><select id="pss1"></select><br>
 					<label for="pss2" style="margin-right:20px;">PSS 2: </label><select id="pss2"></select><br>
 					<label for="pss3" style="margin-right:20px;">PSS 3: </label><select id="pss3"></select><br>
@@ -48,8 +49,9 @@
 		<div class="container" id="extraction">
 			<h2>Opinion Extraction</h2>
 			<div id="filters" class="row" style="margin-top:30px;">
-				<center>
-					<table id="age" class="inlineTable">
+				<p style="margin-left:20px;margin-bottom:10px;">Choose the segments for the age, gender and location filters:</p>
+
+					<table id="age" class="inlineTable" style="display:inline;">
 						<thead>
 							<tr>
 								<th>Age</th>
@@ -74,14 +76,15 @@
 						<tbody></tbody>
 					</table>
 				</div>
-				<div class="row">
-					<div class="col-md-4"></div>
-					<div id="dates" class="col-md-4">
-						<label for="start_date" style="margin-right:20px;">Start date: </label><input id="start_date" class="form-control" type="date" style = "width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);">
-						<label for="end_date" style="margin-right:20px;">End date: </label><input id="end_date" class="form-control" type="date" style = "width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" >
-					</div>
-				</div>
-			</center>
+
+			<div style="float:left;">
+				<p style="margin-left:5px;margin-top:20px;">Choose the time period to display (optional):</p><br>
+
+					<label for="start_date" style="display:inline;margin-left:5px;margin-right:20px;">Start date: </label><input id="start_date" class="form-control" type="date" style = "display:inline;width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);">
+					<label for="end_date" style="display:inline;margin-left:10px;margin-right:20px;">End date: </label><input id="end_date" class="form-control" type="date" style = "display:inline;width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" >
+
+			</div>
+
 		</div>
 		<center>
 			<input id="setup" class="btn btn-default btn-block"	onclick="send_config();" type="submit" value="Save" style="width:60px;margin-right:5px;display:inline;margin-top:10px;"/>
