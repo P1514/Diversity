@@ -210,7 +210,9 @@ function drawChart() {
         'style':'area',
       },
       vAxis: {
-        title: 'Global Sentiment'
+        title: 'Global Sentiment',
+        minValue: 0,
+        maxValue: 100
       },
       legend: {
         position: 'bottom'

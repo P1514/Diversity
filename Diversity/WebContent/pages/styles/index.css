@@ -25,24 +25,24 @@
 }
 
 a {
-	color: black;
+	color: #604460;
 	margin-left: 10px;
 }
 
 a:link {
-	color: black;
+	color: #604460;
 }
 
 a:visited {
-	color: black;
+	color: #604460;
 }
 
 a:hover {
-	color: black;
+	color: #604460;
 }
 
 a:active {
-	color: black;
+	color: #604460;
 }
 
 #_view {
@@ -56,8 +56,8 @@ input {
 }
 
 body {
-	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
-		"AppleGothic", sans-serif;
+    color: #604460;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 }
 
 h1 {
@@ -99,7 +99,7 @@ form {
 	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
 	padding-bottom: 20px;
 	min-height: 250px;
-	color: black;
+	color: #604460;
 	overflow: hidden;
 }
 

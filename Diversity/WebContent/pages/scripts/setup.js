@@ -174,6 +174,28 @@ function addline(table){
   var jsonData = new Array();
   var ii=0;
   if(table=="age"){
+    /*
+    for(var k=1;;k++) {
+      if(document.getElementById("1age"+k) == null)break;
+      var elem = {
+        "Min" : document.getElementById("1age"+k).value,
+        "Max" : document.getElementById("2age"+k).value
+      }
+      var found = false;
+      for (a in jsonData) {
+        if (a == elem) {
+          found = true;
+          console.log("found");
+          break;
+        }
+      }
+
+      if (!found) {
+        jsonData.push(elem);
+        console.log("pushed");
+      }
+    }
+    */
     for(var i=0; i<json.length;i++,ii++){
       if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
         jsonData[ii]=json[i];
@@ -190,6 +212,21 @@ function addline(table){
       jsonData[ii]=json[i];
     }
   }
+
+  /*
+  for(var k=1;;k++){
+    if(document.getElementById("gender"+k) == null)break;
+    for (g in jsonData) {
+
+    }
+    gstring+=document.getElementById("gender"+k).value+",,";
+  }
+
+  for(var i=1;;i++){
+    if(document.getElementById("location"+i) == null)break;
+    lstring+=document.getElementById("location"+i).value+",,";
+  }
+  */
   if(table=="gender"){
     for(var i=0; i<json.length;i++,ii++){
       if(json[i].hasOwnProperty("Param") && json[i].Param=="Gender"){
@@ -285,7 +322,6 @@ function delline(table, id){
       jsonData[ii]=json[i];
     }
   }
-  console.log(jsonData);
   json=jsonData;
   setConfig();
 }
