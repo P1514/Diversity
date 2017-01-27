@@ -146,6 +146,9 @@ ws.onmessage = function(event) {
     populatePSS();
     var jsonData = {
       'Op' : 'Top5Reach',
+      'PSS' : localStorage.pss != "" ? localStorage.pss : undefined,
+      'Start_date' : localStorage.start_date != "" ? localStorage.start_date : undefined,
+      'End_date' : localStorage.end_date != "" ? localStorage.end_date : undefined,
     }
     ws.send(JSON.stringify(jsonData));
   }
