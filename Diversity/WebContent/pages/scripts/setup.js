@@ -134,9 +134,13 @@ function send_config() {
     lstring+=document.getElementById("location"+i).value+",,";
   }
 
+  localStorage.gender = gstring;
+  localStorage.age = astring;
+  localStorage.location = lstring;
+
   start_date = new Date(document.getElementById("start_date").value);
   end_date = new Date(document.getElementById("end_date").value);
-      //console.log("TESTE***********"+date);
+
   if(start_date.toString() != "Invalid Date" || end_date.toString() != "Invalid Date") {
     localStorage.start_date = start_date;
     localStorage.end_date = end_date;
@@ -172,6 +176,7 @@ function send_config() {
 
 }
 function addline(table){
+  var elem;
   var jsonData = new Array();
   var ii=0;
   if(table=="age"){
@@ -197,6 +202,21 @@ function addline(table){
       }
     }
     */
+    for(var k=1;;k++) {
+      if(document.getElementById("1age"+k) == null)break;
+      elem = {
+        "Min" : document.getElementById("1age"+k).value,
+        "Max" : document.getElementById("2age"+k).value
+      }
+
+      var found = false;
+      for (a in jsonData) {
+        if (a == elem) {
+          found = true;
+          elem = undefined;
+        }
+      }
+    }
     for(var i=0; i<json.length;i++,ii++){
       if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
         jsonData[ii]=json[i];
@@ -205,15 +225,24 @@ function addline(table){
         for(var iii=0;iii<tsize+1;iii++, ii++, i++){
           jsonData[ii]=json[i];
         }
-        jsonData[ii]={
+        if (elem != undefined) {
+          jsonData[ii] = elem;
+          console.log("yes");
+        } else {
+          jsonData[ii] = {
             "Min":"0","Max":"99"
+          }
         }
         ii++;
       }
       jsonData[ii]=json[i];
     }
-  }
 
+
+  }
+  /*
+
+  */
   /*
   for(var k=1;;k++){
     if(document.getElementById("gender"+k) == null)break;

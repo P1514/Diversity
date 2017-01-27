@@ -7,6 +7,7 @@ var start = true;
 var chartData;
 var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Name":"Austin Basket"},{"Id":3,"Name":"Austin Soccer"},{"Id":4,"Name":"Morris Sea 1000"},{"Id":5,"Name":"Morris Sea 2099"},{"Id":6,"Name":"Morris Wind"},{"Id":7,"Name":"Austin Polo"},{"Id":8,"Name":"Austin Cricket"},{"Id":9,"Name":"Austin XC"},{"Id":10,"Name":"Austin Base"},{"Products":[{"Products":[{"Products":[{"Products":[{"Id":21,"Name":"21"}],"Id":20,"Name":"20"}],"Id":19,"Name":"19"}],"Id":18,"Name":"18"}],"Id":11,"Name":"Sole Machine"},{"Id":12,"Name":"Sewing Machine"},{"Products":[{"Id":14,"Name":"Rubber"},{"Id":15,"Name":"Aluminium"}],"Id":13,"Name":"Cleat Applier"},{"Id":16,"Name":"Glueing Machine"},{"Id":17,"Name":"Neoprene Cutting Machine"}];
 */
+var count; // for timespan
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -158,6 +159,34 @@ function submit() {
   ws.send(JSON.stringify(json));
 }
 
+function save() {
+  var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#error').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function load() {
+  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#error').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function send(val) {
+  var json = {
+    "Op" : "prediction",
+    "Snapshot" : 1,
+    "creation_date" : new Date(),
+    "timespan" : count,
+    "user" : "test",
+    "Products" : products != "" ? products : undefined,
+    "Services" : services != "" ? services : undefined,
+  }
+  ws.send(JSON.stringify(json));
+  console.log(JSON.stringify(json));
+}
+
 function drawChart() {
   if (draw) {
     $("#wrapper").show();
@@ -168,7 +197,7 @@ function drawChart() {
     data.addColumn({id:'max', type:'number', role:'interval'});
 
     var sum = 0;
-    var count = 0;
+    count = 0;
 
     for (i = 0; i < chartData[1].length; i++) {
       var month = "";
