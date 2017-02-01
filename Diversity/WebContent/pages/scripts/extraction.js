@@ -14,6 +14,8 @@ var windowwidth = $(window).width();
 var needlecolor = '#604460';
 var animationend = false;
 var extra = false;
+var snap = false;
+var name = "";
 
 function setExtra() {
 	extra = !extra;
@@ -102,6 +104,13 @@ function connect() {
 	ws.onmessage = function(event) {
 		json = JSON.parse(event.data);
 
+		if (snap) {
+			$('#genderfilt').hide();
+			$('#agefilt').hide();
+			$('#locationfilt').hide();
+			$('#finalfilt').hide();
+		}
+		
 		if (json[0].Op == "Error") {
 			$('#loading').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 			$('#overlay').show();
@@ -240,7 +249,7 @@ function load() {
   // send request for snapshot list
   var json = {
     "Op" : "load_snapshot",
-		"type" : "Extraction"
+		"Type" : "Extraction"
   }
 
   ws.send(JSON.stringify(json));
@@ -267,11 +276,13 @@ function displaySnapshots() {
 }
 
 function requestSnapshot(val) {
+	name = val;
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
+		"Type" : "All"
   }
-
+	snap = true;
   ws.send(JSON.stringify(json));
 }
 
@@ -764,82 +775,120 @@ function changeRequest() {
 	var ageradio = document.getElementById('Age_radio').checked;
 	var finalradio = document.getElementById('Final').checked;
 	var extrapolate = document.getElementById('extrapolate').checked;
-	var json = {
-		"Op" : "oe_refresh",// OE_Filter
-		"Param" : "",
-		"Values" : "",
-		"Filter" : "",
-		"Id" : sessionStorage.id,
-		"Extrapolate" : extrapolate ? 1 : undefined,
-	};
-	if (globalradio == true)
-		needlecolor = '#604460';
+	var json;
 
-	if (gender == "All" && location == "All" && age == "All"
-			&& products == "All" && globalradio) {
-		json.Param += "Global";
-		json.Values += "Global";
-	} else {
-		if (ageradio == false) {
+	if (snap) {
+		json = {
+			"Op" : "load_snapshot",
+			"Type" : "",
+			"Name" : name
+		};
 
-			if (age == "All") {
-				json.Param += "Age,";
-				json.Values += "All,";
-
-			} else {
-				json.Param += "Age,";
-				var select = document.getElementById('agefilt');
-				json.Values += age + ",";
-			}
-		} else {
-			needlecolor = "#5C6E0E";
-			json.Filter = "Age";
+		if (globalradio == true) {
+			needlecolor = '#604460';
+			json.Type = "All";
 		}
-		if (genderradio == false) {
 
-			if (gender == "All") {
-				json.Param += "Gender,";
-				json.Values += "All,";
-
-			} else {
-				json.Param += "Gender,";
-				var select = document.getElementById('genderfilt');
-				json.Values += gender + ",";
-			}
-		} else {
+		if (genderradio == true) {
 			needlecolor = '#00617F';
-			json.Filter = "Gender";
+			json.Type = "Gender";
 		}
-		if (locationradio == false) {
-			if (location == "All") {
-				json.Param += "Location,";
-				json.Values += "All,";
-			} else {
-				json.Param += "Location,";
-				var select = document.getElementById('locationfilt');
-				json.Values += location + ",";
-			}
-		} else {
-			needlecolor = '#A60202';
-			json.Filter = "Location";
-		}
-		if (finalradio == false) {
-			filteredByProduct = false;
-			if (products == "All") {
-				json.Param += "Product,";
-				json.Values += "All,";
-			} else {
-				json.Param += "Product,";
-				var select = document.getElementById('finalfilt');
-				json.Values += products + ",";
 
-			}
-		} else {
+		if (locationradio == true) {
+			needlecolor = '#A60202';
+			json.Type = "Location";
+		}
+
+		if (ageradio == true) {
+			needlecolor = "#5C6E0E";
+			json.Type = "Age";
+		}
+
+		if (finalradio == true) {
 			needlecolor = '#FFC00C';
-			json.Filter = "Product";
-			filteredByProduct = true;
+			json.Type = "Product";
+		}
+
+	} else {
+		json = {
+			"Op" : "oe_refresh",// OE_Filter
+			"Param" : "",
+			"Values" : "",
+			"Filter" : "",
+			"Id" : sessionStorage.id,
+			"Extrapolate" : extrapolate ? 1 : undefined,
+		};
+
+		if (globalradio == true)
+			needlecolor = '#604460';
+
+		if (gender == "All" && location == "All" && age == "All"
+				&& products == "All" && globalradio) {
+			json.Param += "Global";
+			json.Values += "Global";
+		} else {
+			if (ageradio == false) {
+
+				if (age == "All") {
+					json.Param += "Age,";
+					json.Values += "All,";
+
+				} else {
+					json.Param += "Age,";
+					var select = document.getElementById('agefilt');
+					json.Values += age + ",";
+				}
+			} else {
+				needlecolor = "#5C6E0E";
+				json.Filter = "Age";
+			}
+			if (genderradio == false) {
+
+				if (gender == "All") {
+					json.Param += "Gender,";
+					json.Values += "All,";
+
+				} else {
+					json.Param += "Gender,";
+					var select = document.getElementById('genderfilt');
+					json.Values += gender + ",";
+				}
+			} else {
+				needlecolor = '#00617F';
+				json.Filter = "Gender";
+			}
+			if (locationradio == false) {
+				if (location == "All") {
+					json.Param += "Location,";
+					json.Values += "All,";
+				} else {
+					json.Param += "Location,";
+					var select = document.getElementById('locationfilt');
+					json.Values += location + ",";
+				}
+			} else {
+				needlecolor = '#A60202';
+				json.Filter = "Location";
+			}
+			if (finalradio == false) {
+				filteredByProduct = false;
+				if (products == "All") {
+					json.Param += "Product,";
+					json.Values += "All,";
+				} else {
+					json.Param += "Product,";
+					var select = document.getElementById('finalfilt');
+					json.Values += products + ",";
+
+				}
+			} else {
+				needlecolor = '#FFC00C';
+				json.Filter = "Product";
+				filteredByProduct = true;
+			}
 		}
 	}
+
 	/*
 	 * if (ageradio == "false") { if (age == "All") {
 	 *
