@@ -349,7 +349,7 @@ public class BackendTest {
 		
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
-		obj.put("Type", "prediction");
+		obj.put("Type", "Prediction");
 
 
 		tester= new Backend(25, obj);

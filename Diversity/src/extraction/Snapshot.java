@@ -185,7 +185,7 @@ public class Snapshot {
 		}
 		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			if (type.equals("prediction"))
+			if (type.equals("Prediction"))
 				query1.setString(1, "prediction");
 			else
 				query1.setString(1, "all");
