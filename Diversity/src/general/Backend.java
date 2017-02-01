@@ -94,6 +94,17 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 25:
+				obj = new JSONObject();
+				result = new JSONArray();
+				if (msg.has("Name")) {
+					result=snapshot.load(msg.getString("Name"));
+				}
+				else {
+					result=snapshot.loadNames(msg.getString("Type"));
+				}
+				return result.toString();
+				
 
 			case 24:
 				obj = new JSONObject();

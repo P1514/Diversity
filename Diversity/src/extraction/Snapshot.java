@@ -2,6 +2,7 @@ package extraction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -94,5 +96,53 @@ public class Snapshot {
 	private void dbconnect() throws ClassNotFoundException, SQLException {
 		cnlocal = Settings.connlocal();
 	}
+	
+	public JSONArray loadNames(String type) {
+		JSONArray result = new JSONArray();
+		JSONArray aux = new JSONArray();
+		JSONObject obj = new JSONObject();
+		ResultSet rs;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return null;
+		}
+		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			query1.setString(1, type);
+			rs=query1.executeQuery();
+			//rs.next();//verify
+			for (int i = 0; rs.next(); i++) {
+				 obj.put("Name",  rs.getString("name"));
+				 aux.put(obj);
+			}
+			result.put("Snapshots");
+			result.put(aux);
+			System.out.println("****Names:"+result.toString());
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+		}
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+
+	}
+	
+	public JSONArray load(String name) {
+		JSONArray result=null;
+		JSONObject obj = new JSONObject();
+		return result;
+
+
+	}
+
+
 
 }
