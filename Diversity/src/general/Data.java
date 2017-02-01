@@ -389,7 +389,7 @@ public class Data {
 	public String load(JSONArray json) throws JSONException {
 
 		//return loadJSON(json);
-		return Backend.error_message("not implemented");
+		return Backend.error_message("not implemented").toString();
 	}
 
 	private String loadGeneral() throws JSONException {
@@ -731,96 +731,21 @@ public class Data {
 	 * Load from local database
 	 *
 	 * @return the string if successful or not
+	 * @throws ClassNotFoundException 
 	 * @throws JSONException
 	 *             the JSON exception
 	 */
-	public String load() throws JSONException {
-
-		JSONArray result = new JSONArray();
-		JSONObject obj = new JSONObject();
-		long stime = System.nanoTime();
-		System.out.println(" Beginning " + stime);
-		loadPSS();
-		// General Variable Load
-		String select = "Select * from general WHERE id=1";
-		Statement stmt = null;
-		ResultSet rs = null;
+	private String loadmodels(){
 		try {
 			cnlocal = Settings.connlocal();
+		}catch(Exception e){
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message(Settings.err_dbconnect).toString();
 
-			stmt = cnlocal.createStatement();
-			rs = stmt.executeQuery(select);
-			rs.next();
-			totalviews = rs.getLong("totalviews");
-			totalcomments = rs.getLong("totalcomments");
-			totallikes = rs.getLong("totallikes");
-			totalposts = rs.getLong("totalposts");
-			lastUpdated = rs.getDate("lastupdated");
-			if (rs.getLong("Version") != Settings.dbversion)
-				rs.getLong("asdasasd");
-		} catch (SQLException | ClassNotFoundException e1) {
-			obj.put("Op", "Error");
-			obj.put("Message",
-					"Error (1): Local Database Error\r\n Please check if populated and Updated to latest version");
-			result.put(obj);
-			try {
-				if (rs != null)
-
-					rs.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-				if (cndata != null)
-					cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			LOGGER.log(Level.SEVERE, "Local database either missing or not on last version please update");
-			return result.toString();
-
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-		}
-
-		String query;
-
-		stmt = null;
-		rs = null;
-
-		// Load local models
-
-		try {
-			cnlocal = Settings.connlocal();
-
-			query = selectall + Settings.lmtable;
-			stmt = cnlocal.createStatement();
+			String query = selectall + Settings.lmtable;
+			try(Statement stmt = cnlocal.createStatement()){
 			// System.out.println(query);
-			rs = stmt.executeQuery(query);
+			try(ResultSet rs = stmt.executeQuery(query)){
 
 			for (; rs.next();) {
 				Model model = new Model(rs.getLong(Settings.lmtable_id), rs.getLong(Settings.lmtable_update),
@@ -832,31 +757,35 @@ public class Data {
 				Data.modeldb.put(model.getId(), model);
 
 			}
-			rs.close();
-			stmt.close();
+			}} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "Error on SQL Input", e);
+			}
 			cnlocal.close();
-		} catch (ClassNotFoundException | SQLException e2) {
-			LOGGER.log(Level.SEVERE, "Error on SQL Input", e2);
-		} finally {
+		}finally {
 			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
-			try {
-				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 		}
+	}
+	
+	
+	public String load() throws JSONException {
+
+		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
+		long stime = System.nanoTime();
+		System.out.println(" Beginning " + stime);
+		loadPSS();
+		
+		String err=loadGeneral();
+		if(!err.equals(null))return err;
+		// Load local models
+		err=loadmodels();
+		if(!err.equals(null))return err;
+		
+		ACABAR AQUI VER se todas a situações estão a retornar STRINGS
 
 		// Load PSS
 
