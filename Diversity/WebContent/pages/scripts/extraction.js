@@ -16,6 +16,7 @@ var animationend = false;
 var extra = false;
 var snap = false;
 var name = "";
+var snapshots;
 
 function setExtra() {
 	extra = !extra;
@@ -118,6 +119,11 @@ function connect() {
 			return;
 		}
 
+		if (json[0] == "Snapshots") {
+			snapshots = json[1];
+			displaySnapshots();
+		}
+		
 		if (json[0].Op == "Configs") {
 			var jsonData1 = JSON.parse(JSON.stringify(json));
 
