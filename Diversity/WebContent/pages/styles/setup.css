@@ -1,0 +1,179 @@
+.slider-track {
+  background: #AAAAAA;
+}
+
+.slider-handle {
+  background: #604460;
+}
+
+#overlay-back {
+    position   : absolute;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity: 0.6;
+	filter     : alpha(opacity=60);
+    z-index    : 5;
+    display    : block;
+}
+
+#overlay {
+    position : absolute;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+	box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+    display  : block;
+}
+
+#alert {
+	text-align: center;
+   background:#fff;
+   height: 20%;
+   width: 40%;
+   position: absolute;
+   z-index: 1000;
+   top: 40%;
+	 left: 30%;
+   margin: -25px 0 0 -25px;
+	 border-radius: 5px;
+}
+
+a {color: black; margin-left: 10px;}
+a:link {color: black;}
+a:visited {color: black;}
+a:hover {color: black;}
+a:active {color: black;}
+
+body {
+    color: #604460;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+}
+
+input {
+  margin-top: 0;
+  margin-left: 0;
+  padding-top: 0;
+  padding-left: 0;
+}
+
+h1 {
+  margin-left:50px;
+  padding-top: 0px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 24;
+}
+
+h2 {
+  font-weight: normal;
+  text-align: left;
+  font-size: 24;
+}
+
+h3 {
+  font-weight: normal;
+  margin-top: 0px;
+  text-align: center;
+  font-size: 18;
+  color: white;
+}
+
+img {
+  height: 30px;
+  width: 30px;
+}
+
+form {
+  margin-top: 0px;
+  margin-left: 0px;
+}
+
+.container {
+  background-color: #DDDDDD;
+  margin-top: 20px;
+  width: 90%;
+  box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+  padding-bottom: 20px;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.col-sm-6 {
+  text-align: left;
+}
+
+input[type="number"] {
+  width: 50px;
+}
+
+#tree_div {
+  background-color: #FFFFFF;
+  box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);
+  color: black;
+}
+
+#pss {
+  display: inline-block;
+  width = 100%;
+}
+
+#model_name {
+  display: inline-block;
+  width = 60%;
+}
+
+p {
+  text-align: left;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+table, th, td {
+  text-align: left;
+  padding-left: 10px;
+  padding-bottom: 20px;
+  margin-bottom: 0;
+  display: inline;
+  margin-left:40px;
+}
+
+#overlay-back {
+    position   : absolute;
+    top        : 0;
+    left       : 0;
+    width      : 100%;
+    height     : 100%;
+    background : #000;
+    opacity    : 0.6;
+    filter     : alpha(opacity=60);
+    z-index    : 5;
+    display    : block;
+}
+
+#overlay {
+    position : absolute;
+    top      : 0;
+    left     : 0;
+    width    : 100%;
+    height   : 100%;
+    z-index  : 10;
+    display  : block;
+}
+
+#error {
+	text-align: center;
+   background:#fff;
+   height: 20%;
+   width: 40%;
+   position: absolute;
+   z-index: 1000;
+   top: 40%;
+	 left: 30%;
+   margin: -25px 0 0 -25px;
+	 border-radius: 5px;
+}

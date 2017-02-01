@@ -595,7 +595,8 @@ function drawChart() {
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
-				}
+				},
+				viewWindowMode: 'pretty',
 			},
 			vAxis : {
 				title : 'Sentiment',

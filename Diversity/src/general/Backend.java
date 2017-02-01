@@ -95,22 +95,22 @@ public final class Backend {
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
-				if (msg.has("Products") ||  msg.has("Services")) {
+				if (msg.has("Products") || msg.has("Services")) {
 					obj.put("Op", "Prediction");
 					result.put(obj);
 
-					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "", msg.has("Services") ? msg.getString("Services"): ""));
+					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+							msg.has("Services") ? msg.getString("Services") : ""));
 					// result = convert(result, pre.predict(1,
 					// msg.getString("Products"), msg.getString("Services")),
 					// "Graph", "1");
 					// result = convert(result, gs.getPolarityDistribution(id,
 					// param, values, "Global"), "Average","1");
-					if(result.getJSONArray(1).getJSONObject(0).has("Op")){
-						result=result.getJSONArray(1);
+					if (result.getJSONArray(1).getJSONObject(0).has("Op")) {
+						result = result.getJSONArray(1);
 					}
 
-				}
-				else {
+				} else {
 					obj.put("Message", "No products or services selected");
 					obj.put("Op", "Error");
 					result.put(obj);
@@ -126,8 +126,22 @@ public final class Backend {
 
 			case 20:
 				result = new JSONArray();
-
 				result.put(new JSONObject().put("Op", "Graph"));
+				ArrayList<Long> pss = new ArrayList<Long>();
+
+				if (msg.has("PSS")) {
+					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[0]);
+					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[1]);
+					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[2]);
+					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[3]);
+					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[4]);
+					for(int i=0;i<msg.getString("PSS").split(";").length;i++)
+					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
+					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
+					gs.globalsentiment(1, null, null, pss);
+
+				} else
+					gs.globalsentiment(1, null, null, gr.getTOPReach(5));
 
 				System.out.println(gs.globalsentiment());
 				try {
@@ -135,7 +149,6 @@ public final class Backend {
 				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
-
 				return result.toString();
 
 			case 19:
