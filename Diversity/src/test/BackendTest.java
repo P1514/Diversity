@@ -332,7 +332,7 @@ public class BackendTest {
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15;");
-		obj.put("name", "testing");
+		obj.put("name", "blabla");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
