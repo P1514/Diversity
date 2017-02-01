@@ -117,7 +117,7 @@ public final class Backend {
 				}
 				else{
 					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
-							msg.getString("user"),msg.getInt("Id"));
+							msg.getString("user"),msg.has("Id")?msg.getInt("Id"):0);
 					
 				}
 				
