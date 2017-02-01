@@ -87,9 +87,7 @@ public final class Backend {
 
 			switch (op) {
 			case 99:
-				Prediction ps = new Prediction();
-				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
-				break;
+				return error_message("TESTING MY FRIEND").toString();
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
@@ -314,6 +312,13 @@ public final class Backend {
 		}
 
 		return result.toString();
+	}
+	
+	public static JSONArray error_message(String message) throws JSONException{
+		JSONObject obj = new JSONObject();
+		obj.put("Op", "Error");
+		obj.put("Message", message);
+		return new JSONArray().put(obj);
 	}
 
 	private JSONArray convert(JSONArray result2, JSONArray obj2, String string) {
