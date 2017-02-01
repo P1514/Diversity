@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import extraction.GetReach.parameters;
 import general.Data;
 import general.Model;
 import general.Settings;
@@ -34,6 +32,7 @@ public class Globalsentiment extends GetReach {
 	 * Class that handles sentiment Requests.
 	 */
 	public Globalsentiment() {
+		super();
 
 	}
 
@@ -188,7 +187,6 @@ public class Globalsentiment extends GetReach {
 
 		return result;
 	}
-
 	public double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		Model model = Data.modeldb.get(id);
@@ -200,92 +198,7 @@ public class Globalsentiment extends GetReach {
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		//return calc_global(insert, par, month, model, year);
-		if (par.age != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
-					+ Settings.latable_age + ">?";
-		if (par.gender != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		if (par.location != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (par.products != null) {
-			if (par.products.equals("-1")) {
-				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-			} else {
-				insert += " AND " + Settings.lotable_product + "=?";
-			}
-		} else {
-
-		}
-		insert += ")";
-
-		Double auxcalc = (double) 0;
-		month -= 1;
-		Calendar data = new GregorianCalendar(year, month, 1);
-		double totalreach = 0;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return 0;
-		}
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			query1.setLong(1, model.getDate());
-			query1.setLong(2, data.getTimeInMillis());
-			data.add(Calendar.MONTH, 1);
-			data.add(Calendar.DAY_OF_MONTH, -1);
-			query1.setLong(3, data.getTimeInMillis());
-			query1.setLong(4, model.getPSS());
-			int rangeindex = 5;
-			if (par.age != null) {
-				query1.setString(rangeindex++, par.age.split("-")[1]);
-				query1.setString(rangeindex++, par.age.split("-")[0]);
-			}
-			// System.out.println(query1);
-			if (par.gender != null)
-				query1.setString(rangeindex++, par.gender);
-			if (par.location != null)
-				query1.setString(rangeindex++, par.location);
-			if (par.products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			// System.out.println(query1);
-			/*
-			 * if (param != null) { if (!value.contains("-")) {
-			 * query1.setString(4, value); } else { query1.setString(4,
-			 * values[0]); query1.setString(5, values[1]); } }
-			 */
-			// System.out.println(query1);
-			try (ResultSet rs = query1.executeQuery()) {
-				if (rs.next()) {
-					do {
-						auxcalc += (double) rs.getDouble(Settings.lptable_polarity)
-								* rs.getDouble(Settings.lotable_reach);
-						totalreach += rs.getDouble(Settings.lotable_reach);
-					} while (rs.next());
-				} else {
-					auxcalc = (double) -1;
-				}
-				cnlocal.close();
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (Exception e) {
-		}
-		double result = auxcalc / (totalreach == 0 ? 1 : totalreach);
-		String temp;
-		temp = String.format("%.2f", result);
-		try {
-			result = Double.valueOf(temp);
-		} catch (Exception e) {
-			temp = temp.replaceAll(",", ".");
-			result = Double.parseDouble(temp);
-		}
-		return result;
+		return calc_global("polar",insert, par, month, model, year);
 
 	}
 

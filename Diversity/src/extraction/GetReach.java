@@ -128,11 +128,11 @@ public class GetReach {
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-	return calc_global(insert, par, month, model, year);
+		return calc_global("reach", insert, par, month, model, year);
 	}
-	
-	protected double calc_global(String insert, parameters par, int month, Model model, int year){
-		double result = (double)0;
+
+	protected double calc_global(String type, String insert, parameters par, int month, Model model, int year) {
+		avg result = new avg();
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
 					+ Settings.latable_age + ">?";
@@ -141,15 +141,18 @@ public class GetReach {
 		if (par.location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		if (par.products != null) {
-			insert += " AND " + Settings.lotable_product + "=?";
+			if (par.products.equals("-1")) {
+				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+			} else {
+				insert += " AND " + Settings.lotable_product + "=?";
+			}
 		} else {
+			if(!"polar".equals(type))
 			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
 		insert += ")";
-		Double auxcalc = (double) 0;
 		int nmonth = month - 1;
 		Calendar data = new GregorianCalendar(year, nmonth, 1);
-		long totalreach = 0;
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -174,14 +177,11 @@ public class GetReach {
 			if (par.products != null)
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
 			try (ResultSet rs = query1.executeQuery()) {
+				result = calc_avg(type, rs);
 
-				while (rs.next()) {
-					auxcalc += (double) rs.getDouble(Settings.lotable_reach);
-					totalreach++;
-				}
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, "ERROR -> " + insert, e);
 		} finally {
 			try {
 				if (cnlocal != null)
@@ -190,13 +190,42 @@ public class GetReach {
 				LOGGER.log(Level.INFO, "ERROR", e);
 			}
 		}
-		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
+		result.auxcalc = result.auxcalc / (result.total == 0 ? 1 : result.total);
 		String temp;
-		temp = String.format("%.2f", result);
+		temp = String.format("%.2f", result.auxcalc);
 		try {
-			result = Double.valueOf(temp.replaceAll(",", "."));
+			result.auxcalc = Double.valueOf(temp.replaceAll(",", "."));
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
+		}
+		return result.auxcalc;
+	}
+
+	private class avg {
+		double auxcalc = 0;
+		double total = 0;
+	}
+
+	private avg calc_avg(String param, ResultSet rs) throws SQLException {
+		avg result = new avg();
+		switch (param) {
+
+		case "reach":
+			while (rs.next()) {
+				result.auxcalc += (double) rs.getDouble(Settings.lotable_reach);
+				result.total++;
+			}
+			break;
+		case "polar":
+			while (rs.next()) {
+
+				result.auxcalc += (double) rs.getDouble(Settings.lptable_polarity)
+						* rs.getDouble(Settings.lotable_reach);
+				result.total += rs.getDouble(Settings.lotable_reach);
+			}
+			break;
+		default:
+			break;
 		}
 		return result;
 	}
@@ -259,7 +288,7 @@ public class GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global(insert, par, month, model, year);
+		return calc_global("reach", insert, par, month, model, year);
 
 	}
 
