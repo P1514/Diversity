@@ -123,7 +123,7 @@ function connect() {
 			snapshots = json[1];
 			displaySnapshots();
 		}
-		
+
 		if (json[0].Op == "Configs") {
 			var jsonData1 = JSON.parse(JSON.stringify(json));
 
@@ -276,8 +276,14 @@ function send(val) {
 
 //need to receive json with snapshot names
 function displaySnapshots() {
-  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(":selected").text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+	var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap" style="margin-left:15px;"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(\':selected\').text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Load</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#loading').html(code);
+  for (var i=0; i < snapshots.length; i++) {
+    $('#select_snap').append($('<option>', {
+      value: snapshots[i].Name,
+      text: snapshots[i].Name
+    }));
+  }
   $('#overlay').show();
   $('#overlay-back').show();
 }
