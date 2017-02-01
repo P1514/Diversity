@@ -96,7 +96,7 @@ public class GetReach {
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -1);
+		data.add(Calendar.YEAR, -timespan);
 		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
@@ -261,7 +261,7 @@ public class GetReach {
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -1);
+		data.add(Calendar.YEAR, -timespan);
 
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			try {
