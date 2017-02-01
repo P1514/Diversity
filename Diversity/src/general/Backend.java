@@ -124,6 +124,7 @@ public final class Backend {
 				result.put(obj);
 
 				return result.toString();
+
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
@@ -352,6 +353,13 @@ public final class Backend {
 		}
 
 		return result.toString();
+	}
+	
+	public static JSONArray error_message(String message) throws JSONException{
+		JSONObject obj = new JSONObject();
+		obj.put("Op", "Error");
+		obj.put("Message", message);
+		return new JSONArray().put(obj);
 	}
 
 	private JSONArray convert(JSONArray result2, JSONArray obj2, String string) {

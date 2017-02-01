@@ -3,11 +3,15 @@ package extraction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import general.Backend;
+import general.Data;
 import general.Settings;
 
 /**
@@ -17,8 +21,8 @@ import general.Settings;
  */
 public class GetComments {
 
-	/** The cnlocal. */
 	private Connection cnlocal;
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 
 	/**
 	 * Class that fetches comments data.
@@ -56,59 +60,49 @@ public class GetComments {
 		obj.put("Op", "comments");
 		result.put(obj);
 		String insert = new String();
-		PreparedStatement query1 = null;
 		int ntops = 0;
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + "," + Settings.lptable_polarity + ","
 				+ Settings.lptable_message + " from " + Settings.lptable + "," + Settings.latable + " where ( ("
 				+ Settings.lptable + "." + Settings.lptable_id + "=? OR";
-		ResultSet rs = null;
 		insert += " " + Settings.lptable_opinion + "=? )AND " + Settings.lptable + "." + Settings.lptable_authorid + "="
 				+ Settings.latable + "." + Settings.latable_id + ") ORDER BY " + Settings.lptable + "."
 				+ Settings.lptable_id + " ASC";
 		try {
 			dbconnect();
-			query1 = cnlocal.prepareStatement(insert);
-			int i = 0;
-			query1.setString(1, msg.getString("Values"));
-			query1.setInt(1 + i + 1, msg.getInt("Values"));
-
-			rs = query1.executeQuery();
-
-			for (i = 0;; i++) {
-				if (!rs.next())
-					break;
-				ntops++;
-				preresult[i] = rs.getString(Settings.latable_name) + ",," + rs.getDouble(Settings.latable_influence)
-						+ ",," + rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
-						+ ",," + rs.getInt(Settings.latable_age) + ",,";
-				preresult[i] += rs.getDouble(Settings.lptable_polarity) + ",,";
-				preresult[i] += rs.getString(Settings.lptable_message);
-			}
-
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error", e);
+			return Backend.error_message("Error Connecting to Database Please Try Again Later");
+		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			query1.setString(1, msg.getString("Values"));
+			query1.setInt(2, msg.getInt("Values"));
+
+			try (ResultSet rs = query1.executeQuery()) {
+
+				for (int i = 0;; i++) {
+					if (!rs.next())
+						break;
+					ntops++;
+					preresult[i] = rs.getString(Settings.latable_name) + ",," + rs.getDouble(Settings.latable_influence)
+							+ ",," + rs.getString(Settings.latable_location) + ",,"
+							+ rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age) + ",,";
+					preresult[i] += rs.getDouble(Settings.lptable_polarity) + ",,";
+					preresult[i] += rs.getString(Settings.lptable_message);
+				}
+
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "ERROR", e);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
 		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-				System.out.println("Error Closing Connections");
-			}
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				System.out.println("Error Closing Connections");
-			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
-				System.out.println("Error Closing Connections");
+				LOGGER.log(Level.INFO, "ERROR", e);
 			}
-			;
 		}
 
 		for (int i = 0; i < ntops; i++) {
@@ -152,7 +146,7 @@ public class GetComments {
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (ClassNotFoundException e) {
-			System.out.println("Error Settings class unavailable");
+			LOGGER.log(Level.SEVERE, "ERROR", e);
 		}
 
 	}
