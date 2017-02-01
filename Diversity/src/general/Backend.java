@@ -5,11 +5,9 @@ import security.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 import extraction.Extrapolation;
-import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetPosts;
 import extraction.GetProducts;
@@ -170,14 +168,14 @@ public final class Backend {
 					for (int i = 0; i < msg.getString("PSS").split(";").length; i++)
 						pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
-					gs.calc_TOPreachglobalsentiment(1, null, null, pss);
+					gs.globalsentiment(1, null, null, pss);
 
 				} else
-					gs.calc_TOPreachglobalsentiment(1, null, null, gr.getTOPReach(5));
+					gs.globalsentiment(1, null, null, gr.getTOPReach(5));
 
-				System.out.println(gs.Topreachglobalsentiment());
+				System.out.println(gs.globalsentiment());
 				try {
-					result.put(new JSONArray(gs.Topreachglobalsentiment()));
+					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
@@ -303,8 +301,11 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				// if (msg.has("Id"))
-				tmp = conf.getConf(845/* msg.getLong("Id") */).toString();
+				if (msg.has("Id")){
+					tmp = conf.getConf(msg.getLong("Id")).toString();
+				}else{
+					tmp = conf.getConf(845).toString();
+				}
 				return tmp;
 			case 13:
 				conf = new Settings();

@@ -7,6 +7,8 @@ var start = true;
 var chartData;
 var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Name":"Austin Basket"},{"Id":3,"Name":"Austin Soccer"},{"Id":4,"Name":"Morris Sea 1000"},{"Id":5,"Name":"Morris Sea 2099"},{"Id":6,"Name":"Morris Wind"},{"Id":7,"Name":"Austin Polo"},{"Id":8,"Name":"Austin Cricket"},{"Id":9,"Name":"Austin XC"},{"Id":10,"Name":"Austin Base"},{"Products":[{"Products":[{"Products":[{"Products":[{"Id":21,"Name":"21"}],"Id":20,"Name":"20"}],"Id":19,"Name":"19"}],"Id":18,"Name":"18"}],"Id":11,"Name":"Sole Machine"},{"Id":12,"Name":"Sewing Machine"},{"Products":[{"Id":14,"Name":"Rubber"},{"Id":15,"Name":"Aluminium"}],"Id":13,"Name":"Cleat Applier"},{"Id":16,"Name":"Glueing Machine"},{"Id":17,"Name":"Neoprene Cutting Machine"}];
 */
+var count; // for timespan
+var snapshots;
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -37,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
       start = true;
       makeTree("serv_list",jsonData);
       $('#serv_list').jstree(true).refresh();
-      console.log(jsonData);
     }
 
 
@@ -51,8 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (json[0].hasOwnProperty("Message")) {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />')
-        console.log(json[0].Message);
+        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
       }
     }
   }
@@ -158,6 +158,53 @@ function submit() {
   ws.send(JSON.stringify(json));
 }
 
+function save() {
+  var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#error').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function load() {
+  // send request for snapshot list
+  var json = {
+    "Op" : "load_snapshot"
+  }
+
+  ws.send(JSON.stringify(json));
+}
+
+function send(val) {
+  var json = {
+    "Op" : "Snapshot",
+    "type" : "Prediction",
+    "name" : val,
+    "creation_date" : new Date(),
+    "timespan" : count,
+    "user" : "test",
+    "Products" : products != "" ? products : undefined,
+    "Services" : services != "" ? services : undefined,
+  }
+  ws.send(JSON.stringify(json));
+}
+
+//need to receive json with snapshot names
+function displaySnapshots() {
+  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(":selected").text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#error').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function requestSnapshot(val) {
+  var json = {
+    "Op" : "load_snapshot",
+    "Name" : val,
+  }
+
+  ws.send(JSON.stringify(json));
+}
+
 function drawChart() {
   if (draw) {
     $("#wrapper").show();
@@ -168,7 +215,7 @@ function drawChart() {
     data.addColumn({id:'max', type:'number', role:'interval'});
 
     var sum = 0;
-    var count = 0;
+    count = 0;
 
     for (i = 0; i < chartData[1].length; i++) {
       var month = "";
