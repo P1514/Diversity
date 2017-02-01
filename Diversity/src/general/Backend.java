@@ -97,9 +97,10 @@ public final class Backend {
 				result = new JSONArray();
 				String resul;
 				if (msg.has("Name")) {
-					result=snapshot.load(msg.getString("Name"));
+					/*result=snapshot.load(msg.getString("Name"));
 					resul=result.toString();
-					resul=resul.substring(2, resul.length()-2);
+					resul=resul.substring(2, resul.length()-2);*/
+					return snapshot.load(msg.getString("Name"));
 				}
 				else {
 					result=snapshot.loadNames(msg.getString("Type"));
