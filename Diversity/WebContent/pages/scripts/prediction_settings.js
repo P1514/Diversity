@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "Prediction") {
       draw = true;
       console.log(json);
-      chartData = JSON.parse(JSON.stringify(json).replace(/ \"/g," "));
+      chartData = JSON.parse(JSON.stringify(json));
 
       drawChart();
     }
