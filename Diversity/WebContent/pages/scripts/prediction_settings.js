@@ -168,7 +168,8 @@ function save() {
 function load() {
   // send request for snapshot list
   var json = {
-    "Op" : "load_snapshot"
+    "Op" : "load_snapshot",
+    "type" : "Prediction"
   }
 
   ws.send(JSON.stringify(json));

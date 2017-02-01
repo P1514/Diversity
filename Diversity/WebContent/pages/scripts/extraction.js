@@ -46,12 +46,12 @@ function connect() {
 	bottom_right = new google.visualization.LineChart(document
 			.getElementById('globalline'));
 	google.visualization.events.addListener(bottom_right, 'select', function() {
-		var selection = bottom_right.getSelection();
-		if (selection != "") {
-			var row = selection[0].row;
-			var col = selection[0].column;
+		var selection = bottom_right.getSelection()[0];
+		if (selection != undefined && (selection.hasOwnProperty('row') && selection.row != null)) {
+			var row = selection.row ;
+			var col = selection.column;
 			var month = sentimentdata.getValue(row, 0);
-      var product = sentimentdata.getColumnLabel(selection[0].column);
+      var product = sentimentdata.getColumnLabel(selection.column);
 
       if (product != "Global" && filteredByProduct) {
         json = {
@@ -93,7 +93,6 @@ function connect() {
 
 		json = {
 			"Op" : "getconfig",
-
 			"Id" : sessionStorage.id,
 		}
 
@@ -104,7 +103,9 @@ function connect() {
 		json = JSON.parse(event.data);
 
 		if (json[0].Op == "Error") {
-			alert(json[0].Message);
+			$('#loading').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
+			$('#overlay').show();
+			$('#overlay-back').show();
 			return;
 		}
 
@@ -227,6 +228,53 @@ google.charts.load('current', {
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
 });
+
+function save() {
+  var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#loading').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function load() {
+  // send request for snapshot list
+  var json = {
+    "Op" : "load_snapshot",
+		"type" : "Extraction"
+  }
+
+  ws.send(JSON.stringify(json));
+}
+
+function send(val) {
+  var json = {
+    "Op" : "Snapshot",
+    "type" : "Extraction",
+    "name" : val,
+    "creation_date" : new Date(),
+    "timespan" : 12,
+    "user" : "test"
+  }
+  ws.send(JSON.stringify(json));
+}
+
+//need to receive json with snapshot names
+function displaySnapshots() {
+  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(":selected").text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  $('#loading').html(code);
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function requestSnapshot(val) {
+  var json = {
+    "Op" : "load_snapshot",
+    "Name" : val,
+  }
+
+  ws.send(JSON.stringify(json));
+}
+
 // Detect table click
 
 function clicker(hidden) {
@@ -252,7 +300,7 @@ function drawChart() {
 	// Top Left
 	var data = new google.visualization.DataTable();
 	var i = 1;
-	data.addColumn('string', 'Param')
+	data.addColumn('string', 'Param');
 	if (jsonData[i].Graph == "Top_Left") {
 		for (filt = 1; i < jsonData.length
 				&& jsonData[i].hasOwnProperty("Filter")
@@ -447,15 +495,17 @@ function drawChart() {
 
 
     function midSelectHandler() {
-      var selectedItem = bottom_middle.getSelection()[0];
+      var selectedItem = bottom_middle.getSelection()[0] != undefined ? bottom_middle.getSelection()[0] : false ;
       if (selectedItem) {
-        if (bottom_right.getSelection()[0] == undefined || selectedItem.row != bottom_right.getSelection()[0].row) {
+        if ( (selectedItem.row != null && bottom_right.getSelection()[0] == undefined) || (selectedItem.row != null && selectedItem.row != bottom_right.getSelection()[0].row)) {
           bottom_right.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
           google.visualization.events.trigger(bottom_right, 'select');
         }
-      }
+      } else {
+				bottom_right.setSelection([]);
+			}
     }
-
+/*
 		function midSelectHandler() {
 			var selectedItem = bottom_middle.getSelection()[0];
 			if (selectedItem) {
@@ -465,7 +515,7 @@ function drawChart() {
 				}
 			}
 		}
-
+*/
 
 		var options = {
 			hAxis : {
@@ -497,7 +547,7 @@ function drawChart() {
     google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
 
 
-		google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
+		//google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
 
 		bottom_middle.draw(data, options);
 	}
@@ -568,15 +618,18 @@ function drawChart() {
 
 
     function rightSelectHandler() {
-      var selectedItem = bottom_right.getSelection()[0];
+      var selectedItem = bottom_right.getSelection()[0] != undefined ? bottom_right.getSelection()[0] : false ;
       if (selectedItem) {
-        if (bottom_middle.getSelection()[0] == undefined || selectedItem.row != bottom_middle.getSelection()[0].row) {
-          bottom_middle.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
+        if ( (selectedItem.row != null && bottom_middle.getSelection()[0] == undefined) || (selectedItem.row != null && selectedItem.row != bottom_middle.getSelection()[0].row)) {
+					bottom_middle.setSelection([{column:selectedItem.column, row:selectedItem.row}]);
           google.visualization.events.trigger(bottom_middle, 'select');
-        }
-      }
-    }
+      	}
+  		} else {
+				bottom_middle.setSelection([]);
+			}
+		}
 
+/*
 		function rightSelectHandler() {
 			var selectedItem = bottom_right.getSelection()[0];
 			if (selectedItem) {
@@ -586,8 +639,7 @@ function drawChart() {
 				}
 			}
 		}
-
-
+*/
 
 		var options = {
 			hAxis : {
@@ -626,7 +678,7 @@ function drawChart() {
 		console.log(options);
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
-		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
+		//google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, options);
 	}
 	 $('#overlay').fadeOut(2000);
@@ -811,6 +863,7 @@ function changeRequest() {
 		style.appendChild(document.createTextNode(css));
 	}
 	head.appendChild(style);
+	$('#loading').html('<i class="fa fa-ellipsis-h fa-5x" aria-hidden="true"></i><br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	ws.send(JSON.stringify(json));
