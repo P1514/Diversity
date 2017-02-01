@@ -119,7 +119,7 @@ public class Snapshot {
 			}
 			result.put("Snapshots");
 			result.put(aux);
-			System.out.println("****Names:"+result.toString());
+			//System.out.println("****Names:"+result.toString());
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
@@ -136,10 +136,33 @@ public class Snapshot {
 	}
 	
 	public JSONArray load(String name) {
-		JSONArray result=null;
-		JSONObject obj = new JSONObject();
-		return result;
+		JSONArray result = new JSONArray();
+		ResultSet rs;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return null;
+		}
+		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=?;");
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			query1.setString(1, name);
+			rs=query1.executeQuery();
+			rs.next();
+			result.put(rs.getString("result"));
+			System.out.println("****Names:"+result.toString());
 
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+		}
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 
 	}
 

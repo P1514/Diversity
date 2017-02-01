@@ -95,13 +95,18 @@ public final class Backend {
 			case 25:
 				obj = new JSONObject();
 				result = new JSONArray();
+				String resul;
 				if (msg.has("Name")) {
 					result=snapshot.load(msg.getString("Name"));
+					resul=result.toString();
+					resul=resul.substring(2, resul.length()-2);
 				}
 				else {
 					result=snapshot.loadNames(msg.getString("Type"));
+					resul=result.toString();
 				}
-				return result.toString();
+
+				return resul;
 				
 
 			case 24:
