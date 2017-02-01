@@ -7,6 +7,7 @@ var middle;
 var jsonData;
 var newData;
 var all_models = [];
+var timespan;
 
 function giveAcessRights(json){
       if(json[0].view_OM){
@@ -150,6 +151,7 @@ ws.onmessage = function(event) {
       'Start_date' : localStorage.start_date != "" ? localStorage.start_date : undefined,
       'End_date' : localStorage.end_date != "" ? localStorage.end_date : undefined,
     }
+    timespan
     ws.send(JSON.stringify(jsonData));
   }
 
@@ -257,6 +259,10 @@ function refreshDB(clean) {
   }
 };
 
+function getMonthFromString(mon){
+   return new Date(Date.parse(mon +" 1, 2012")).getMonth();
+}
+
 function drawChart() {
   //top 5 PSS
   middle = new google.visualization.LineChart(document.getElementById('top5'));
@@ -265,7 +271,7 @@ function drawChart() {
 
 
   var globaldata = new google.visualization.DataTable();
-  globaldata.addColumn('string', 'Month');
+  globaldata.addColumn('date', 'Month');
 
   var counter = data[1];
 
@@ -283,7 +289,8 @@ function drawChart() {
         if (i == 1 && j == 0) {
           globaldata.addRows(12);													// add 12 rows for the 12 months
         }
-        globaldata.setCell(j,0,counter[((i-1)*12) + i+j].Month);				// the first cell of each line is the name of the month
+        globaldata.setCell(j,0,new Date(new Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) + i+j].Month),01));				// the first cell of each line is the name of the month
+        console.log(new Date(2000,getMonthFromString(counter[((i-1)*12) + i+j].Month),01).getMonth());
         if (counter[((i-1)*12) + i+j].Value != -1) {
           globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
         }
@@ -291,7 +298,10 @@ function drawChart() {
     }																// adds 12 positions per iteration
   }
 
- var options = {
+  var start = new Date(localStorage.start_date);
+  var end = new Date(localStorage.end_date);
+
+  var options = {
    backgroundColor: { fill:'transparent' },
    lineWidth: 3,
    legend : {
@@ -301,17 +311,26 @@ function drawChart() {
      showTextEvery: 1,
      textStyle : {
        fontSize: 12
-     }
+     },
+     viewWindow: {
+       min : start,
+       max : end
+     },
    },
    vAxis: {
      title: 'Global Sentiment',
      viewWindow: {
       max: 0,
       min: 100
-    }
+    },
   },
   width : '100%',
   height : '100%',
+  explorer: {
+    axis: 'horizontal',
+    keepInBounds: false,
+    maxZoomIn: 4.0
+  }
  };
 
  middle.draw(globaldata, options);
