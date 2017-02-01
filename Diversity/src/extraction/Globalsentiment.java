@@ -4,9 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,25 +17,27 @@ import general.Data;
 import general.Model;
 import general.Settings;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Globalsentiment.
  *
  * @author Uninova - IControl
  */
-public class Globalsentiment {
+public class Globalsentiment extends GetReach {
 
-	private Connection cnlocal;
+	private Connection cnlocal = null;
+	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
 	 * Class that handles sentiment Requests.
 	 */
 	public Globalsentiment() {
+		super();
 
 	}
 
 	/**
-	 * Calculates the Sentiment for the pss id's present in the arraylist top5,
+	 * Calculates the Sentiment for the pss id's present in the list psslist,
 	 * and saves it in the database for faster fetching when requested.
 	 * <p>
 	 * Timespan specifies ammount of year to calculate, String param and values
@@ -46,57 +49,59 @@ public class Globalsentiment {
 	 *            Example:[Age,Age,Gender]
 	 * @param values
 	 *            Example:[0-30,30-60,Female]
-	 * @param top5
-	 *            ArrayList with id's
+	 * @param psslist
+	 *            List with PSS id's
 	 * @throws JSONException
 	 *             is case JSON creation fails
 	 */
-	public void calc_TOPreachglobalsentiment(int timespan /* years */, String param, String values,
-			ArrayList<Long> top5) throws JSONException {
-		if (top5.isEmpty())
+	public void globalsentiment(int timespan /* years */, String param, String values, List<Long> psslist)
+			throws JSONException {
+		if (psslist.isEmpty())
 			return;
-		PreparedStatement query1 = null;
 		try {
 			dbconnect();
-			String delete = "Delete from reach";
-			query1 = cnlocal.prepareStatement(delete);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error Connecting to Database", e);
+			return;
+		}
+		StringBuilder buildstring = new StringBuilder();
+		String result = "";
+		String delete = "Delete from reach";
+		try (PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
 			query1.execute();
-			String result = "";
-			query1.close();
-			cnlocal.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.INFO, "ERROR", e);
+		}
 
-			for (long k : top5) {
+		for (long k : psslist) {
 
-				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
-				result += globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString();
-				Data.modeldb.remove((long) -1);
-			}
+			Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
+			buildstring.append(globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString());
+			Data.modeldb.remove((long) -1);
+		}
+		result = buildstring.toString().replaceAll("\\]\\[", ",");
+		if ("".equals(result))
+			return;
+		String insert = "Insert into " + Settings.lrtable + " values (?)";
+		try {
 			dbconnect();
-			result = result.replaceAll("\\]\\[", ",");
-			String insert = new String("Insert into " + Settings.lrtable + " values (?)");
-			query1 = cnlocal.prepareStatement(insert);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error Connecting to Database", e);
+			return;
+		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, result);
 			query1.execute();
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			LOGGER.log(Level.INFO, "ERROR", e);
 		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			LOGGER.log(Level.INFO, "ERROR", e);
+		}
+
 	}
 
 	/**
@@ -105,41 +110,32 @@ public class Globalsentiment {
 	 *
 	 * @return String
 	 */
-	public String Topreachglobalsentiment() {
+	public String globalsentiment() {
 
 		String select = "Select * from " + Settings.lrtable;
-		PreparedStatement query1 = null;
-		ResultSet rs = null;
 		try {
 			dbconnect();
-			query1 = cnlocal.prepareStatement(select);
-			rs = query1.executeQuery();
-			while (rs.next()) {
-				String output = rs.getString(1);
-				rs.close();
-				query1.close();
-				cnlocal.close();
-				return output;
-			}
-		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return "";
 		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+			try (ResultSet rs = query1.executeQuery()) {
+				while (rs.next()) {
+					String output = rs.getString(1);
+					cnlocal.close();
+					return output;
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			LOGGER.log(Level.INFO, "ERROR", e);
+		}
+
 		return "";
 
 	}
@@ -167,21 +163,7 @@ public class Globalsentiment {
 	public JSONArray globalsentiment(int timespan /* years */, String param, String values, String output, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
-		JSONObject obj = new JSONObject();
-
-		String[] time = new String[12];
-		time[0] = "JAN";
-		time[1] = "FEB";
-		time[2] = "MAR";
-		time[3] = "APR";
-		time[4] = "MAY";
-		time[5] = "JUN";
-		time[6] = "JUL";
-		time[7] = "AUG";
-		time[8] = "SEP";
-		time[9] = "OCT";
-		time[10] = "NOV";
-		time[11] = "DEC";
+		JSONObject obj;
 		obj = new JSONObject();
 		obj.put("Filter", output);
 		result.put(obj);
@@ -199,156 +181,24 @@ public class Globalsentiment {
 				result.put(obj);
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "ERROR", e);
 			}
 		}
 
 		return result;
 	}
-
-	// TODO change this do open and close opinions and check things inside
 	public double globalsentimentby(int month, int year, String param, String value, long id) {
 
-		double result = (double) 0;
 		Model model = Data.modeldb.get(id);
-		String insert;
-		String gender = null;
-		String location = null;
-		String age = null;
-		String products = null;
-		String[] params;
-		String[] values;
-		if (param != null) {
-
-			params = param.split(",");
-			values = value.split(",");
-			for (int i = 0; i < params.length; i++) {
-				switch (params[i]) {
-				case "Age":
-					if (!values[i].equals("All"))
-						age = values[i];
-					break;
-
-				case "Gender":
-					if (!values[i].equals("All"))
-						gender = values[i];
-					break;
-				case "Location":
-					if (!values[i].equals("All"))
-						location = values[i];
-					break;
-				case "Product":
-					if (!values[i].equals("All"))
-						products = values[i];
-					break;
-				}
-			}
-		}
-		PreparedStatement query1 = null;
-		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
+		parameters par = split_params(param, value);
+		String insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		if (age != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
-					+ Settings.latable_age + ">?";
-		if (gender != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		if (location != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (products != null) {
-			if (products.equals("-1")) {
-				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-			} else {
-				insert += " AND " + Settings.lotable_product + "=?";
-			}
-		} else {
 
-		}
-		insert += ")";
-
-		// System.out.println(insert);
-		ResultSet rs = null;
-		Double auxcalc = (double) 0;
-		month -= 1;
-		Calendar data = new GregorianCalendar(year, month, 1);
-		double totalreach = 0;
-		try {
-			dbconnect();
-			query1 = cnlocal.prepareStatement(insert);
-			query1.setLong(1, model.getDate());
-			query1.setLong(2, data.getTimeInMillis());
-			data.add(Calendar.MONTH, 1);
-			data.add(Calendar.DAY_OF_MONTH, -1);
-			query1.setLong(3, data.getTimeInMillis());
-			query1.setLong(4, model.getPSS());
-			int rangeindex = 5;
-			if (age != null) {
-				query1.setString(rangeindex++, age.split("-")[1]);
-				query1.setString(rangeindex++, age.split("-")[0]);
-			}
-			// System.out.println(query1);
-			if (gender != null)
-				query1.setString(rangeindex++, gender);
-			if (location != null)
-				query1.setString(rangeindex++, location);
-			if (products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
-			// System.out.println(query1);
-			/*
-			 * if (param != null) { if (!value.contains("-")) {
-			 * query1.setString(4, value); } else { query1.setString(4,
-			 * values[0]); query1.setString(5, values[1]); } }
-			 */
-			// System.out.println(query1);
-			rs = query1.executeQuery();
-			if (rs.next()) {
-				do {
-					auxcalc += (double) rs.getDouble(Settings.lptable_polarity) * rs.getDouble(Settings.lotable_reach);
-					totalreach += rs.getDouble(Settings.lotable_reach);
-				} while (rs.next());
-			} else {
-				auxcalc = (double) -1;
-			}
-			rs.close();
-			query1.close();
-			cnlocal.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (Exception e) {
-			}
-			;
-		}
-		result = auxcalc / (totalreach == 0 ? 1 : totalreach);
-		String temp;
-		temp = String.format("%.2f", result);
-		try {
-			result = Double.valueOf(temp);
-		} catch (Exception e) {
-			temp = temp.replaceAll(",", ".");
-			result = Double.parseDouble(temp);
-		}
-		return result;
+		return calc_global("polar",insert, par, month, model, year);
 
 	}
 
@@ -376,21 +226,6 @@ public class Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		double value = 0;
-
-		String[] time = new String[12];
-		time[0] = "JAN";
-		time[1] = "FEB";
-		time[2] = "MAR";
-		time[3] = "APR";
-		time[4] = "MAY";
-		time[5] = "JUN";
-		time[6] = "JUL";
-		time[7] = "AUG";
-		time[8] = "SEP";
-		time[9] = "OCT";
-		time[10] = "NOV";
-		time[11] = "DEC";
-
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);

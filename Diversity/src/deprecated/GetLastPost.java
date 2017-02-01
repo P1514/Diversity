@@ -1,4 +1,4 @@
-package extraction;
+package deprecated;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Settings;
-// TODO: Auto-generated Javadoc
 
 /**
  * The Class GetLastPost.
@@ -24,6 +23,7 @@ public class GetLastPost {
 	/**
 	 * Get Last Post from a specific author.
 	 */
+	@Deprecated
 	public GetLastPost() {
 	}
 
@@ -35,6 +35,7 @@ public class GetLastPost {
 	 * @return JSONArray - with all the information regarding that specific post
 	 * @throws JSONException in case and error occured while building the JSON
 	 */
+	@Deprecated
 	public JSONArray get(String name) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -99,7 +100,7 @@ public class GetLastPost {
 		return result;
 
 	}
-
+	@Deprecated
 	private String trunc(String number) {
 		double result = 0;
 		try {
@@ -116,7 +117,7 @@ public class GetLastPost {
 		return Double.toString(result);
 
 	}
-
+	@Deprecated
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
