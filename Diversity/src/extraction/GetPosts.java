@@ -3,6 +3,7 @@ package extraction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -126,101 +127,99 @@ public class GetPosts {
 					topid[i] = rs.getInt("id");
 					n_tops++;
 				}
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "ERROR", e);
-				cnlocal.close();
-				return Backend.error_message("Error");
 			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cnlocal.close();
+			} catch (SQLException e1) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
+			return Backend.error_message("ERROR");
 		}
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + " from " + Settings.latable + " where "
 				+ Settings.latable_id + " in (Select " + Settings.lotable_author + " from " + Settings.lotable
 				+ " where " + Settings.lotable_id + " = ? )";
-		for (i = 0; i < n_tops; i++) {
+		for (int i = 0; i < n_tops; i++) {
 
-			try(PreparedStatement query1 = cnlocal.prepareStatement(insert)){
+			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
-				try(ResultSet rs = query1.executeQuery()){
+				try (ResultSet rs = query1.executeQuery()) {
 					rs.next();
 					pre_result[i] = topid[i] + ",," + rs.getString(Settings.latable_name) + ",,"
-							+ rs.getDouble(Settings.latable_influence) + ",," + rs.getString(Settings.latable_location) + ",,"
-							+ rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age) + ",,";
+							+ rs.getDouble(Settings.latable_influence) + ",," + rs.getString(Settings.latable_location)
+							+ ",," + rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age)
+							+ ",,";
 				}
-			}catch(Exception e){
-				LOGGER.log(Level.SEVERE, "ERROR", e);
-				cnlocal.close();
-				return Backend.error_message("ERROR");
+			} catch (Exception e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+
 			}
 		}
 
 		insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
 				+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
 				+ " = ?";
-		for (i = 0; i < n_tops; i++) {
+		for (int i = 0; i < n_tops; i++) {
 
-			query1 = cnlocal.prepareStatement(insert);
-			query1.setInt(1, topid[i]);
-			rs = query1.executeQuery();
-			rs.next();
-			pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",," + rs.getDouble(Settings.lotable_polarity)
-					+ ",," + rs.getDouble(Settings.lotable_reach) + ",," + rs.getInt(Settings.lotable_comments) + ",,";
-			rs.close();
-			query1.close();
+			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+				query1.setInt(1, topid[i]);
+				try (ResultSet rs = query1.executeQuery()) {
+					rs.next();
+					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
+							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
+							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
 		}
 
 		insert = "Select " + Settings.lptable_message + " from " + Settings.lptable + " where " + Settings.lptable_id
 				+ " = ?";
-		for (i = 0; i < n_tops; i++) {
+		for (int i = 0; i < n_tops; i++) {
 
-			query1 = cnlocal.prepareStatement(insert);
-			query1.setInt(1, topid[i]);
-			rs = query1.executeQuery();
-			if (rs.next())
-				pre_result[i] += rs.getString(Settings.lptable_message);
-			rs.close();
-			query1.close();
+			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+				query1.setInt(1, topid[i]);
+				try (ResultSet rs = query1.executeQuery()) {
+					if (rs.next())
+						pre_result[i] += rs.getString(Settings.lptable_message);
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
 		}
 
-	}catch(
-
-	Exception e)
-	{
-		LOGGER.log(Level.SEVERE, "ERROR", e);
-		return Backend.error_message("Error on Backend Please Contact System Administrator");
-	}finally
-	{
-
 		try {
-			if (cnlocal != null)
-				cnlocal.close();
+
+			cnlocal.close();
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
-	}}
 
-	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");for(
-	int i = 0;i<n_tops;i++)
-	{
-		obj = new JSONObject();
-		String[] pre_results = pre_result[i].split(",,");
-		obj.put("Id", pre_results[0]);
-		obj.put("Name", pre_results[1]);
-		obj.put("Influence", trunc(pre_results[2]));
-		obj.put("Location", pre_results[3]);
-		obj.put("Gender", pre_results[4]);
-		obj.put("Age", pre_results[5]);
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		for (int i = 0; i < n_tops; i++) {
+			obj = new JSONObject();
+			String[] pre_results = pre_result[i].split(",,");
+			obj.put("Id", pre_results[0]);
+			obj.put("Name", pre_results[1]);
+			obj.put("Influence", trunc(pre_results[2]));
+			obj.put("Location", pre_results[3]);
+			obj.put("Gender", pre_results[4]);
+			obj.put("Age", pre_results[5]);
 
-		Date date = new Date(Long.parseLong(pre_results[6]));
-		obj.put("Date", df.format(date));
-		obj.put("Polarity", trunc(pre_results[7]));
-		obj.put("Reach", trunc(pre_results[8]));
-		obj.put("Comments", pre_results[9]);
-		obj.put("Message", pre_results[10]);
-		result.put(obj);
+			Date date = new Date(Long.parseLong(pre_results[6]));
+			obj.put("Date", df.format(date));
+			obj.put("Polarity", trunc(pre_results[7]));
+			obj.put("Reach", trunc(pre_results[8]));
+			obj.put("Comments", pre_results[9]);
+			obj.put("Message", pre_results[10]);
+			result.put(obj);
 
-	}
+		}
 
-	return result;
+		return result;
 
 	}
 
