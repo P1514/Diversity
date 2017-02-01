@@ -22,33 +22,34 @@ import org.json.JSONObject;
  */
 public class Data {
 	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
-	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<Long, Author>();
-	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<String, Author>();
-	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<Long, Opinion>();
+	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 
 	/** The modeldb. */
-	public static ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<Long, Model>();
+	private static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 
 	/** The pssdb. */
-	public static ConcurrentHashMap<Long, PSS> pssdb = new ConcurrentHashMap<Long, PSS>();
+	private static final ConcurrentHashMap<Long, PSS> pssdb = new ConcurrentHashMap<>();
 
 	/** The productdb. */
-	public static ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<Long, Product>();
+	private static final ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<>();
 
 	/** The servicedb. */
-	public static ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<Long, Product>();
+	@SuppressWarnings("unused")
+	private static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
 
 	/** The companydb. */
-	public static ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<Long, Company>();
+	private static final ConcurrentHashMap<Long, Company> companydb = new ConcurrentHashMap<>();
+
 	private long totalposts;
 	private long totalviews;
 	private long totalcomments;
 	private long totallikes;
-	private java.sql.Date LastUpdated = null;
-	private java.sql.Date LastUpdated2 = null;
-	private Calendar cal = Calendar.getInstance();
-	private List<Long> users = new ArrayList<Long>();
-	private List<Author> users2 = new ArrayList<Author>();
+	private java.sql.Date lastUpdated = null;
+	private java.sql.Date lastUpdated2 = null;
+	private List<Long> users = new ArrayList<>();
+	private List<Author> users2 = new ArrayList<>();
 
 	private Connection cndata = null;
 	private Connection cnlocal = null;
@@ -58,6 +59,55 @@ public class Data {
 	 * Instantiates a new data.
 	 */
 	public Data() {
+		/**
+		 * No construct variables needed, class only used to load data into the
+		 * software
+		 **/
+	}
+
+	public static Model getmodel(long id) {
+		if (modeldb.containsKey(id))
+			return modeldb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get model");
+		return null;
+	}
+
+	public static void addmodel(long id, Model model) {
+		modeldb.put(id, model);
+	}
+
+	public static void delmodel(long id) {
+		modeldb.remove(id);
+	}
+
+	public static Collection<Model> dbmodelall() {
+		return modeldb.values();
+	}
+
+	public static Collection<PSS> dbpssall() {
+		return pssdb.values();
+	}
+
+	public static PSS getpss(long id) {
+		if (pssdb.containsKey(id))
+			return pssdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
+		return null;
+	}
+
+	public static boolean dbhasproduct(long id) {
+		return productdb.containsKey(id);
+	}
+
+	public static Product getProduct(long id) {
+		if (dbhasproduct(id))
+			return productdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get product");
+		return null;
+	}
+
+	public static Collection<Product> dbproductall() {
+		return productdb.values();
 	}
 
 	/**
@@ -106,98 +156,116 @@ public class Data {
 	public static long identifyProduct(String message) {
 
 		for (Product a : productdb.values()) {
-			if (a.checkMessage(message) == true)
+			if (a.checkMessage(message))
 				return a.get_Id();
 		}
 
 		return 0;
 	}
 
-	@SuppressWarnings("resource")
-	private void LoadPSS() {
-		PreparedStatement query = null;
-		ResultSet rs = null;
+	private void loadPSS() {
+		String selectall = "Select * from ";
+
+		String select = selectall + Settings.crpsstable;
 		try {
-			String select = "Select * from " + Settings.crpsstable;
 			cncr = Settings.conncr();
-			query = cncr.prepareStatement(select);
-			rs = query.executeQuery();
-			while (rs.next()) {
-				pssdb.put(rs.getLong(Settings.crpsstable_id),
-						new PSS(rs.getLong(Settings.crpsstable_id), rs.getLong(Settings.crpsstable_company),
-								rs.getString(Settings.crpsstable_name), rs.getLong(Settings.crpsstable_author),
-								rs.getString(Settings.crpsstable_type)));
-			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return;
+		}
 
-			select = "Select * from " + Settings.crproducttable + " ORDER BY " + Settings.crproducttable_id + " ASC";
-			query = cncr.prepareStatement(select);
-			rs = query.executeQuery();
-
-			while (rs.next()) {
-				productdb.put(rs.getLong(Settings.crproducttable_id),
-						new Product(rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
-								rs.getBoolean(Settings.crproducttable_isfinal),
-								rs.getLong(Settings.crproducttable_supplied_by),
-								rs.getLong(Settings.crproducttable_parent)));
-				if (rs.getLong(Settings.crproducttable_parent) != 0) {
-					Product parent = productdb.get(rs.getLong(Settings.crproducttable_parent));
-					parent.setParent(rs.getLong(Settings.crproducttable_id));
-					productdb.put(rs.getLong(Settings.crproducttable_parent), parent);
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+				while (rs.next()) {
+					pssdb.put(rs.getLong(Settings.crpsstable_id),
+							new PSS(rs.getLong(Settings.crpsstable_id), rs.getLong(Settings.crpsstable_company),
+									rs.getString(Settings.crpsstable_name), rs.getLong(Settings.crpsstable_author),
+									rs.getString(Settings.crpsstable_type)));
 				}
 			}
-
-			select = "Select * from " + Settings.crcompanytable;
-			query = cncr.prepareStatement(select);
-			rs = query.executeQuery();
-
-			while (rs.next()) {
-				companydb.put(rs.getLong(Settings.crcompanytable_id),
-						new Company(rs.getLong(Settings.crcompanytable_id), rs.getString(Settings.crcompanytable_name),
-								rs.getString(Settings.crcompanytable_type),
-								rs.getLong(Settings.crcompanytable_belongs_to)));
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
 			}
+			return;
+		}
 
-			select = "Select * from " + Settings.crpssproducttable;
+		select = selectall + Settings.crproducttable + " ORDER BY " + Settings.crproducttable_id + " ASC";
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
 
-			query = cncr.prepareStatement(select);
-			rs = query.executeQuery();
-
-			while (rs.next()) {
-				pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
-						.add_product(rs.getLong(Settings.crrpssproducttable_product));
-				/*
-				 * productdb.get(rs.getLong(Settings.crrpssproducttable_product)
-				 * ) .set_PSS(rs.getLong(Settings.crrpssproducttable_pss));
-				 */
+				while (rs.next()) {
+					productdb.put(rs.getLong(Settings.crproducttable_id),
+							new Product(rs.getLong(Settings.crproducttable_id),
+									rs.getString(Settings.crproducttable_name),
+									rs.getBoolean(Settings.crproducttable_isfinal),
+									rs.getLong(Settings.crproducttable_supplied_by),
+									rs.getLong(Settings.crproducttable_parent)));
+					if (rs.getLong(Settings.crproducttable_parent) != 0) {
+						Product parent = productdb.get(rs.getLong(Settings.crproducttable_parent));
+						parent.setParent(rs.getLong(Settings.crproducttable_id));
+						productdb.put(rs.getLong(Settings.crproducttable_parent), parent);
+					}
+				}
 			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+			}
+			return;
+		}
 
-			rs.close();
-			query.close();
+		select = selectall + Settings.crcompanytable;
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					companydb.put(rs.getLong(Settings.crcompanytable_id),
+							new Company(rs.getLong(Settings.crcompanytable_id),
+									rs.getString(Settings.crcompanytable_name),
+									rs.getString(Settings.crcompanytable_type),
+									rs.getLong(Settings.crcompanytable_belongs_to)));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+			}
+			return;
+		}
+		select = selectall + Settings.crpssproducttable;
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
+							.add_product(rs.getLong(Settings.crrpssproducttable_product));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+			}
+			return;
+		}
+
+		try {
 			cncr.close();
-
-		} catch (SQLException e1) {
-			LOGGER.log(Level.SEVERE, "ERROR: Cannot connect to Common Repository Check setup");
-		} catch (ClassNotFoundException e) {
-			LOGGER.log(Level.FINE, "ERROR: Settings class not found inside LoadPSS() on Data class");
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
-			}
-			try {
-				if (query != null)
-					query.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
-			}
-			try {
-				if (cncr != null)
-					cncr.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here error closing");
-			}
+		} catch (Exception e) {
+			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
 		}
 	}
 
@@ -221,7 +289,7 @@ public class Data {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 
-		LoadPSS();
+		loadPSS();
 
 		// DONE FAZER LOAD DAS VARIAVEIS NO GENERAL
 		String select = "Select * from general WHERE id=1";
@@ -237,7 +305,7 @@ public class Data {
 			totalcomments = rs.getLong("totalcomments");
 			totallikes = rs.getLong("totallikes");
 			totalposts = rs.getLong("totalposts");
-			LastUpdated = rs.getDate("lastupdated");
+			lastUpdated = rs.getDate("lastupdated");
 			if (rs.getLong("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
@@ -634,7 +702,7 @@ public class Data {
 			query1.setLong(2, totallikes);
 			query1.setLong(3, totalcomments);
 			query1.setLong(4, totalviews);
-			query1.setDate(5, (Date) LastUpdated2);
+			query1.setDate(5, (Date) lastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
 			LOGGER.log(Level.FINE, "SQL Error", e1);
@@ -682,7 +750,7 @@ public class Data {
 		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
-		LoadPSS();
+		loadPSS();
 		// General Variable Load
 		String select = "Select * from general WHERE id=1";
 		Statement stmt = null;
@@ -697,7 +765,7 @@ public class Data {
 			totalcomments = rs.getLong("totalcomments");
 			totallikes = rs.getLong("totallikes");
 			totalposts = rs.getLong("totalposts");
-			LastUpdated = rs.getDate("lastupdated");
+			lastUpdated = rs.getDate("lastupdated");
 			if (rs.getLong("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 		} catch (SQLException | ClassNotFoundException e1) {
@@ -810,12 +878,12 @@ public class Data {
 			cndata = Settings.conndata();
 			do {
 				// Load Opinions id first
-				cal = Calendar.getInstance();
-				LastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
+				Calendar cal = Calendar.getInstance();
+				lastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
 				query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 						+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 						+ Settings.rptable_rpostid + " end from " + Settings.rptable + " Where " + Settings.ptime
-						+ " > \'" + LastUpdated + "\' && " + Settings.ptime + " <= \'" + LastUpdated2
+						+ " > \'" + lastUpdated + "\' && " + Settings.ptime + " <= \'" + lastUpdated2
 						+ "\' ORDER BY ID ASC");
 				stmt = cndata.createStatement();
 				rs = stmt.executeQuery(query);
@@ -1177,7 +1245,7 @@ public class Data {
 			query1.setLong(2, totallikes);
 			query1.setLong(3, totalcomments);
 			query1.setLong(4, totalviews);
-			query1.setDate(5, (Date) LastUpdated2);
+			query1.setDate(5, (Date) lastUpdated2);
 			query1.executeUpdate();
 		} catch (SQLException e1) {
 			//

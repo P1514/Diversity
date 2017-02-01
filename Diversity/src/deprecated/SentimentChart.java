@@ -146,7 +146,7 @@ public class SentimentChart {
 		int maxage = Integer.parseInt(agerange[1]);
 		String[] genders = Settings.genders.split(",,");
 		double result = (double) 0;
-		Model model = Data.modeldb.get(id);
+		Model model = null; //Data.modeldb.get(id);
 		String insert = "Select " + Settings.lptable_polarity + " FROM " + Settings.lptable + " WHERE "
 				+ Settings.lptable_opinion + " in (" + "Select " + Settings.lotable_id + " from opinions where "
 				+ Settings.lotable_pss + "=? "

@@ -119,12 +119,12 @@ public final class Model {
 		for (String a : productsbyname) {
 			product = null;
 			pss1 = null;
-			for (Product product2 : Data.productdb.values())
+			for (Product product2 : Data.dbproductall())
 				if (product2.get_Name().equals(a)) {
 					product = product2;
 					break;
 				}
-			for (PSS pss2 : Data.pssdb.values()) {
+			for (PSS pss2 : Data.dbpssall()) {
 				if (pss2.getID() == pss) {
 					pss1 = pss2;
 					break;
@@ -224,7 +224,7 @@ public final class Model {
 		Boolean delete = msg.has("Archive") ? msg.getBoolean("Archive") : false;
 		int rangeindex=1;
 		if (!msg.get("Name").equals(this.name)
-				|| Data.pssdb.get(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
+				|| Data.getpss(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
 			obj.put("id", msg.getInt("Id"));
 			obj.put("Op", "Error");
 			obj.put("Message", "Error updating model " + msg.getString("Name") + "updated attempt not allowed");

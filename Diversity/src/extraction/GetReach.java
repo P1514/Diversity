@@ -119,7 +119,7 @@ public class GetReach {
 
 	private double globalsentimentby(int month, int year, String param, String value, long id) {
 
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 		String insert;
 		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
@@ -280,7 +280,7 @@ public class GetReach {
 
 	private double globalreachby(int month, int year, String param, String value, long id) {
 
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 		String insert;
 		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.latable + ","
@@ -292,14 +292,14 @@ public class GetReach {
 
 	}
 
-	protected class parameters {
+	protected static class parameters {
 		String age = null;
 		String gender = null;
 		String location = null;
 		String products = null;
 	}
 
-	protected parameters split_params(String param, String value) {
+	protected static parameters split_params(String param, String value) {
 		if (param == null)
 			return new parameters();
 		String[] params = param.split(",");

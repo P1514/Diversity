@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import extraction.GetReach.parameters;
+import extraction.GetReach;
 import general.Backend;
 import general.Data;
 import general.Model;
@@ -54,6 +56,7 @@ public class GetPosts {
 		JSONObject obj = new JSONObject();
 		Calendar inputdate = Calendar.getInstance();
 		obj.put("Op", "table");
+		boolean dateerror=false;
 		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[MAXTOP];
@@ -63,7 +66,7 @@ public class GetPosts {
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
 				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_product;
 
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 
 		if (model == null) {
 			result = new JSONArray();
@@ -88,8 +91,10 @@ public class GetPosts {
 			try {
 				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + month));
 			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log(Level.INFO, "ERROR", e1);
+				insert = insert.replace(
+						" && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?", "");
+				dateerror=true;
 			}
 		}
 		insert += ")";
@@ -108,7 +113,7 @@ public class GetPosts {
 			int i = 0;
 			query1.setLong(1, model.getPSS());
 			query1.setLong(2, model.getDate());
-			if (param != null) {
+			if (param != null && !dateerror) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
 					inputdate.add(Calendar.YEAR, -1);
@@ -248,17 +253,12 @@ public class GetPosts {
 	public JSONArray getAmmount(String param, String value, String filter, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		String[] params;
-		String[] values;
-		String age = null;
-		String location = null;
-		String gender = null;
+
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
-		PreparedStatement query1 = null;
 		insert = "Select count(*) FROM " + Settings.lotable + " where ( " + Settings.lotable_pss + "=? AND "
 				+ Settings.lotable_product;
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 		if (model == null) {
 			obj = new JSONObject();
 			obj.put("Op", "Error");
@@ -271,51 +271,34 @@ public class GetPosts {
 		} else {
 			insert += "=0";
 		}
-		if (param != null) {
-
-			params = param.split(",");
-			values = value.split(",");
-			for (int i = 0; i < params.length; i++) {
-				switch (params[i]) {
-				case "Age":
-					if (!values[i].equals("All"))
-						age = values[i];
-					break;
-
-				case "Gender":
-					if (!values[i].equals("All"))
-						gender = values[i];
-					break;
-				case "Location":
-					if (!values[i].equals("All"))
-						location = values[i];
-					break;
-				}
-			}
-		}
-		if (age != null)
+		parameters par = GetReach.split_params(param, value);
+		if (par.age != null)
 			insert += " AND age<=? AND age>?";
-		if (gender != null)
+		if (par.gender != null)
 			insert += " AND gender=?";
-		if (location != null)
+		if (par.location != null)
 			insert += " AND location=?";
 		insert += " AND timestamp<? AND timestamp>=? AND " + Settings.lotable_timestamp + ">=?)";
-		ResultSet rs = null;
+		//ResultSet rs = null;
 
 		try {
 			dbconnect();
-			query1 = cnlocal.prepareStatement(insert);
+		}catch(Exception e){
+		LOGGER.log(Level.SEVERE,"ERROR",e);
+		return Backend.error_message("Cannot connect to database please try again later");
+		}
+			try(PreparedStatement query1 = cnlocal.prepareStatement(insert)){
 			int rangeindex = 2;
 			query1.setLong(1, model.getPSS());
 
-			if (age != null) {
-				query1.setString(rangeindex++, age.split("-")[1]);
-				query1.setString(rangeindex++, age.split("-")[0]);
+			if (par.age != null) {
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
-			if (gender != null)
-				query1.setString(rangeindex++, gender);
-			if (location != null)
-				query1.setString(rangeindex++, location.substring(0, location.length()));
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location);
 			inputdate.add(Calendar.MONTH, 1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
@@ -324,37 +307,22 @@ public class GetPosts {
 			rangeindex++;
 			query1.setLong(rangeindex, model.getDate());
 
-			// System.out.print(query1);
-			rs = query1.executeQuery();
+			try(ResultSet rs = query1.executeQuery()){
 			rs.next();
 			obj.put("Filter", "Global");
 			result.put(obj);
 			obj = new JSONObject();
 			obj.put("Value", rs.getInt("count(*)"));
 			result.put(obj);
-
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "ERROR", e);
 		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-			}
-			;
-			try {
-				if (cnlocal != null)
+			try{
 					cnlocal.close();
 			} catch (Exception e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
 			}
-			;
 		}
 
 		return result;
@@ -378,13 +346,10 @@ public class GetPosts {
 
 	}
 
-	private void dbconnect() {
-		try {
+	private void dbconnect() throws ClassNotFoundException {
+
 			cnlocal = Settings.connlocal();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 
 	}
 }

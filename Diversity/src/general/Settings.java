@@ -201,6 +201,10 @@ public class Settings {
 	public static final String artable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String artable_role = "role";
 
+	
+	//Errors
+	public static final String err_unknown="ERROR ";
+	public static final String err_dbconnect="Cannot connect to database Please Try Again Later.";
 	/**
 	 * Conndata.
 	 *
@@ -313,16 +317,16 @@ public class Settings {
 			result.put(obj);
 		}
 		obj = new JSONObject();
-		if (!Data.modeldb.get(id).getProducts().isEmpty()) {
-			String[] values4 = Data.modeldb.get(id).getProducts().split(",");
+		if (!Data.getmodel(id).getProducts().isEmpty()) {
+			String[] values4 = Data.getmodel(id).getProducts().split(",");
 			obj.put("Size", values4.length);
 			obj.put("Param", "Product");
 			result.put(obj);
 			for (int i = 0; i < values4.length; i++) {
-				if (!Data.productdb.containsKey(Long.valueOf(values4[i])))
+				if (!Data.dbhasproduct(Long.valueOf(values4[i])))
 					continue;
 				obj = new JSONObject();
-				obj.put("Product", Data.productdb.get(Long.valueOf(values4[i])).get_Name());
+				obj.put("Product", Data.getProduct(Long.valueOf(values4[i])).get_Name());
 				result.put(obj);
 			}
 		}
