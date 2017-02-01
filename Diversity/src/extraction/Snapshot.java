@@ -35,9 +35,10 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return false;
 		}
-		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=?;");
+		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=? && type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
+			query1.setString(2, type);
 			rs = query1.executeQuery();
 			if (rs.next())
 				return false;
@@ -71,7 +72,8 @@ public class Snapshot {
 
 	}
 
-	public String prediction(String name, String date, int timespan, String user, String products, String services) {
+	public String savePrediction(String name, String date, int timespan, String user, String products,
+			String services) {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
@@ -106,6 +108,66 @@ public class Snapshot {
 
 	}
 
+	public String saveExtraction(String name, String date, int timespan, String user, int id) {
+		String result;
+		JSONObject obj = new JSONObject();
+		long cdate;
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		Date dateaux = null;
+		try {
+			dateaux = df.parse(date);
+		} catch (ParseException e) {
+			LOGGER.log(Level.SEVERE, "ERROR Parsing Date from Browser", e);
+		}
+		cdate = dateaux.getTime();
+		if (cdate < 0) {
+			LOGGER.log(Level.SEVERE, "ERROR BAD DATE");
+			return "bad date";
+		}
+		try {
+			obj.put("Id", id);
+			obj.put("Filter", "");
+			Backend b = new Backend(19, obj);
+			result = b.resolve();
+			create(name, cdate, timespan, user, "all", result);
+
+			obj = new JSONObject();
+			obj.put("Id", id);
+			obj.put("Filter", "Location");
+			b = new Backend(19, obj);
+			result = b.resolve();
+			create(name, cdate, timespan, user, "location", result);
+
+			obj = new JSONObject();
+			obj.put("Id", id);
+			obj.put("Filter", "Gender");
+			b = new Backend(19, obj);
+			result = b.resolve();
+			create(name, cdate, timespan, user, "gender", result);
+
+			obj = new JSONObject();
+			obj.put("Id", id);
+			obj.put("Filter", "Age");
+			b = new Backend(19, obj);
+			result = b.resolve();
+			create(name, cdate, timespan, user, "age", result);
+
+			obj = new JSONObject();
+			obj.put("Id", id);
+			obj.put("Filter", "Product");
+			b = new Backend(19, obj);
+			result = b.resolve();
+			return create(name, cdate, timespan, user, "product", result) == true ? "success" : "name_in_use";
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+
+	}
+
 	private void dbconnect() throws ClassNotFoundException, SQLException {
 		cnlocal = Settings.connlocal();
 	}
@@ -123,17 +185,21 @@ public class Snapshot {
 		}
 		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			query1.setString(1, type);
+			if (type.equals("prediction"))
+				query1.setString(1, "prediction");
+			else
+				query1.setString(1, "all");
+
+			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
 			// rs.next();//verify
 			for (int i = 0; rs.next(); i++) {
-				obj=new JSONObject();
+				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
 				aux.put(obj);
 			}
 			result.put("Snapshots");
 			result.put(aux);
-			// System.out.println("****Names:"+result.toString());
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
@@ -149,7 +215,7 @@ public class Snapshot {
 
 	}
 
-	public String load(String name) throws JSONException {
+	public String load(String name, String type) throws JSONException {
 
 		try {
 			dbconnect();
@@ -157,9 +223,13 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return null;
 		}
-		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=?;");
+		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=? && type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
+			if (type.equals(""))
+				query1.setString(2, "prediction");
+			else
+				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				return rs.getString("result");
@@ -167,7 +237,7 @@ public class Snapshot {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return Backend.error_message("ERROR").toString();
-		}finally{
+		} finally {
 			try {
 				cnlocal.close();
 			} catch (SQLException e) {

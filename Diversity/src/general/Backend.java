@@ -97,7 +97,7 @@ public final class Backend {
 				result = new JSONArray();
 				String resul;
 				if (msg.has("Name")) {
-					return snapshot.load(msg.getString("Name"));
+					return snapshot.load(msg.getString("Name"), msg.has("Type")?msg.getString("Type"):"");
 				} else {
 					result = snapshot.loadNames(msg.getString("Type"));
 					resul = result.toString();
@@ -111,9 +111,14 @@ public final class Backend {
 				String res="";
 
 				if (msg.getString("type").equals("Prediction")) {
-					res = snapshot.prediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+					res = snapshot.savePrediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
 							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : "");
+				}
+				else{
+					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+							msg.getString("user"),msg.getInt("Id"));
+					
 				}
 				
 				if(res.equals("name_in_use")){
