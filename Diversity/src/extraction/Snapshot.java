@@ -27,14 +27,26 @@ public class Snapshot {
 
 	}
 
-	public void create(String name, long date, int timespan, String user, String type, String result) {
+	public boolean create(String name, long date, int timespan, String user, String type, String result) {
+		ResultSet rs;
 		try {
 			dbconnect();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return;
+			return false;
 		}
-		String insert = new String("Insert into " + "snapshots(name,creation_date,creation_user,result,type,timespan)"
+		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=?;");
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			query1.setString(1, name);
+			rs = query1.executeQuery();
+			if (rs.next())
+				return false;
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+		}
+
+		insert = new String("Insert into " + "snapshots(name,creation_date,creation_user,result,type,timespan)"
 				+ " values (?,?,?,?,?,?)");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
@@ -55,19 +67,20 @@ public class Snapshot {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return true;
 
 	}
 
-	public void prediction(String name, String date, int timespan, String user, String products, String services) {
+	public String prediction(String name, String date, int timespan, String user, String products, String services) {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
 		try {
 			obj.put("Op", "Prediction");
-			if(products!="")
-			obj.put("Products", products);
-			if(services!="")
-			obj.put("Services", services);
+			if (products != "")
+				obj.put("Products", products);
+			if (services != "")
+				obj.put("Services", services);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -83,20 +96,20 @@ public class Snapshot {
 		cdate = dateaux.getTime();
 		if (cdate < 0) {
 			LOGGER.log(Level.SEVERE, "ERROR BAD DATE");
-			return;
+			return "bad date";
 		}
 
 		Backend b = new Backend(23, obj);
 		result = b.resolve();
 
-		create(name, cdate, timespan, user, "prediction", result);
+		return create(name, cdate, timespan, user, "prediction", result) == true ? "success" : "name_in_use";
 
 	}
 
 	private void dbconnect() throws ClassNotFoundException, SQLException {
 		cnlocal = Settings.connlocal();
 	}
-	
+
 	public JSONArray loadNames(String type) {
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
@@ -111,15 +124,16 @@ public class Snapshot {
 		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, type);
-			rs=query1.executeQuery();
-			//rs.next();//verify
+			rs = query1.executeQuery();
+			// rs.next();//verify
 			for (int i = 0; rs.next(); i++) {
-				 obj.put("Name",  rs.getString("name"));
-				 aux.put(obj);
+				obj=new JSONObject();
+				obj.put("Name", rs.getString("name"));
+				aux.put(obj);
 			}
 			result.put("Snapshots");
 			result.put(aux);
-			//System.out.println("****Names:"+result.toString());
+			// System.out.println("****Names:"+result.toString());
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
@@ -134,10 +148,9 @@ public class Snapshot {
 		return result;
 
 	}
-	
-	public JSONArray load(String name) {
-		JSONArray result = new JSONArray();
-		ResultSet rs;
+
+	public String load(String name) throws JSONException {
+
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -147,25 +160,20 @@ public class Snapshot {
 		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
-			rs=query1.executeQuery();
-			rs.next();
-			result.put(rs.getString("result"));
-			System.out.println("****Names:"+result.toString());
-
+			try (ResultSet rs = query1.executeQuery()) {
+				rs.next();
+				return rs.getString("result");
+			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
-		}
-		try {
-			if (cnlocal != null)
+			return Backend.error_message("ERROR").toString();
+		}finally{
+			try {
 				cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
 		}
-		return result;
-
 	}
-
-
 
 }
