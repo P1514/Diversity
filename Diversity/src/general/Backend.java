@@ -97,31 +97,34 @@ public final class Backend {
 				result = new JSONArray();
 				String resul;
 				if (msg.has("Name")) {
-					/*result=snapshot.load(msg.getString("Name"));
-					resul=result.toString();
-					resul=resul.substring(2, resul.length()-2);*/
 					return snapshot.load(msg.getString("Name"));
-				}
-				else {
-					result=snapshot.loadNames(msg.getString("Type"));
-					resul=result.toString();
+				} else {
+					result = snapshot.loadNames(msg.getString("Type"));
+					resul = result.toString();
 				}
 
 				return resul;
-				
 
 			case 24:
 				obj = new JSONObject();
 				result = new JSONArray();
-				
+				String res="";
+
 				if (msg.getString("type").equals("Prediction")) {
-					snapshot.prediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+					res = snapshot.prediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
 							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : "");
 				}
-
+				
+				if(res.equals("name_in_use")){
+					obj.put("Message", "Name Already in Use");
+					obj.put("Op", "Error");
+					
+				}
+				if(res.equals("success")){	
 				obj.put("Message", "Snapshot Saved Successfully");
 				obj.put("Op", "Error");
+				}
 				result.put(obj);
 
 				return result.toString();
@@ -309,9 +312,9 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				if (msg.has("Id")){
+				if (msg.has("Id")) {
 					tmp = conf.getConf(msg.getLong("Id")).toString();
-				}else{
+				} else {
 					tmp = conf.getConf(845).toString();
 				}
 				return tmp;
@@ -355,8 +358,8 @@ public final class Backend {
 
 		return result.toString();
 	}
-	
-	public static JSONArray error_message(String message) throws JSONException{
+
+	public static JSONArray error_message(String message) throws JSONException {
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Error");
 		obj.put("Message", message);
