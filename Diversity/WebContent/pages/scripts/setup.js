@@ -202,6 +202,7 @@ function addline(table){
       }
     }
     */
+
     for(var k=1;;k++) {
       if(document.getElementById("1age"+k) == null)break;
       elem = {
@@ -217,6 +218,7 @@ function addline(table){
         }
       }
     }
+
     for(var i=0; i<json.length;i++,ii++){
       if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
         jsonData[ii]=json[i];
@@ -251,6 +253,17 @@ function addline(table){
     }
     gstring+=document.getElementById("gender"+k).value+",,";
   }
+
+
+  /*
+  for(var k=1;;k++){
+    if(document.getElementById("gender"+k) == null)break;
+    for (g in jsonData) {
+
+    }
+    gstring+=document.getElementById("gender"+k).value+",,";
+  }
+
 
   for(var i=1;;i++){
     if(document.getElementById("location"+i) == null)break;

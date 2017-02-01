@@ -10,6 +10,7 @@ var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Nam
 var count; // for timespan
 var snapshots;
 
+
 document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   ws.onmessage = function(event) {
-    var json = JSON.parse(event.data);
+    var json = JSON.parse(event.data.replace(/\\/g,''));
 
     if (json[0].Op == "Tree") {
       jsonData = JSON.parse(JSON.stringify(json));
@@ -44,7 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (json[0].Op == "Prediction") {
       draw = true;
+      console.log(json);
       chartData = JSON.parse(JSON.stringify(json));
+
       drawChart();
     }
 
@@ -54,6 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#overlay').show();
         $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
       }
+    }
+
+    if (json[0] == "Snapshots") {
+      snapshots = json[1];
+      displaySnapshots();
     }
   }
 });
@@ -159,7 +167,7 @@ function submit() {
 }
 
 function save() {
-  var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" style="margin-left:15px;" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#error').html(code);
   $('#overlay').show();
   $('#overlay-back').show();
@@ -169,7 +177,7 @@ function load() {
   // send request for snapshot list
   var json = {
     "Op" : "load_snapshot",
-    "type" : "Prediction"
+    "Type" : "Prediction"
   }
 
   ws.send(JSON.stringify(json));
@@ -191,11 +199,18 @@ function send(val) {
 
 //need to receive json with snapshot names
 function displaySnapshots() {
-  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(":selected").text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap" style="margin-left:15px;"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(\':selected\').text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Load</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#error').html(code);
+  for (var i=0; i < snapshots.length; i++) {
+    $('#select_snap').append($('<option>', {
+      value: snapshots[i].Name,
+      text: snapshots[i].Name
+    }));
+  }
   $('#overlay').show();
   $('#overlay-back').show();
 }
+
 
 function requestSnapshot(val) {
   var json = {
