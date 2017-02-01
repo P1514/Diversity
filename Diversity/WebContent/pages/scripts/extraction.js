@@ -110,7 +110,7 @@ function connect() {
 			$('#locationfilt').hide();
 			$('#finalfilt').hide();
 		}
-		
+
 		if (json[0].Op == "Error") {
 			$('#loading').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 			$('#overlay').show();
@@ -262,7 +262,8 @@ function send(val) {
     "name" : val,
     "creation_date" : new Date(),
     "timespan" : 12,
-    "user" : "test"
+    "user" : "test",
+		"Id" : sessionStorage.id
   }
   ws.send(JSON.stringify(json));
 }
@@ -280,7 +281,7 @@ function requestSnapshot(val) {
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
-		"Type" : "All"
+		"Type" : "All",
   }
 	snap = true;
   ws.send(JSON.stringify(json));
@@ -781,7 +782,8 @@ function changeRequest() {
 		json = {
 			"Op" : "load_snapshot",
 			"Type" : "",
-			"Name" : name
+			"Name" : name,
+			"Id" : sessionStorage.id,
 		};
 
 		if (globalradio == true) {
