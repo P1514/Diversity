@@ -5,11 +5,9 @@ import security.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 import extraction.Extrapolation;
-import extraction.GetAuthors;
 import extraction.GetComments;
 import extraction.GetPosts;
 import extraction.GetProducts;
