@@ -112,7 +112,8 @@ public final class Backend {
 			case 24:
 				obj = new JSONObject();
 				result = new JSONArray();
-				if (msg.getString("type") == "Prediction") {
+				
+				if (msg.getString("type").equals("Prediction")) {
 					snapshot.prediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
 							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : "");
