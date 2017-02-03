@@ -18,10 +18,16 @@ var snap = false;
 var name = "";
 var snapshots;
 
+/*
+* Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
+*/
 function setExtra() {
 	extra = !extra;
 }
 
+/*
+* Connects to the server and performs some initialization.
+*/
 function connect() {
 	var css = /* Needle */"#globalgauge path:nth-child(2){ fill:" + needlecolor
 			+ " ; stroke-width:0; } #globalgauge circle:nth-child(1){ fill:" + needlecolor
@@ -35,6 +41,7 @@ function connect() {
 	} else {
 		style.appendChild(document.createTextNode(css));
 	}
+
 	head.appendChild(style);
 	top_left = new google.visualization.PieChart(document
 			.getElementById('opinionpie'));
@@ -48,6 +55,8 @@ function connect() {
 			.getElementById('reachline'));
 	bottom_right = new google.visualization.LineChart(document
 			.getElementById('globalline'));
+
+	//Sends a message when a point in the bottom right chart is selected, which will change the displayed posts in the table.
 	google.visualization.events.addListener(bottom_right, 'select', function() {
 		var selection = bottom_right.getSelection()[0];
 		if (selection != undefined && (selection.hasOwnProperty('row') && selection.row != null)) {
@@ -55,6 +64,7 @@ function connect() {
 			var col = selection.column;
 			var month = sentimentdata.getValue(row, 0);
       var product = sentimentdata.getColumnLabel(selection.column);
+
 
       if (product != "Global" && filteredByProduct) {
         json = {
@@ -83,7 +93,7 @@ function connect() {
 
 			ws.send(JSON.stringify(json));
 		}
-	})
+	});
 
 	document.getElementById("Cookie").innerHTML = "Model: "
 			+ window.sessionStorage.model + "; PSS: "
@@ -92,6 +102,7 @@ function connect() {
 	ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
 
+  //When the connection is opened, ask the server for the chart configuration settings (gender, location and age segments to be displayed)
 	ws.onopen = function() {
 
 		json = {
@@ -105,6 +116,7 @@ function connect() {
 	ws.onmessage = function(event) {
 		json = JSON.parse(event.data);
 
+		//If it's a snapshot, hide the segmentation options
 		if (snap) {
 			$('#genderfilt').hide();
 			$('#agefilt').hide();
@@ -112,6 +124,7 @@ function connect() {
 			$('#finalfilt').hide();
 		}
 
+		//If Op is 'Error', display the server message in an overlay window
 		if (json[0].Op == "Error") {
 			$('#loading').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 			$('#overlay').show();
@@ -119,11 +132,13 @@ function connect() {
 			return;
 		}
 
+		//If the message contains 'Snapshots', build a dropdown with the availiable snapshots to be loaded
 		if (json[0] == "Snapshots") {
 			snapshots = json[1];
 			displaySnapshots();
 		}
 
+		//If Op is 'Configs', set the segmentation options to the ones specified in the message
 		if (json[0].Op == "Configs") {
 			var jsonData1 = JSON.parse(JSON.stringify(json));
 
@@ -169,6 +184,7 @@ function connect() {
 				}
 			}
 
+			//After the configuration, ask for the opinion extraction (chart) data
 			json = {
 				"Op" : "opinion_extraction",
 				"Id" : window.sessionStorage.id
@@ -176,8 +192,9 @@ function connect() {
 
 			ws.send(JSON.stringify(json));
 			return;
-
 		}
+
+		//If Op is 'OE_Redone' and data is availiable, draw the charts
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if ( json[1].hasOwnProperty("Error")) {
@@ -187,18 +204,21 @@ function connect() {
 						$('#overlay-back').show();
 				}
 			} else {
-				console.log("redone");
+				//console.log("redone");
 				drawChart();
 			}
+
+			//Request posts to build the post table
       var json = {
-            "Op" : "getposts",
-            "Id" : sessionStorage.id,
+        "Op" : "getposts",
+        "Id" : sessionStorage.id,
       }
 
 			ws.send(JSON.stringify(json));
 			return;
 		}
 
+		//If Op is 'table', build the table with the data from the server
 		if (json[0].Op == "table") {
 			// populate table
 			var tr;
@@ -225,11 +245,13 @@ function connect() {
 
 			return;
 		}
+		//If Op is 'graph', draw the charts
 		if (json[0].Op == "graph") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			drawChart();
 			return;
 		}
+		//If Op is 'comments' display an overlay window with the comments from the selected post
 		if (json[0].Op == "comments") {
 			clicker();
 			return;
@@ -244,6 +266,9 @@ $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
 });
 
+/*
+* Displays an overlay window to save a new snapshot.
+*/
 function save() {
   var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#loading').html(code);
@@ -251,6 +276,9 @@ function save() {
   $('#overlay-back').show();
 }
 
+/*
+* Sends a message requesting a list of snapshots.
+*/
 function load() {
   // send request for snapshot list
   var json = {
@@ -261,6 +289,9 @@ function load() {
   ws.send(JSON.stringify(json));
 }
 
+/*
+* Sends a message with all the data required to save a snapshot.
+*/
 function send(val) {
   var json = {
     "Op" : "Snapshot",
@@ -274,7 +305,9 @@ function send(val) {
   ws.send(JSON.stringify(json));
 }
 
-//need to receive json with snapshot names
+/*
+* Builds a dropdown list of availiable snapshots and displays them in an overlay window to be loaded.
+*/
 function displaySnapshots() {
 	var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap" style="margin-left:15px;"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(\':selected\').text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Load</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#loading').html(code);
@@ -288,6 +321,9 @@ function displaySnapshots() {
   $('#overlay-back').show();
 }
 
+/*
+* Sends a message requesting a specific snapshot to be loaded.
+*/
 function requestSnapshot(val) {
 	name = val;
   var json = {
@@ -299,8 +335,9 @@ function requestSnapshot(val) {
   ws.send(JSON.stringify(json));
 }
 
-// Detect table click
-
+/*
+* Detects a table click and displays an overlay window with comments from the selected post.
+*/
 function clicker(hidden) {
 	var thediv = document.getElementById('displaybox');
 	var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
@@ -320,6 +357,9 @@ function clicker(hidden) {
 	return false;
 }
 
+/*
+* Draws all the charts with the opinion extraction data.
+*/
 function drawChart() {
 	// Top Left
 	var data = new google.visualization.DataTable();
@@ -566,6 +606,10 @@ function drawChart() {
 			backgroundColor: {
 				fill:'transparent'
 			},
+			legend : {
+				maxLines: 5,
+				position: 'bottom'
+			}
 		};
 
     google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
@@ -693,13 +737,16 @@ function drawChart() {
 				fill:'transparent'
 			},
 			series: {},
+			legend : {
+				maxLines: 5,
+				position: 'bottom'
+			}
 		};
 
 		for (var v = 0; v < series.length; v++) {
 			options["series"][series[v]] = { lineDashStyle: [4, 4] }
 		}
 
-		console.log(options);
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		//google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);

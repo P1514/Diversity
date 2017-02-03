@@ -62,7 +62,7 @@ ws.onopen = function() {
 }
 ws.onmessage = function(event) {
   json = JSON.parse(event.data);
-  console.log(json);
+  //console.log(json);
 
   if (json.Op == "Error") {
     var code = json.Message + '<br><br><button class="btn btn-default" id="ok" onclick="window.history.back();">OK</button>';
@@ -171,7 +171,7 @@ function send_config() {
     "Location" : lstring,
   }
 
-  console.log(jsonData);
+  //console.log(jsonData);
   ws.send(JSON.stringify(jsonData));
 
 }
@@ -229,7 +229,6 @@ function addline(table){
         }
         if (elem != undefined) {
           jsonData[ii] = elem;
-          console.log("yes");
         } else {
           jsonData[ii] = {
             "Min":"0","Max":"99"

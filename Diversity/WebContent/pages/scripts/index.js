@@ -7,7 +7,11 @@ var middle;
 var jsonData;
 var newData;
 var all_models = [];
+var timespan;
 
+/*
+* Hides and displays certain UI elements according to the current user's access rights.
+*/
 function giveAcessRights(json){
       if(json[0].view_OM){
       document.getElementById("view").style.display = 'block';//show
@@ -70,14 +74,16 @@ function giveAcessRights(json){
 
       if(!json[0].create_edit_delete_model && !json[0].view_OM ){
           document.getElementById("_define").style["background-color"]= "#666666";
-          console.log('test');
+          //console.log('test');
         }
         else{
 
         }
 }
 
-
+/*
+* Extracts the user role from the page URL
+*/
 function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
@@ -128,6 +134,7 @@ function setCookie2(name, id, pss) {
   sessionStorage.pss = pss;
 }
 
+//dev only feature - removes the need to set the user type every time
 ws.onopen = function() {
 	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
   getRole();
@@ -150,9 +157,11 @@ ws.onmessage = function(event) {
       'Start_date' : localStorage.start_date != "" ? localStorage.start_date : undefined,
       'End_date' : localStorage.end_date != "" ? localStorage.end_date : undefined,
     }
+    timespan
     ws.send(JSON.stringify(jsonData));
   }
 
+  //If Op is 'Graph' and there is data to display, draw the global sentiment chart
   if (json[0].Op == 'Graph') {
     if (!json[1].hasOwnProperty('Graph')) {
       newData = JSON.parse(JSON.stringify(json));
@@ -162,6 +171,7 @@ ws.onmessage = function(event) {
     }
     //drawChart();
   }
+  //If Op is 'Rights', assign the access rights and request the availiable models list
   if (json[0].Op == 'Rights') {
     giveAcessRights(json);
     var jsonData = {
@@ -182,6 +192,9 @@ function new_model(){
   sessionStorage.internal = true; // true if the new model request comes from the homepage
 }
 
+/*
+* Builds a dropdown with all the availiable models
+*/
 function populatePSS() {
   /*
   var x = document.getElementById('Models');
@@ -235,7 +248,9 @@ $(window).on('resizeEnd', function() {
   }
 });
 
-
+/*
+* Reload the database (currently not availiable in the UI)
+*/
 function refreshDB(clean) {
   if (clean == 1) {
     json = {
@@ -257,6 +272,10 @@ function refreshDB(clean) {
   }
 };
 
+function getMonthFromString(mon){
+   return new Date(Date.parse(mon +" 1, 2012")).getMonth();
+}
+
 function drawChart() {
   //top 5 PSS
   middle = new google.visualization.LineChart(document.getElementById('top5'));
@@ -265,7 +284,7 @@ function drawChart() {
 
 
   var globaldata = new google.visualization.DataTable();
-  globaldata.addColumn('string', 'Month');
+  globaldata.addColumn('date', 'Month');
 
   var counter = data[1];
 
@@ -283,7 +302,8 @@ function drawChart() {
         if (i == 1 && j == 0) {
           globaldata.addRows(12);													// add 12 rows for the 12 months
         }
-        globaldata.setCell(j,0,counter[((i-1)*12) + i+j].Month);				// the first cell of each line is the name of the month
+        //globaldata.setCell(j,0,new Date(new Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) + i+j].Month),01));				// the first cell of each line is the name of the month
+        globaldata.setCell(j,0, new Date(counter[((i-1)*12) + i+j].Year, counter[((i-1)*12) + i+j], 01));
         if (counter[((i-1)*12) + i+j].Value != -1) {
           globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
         }
@@ -291,7 +311,10 @@ function drawChart() {
     }																// adds 12 positions per iteration
   }
 
- var options = {
+  var start = new Date(localStorage.start_date);
+  var end = new Date(localStorage.end_date);
+
+  var options = {
    backgroundColor: { fill:'transparent' },
    lineWidth: 3,
    legend : {
@@ -301,17 +324,30 @@ function drawChart() {
      showTextEvery: 1,
      textStyle : {
        fontSize: 12
-     }
+     },
+     viewWindow: {
+       min : start,
+       max : end
+     },
    },
    vAxis: {
      title: 'Global Sentiment',
      viewWindow: {
       max: 0,
       min: 100
-    }
+    },
   },
   width : '100%',
   height : '100%',
+  explorer: {
+    axis: 'horizontal',
+    keepInBounds: false,
+    maxZoomIn: 4.0
+  },
+  legend : {
+    maxLines: 5,
+    position: 'bottom'
+  }
  };
 
  middle.draw(globaldata, options);
@@ -385,7 +421,7 @@ function ok(val) {
 
 	 if (val) {
 
-	var name = $('#Models :selected').text();
+	  var name = $('#Models :selected').text();
     var model_data = document.getElementById('Models').value.split(';');
     var jsonData = {
       "Op" : "update_model",//create or update
@@ -404,24 +440,21 @@ function ok(val) {
       "Start_date": 0,
     };
     ws.send(JSON.stringify(jsonData));
-	$('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
     $('#overlay').show();
-	$('#overlay-back').show();
-	//window.alert("Model " + name + " deleted.");
+	  $('#overlay-back').show();
+	  //window.alert("Model " + name + " deleted.");
   } else {
     $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
-	$('#overlay').show();
-	$('#overlay-back').show();
-  }
-}
+  	$('#overlay').show();
+  	$('#overlay-back').show();
+   }
+ }
 
 function deleteModel() {
-
-
-
 	//var confirm = window.confirm("Do you really want to delete model " + name + "?");
 	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
-    $('#overlay').show();
+  $('#overlay').show();
 	$('#overlay-back').show();
 
 }
