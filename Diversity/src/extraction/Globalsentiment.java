@@ -57,8 +57,7 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             is case JSON creation fails
 	 */
-	public void globalsentiment(String param, String values, List<Long> psslist)
-			throws JSONException {
+	public void globalsentiment(String param, String values, List<Long> psslist) throws JSONException {
 		if (psslist.isEmpty())
 			return;
 		try {
@@ -81,7 +80,6 @@ public class Globalsentiment extends GetReach {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
 
 		for (long k : psslist) {
 
@@ -173,8 +171,7 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalsentiment(String param, String values, String output, long id)
-			throws JSONException {
+	public JSONArray globalsentiment(String param, String values, String output, long id) throws JSONException {
 		Model model = Data.modeldb.get(id);
 		JSONArray result = new JSONArray();
 		JSONObject obj;
@@ -182,34 +179,45 @@ public class Globalsentiment extends GetReach {
 		obj.put("Filter", output);
 		result.put(obj);
 
-		Calendar data=Calendar.getInstance();
+		Calendar data = Calendar.getInstance();
 		Calendar today = Calendar.getInstance();
-		
-		//data.setTimeInMillis(model.getDate());
-		//data.add(Calendar.YEAR, -1);
-		//System.out.println("MODEL START DATE"+"mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
-		System.out.println("PSS ID:"+ id);
-	
+
+		// data.setTimeInMillis(model.getDate());
+		// data.add(Calendar.YEAR, -1);
+		// System.out.println("MODEL START
+		// DATE"+"mon:"+data.get(Calendar.MONTH)+"
+		// year:"+data.get(Calendar.YEAR));
+		// System.out.println("PSS ID:"+ id);
+
 		data.setTimeInMillis(firstDate(id));
-		data.add(Calendar.MONTH,1);
-		
-		
-//		while(today.after(data) && globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id)<=0){
-//			//System.out.println("GLOBAL SENTIMENT:"+globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id));
-//			data.add(Calendar.MONTH, 1);			
-//		}
-		
-		if(firstDate(id)!=0){
-		//System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
-		for (; today.after(data)/*data.get(Calendar.MONTH) <Calendar.getInstance().get(Calendar.MONTH)*/; data.add(Calendar.MONTH, 1)) {
+		data.add(Calendar.MONTH, 1);
+
+		// while(today.after(data) &&
+		// globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) ,
+		// param, values, id)<=0){
+		// //System.out.println("GLOBAL
+		// SENTIMENT:"+globalsentimentby(data.get(Calendar.MONTH),
+		// data.get(Calendar.YEAR) , param, values, id));
+		// data.add(Calendar.MONTH, 1);
+		// }
+
+		if (firstDate(id) != 0) {
+			// System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+"
+			// year:"+data.get(Calendar.YEAR));
+			for (; today
+					.after(data)/*
+								 * data.get(Calendar.MONTH)
+								 * <Calendar.getInstance().get(Calendar.MONTH)
+								 */; data.add(Calendar.MONTH, 1)) {
 				obj = new JSONObject();
 				obj.put("Month", time[data.get(Calendar.MONTH)]);
 				obj.put("Year", data.get(Calendar.YEAR));
 				obj.put("Value",
-						globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id));
-				//System.out.println("mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
+						globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+				// System.out.println("mon:"+data.get(Calendar.MONTH)+"
+				// year:"+data.get(Calendar.YEAR));
 				result.put(obj);
-		}
+			}
 		}
 		return result;
 	}
@@ -248,18 +256,27 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray getAvgSentiment(int timespan /* years */, String param, String values, long id)
+	public JSONArray getAvgSentiment(String param, String values, long id)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		double value = 0;
-		Calendar data = Calendar.getInstance();
-		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -timespan);
-		int avg = 0;
-		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
+		Calendar data=Calendar.getInstance();
+		Calendar today = Calendar.getInstance();
+		
+
+		data.setTimeInMillis(firstDate(id));
+		data.add(Calendar.MONTH,1);
+		
+		
+
+		int avg=0;
+		if(firstDate(id)!=0){
+		//System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
+		for (; today.after(data)/*data.get(Calendar.MONTH) <Calendar.getInstance().get(Calendar.MONTH)*/; data.add(Calendar.MONTH, 1)) {
+			value += globalsentimentby(data.get(Calendar.YEAR), data.get(Calendar.YEAR) , param, values, id);
 			avg++;
+		}
 		}
 		value = value / ((avg != 0) ? avg : 1);
 		String temp;
@@ -451,6 +468,5 @@ public class Globalsentiment extends GetReach {
 	private void dbconnect() throws ClassNotFoundException, SQLException {
 		cnlocal = Settings.connlocal();
 	}
-	
-	
+
 }
