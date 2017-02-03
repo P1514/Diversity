@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (json[0].Op == "Tree") {
       jsonData = JSON.parse(JSON.stringify(json))
-      console.log(jsonData);
+      //console.log(jsonData);
       makeTree();
       if (sessionStorage.id != null) {
         var json2 = {

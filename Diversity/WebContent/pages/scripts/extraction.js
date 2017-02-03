@@ -347,7 +347,7 @@ function clicker(hidden) {
 		thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 				+ "<param name='bgcolor' value='#000000'>"
 				+ embedCode
-				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></center></td></tr></table>";
 		// thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage'
 		// class='btn btn-default'>Close Page</button>";
 	} else {
