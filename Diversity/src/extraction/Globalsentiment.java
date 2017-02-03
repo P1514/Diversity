@@ -16,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import general.Backend;
 import general.Data;
 import general.Model;
 import general.Settings;
@@ -83,9 +84,10 @@ public class Globalsentiment extends GetReach {
 
 		for (long k : psslist) {
 
-			Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
-			buildstring.append(globalsentiment(param, values, Data.pssdb.get(k).getName(), -1).toString());
-			Data.modeldb.remove((long) -1);
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
+			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1).toString());
+			Data.delmodel((long) -1);
+
 		}
 		result = buildstring.toString().replaceAll("\\]\\[", ",");
 		if ("".equals(result))
@@ -172,7 +174,6 @@ public class Globalsentiment extends GetReach {
 	 *             in case creating a JSON fails
 	 */
 	public JSONArray globalsentiment(String param, String values, String output, long id) throws JSONException {
-		Model model = Data.modeldb.get(id);
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -224,7 +225,7 @@ public class Globalsentiment extends GetReach {
 
 	public double globalsentimentby(int month, int year, String param, String value, long id) {
 
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 		parameters par = split_params(param, value);
 		String insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
@@ -325,40 +326,8 @@ public class Globalsentiment extends GetReach {
 	public JSONArray getPolarityDistribution(long id, String param, String value, String output) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		String[] params = null;
-		String[] values = null;
-		String gender = null;
-		String location = null;
-		String age = null;
-		String products = null;
-		if (param != null) {
-
-			params = param.split(",");
-			values = value.split(",");
-			for (int i = 0; i < params.length; i++) {
-				switch (params[i]) {
-				case "Age":
-					if (!values[i].equals("All"))
-						age = values[i];
-					break;
-				case "Gender":
-					if (!values[i].equals("All"))
-						gender = values[i];
-					break;
-				case "Location":
-					if (!values[i].equals("All"))
-						location = values[i];
-					break;
-				case "Product":
-					if (!values[i].equals("All"))
-						products = values[i];
-					break;
-				}
-			}
-		}
-		PreparedStatement query1 = null;
-		Model model = Data.modeldb.get(id);
-		ResultSet rs = null;
+		parameters par = split_params(param, value);
+		Model model = Data.getmodel(id);
 		obj = new JSONObject();
 		obj.put("Filter", output);
 		result.put(obj);
@@ -372,92 +341,76 @@ public class Globalsentiment extends GetReach {
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
 				+ "=?" + " AND " + Settings.lotable_product
-				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND " + Settings.lotable_timestamp
-				+ ">?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
-				+ Settings.latable;
-		if (age != null || gender != null || location != null)
+				+ (par.products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "
+				+ Settings.lotable_timestamp + ">?) AND " + Settings.lptable_authorid + " in (Select "
+				+ Settings.latable_id + " from " + Settings.latable;
+		if (par.age != null || par.gender != null || par.location != null)
 			query += " where 1=1 ";
-		if (age != null)
+		if (par.age != null)
 			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?";
-		if (gender != null)
+		if (par.gender != null)
 			query += " AND " + Settings.latable_gender + "=?";
-		if (location != null)
+		if (par.location != null)
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
 
 		try {
 			dbconnect();
-			query1 = cnlocal.prepareStatement(query);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message(Settings.err_dbconnect);
+		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
 			query1.setLong(1, model.getPSS());
 			int rangeindex = 2;
-			if (products != null) {
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(products)));
+			if (par.products != null) {
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
 			}
 			query1.setLong(rangeindex++, model.getDate());
-			if (age != null) {
-				query1.setString(rangeindex++, age.split("-")[1]);
-				query1.setString(rangeindex++, age.split("-")[0]);
+			if (par.age != null) {
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
 
-			if (gender != null)
-				query1.setString(rangeindex++, gender);
-			if (location != null)
-				query1.setString(rangeindex++, location);
-			// System.out.println(query1);
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location);
 
-			// System.out.print(query1 + "\n");
-			rs = query1.executeQuery();
-			rs.next();
+			try (ResultSet rs = query1.executeQuery()) {
+				if (!rs.next())
+					return Backend.error_message("No results found");
 
-			obj = new JSONObject();
-			obj.put("Param", "--");
-			obj.put("Value", rs.getInt("--"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Param", "-");
-			obj.put("Value", rs.getInt("-"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Param", "0");
-			obj.put("Value", rs.getInt("0"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Param", "+");
-			obj.put("Value", rs.getInt("+"));
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Param", "++");
-			obj.put("Value", rs.getInt("++"));
-			result.put(obj);
-
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				obj = new JSONObject();
+				obj.put("Param", "--");
+				obj.put("Value", rs.getInt("--"));
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Param", "-");
+				obj.put("Value", rs.getInt("-"));
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Param", "0");
+				obj.put("Value", rs.getInt("0"));
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Param", "+");
+				obj.put("Value", rs.getInt("+"));
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Param", "++");
+				obj.put("Value", rs.getInt("++"));
+				result.put(obj);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error", e);
+			return Backend.error_message("Error Fetching Data Please Try Again");
 		} finally {
 			try {
-				if (rs != null)
-					rs.close();
+				cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "ERROR", e);
 			}
 		}
 

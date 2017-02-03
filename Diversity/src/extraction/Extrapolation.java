@@ -135,22 +135,22 @@ public final class Extrapolation extends Globalsentiment {
 		ArrayList<Long> commonid = new ArrayList<Long>();
 		if (product_id1 == product_id2)
 			return 1;
-		if (!(Data.productdb.containsKey(product_id1) && Data.productdb.containsKey(product_id2)))
+		if (!(Data.dbhasproduct(product_id1) && Data.dbhasproduct(product_id2)))
 			return 0;
 
-		Product pro1 = Data.productdb.get(product_id1);
+		Product pro1 = Data.getProduct(product_id1);
 		commonid.add(product_id1);
 		int depth1 = 2;
 		int founddepth = -1;
 		if (pro1.getParent() != 0) {
 			do {
 				commonid.add(pro1.getParent());
-				pro1 = Data.productdb.get(pro1.getParent());
+				pro1 = Data.getProduct(pro1.getParent());
 				depth1++;
 
 			} while (pro1.getParent() != 0);
 		}
-		Product pro2 = Data.productdb.get(product_id2);
+		Product pro2 = Data.getProduct(product_id2);
 		int depth2 = 2;
 		if (commonid.contains(product_id2))
 			founddepth = 0;
@@ -160,7 +160,7 @@ public final class Extrapolation extends Globalsentiment {
 					if (commonid.contains(pro2.getParent()))
 						founddepth = depth2 - 1;
 				}
-				pro2 = Data.productdb.get(pro2.getParent());
+				pro2 = Data.getProduct(pro2.getParent());
 				depth2++;
 			} while (pro2.getParent() != 0);
 		}
@@ -184,7 +184,7 @@ public final class Extrapolation extends Globalsentiment {
 			}
 		}
 		for (Long id : simproducts) {
-			for (PSS pss : Data.pssdb.values()) {
+			for (PSS pss : Data.dbpssall()) {
 				if (pss.get_products().contains(id)) {
 					if (pssweights.containsKey(pss.getID())) {
 						pssweights.put(pss.getID(), pssweights.get(pss.getID()) + 1);
@@ -204,7 +204,7 @@ public final class Extrapolation extends Globalsentiment {
 		while (threshold > 1)
 			threshold = threshold / ((double) 100);
 
-		for (Product pro : Data.productdb.values()) {
+		for (Product pro : Data.dbproductall()) {
 			if (pro.get_Id() == product_id)
 				continue;
 
