@@ -546,10 +546,10 @@ function drawChart() {
 						data.addRow();
 				}
 				if (jsonData[i].Value != 0) {
-					data.setCell(ii, 0, new Date(jsonData[i].Year, jsonData[i].Month,01));
+					data.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01)); //month comes as a number from server, if it changes use getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, new Date(jsonData[i].Year, jsonData[i].Month,01));
+					data.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 				}
 			}
 		}
