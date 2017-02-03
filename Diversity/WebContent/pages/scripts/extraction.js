@@ -17,7 +17,8 @@ var extra = false;
 var snap = false;
 var name = "";
 var snapshots;
-
+var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+	"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 /*
 * Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
 */
@@ -62,7 +63,7 @@ function connect() {
 		if (selection != undefined && (selection.hasOwnProperty('row') && selection.row != null)) {
 			var row = selection.row ;
 			var col = selection.column;
-			var month = sentimentdata.getValue(row, 0);
+			var month = monthNames[sentimentdata.getValue(row, 0).getMonth()] ;
       var product = sentimentdata.getColumnLabel(selection.column);
 
 
@@ -580,13 +581,19 @@ function drawChart() {
 			}
 		}
 */
+		var start = new Date(localStorage.start_date);
+		var end = new Date(localStorage.end_date);
 
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
-				}
+				},
+				viewWindow: {
+					min : start,
+					max : end
+				},
 			},
 			vAxis : {
 				title : 'Reach',
@@ -609,7 +616,12 @@ function drawChart() {
 			legend : {
 				maxLines: 5,
 				position: 'bottom'
-			}
+			},
+			explorer: {
+				axis: 'horizontal',
+				keepInBounds: false,
+				maxZoomIn: 4.0
+			},
 		};
 
     google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
@@ -633,13 +645,12 @@ function drawChart() {
 		var series = [];
 		var randomYear = 2000;
 
-		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
 
 		var columns = [];
 
 		sentimentdata = new google.visualization.DataTable();
-		sentimentdata.addColumn('string', 'Month');
+		sentimentdata.addColumn('date', 'Month');
 		columns.push('Month');
 		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
 			var name = jsonData[i].Filter;
@@ -656,11 +667,11 @@ function drawChart() {
 					sentimentdata.addRow();
 				if (jsonData[i].Value != -1) {
 					if (jsonData[i].Graph == 'Bottom_Right') {
-						sentimentdata.setCell(ii, 0, jsonData[i].Month);
+						sentimentdata.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 					}
 				} else {
-					sentimentdata.setCell(ii, 0, jsonData[i].Month);
+					sentimentdata.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 				}
 			}
 
@@ -672,7 +683,7 @@ function drawChart() {
 						series.push(sentimentdata.getNumberOfColumns()-2);
 					}
 					sentimentdata.addRow();
-					sentimentdata.setCell(iii, 0, jsonData[i].Month);
+					sentimentdata.setCell(iii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 					sentimentdata.setCell(iii, filt, jsonData[i].Value);
 				}
 			}
@@ -716,7 +727,10 @@ function drawChart() {
 				textStyle : {
 					fontSize : 8
 				},
-				viewWindowMode: 'pretty',
+				viewWindow: {
+					min : start,
+					max : end
+				},
 			},
 			vAxis : {
 				title : 'Sentiment',
@@ -740,7 +754,12 @@ function drawChart() {
 			legend : {
 				maxLines: 5,
 				position: 'bottom'
-			}
+			},
+			explorer: {
+				axis: 'horizontal',
+				keepInBounds: false,
+				maxZoomIn: 4.0
+			},
 		};
 
 		for (var v = 0; v < series.length; v++) {
@@ -764,6 +783,10 @@ $(window).resize(function() {
 		$(this).trigger('resizeEnd');
 	}, 500);
 });
+
+function getMonthFromString(mon){
+   return new Date(Date.parse(mon +" 1, 2012")).getMonth();
+}
 
 // redraw graph when window resize is completed
 $(window).on('resizeEnd', function() {

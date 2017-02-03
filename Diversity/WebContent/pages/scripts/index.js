@@ -303,7 +303,7 @@ function drawChart() {
           globaldata.addRows(12);													// add 12 rows for the 12 months
         }
         //globaldata.setCell(j,0,new Date(new Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) + i+j].Month),01));				// the first cell of each line is the name of the month
-        globaldata.setCell(j,0, new Date(counter[((i-1)*12) + i+j].Year, counter[((i-1)*12) + i+j], 01));
+        globaldata.setCell(j,0, new Date(counter[((i-1)*12) + i+j].Year, getMonthFromString(counter[((i-1)*12) + i+j].Month), 01));
         if (counter[((i-1)*12) + i+j].Value != -1) {
           globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
         }
