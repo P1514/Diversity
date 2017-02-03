@@ -196,7 +196,7 @@ public class Oversight extends TimerTask {
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
-			gs.globalsentiment(1, null, null, gr.getTOPReach(5));
+			gs.globalsentiment(null, null, gr.getTOPReach(5));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

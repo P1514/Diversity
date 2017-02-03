@@ -184,10 +184,10 @@ public final class Backend {
 					for (int i = 0; i < msg.getString("PSS").split(";").length; i++)
 						pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
-					gs.globalsentiment(1, null, null, pss);
+					gs.globalsentiment(null, null, pss);
 
 				} else
-					gs.globalsentiment(1, null, null, gr.getTOPReach(5));
+					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
 				System.out.println(gs.globalsentiment());
 				try {
@@ -224,7 +224,7 @@ public final class Backend {
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalsentiment(1, param + "," + filtering,
+							gs.globalsentiment(param + "," + filtering,
 									values + "," + (filtering.equals("Product")
 											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
@@ -260,7 +260,7 @@ public final class Backend {
 					result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
 					result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
 					result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph",
+					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph",
 							"Bottom_Right");
 				} else {
 					obj = new JSONObject();
