@@ -1286,20 +1286,43 @@ public class Data {
 				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 			}
 		}
-		try {
-			cnlocal.close();
-		} catch (SQLException e) {
-			LOGGER.log(Level.INFO, "Nothing can be done here", e);
-		}
 		LOGGER.log(Level.INFO, " Model Loading: " + (System.nanoTime() - stime));
+		stime = System.nanoTime();
+		return null;
+	}
+	
+	private String updatelocal() throws JSONException{
+		String update = "UPDATE general SET totalposts=?,totallikes=?,totalcomments=?,totalviews=?,lastupdated=? WHERE id=1";
+		try{
+			cnlocal=Settings.connlocal();
+		}catch(Exception e){
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+			
+		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(update)){
+			query1.setLong(1, totalposts);
+			query1.setLong(2, totallikes);
+			query1.setLong(3, totalcomments);
+			query1.setLong(4, totalviews);
+			query1.setDate(5, (Date) lastUpdated2);
+			query1.executeUpdate();
+		} catch (SQLException e) {
+			LOGGER.log(Level.SEVERE,Settings.err_unknown,e);
+			return Backend.error_message(Settings.err_unknown).toString();
+		}
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.INFO,"Nothing can de done here",e);
+		}
+		LOGGER.log(Level.INFO," update general " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 		return null;
 	}
 
 	public String load() throws JSONException {
-
-		JSONArray result = new JSONArray();
-		JSONObject obj = new JSONObject();
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 		loadPSS();
@@ -1332,38 +1355,11 @@ public class Data {
 		err = insertposts();
 		if (err != null)
 			return err;
-		// TODO
+		err = updatelocal();
+		if(err!=null)
+			return err;
 
-		String update = "UPDATE general SET totalposts=?,totallikes=?,totalcomments=?,totalviews=?,lastupdated=? WHERE id=1";
-
-		PreparedStatement query1 = null;
-		try {
-			query1 = cnlocal.prepareStatement(update);
-			query1.setLong(1, totalposts);
-			query1.setLong(2, totallikes);
-			query1.setLong(3, totalcomments);
-			query1.setLong(4, totalviews);
-			query1.setDate(5, (Date) lastUpdated2);
-			query1.executeUpdate();
-		} catch (SQLException e1) {
-			//
-			e1.printStackTrace();
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		;
-
-		System.out.println(" update general " + (System.nanoTime() - stime));
-		stime = System.nanoTime();
-
-		obj.put("Op", "Error");
-		obj.put("Message", "Loaded Successfully");
-		result.put(obj);
-		return result.toString();
+		return Backend.error_message("Loaded Successfully").toString();
 	}
 
 	/**
@@ -1461,17 +1457,16 @@ public class Data {
 		public void run() {
 			try {
 				cnlocal = Settings.connlocal();
-			} catch (ClassNotFoundException e1) {
-				e1.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+				return;
 			}
 
 			String insert = "INSERT INTO " + Settings.latable + " "
 					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
-			PreparedStatement query1 = null;
-			try {
-				query1 = cnlocal.prepareStatement(insert);
+			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)){
 				query1.setLong(1, a.getID());
 				query1.setLong(2, a.getAge());
 				query1.setString(3, a.getName());
@@ -1487,18 +1482,16 @@ public class Data {
 				query1.setLong(13, a.getLikes());
 				query1.setLong(14, a.getViews());
 				query1.setLong(15, a.getPosts());
-				// System.out.println(query1);
 				query1.executeUpdate();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 				return;
 			} finally {
 				try {
-					if (query1 != null)
-						query1.close();
 					if (cnlocal != null)
 						cnlocal.close();
 				} catch (Exception e) {
+					LOGGER.log(Level.INFO, "Nothing can be done here", e);
 				}
 			}
 
@@ -1540,17 +1533,58 @@ public class Data {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
+		
+		private void load(long postid, long userid, long time,){TOU AQUI //TODO
+			// System.out.println(id);
+			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
+			// System.out.println(id);
+			long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
+			long time = 0;
+			if (remote) {
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				java.util.Date date = null;
+				try {
+					date = df.parse(rs.getString(Settings.rptable_date));
+				} catch (ParseException e) {
+					System.out.print("Error Parsing Date from Local DB");
+				}
+				time = date.getTime();
+
+			}
+			long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
+			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
+			;
+			String message = remote ? rs.getString(Settings.rptable_message)
+					: rs.getString(Settings.lptable_message);
+			long product = identifyProduct(message);
+			if (product == 0) {
+				rs.close();
+				stmt.close();
+				conlocal.close();
+				condata.close();
+				return;
+			}
+			Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
+					: new Post(postid, user_id, 0, likes, views, message);
+			if (!(users.contains(user_id))) {
+				users.add(user_id);
+			}
+
+			opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product));
+		}
 		public void run() {
 			if (obj == null) {
-				Statement stmt = null;
-				ResultSet rs = null;
 				try {
 					condata = Settings.conndata();
 					conlocal = Settings.connlocal();
+				}catch(Exception e){
+					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+					return;
+				}
 					boolean remote = true;
 					String query = (selectall + Settings.rptable + " Where " + Settings.rptable_postid + " = " + id);
-					stmt = condata.createStatement();
-					rs = stmt.executeQuery(query);
+					try(Statement stmt = condata.createStatement()){
+					try(ResultSet rs = stmt.executeQuery(query)){
 					if (!rs.next()) {
 						query = (selectall + Settings.lptable + " Where " + Settings.lptable_id + " = " + id);
 						stmt = conlocal.createStatement();
@@ -1565,42 +1599,7 @@ public class Data {
 							return;
 						}
 					}
-					// System.out.println(id);
-					long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
-					// System.out.println(id);
-					long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
-					long time = 0;
-					if (remote) {
-						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						java.util.Date date = null;
-						try {
-							date = df.parse(rs.getString(Settings.rptable_date));
-						} catch (ParseException e) {
-							System.out.print("Error Parsing Date from Local DB");
-						}
-						time = date.getTime();
-
-					}
-					long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
-					long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
-					;
-					String message = remote ? rs.getString(Settings.rptable_message)
-							: rs.getString(Settings.lptable_message);
-					long product = identifyProduct(message);
-					if (product == 0) {
-						rs.close();
-						stmt.close();
-						conlocal.close();
-						condata.close();
-						return;
-					}
-					Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
-							: new Post(postid, user_id, 0, likes, views, message);
-					if (!(users.contains(user_id))) {
-						users.add(user_id);
-					}
-
-					opiniondb.put(postid, new Opinion(_post, identifyPSSbyproduct(product), product));
+					
 					if (rs != null)
 						rs.close();
 					if (stmt != null)
