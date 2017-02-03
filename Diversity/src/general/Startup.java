@@ -1,5 +1,8 @@
 package general;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -7,6 +10,9 @@ import java.sql.Statement;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import com.mysql.jdbc.Connection;
 import monitoring.Oversight;
@@ -22,13 +28,14 @@ public class Startup implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		//CleanDB clean = new CleanDB();
-		/*try {
-			clean.clean();
-		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
+		/*CleanDB clean = new CleanDB();
+			try {
+				clean.clean();
+			} catch (JSONException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}*/
+		
 		System.out.println("Starting up!");
 		Oversight o = new Oversight(true);
 		o.run();
@@ -45,14 +52,13 @@ public class Startup implements ServletContextListener {
 			if (rs.getInt("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 			//System.out.println(clean.clean());
-			/*if (Settings.JSON_use == false) {
-				start.load();
+			if (Settings.JSON_use == false) {
+				new Data().load();
 			} else {
-				JSONArray json = new JSONArray(readUrl(
-				"http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith"));
-				//System.out.println(json);
-				//start.load(json);
-			}*/
+				JSONArray json = new JSONArray(readUrl(Settings.JSON_uri));
+				System.out.println(json);
+				new Data().load(json);
+			}
 			/*
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
@@ -125,7 +131,7 @@ public class Startup implements ServletContextListener {
 		System.out.println("Shutting down!");
 	}
 
-	/*private static String readUrl(String urlString) throws Exception {
+	private static String readUrl(String urlString) throws Exception {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
@@ -141,5 +147,5 @@ public class Startup implements ServletContextListener {
 			if (reader != null)
 				reader.close();
 		}
-	}*/
+	}
 }

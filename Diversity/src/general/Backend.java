@@ -82,7 +82,7 @@ public final class Backend {
 					filter = Settings.locations.split(",,");
 					break;
 				case "Product":
-					filter = Data.modeldb.get(msg.getLong("Id")).getProducts().split(",");
+					filter = Data.getmodel(msg.getLong("Id")).getProducts().split(",");
 				}
 
 			}
@@ -206,9 +206,9 @@ public final class Backend {
 					result = convert(result,
 							gs.getPolarityDistribution(id, param + "," + filtering,
 									values + "," + (filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i])),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i])),
 							"Graph", "Top_Middle");
 
 				result = convert(result, gs.getAvgSentiment( param, values, id), "Graph", "Top_Right");
@@ -217,18 +217,18 @@ public final class Backend {
 					result = convert(result,
 							gr.globalreach(param + "," + filtering,
 									values + "," + (filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									id),
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
 							gs.globalsentiment(param + "," + filtering,
 									values + "," + (filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
-											? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									id),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
@@ -237,9 +237,9 @@ public final class Backend {
 						result = convert(result,
 								extra.extrapolate(param + "," + filtering,
 										values + "," + (filtering.equals("Product")
-												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										(filtering.equals("Product")
-												? Data.productdb.get(Long.valueOf(filter[i])).get_Name() : filter[i]),
+												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										id),
 								"Graph", "Bottom_Right_Ex");
 				}
@@ -343,7 +343,7 @@ public final class Backend {
 				result = new JSONArray();
 				result.put(new JSONObject().put("Op", "pss"));
 
-				for (PSS a : Data.pssdb.values()) {
+				for (PSS a : Data.dbpssall()) {
 					result.put(new JSONObject().put("Pss", a.getName()));
 				}
 

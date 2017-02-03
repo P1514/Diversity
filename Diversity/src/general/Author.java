@@ -252,7 +252,7 @@ public final class Author {
 	 */
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
 		this.influence = Settings.aWcomments
-				* ((this.comments / this.posts) / (double) (avgcom != 0 ? avgcom : (double) 1))
+ 				* ((this.comments / this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
 				+ Settings.aWlikes * ((this.likes / this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
 				+ Settings.aWviews * ((this.views / this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
 		// System.out.println(avgcom + " / " + avglike + " / " + avgview);

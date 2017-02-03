@@ -145,7 +145,7 @@ public class GetComments {
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 		}
 

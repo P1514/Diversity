@@ -35,6 +35,7 @@ public class GetPopulation {
 	 * @return the all
 	 * @throws JSONException the JSON exception
 	 */
+	@Deprecated
 	public JSONArray getAll(String param, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -62,7 +63,7 @@ public class GetPopulation {
 		result.put(obj);
 		PreparedStatement query1 = null;
 		ResultSet rs = null;
-		Model model = Data.modeldb.get(id);
+		Model model = null;//Data.modeldb.get(id);
 		try {
 			dbconnect();
 			if (!params.contains("-")) {
@@ -151,7 +152,7 @@ public class GetPopulation {
 		return result;
 
 	}
-
+	@Deprecated
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
