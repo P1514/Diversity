@@ -345,7 +345,7 @@ public class GetReach {
 	}
 
 	public long firstDate(long id) {
-		Model model = Data.modeldb.get(id);
+		Model model = Data.getmodel(id);
 		long result = 0;
 		ResultSet rs;
 		try {

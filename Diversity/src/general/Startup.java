@@ -28,18 +28,18 @@ public class Startup implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		CleanDB clean = new CleanDB();
+		/*CleanDB clean = new CleanDB();
 			try {
 				clean.clean();
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 		
 		System.out.println("Starting up!");
-		//Oversight o = new Oversight(true);
-		//o.run();
-		//new Oversight();
+		Oversight o = new Oversight(true);
+		o.run();
+		new Oversight();
 		Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;
