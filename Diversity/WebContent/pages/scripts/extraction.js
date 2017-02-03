@@ -14,11 +14,21 @@ var windowwidth = $(window).width();
 var needlecolor = '#604460';
 var animationend = false;
 var extra = false;
-
+var snap = false;
+var name = "";
+var snapshots;
+var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+	"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+/*
+* Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
+*/
 function setExtra() {
 	extra = !extra;
 }
 
+/*
+* Connects to the server and performs some initialization.
+*/
 function connect() {
 	var css = /* Needle */"#globalgauge path:nth-child(2){ fill:" + needlecolor
 			+ " ; stroke-width:0; } #globalgauge circle:nth-child(1){ fill:" + needlecolor
@@ -32,6 +42,7 @@ function connect() {
 	} else {
 		style.appendChild(document.createTextNode(css));
 	}
+
 	head.appendChild(style);
 	top_left = new google.visualization.PieChart(document
 			.getElementById('opinionpie'));
@@ -45,13 +56,16 @@ function connect() {
 			.getElementById('reachline'));
 	bottom_right = new google.visualization.LineChart(document
 			.getElementById('globalline'));
+
+	//Sends a message when a point in the bottom right chart is selected, which will change the displayed posts in the table.
 	google.visualization.events.addListener(bottom_right, 'select', function() {
 		var selection = bottom_right.getSelection()[0];
 		if (selection != undefined && (selection.hasOwnProperty('row') && selection.row != null)) {
 			var row = selection.row ;
 			var col = selection.column;
-			var month = sentimentdata.getValue(row, 0);
+			var month = monthNames[sentimentdata.getValue(row, 0).getMonth()] ;
       var product = sentimentdata.getColumnLabel(selection.column);
+
 
       if (product != "Global" && filteredByProduct) {
         json = {
@@ -80,7 +94,7 @@ function connect() {
 
 			ws.send(JSON.stringify(json));
 		}
-	})
+	});
 
 	document.getElementById("Cookie").innerHTML = "Model: "
 			+ window.sessionStorage.model + "; PSS: "
@@ -89,6 +103,7 @@ function connect() {
 	ws = new WebSocket('ws://' + window.location.hostname + ":"
 			+ window.location.port + '/Diversity/server');
 
+  //When the connection is opened, ask the server for the chart configuration settings (gender, location and age segments to be displayed)
 	ws.onopen = function() {
 
 		json = {
@@ -102,6 +117,15 @@ function connect() {
 	ws.onmessage = function(event) {
 		json = JSON.parse(event.data);
 
+		//If it's a snapshot, hide the segmentation options
+		if (snap) {
+			$('#genderfilt').hide();
+			$('#agefilt').hide();
+			$('#locationfilt').hide();
+			$('#finalfilt').hide();
+		}
+
+		//If Op is 'Error', display the server message in an overlay window
 		if (json[0].Op == "Error") {
 			$('#loading').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 			$('#overlay').show();
@@ -109,6 +133,13 @@ function connect() {
 			return;
 		}
 
+		//If the message contains 'Snapshots', build a dropdown with the availiable snapshots to be loaded
+		if (json[0] == "Snapshots") {
+			snapshots = json[1];
+			displaySnapshots();
+		}
+
+		//If Op is 'Configs', set the segmentation options to the ones specified in the message
 		if (json[0].Op == "Configs") {
 			var jsonData1 = JSON.parse(JSON.stringify(json));
 
@@ -154,6 +185,7 @@ function connect() {
 				}
 			}
 
+			//After the configuration, ask for the opinion extraction (chart) data
 			json = {
 				"Op" : "opinion_extraction",
 				"Id" : window.sessionStorage.id
@@ -161,8 +193,9 @@ function connect() {
 
 			ws.send(JSON.stringify(json));
 			return;
-
 		}
+
+		//If Op is 'OE_Redone' and data is availiable, draw the charts
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if ( json[1].hasOwnProperty("Error")) {
@@ -172,18 +205,21 @@ function connect() {
 						$('#overlay-back').show();
 				}
 			} else {
-				console.log("redone");
+				//console.log("redone");
 				drawChart();
 			}
+
+			//Request posts to build the post table
       var json = {
-            "Op" : "getposts",
-            "Id" : sessionStorage.id,
+        "Op" : "getposts",
+        "Id" : sessionStorage.id,
       }
 
 			ws.send(JSON.stringify(json));
 			return;
 		}
 
+		//If Op is 'table', build the table with the data from the server
 		if (json[0].Op == "table") {
 			// populate table
 			var tr;
@@ -210,11 +246,13 @@ function connect() {
 
 			return;
 		}
+		//If Op is 'graph', draw the charts
 		if (json[0].Op == "graph") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			drawChart();
 			return;
 		}
+		//If Op is 'comments' display an overlay window with the comments from the selected post
 		if (json[0].Op == "comments") {
 			clicker();
 			return;
@@ -229,6 +267,9 @@ $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
 });
 
+/*
+* Displays an overlay window to save a new snapshot.
+*/
 function save() {
   var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#loading').html(code);
@@ -236,16 +277,22 @@ function save() {
   $('#overlay-back').show();
 }
 
+/*
+* Sends a message requesting a list of snapshots.
+*/
 function load() {
   // send request for snapshot list
   var json = {
     "Op" : "load_snapshot",
-		"type" : "Extraction"
+		"Type" : "Extraction"
   }
 
   ws.send(JSON.stringify(json));
 }
 
+/*
+* Sends a message with all the data required to save a snapshot.
+*/
 function send(val) {
   var json = {
     "Op" : "Snapshot",
@@ -253,30 +300,45 @@ function send(val) {
     "name" : val,
     "creation_date" : new Date(),
     "timespan" : 12,
-    "user" : "test"
+    "user" : "test",
+		"Id" : sessionStorage.id
   }
   ws.send(JSON.stringify(json));
 }
 
-//need to receive json with snapshot names
+/*
+* Builds a dropdown list of availiable snapshots and displays them in an overlay window to be loaded.
+*/
 function displaySnapshots() {
-  var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(":selected").text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
+	var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap" style="margin-left:15px;"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(\':selected\').text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Load</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#loading').html(code);
+  for (var i=0; i < snapshots.length; i++) {
+    $('#select_snap').append($('<option>', {
+      value: snapshots[i].Name,
+      text: snapshots[i].Name
+    }));
+  }
   $('#overlay').show();
   $('#overlay-back').show();
 }
 
+/*
+* Sends a message requesting a specific snapshot to be loaded.
+*/
 function requestSnapshot(val) {
+	name = val;
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
+		"Type" : "All",
   }
-
+	snap = true;
   ws.send(JSON.stringify(json));
 }
 
-// Detect table click
-
+/*
+* Detects a table click and displays an overlay window with comments from the selected post.
+*/
 function clicker(hidden) {
 	var thediv = document.getElementById('displaybox');
 	var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
@@ -286,7 +348,7 @@ function clicker(hidden) {
 		thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 				+ "<param name='bgcolor' value='#000000'>"
 				+ embedCode
-				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></td></tr></table>";
+				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></center></td></tr></table>";
 		// thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage'
 		// class='btn btn-default'>Close Page</button>";
 	} else {
@@ -296,6 +358,9 @@ function clicker(hidden) {
 	return false;
 }
 
+/*
+* Draws all the charts with the opinion extraction data.
+*/
 function drawChart() {
 	// Top Left
 	var data = new google.visualization.DataTable();
@@ -467,7 +532,7 @@ function drawChart() {
 	// Bottom Middle
 	if (jsonData[i].Graph == "Bottom_Middle") {
 		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Month');
+		data.addColumn('date', 'Month');
 
 		for (filt = 1; i < jsonData.length
 				&& jsonData[i].Graph == "Bottom_Middle"; filt++) {
@@ -481,10 +546,10 @@ function drawChart() {
 						data.addRow();
 				}
 				if (jsonData[i].Value != 0) {
-					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01)); //month comes as a number from server, if it changes use getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 				}
 			}
 		}
@@ -516,13 +581,19 @@ function drawChart() {
 			}
 		}
 */
+		var start = new Date(localStorage.start_date);
+		var end = new Date(localStorage.end_date);
 
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
-				}
+				},
+				viewWindow: {
+					min : start,
+					max : end
+				},
 			},
 			vAxis : {
 				title : 'Reach',
@@ -541,6 +612,15 @@ function drawChart() {
 			},
 			backgroundColor: {
 				fill:'transparent'
+			},
+			legend : {
+				maxLines: 5,
+				position: 'bottom'
+			},
+			explorer: {
+				axis: 'horizontal',
+				keepInBounds: false,
+				maxZoomIn: 4.0
 			},
 		};
 
@@ -565,13 +645,12 @@ function drawChart() {
 		var series = [];
 		var randomYear = 2000;
 
-		var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-		  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
 
 		var columns = [];
 
 		sentimentdata = new google.visualization.DataTable();
-		sentimentdata.addColumn('string', 'Month');
+		sentimentdata.addColumn('date', 'Month');
 		columns.push('Month');
 		for (filt = 1; i < jsonData.length && (jsonData[i].Graph == "Bottom_Right" || jsonData[i].Graph == "Bottom_Right_Ex"); filt++) {
 			var name = jsonData[i].Filter;
@@ -588,11 +667,11 @@ function drawChart() {
 					sentimentdata.addRow();
 				if (jsonData[i].Value != -1) {
 					if (jsonData[i].Graph == 'Bottom_Right') {
-						sentimentdata.setCell(ii, 0, jsonData[i].Month);
+						sentimentdata.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 					}
 				} else {
-					sentimentdata.setCell(ii, 0, jsonData[i].Month);
+					sentimentdata.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 				}
 			}
 
@@ -604,7 +683,7 @@ function drawChart() {
 						series.push(sentimentdata.getNumberOfColumns()-2);
 					}
 					sentimentdata.addRow();
-					sentimentdata.setCell(iii, 0, jsonData[i].Month);
+					sentimentdata.setCell(iii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01));
 					sentimentdata.setCell(iii, filt, jsonData[i].Value);
 				}
 			}
@@ -648,7 +727,10 @@ function drawChart() {
 				textStyle : {
 					fontSize : 8
 				},
-				viewWindowMode: 'pretty',
+				viewWindow: {
+					min : start,
+					max : end
+				},
 			},
 			vAxis : {
 				title : 'Sentiment',
@@ -669,13 +751,21 @@ function drawChart() {
 				fill:'transparent'
 			},
 			series: {},
+			legend : {
+				maxLines: 5,
+				position: 'bottom'
+			},
+			explorer: {
+				axis: 'horizontal',
+				keepInBounds: false,
+				maxZoomIn: 4.0
+			},
 		};
 
 		for (var v = 0; v < series.length; v++) {
 			options["series"][series[v]] = { lineDashStyle: [4, 4] }
 		}
 
-		console.log(options);
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		//google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
@@ -693,6 +783,10 @@ $(window).resize(function() {
 		$(this).trigger('resizeEnd');
 	}, 500);
 });
+
+function getMonthFromString(mon){
+   return new Date(Date.parse(mon +" 1, 2012")).getMonth();
+}
 
 // redraw graph when window resize is completed
 $(window).on('resizeEnd', function() {
@@ -764,82 +858,121 @@ function changeRequest() {
 	var ageradio = document.getElementById('Age_radio').checked;
 	var finalradio = document.getElementById('Final').checked;
 	var extrapolate = document.getElementById('extrapolate').checked;
-	var json = {
-		"Op" : "oe_refresh",// OE_Filter
-		"Param" : "",
-		"Values" : "",
-		"Filter" : "",
-		"Id" : sessionStorage.id,
-		"Extrapolate" : extrapolate ? 1 : undefined,
-	};
-	if (globalradio == true)
-		needlecolor = '#604460';
+	var json;
 
-	if (gender == "All" && location == "All" && age == "All"
-			&& products == "All" && globalradio) {
-		json.Param += "Global";
-		json.Values += "Global";
-	} else {
-		if (ageradio == false) {
+	if (snap) {
+		json = {
+			"Op" : "load_snapshot",
+			"Type" : "",
+			"Name" : name,
+			"Id" : sessionStorage.id,
+		};
 
-			if (age == "All") {
-				json.Param += "Age,";
-				json.Values += "All,";
-
-			} else {
-				json.Param += "Age,";
-				var select = document.getElementById('agefilt');
-				json.Values += age + ",";
-			}
-		} else {
-			needlecolor = "#5C6E0E";
-			json.Filter = "Age";
+		if (globalradio == true) {
+			needlecolor = '#604460';
+			json.Type = "All";
 		}
-		if (genderradio == false) {
 
-			if (gender == "All") {
-				json.Param += "Gender,";
-				json.Values += "All,";
-
-			} else {
-				json.Param += "Gender,";
-				var select = document.getElementById('genderfilt');
-				json.Values += gender + ",";
-			}
-		} else {
+		if (genderradio == true) {
 			needlecolor = '#00617F';
-			json.Filter = "Gender";
+			json.Type = "Gender";
 		}
-		if (locationradio == false) {
-			if (location == "All") {
-				json.Param += "Location,";
-				json.Values += "All,";
-			} else {
-				json.Param += "Location,";
-				var select = document.getElementById('locationfilt');
-				json.Values += location + ",";
-			}
-		} else {
-			needlecolor = '#A60202';
-			json.Filter = "Location";
-		}
-		if (finalradio == false) {
-			filteredByProduct = false;
-			if (products == "All") {
-				json.Param += "Product,";
-				json.Values += "All,";
-			} else {
-				json.Param += "Product,";
-				var select = document.getElementById('finalfilt');
-				json.Values += products + ",";
 
-			}
-		} else {
+		if (locationradio == true) {
+			needlecolor = '#A60202';
+			json.Type = "Location";
+		}
+
+		if (ageradio == true) {
+			needlecolor = "#5C6E0E";
+			json.Type = "Age";
+		}
+
+		if (finalradio == true) {
 			needlecolor = '#FFC00C';
-			json.Filter = "Product";
-			filteredByProduct = true;
+			json.Type = "Product";
+		}
+
+	} else {
+		json = {
+			"Op" : "oe_refresh",// OE_Filter
+			"Param" : "",
+			"Values" : "",
+			"Filter" : "",
+			"Id" : sessionStorage.id,
+			"Extrapolate" : extrapolate ? 1 : undefined,
+		};
+
+		if (globalradio == true)
+			needlecolor = '#604460';
+
+		if (gender == "All" && location == "All" && age == "All"
+				&& products == "All" && globalradio) {
+			json.Param += "Global";
+			json.Values += "Global";
+		} else {
+			if (ageradio == false) {
+
+				if (age == "All") {
+					json.Param += "Age,";
+					json.Values += "All,";
+
+				} else {
+					json.Param += "Age,";
+					var select = document.getElementById('agefilt');
+					json.Values += age + ",";
+				}
+			} else {
+				needlecolor = "#5C6E0E";
+				json.Filter = "Age";
+			}
+			if (genderradio == false) {
+
+				if (gender == "All") {
+					json.Param += "Gender,";
+					json.Values += "All,";
+
+				} else {
+					json.Param += "Gender,";
+					var select = document.getElementById('genderfilt');
+					json.Values += gender + ",";
+				}
+			} else {
+				needlecolor = '#00617F';
+				json.Filter = "Gender";
+			}
+			if (locationradio == false) {
+				if (location == "All") {
+					json.Param += "Location,";
+					json.Values += "All,";
+				} else {
+					json.Param += "Location,";
+					var select = document.getElementById('locationfilt');
+					json.Values += location + ",";
+				}
+			} else {
+				needlecolor = '#A60202';
+				json.Filter = "Location";
+			}
+			if (finalradio == false) {
+				filteredByProduct = false;
+				if (products == "All") {
+					json.Param += "Product,";
+					json.Values += "All,";
+				} else {
+					json.Param += "Product,";
+					var select = document.getElementById('finalfilt');
+					json.Values += products + ",";
+
+				}
+			} else {
+				needlecolor = '#FFC00C';
+				json.Filter = "Product";
+				filteredByProduct = true;
+			}
 		}
 	}
+
 	/*
 	 * if (ageradio == "false") { if (age == "All") {
 	 *
