@@ -273,7 +273,7 @@ public class GetReach {
 			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
 				try {
 					obj = new JSONObject();
-					obj.put("Month", data.get(Calendar.MONTH));
+					obj.put("Month", time[data.get(Calendar.MONTH)]);
 					obj.put("Year", data.get(Calendar.YEAR));
 					obj.put("Value",
 							globalreachby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
