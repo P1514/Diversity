@@ -532,7 +532,7 @@ function drawChart() {
 	// Bottom Middle
 	if (jsonData[i].Graph == "Bottom_Middle") {
 		var data = new google.visualization.DataTable();
-		data.addColumn('string', 'Month');
+		data.addColumn('date', 'Month');
 
 		for (filt = 1; i < jsonData.length
 				&& jsonData[i].Graph == "Bottom_Middle"; filt++) {
@@ -546,10 +546,10 @@ function drawChart() {
 						data.addRow();
 				}
 				if (jsonData[i].Value != 0) {
-					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii, 0, new Date(jsonData[i].Year, jsonData[i].Month,01));
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, jsonData[i].Month);
+					data.setCell(ii, 0, new Date(jsonData[i].Year, jsonData[i].Month,01));
 				}
 			}
 		}
