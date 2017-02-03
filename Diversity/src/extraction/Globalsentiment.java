@@ -170,22 +170,14 @@ public class Globalsentiment extends GetReach {
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -5);
+		data.add(Calendar.YEAR, -timespan);
 
-		while (globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values,
-				id) == 0) {
-			data.add(Calendar.MONTH, 1);
-			
-		}
-		System.out.println("mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
-		System.out.println("current mon:"+Calendar.getInstance().get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
-		for (; data.get(Calendar.MONTH) <Calendar.getInstance().get(Calendar.MONTH); data.add(Calendar.MONTH, 1)) {
+		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			try {
 				obj = new JSONObject();
-				obj.put("Month", time[data.get(Calendar.MONTH)-1]);
+				obj.put("Month", time[month % 12]);
 				obj.put("Value",
-						globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id));
-				System.out.println("mon:"+data.get(Calendar.MONTH)+" year:"+data.get(Calendar.YEAR));
+						globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -195,7 +187,6 @@ public class Globalsentiment extends GetReach {
 
 		return result;
 	}
-
 	public double globalsentimentby(int month, int year, String param, String value, long id) {
 
 		Model model = Data.modeldb.get(id);
@@ -207,7 +198,7 @@ public class Globalsentiment extends GetReach {
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		return calc_global("polar", insert, par, month, model, year);
+		return calc_global("polar",insert, par, month, model, year);
 
 	}
 
