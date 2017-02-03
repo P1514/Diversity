@@ -345,9 +345,12 @@ public class GetPosts {
 
 	}
 
-	private void dbconnect() throws ClassNotFoundException {
-
+	private void dbconnect() {
+		try{
 			cnlocal = Settings.connlocal();
+		}catch(Exception e){
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+		}
 		
 
 	}

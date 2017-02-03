@@ -133,11 +133,12 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = true;
-	//public static String JSON_uri = "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
+	public static Boolean JSON_use = false;
+	// public static String JSON_uri =
+	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	public static String JSON_uri = "https://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final boolean LocalPolarity=true;
-	
+	public static final boolean LocalPolarity = true;
+
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
 	public static final String JSON_replies = "replies";
@@ -202,11 +203,11 @@ public class Settings {
 	public static final String artable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String artable_role = "role";
 
-	
-	//Errors
-	public static final String err_unknown="ERROR ";
-	public static final String err_dbconnect="Cannot connect to database Please Try Again Later.";
-	public static final String err_cr="Cannot connect to common repository";
+	// Errors
+	public static final String err_unknown = "ERROR ";
+	public static final String err_dbconnect = "Cannot connect to database Please Try Again Later.";
+	public static final String err_cr = "Cannot connect to common repository";
+
 	/**
 	 * Conndata.
 	 *
@@ -217,9 +218,6 @@ public class Settings {
 	 *             the SQL exception
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
-
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.YEAR, 2);
 		Class.forName("com.mysql.jdbc.Driver");
 		return (Connection) DriverManager.getConnection(rurl, ruser, rpass);
 	}
@@ -231,21 +229,9 @@ public class Settings {
 	 * @throws ClassNotFoundException
 	 *             the class not found exception
 	 */
-	public static Connection connlocal() throws ClassNotFoundException {
+	public static Connection connlocal() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
-		while (true) {
-			try {
-				return (Connection) DriverManager.getConnection(url2, user2, pass2);
-			} catch (SQLException e) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				e.printStackTrace();
-			}
-		}
+		return (Connection) DriverManager.getConnection(url2, user2, pass2);
 	}
 
 	/**
@@ -254,22 +240,12 @@ public class Settings {
 	 * @return the connection
 	 * @throws ClassNotFoundException
 	 *             the class not found exception
+	 * @throws SQLException 
 	 */
-	public static Connection conncr() throws ClassNotFoundException {
+	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
-		while (true) {
-			try {
-				return (Connection) DriverManager.getConnection(crurl, cruser, crpass);
-			} catch (SQLException e) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				e.printStackTrace();
-			}
-		}
+		return (Connection) DriverManager.getConnection(crurl, cruser, crpass);
+
 	}
 
 	/**

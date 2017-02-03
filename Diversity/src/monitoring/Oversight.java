@@ -217,7 +217,7 @@ public class Oversight extends TimerTask {
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

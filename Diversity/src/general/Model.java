@@ -13,6 +13,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sun.media.jfxmedia.logging.Logger;
+
 import monitoring.Monitor;;
 
 // TODO: Auto-generated Javadoc
@@ -393,8 +395,7 @@ public final class Model {
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
