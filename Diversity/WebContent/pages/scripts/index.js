@@ -311,8 +311,9 @@ function drawChart() {
     }																// adds 12 positions per iteration
   }
 
-  var start = new Date(localStorage.start_date);
-  var end = new Date(localStorage.end_date);
+
+  var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
+  var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
 
   var options = {
    backgroundColor: { fill:'transparent' },
@@ -324,10 +325,6 @@ function drawChart() {
      showTextEvery: 1,
      textStyle : {
        fontSize: 12
-     },
-     viewWindow: {
-       min : start,
-       max : end
      },
    },
    vAxis: {
@@ -349,6 +346,21 @@ function drawChart() {
     position: 'bottom'
   }
  };
+
+ if (start != 0 && end != 0) {
+   options.hAxis.viewWindow = {
+     min : start,
+     max : end
+   }
+ } else if (start != 0 && end == 0) {
+    options.hAxis.viewWindow = {
+     min : start
+   }
+ } else if (start == 0 && end != 0) {
+    options.hAxis.viewWindow = {
+     max : start
+   }
+ }
 
  middle.draw(globaldata, options);
 }
