@@ -97,7 +97,6 @@ public class GetReach {
 		Calendar data = Calendar.getInstance();
 		Calendar today = Calendar.getInstance();
 
-
 		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
 
@@ -361,10 +360,10 @@ public class GetReach {
 
 			rs = query1.executeQuery();
 			rs.next();
-			result = rs.getLong(1);
-			//System.out.println("Query:" + query1);
-
-			//System.out.println("Result:" + result);
+			if (model.getDate() > rs.getLong(1))
+				result = model.getDate();
+			else
+				result = rs.getLong(1);
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
