@@ -9,6 +9,9 @@ var newData;
 var all_models = [];
 var timespan;
 
+/*
+* Hides and displays certain UI elements according to the current user's access rights.
+*/
 function giveAcessRights(json){
       if(json[0].view_OM){
       document.getElementById("view").style.display = 'block';//show
@@ -71,14 +74,16 @@ function giveAcessRights(json){
 
       if(!json[0].create_edit_delete_model && !json[0].view_OM ){
           document.getElementById("_define").style["background-color"]= "#666666";
-          console.log('test');
+          //console.log('test');
         }
         else{
 
         }
 }
 
-
+/*
+* Extracts the user role from the page URL
+*/
 function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
@@ -129,6 +134,7 @@ function setCookie2(name, id, pss) {
   sessionStorage.pss = pss;
 }
 
+//dev only feature - removes the need to set the user type every time
 ws.onopen = function() {
 	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
   getRole();
@@ -155,6 +161,7 @@ ws.onmessage = function(event) {
     ws.send(JSON.stringify(jsonData));
   }
 
+  //If Op is 'Graph' and there is data to display, draw the global sentiment chart
   if (json[0].Op == 'Graph') {
     if (!json[1].hasOwnProperty('Graph')) {
       newData = JSON.parse(JSON.stringify(json));
@@ -164,6 +171,7 @@ ws.onmessage = function(event) {
     }
     //drawChart();
   }
+  //If Op is 'Rights', assign the access rights and request the availiable models list
   if (json[0].Op == 'Rights') {
     giveAcessRights(json);
     var jsonData = {
@@ -184,6 +192,9 @@ function new_model(){
   sessionStorage.internal = true; // true if the new model request comes from the homepage
 }
 
+/*
+* Builds a dropdown with all the availiable models
+*/
 function populatePSS() {
   /*
   var x = document.getElementById('Models');
@@ -237,7 +248,9 @@ $(window).on('resizeEnd', function() {
   }
 });
 
-
+/*
+* Reload the database (currently not availiable in the UI)
+*/
 function refreshDB(clean) {
   if (clean == 1) {
     json = {
@@ -330,6 +343,10 @@ function drawChart() {
     axis: 'horizontal',
     keepInBounds: false,
     maxZoomIn: 4.0
+  },
+  legend : {
+    maxLines: 5,
+    position: 'bottom'
   }
  };
 
@@ -404,7 +421,7 @@ function ok(val) {
 
 	 if (val) {
 
-	var name = $('#Models :selected').text();
+	  var name = $('#Models :selected').text();
     var model_data = document.getElementById('Models').value.split(';');
     var jsonData = {
       "Op" : "update_model",//create or update
@@ -423,24 +440,21 @@ function ok(val) {
       "Start_date": 0,
     };
     ws.send(JSON.stringify(jsonData));
-	$('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
     $('#overlay').show();
-	$('#overlay-back').show();
-	//window.alert("Model " + name + " deleted.");
+	  $('#overlay-back').show();
+	  //window.alert("Model " + name + " deleted.");
   } else {
     $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
-	$('#overlay').show();
-	$('#overlay-back').show();
-  }
-}
+  	$('#overlay').show();
+  	$('#overlay-back').show();
+   }
+ }
 
 function deleteModel() {
-
-
-
 	//var confirm = window.confirm("Do you really want to delete model " + name + "?");
 	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
-    $('#overlay').show();
+  $('#overlay').show();
 	$('#overlay-back').show();
 
 }

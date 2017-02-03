@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ws = new WebSocket('ws://' + window.location.hostname + ":"
     + window.location.port + '/Diversity/server');
 
-
+  //Request products and services tree
   ws.onopen = function () {
     json = {
       "Op" : "gettree",
@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
+    //If the message Op is 'Tree', build the products and services list as an interactive tree
     if (json[0].Op == "Tree") {
       jsonData = JSON.parse(JSON.stringify(json));
       makeTree("prod_list",jsonData);
@@ -42,15 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
       $('#serv_list').jstree(true).refresh();
     }
 
-
+    //If the message Op is 'Prediction', draw the predicted global sentiment chart
     if (json[0].Op == "Prediction") {
       draw = true;
-      console.log(json);
+      //console.log(json);
       chartData = JSON.parse(JSON.stringify(json));
 
       drawChart();
     }
 
+    //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
       if (json[0].hasOwnProperty("Message")) {
         $('#overlay-back').show();
@@ -59,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
+    //If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
     if (json[0] == "Snapshots") {
       snapshots = json[1];
       displaySnapshots();
@@ -112,6 +115,13 @@ function makeTree(div,test) {
   });
 }
 
+/*
+* Finds and returns objects with a specific property inside an array.
+* Input: obj - array to be searched;
+*        key - name of the property that we're looking for;
+*        val - value of the property that we're looking for.
+* Output: an array with all objects that meet the requirements.
+*/
 function getObjects(obj, key, val) {
     var objects = [];
     for (var i in obj) {
@@ -126,7 +136,7 @@ function getObjects(obj, key, val) {
 }
 
 /*
-* Makes a HTML unordered list from a json array (uses recursion, requires a var start = true)
+* Makes an HTML unordered list from a json array (uses recursion, requires a var start = true)
 */
 function makeList(array) {
   if (typeof array == 'undefined') {
@@ -156,6 +166,9 @@ function makeList(array) {
   }
 }
 
+/*
+* Sends a JSON message requesting a prediction for the given products and services.
+*/
 function submit() {
   var json = {
     "Op" : "prediction",
@@ -166,6 +179,9 @@ function submit() {
   ws.send(JSON.stringify(json));
 }
 
+/*
+* Displays an overlay window to save a new snapshot.
+*/
 function save() {
   var code = '<center><b>Save snapshot</b></center><br><label for="snap_name">Name: </label><input id="snap_name" type="text" style="margin-left:15px;" placeholder="Snapshot name..."><br><br><button class="btn btn-default" id="save" onclick="send($(\'#snap_name\').val());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Save</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#error').html(code);
@@ -173,8 +189,10 @@ function save() {
   $('#overlay-back').show();
 }
 
+/*
+* Sends a message requesting a list of snapshots.
+*/
 function load() {
-  // send request for snapshot list
   var json = {
     "Op" : "load_snapshot",
     "Type" : "Prediction"
@@ -183,6 +201,9 @@ function load() {
   ws.send(JSON.stringify(json));
 }
 
+/*
+* Sends a message with all the data required to save a snapshot.
+*/
 function send(val) {
   var json = {
     "Op" : "Snapshot",
@@ -197,7 +218,9 @@ function send(val) {
   ws.send(JSON.stringify(json));
 }
 
-//need to receive json with snapshot names
+/*
+* Builds a dropdown list of availiable snapshots and displays them in an overlay window to be loaded.
+*/
 function displaySnapshots() {
   var code = '<center><b>Load snapshot</b></center><br><label for="snap_name">Select a snapshot: </label><select id="select_snap" style="margin-left:15px;"></select><br><br><button class="btn btn-default" id="sel_btn" onclick="requestSnapshot($(\'#select_snap\').find(\':selected\').text());$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Load</button> <button class="btn btn-default" id="cancel" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">Cancel</button>';
   $('#error').html(code);
@@ -211,7 +234,9 @@ function displaySnapshots() {
   $('#overlay-back').show();
 }
 
-
+/*
+* Sends a message requesting a specific snapshot to be loaded.
+*/
 function requestSnapshot(val) {
   var json = {
     "Op" : "load_snapshot",
@@ -221,14 +246,17 @@ function requestSnapshot(val) {
   ws.send(JSON.stringify(json));
 }
 
+/*
+* Uses Google Charts API to draw the predicted global sentiment chart.
+*/
 function drawChart() {
   if (draw) {
     $("#wrapper").show();
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Month');
     data.addColumn('number', 'Global Sentiment');
-    data.addColumn({id:'min', type:'number', role:'interval'});
-    data.addColumn({id:'max', type:'number', role:'interval'});
+    data.addColumn({id:'min', type:'number', role:'interval'}); // value - variance
+    data.addColumn({id:'max', type:'number', role:'interval'}); // value + variance
 
     var sum = 0;
     count = 0;
