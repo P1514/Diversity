@@ -1,4 +1,4 @@
-google.charts.load('current', {packages:['corechart']});
+google.charts.load('current', {packages:['corechart','controls']});
 ws = new WebSocket('ws://' + window.location.hostname + ':'
     + window.location.port + '/Diversity/server');
 var json;
@@ -311,8 +311,10 @@ function drawChart() {
     }																// adds 12 positions per iteration
   }
 
-  var start = new Date(localStorage.start_date);
-  var end = new Date(localStorage.end_date);
+
+  var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
+  var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
+
 
   var options = {
    backgroundColor: { fill:'transparent' },
@@ -324,10 +326,6 @@ function drawChart() {
      showTextEvery: 1,
      textStyle : {
        fontSize: 12
-     },
-     viewWindow: {
-       min : start,
-       max : end
      },
    },
    vAxis: {
@@ -349,8 +347,57 @@ function drawChart() {
     position: 'bottom'
   }
  };
+/*
+ if (start != 0 && end != 0) {
+   options.hAxis.viewWindow = {
+     min : start,
+     max : end
+   }
+ } else if (start != 0 && end == 0) {
+    options.hAxis.viewWindow = {
+     min : start
+   }
+ } else if (start == 0 && end != 0) {
+    options.hAxis.viewWindow = {
+     max : start
+   }
+ }
+*/
+ var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'));
 
- middle.draw(globaldata, options);
+  var control = new google.visualization.ControlWrapper({
+    controlType: 'ChartRangeFilter',
+    containerId: 'control',
+    options : {
+     'filterColumnIndex': 0,
+     ui : {
+       chartOptions : {
+         backgroundColor: { fill:'transparent' },
+         chartArea: {
+           height: '100%',
+           width: '40%'
+         }
+       }
+     },
+    },
+    state: {
+      range : {
+        'start': start != 0 ? start : undefined,
+        'end' : end != 0 ? end : undefined
+      }
+    }
+  });
+
+  var chart = new google.visualization.ChartWrapper({
+    'chartType': 'LineChart',
+    'containerId': 'top5',
+    'dataTable' : globaldata,
+    'options': options,
+  });
+
+  dashboard.bind(control, chart);
+  dashboard.draw(globaldata);
+ //middle.draw(globaldata, options);
 }
 
 function viewModels(op) {

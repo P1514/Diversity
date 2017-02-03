@@ -581,18 +581,16 @@ function drawChart() {
 			}
 		}
 */
-		var start = new Date(localStorage.start_date);
-		var end = new Date(localStorage.end_date);
+
+	var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
+	var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
+
 
 		var options = {
 			hAxis : {
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
-				},
-				viewWindow: {
-					min : start,
-					max : end
 				},
 			},
 			vAxis : {
@@ -624,6 +622,20 @@ function drawChart() {
 			},
 		};
 
+		if (start != 0 && end != 0) {
+			options.hAxis.viewWindow = {
+				min : start,
+				max : end
+			}
+		} else if (start != 0 && end == 0) {
+			 options.hAxis.viewWindow = {
+				min : start
+			}
+		} else if (start == 0 && end != 0) {
+			 options.hAxis.viewWindow = {
+				max : start
+			}
+		}
     google.visualization.events.addListener(bottom_middle, 'select', midSelectHandler);
 
 
@@ -727,10 +739,6 @@ function drawChart() {
 				textStyle : {
 					fontSize : 8
 				},
-				viewWindow: {
-					min : start,
-					max : end
-				},
 			},
 			vAxis : {
 				title : 'Sentiment',
@@ -764,6 +772,21 @@ function drawChart() {
 
 		for (var v = 0; v < series.length; v++) {
 			options["series"][series[v]] = { lineDashStyle: [4, 4] }
+		}
+
+		if (start != 0 && end != 0) {
+			options.hAxis.viewWindow = {
+				min : start,
+				max : end
+			}
+		} else if (start != 0 && end == 0) {
+			 options.hAxis.viewWindow = {
+				min : start
+			}
+		} else if (start == 0 && end != 0) {
+			 options.hAxis.viewWindow = {
+				max : start
+			}
 		}
 
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
