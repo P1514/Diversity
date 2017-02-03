@@ -89,18 +89,24 @@ public class GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray getReach(int timespan /* years */ , String param, String values, long id) throws JSONException {
+	public JSONArray getReach(String param, String values, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		double value = 0;
 
 		Calendar data = Calendar.getInstance();
+		Calendar today = Calendar.getInstance();
+
+
+		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -timespan);
+
 		int avg = 0;
-		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
-			avg++;
+		if (firstDate(id) != 0) {
+			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+				value += globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id);
+				avg++;
+			}
 		}
 		value = value / ((avg != 0) ? avg : 1);
 		String temp;
@@ -147,8 +153,8 @@ public class GetReach {
 				insert += " AND " + Settings.lotable_product + "=?";
 			}
 		} else {
-			if(!"polar".equals(type))
-			insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+			if (!"polar".equals(type))
+				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
 		insert += ")";
 		int nmonth = month - 1;
@@ -251,8 +257,7 @@ public class GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalreach(int timespan /* years */, String param, String values, String output, long id)
-			throws JSONException {
+	public JSONArray globalreach(String param, String values, String output, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -260,21 +265,25 @@ public class GetReach {
 		result.put(obj);
 
 		Calendar data = Calendar.getInstance();
+		Calendar today = Calendar.getInstance();
+
+		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -timespan);
+		if (firstDate(id) != 0) {
+			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+				try {
+					obj = new JSONObject();
+					obj.put("Month", time[data.get(Calendar.MONTH)]);
+					obj.put("Year", data.get(Calendar.YEAR));
+					obj.put("Value",
+							globalreachby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+					result.put(obj);
 
-		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
-			try {
-				obj = new JSONObject();
-				obj.put("Month", time[month % 12]);
-				obj.put("Value", globalreachby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
-				result.put(obj);
-
-			} catch (JSONException e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				} catch (JSONException e) {
+					LOGGER.log(Level.INFO, "ERROR", e);
+				}
 			}
 		}
-
 		return result;
 	}
 
@@ -333,5 +342,41 @@ public class GetReach {
 
 	private void dbconnect() throws ClassNotFoundException, SQLException {
 		cnlocal = Settings.connlocal();
+	}
+
+	public long firstDate(long id) {
+		Model model = Data.modeldb.get(id);
+		long result = 0;
+		ResultSet rs;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return (Long) null;
+		}
+		String insert = new String("Select min(timestamp) from opinions where pss=?");
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+
+			query1.setLong(1, model.getPSS());
+
+			rs = query1.executeQuery();
+			rs.next();
+			result = rs.getLong(1);
+			//System.out.println("Query:" + query1);
+
+			//System.out.println("Result:" + result);
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+		}
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+
 	}
 }

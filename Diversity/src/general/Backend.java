@@ -14,6 +14,7 @@ import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
+import extraction.Snapshot;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -57,6 +58,7 @@ public final class Backend {
 		Globalsentiment gs = new Globalsentiment();
 		Extrapolation extra = Extrapolation.getInstance();
 		Prediction pre = new Prediction();
+		Snapshot snapshot = new Snapshot();
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
@@ -87,7 +89,51 @@ public final class Backend {
 
 			switch (op) {
 			case 99:
-				return error_message("TESTING MY FRIEND").toString();
+				Prediction ps = new Prediction();
+				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
+				break;
+			case 25:
+				obj = new JSONObject();
+				result = new JSONArray();
+				String resul;
+				if (msg.has("Name")) {
+					return snapshot.load(msg.getString("Name"), msg.has("Type")?msg.getString("Type"):"");
+				} else {
+					result = snapshot.loadNames(msg.getString("Type"));
+					resul = result.toString();
+				}
+
+				return resul;
+
+			case 24:
+				obj = new JSONObject();
+				result = new JSONArray();
+				String res="";
+
+				if (msg.getString("type").equals("Prediction")) {
+					res = snapshot.savePrediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
+							msg.has("Services") ? msg.getString("Services") : "");
+				}
+				else{
+					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
+							msg.getString("user"),msg.has("Id")?msg.getInt("Id"):0);
+					
+				}
+				
+				if(res.equals("name_in_use")){
+					obj.put("Message", "Name Already in Use");
+					obj.put("Op", "Error");
+					
+				}
+				if(res.equals("success")){	
+				obj.put("Message", "Snapshot Saved Successfully");
+				obj.put("Op", "Error");
+				}
+				result.put(obj);
+
+				return result.toString();
+
 			case 23:
 				result = new JSONArray();
 				obj = new JSONObject();
@@ -112,7 +158,6 @@ public final class Backend {
 					result.put(obj);
 				}
 				return result.toString();
-
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -126,18 +171,23 @@ public final class Backend {
 				ArrayList<Long> pss = new ArrayList<Long>();
 
 				if (msg.has("PSS")) {
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[0]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[1]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[2]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[3]);
-					//LOGGER.log(Level.INFO, "PSSNAME:" + msg.getString("PSS").split(";")[4]);
-					for(int i=0;i<msg.getString("PSS").split(";").length;i++)
-					pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[0]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[1]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[2]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[3]);
+					// LOGGER.log(Level.INFO, "PSSNAME:" +
+					// msg.getString("PSS").split(";")[4]);
+					for (int i = 0; i < msg.getString("PSS").split(";").length; i++)
+						pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
-					gs.globalsentiment(1, null, null, pss);
+					gs.globalsentiment(null, null, pss);
 
 				} else
-					gs.globalsentiment(1, null, null, gr.getTOPReach(5));
+					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
 				System.out.println(gs.globalsentiment());
 				try {
@@ -161,11 +211,11 @@ public final class Backend {
 											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i])),
 							"Graph", "Top_Middle");
 
-				result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
-				result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
+				result = convert(result, gs.getAvgSentiment( param, values, id), "Graph", "Top_Right");
+				result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gr.globalreach(1, param + "," + filtering,
+							gr.globalreach(param + "," + filtering,
 									values + "," + (filtering.equals("Product")
 											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
@@ -174,7 +224,7 @@ public final class Backend {
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalsentiment(1, param + "," + filtering,
+							gs.globalsentiment(param + "," + filtering,
 									values + "," + (filtering.equals("Product")
 											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product")
@@ -185,7 +235,7 @@ public final class Backend {
 					System.out.println("EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
-								extra.extrapolate(1, param + "," + filtering,
+								extra.extrapolate(param + "," + filtering,
 										values + "," + (filtering.equals("Product")
 												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										(filtering.equals("Product")
@@ -207,10 +257,10 @@ public final class Backend {
 					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
 					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
 							"Top_Middle");
-					result = convert(result, gs.getAvgSentiment(1, param, values, id), "Graph", "Top_Right");
-					result = convert(result, gr.getReach(1, param, values, id), "Graph", "Bottom_Left");
-					result = convert(result, gr.globalreach(1, param, values, "Global", id), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(1, param, values, "Global", id), "Graph",
+					result = convert(result, gs.getAvgSentiment( param, values, id), "Graph", "Top_Right");
+					result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
+					result = convert(result, gr.globalreach(param, values, "Global", id), "Graph", "Bottom_Middle");
+					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph",
 							"Bottom_Right");
 				} else {
 					obj = new JSONObject();
@@ -267,9 +317,9 @@ public final class Backend {
 			case 12:
 				conf = new Settings();
 				tmp = "";
-				if (msg.has("Id")){
+				if (msg.has("Id")) {
 					tmp = conf.getConf(msg.getLong("Id")).toString();
-				}else{
+				} else {
 					tmp = conf.getConf(845).toString();
 				}
 				return tmp;
@@ -313,8 +363,8 @@ public final class Backend {
 
 		return result.toString();
 	}
-	
-	public static JSONArray error_message(String message) throws JSONException{
+
+	public static JSONArray error_message(String message) throws JSONException {
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Error");
 		obj.put("Message", message);

@@ -62,7 +62,7 @@ ws.onopen = function() {
 }
 ws.onmessage = function(event) {
   json = JSON.parse(event.data);
-  console.log(json);
+  //console.log(json);
 
   if (json.Op == "Error") {
     var code = json.Message + '<br><br><button class="btn btn-default" id="ok" onclick="window.history.back();">OK</button>';
@@ -171,7 +171,7 @@ function send_config() {
     "Location" : lstring,
   }
 
-  console.log(jsonData);
+  //console.log(jsonData);
   ws.send(JSON.stringify(jsonData));
 
 }
@@ -202,6 +202,7 @@ function addline(table){
       }
     }
     */
+
     for(var k=1;;k++) {
       if(document.getElementById("1age"+k) == null)break;
       elem = {
@@ -217,6 +218,7 @@ function addline(table){
         }
       }
     }
+
     for(var i=0; i<json.length;i++,ii++){
       if(json[i].hasOwnProperty("Param") && json[i].Param=="Age"){
         jsonData[ii]=json[i];
@@ -227,7 +229,6 @@ function addline(table){
         }
         if (elem != undefined) {
           jsonData[ii] = elem;
-          console.log("yes");
         } else {
           jsonData[ii] = {
             "Min":"0","Max":"99"
@@ -251,6 +252,17 @@ function addline(table){
     }
     gstring+=document.getElementById("gender"+k).value+",,";
   }
+
+
+  /*
+  for(var k=1;;k++){
+    if(document.getElementById("gender"+k) == null)break;
+    for (g in jsonData) {
+
+    }
+    gstring+=document.getElementById("gender"+k).value+",,";
+  }
+
 
   for(var i=1;;i++){
     if(document.getElementById("location"+i) == null)break;

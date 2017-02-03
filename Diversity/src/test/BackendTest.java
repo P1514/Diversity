@@ -222,8 +222,8 @@ public class BackendTest {
 	public void resolveOeRefresh() throws JSONException {
 		
 		obj = new JSONObject();
-		obj.put("Param", "Global");
-		obj.put("Values", "");
+		//obj.put("Param", "Global");
+		//obj.put("Values", "");
 		obj.put("Filter", "");
 		obj.put("Id", "838");
 		tester = new Backend(19, obj);
@@ -294,7 +294,7 @@ public class BackendTest {
 		obj.put("Param", "Age,Gender,Location,");
 		obj.put("Values", "All,All,All,");
 		obj.put("Filter", "Product");
-		obj.put("Id", "839");
+		obj.put("Id", "856");
 		obj.put("Extrapolate", 1);
 		tester = new Backend(19, obj);
 		result="[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
@@ -326,5 +326,84 @@ public class BackendTest {
 
 	}
 	
+	@Test
+	public void resolveSnapshotPrediction() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "Snapshot");
+		obj.put("Products", "13;14;15;");
+		obj.put("name", "test");
+		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
+		obj.put("timespan", "6");
+		obj.put("type", "Prediction");
+		obj.put("user", "test");
+
+		tester= new Backend(24, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
+	
+	@Test
+	public void resolveSnapshotLoadNames() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "load_snapshot");
+		obj.put("Type", "Prediction");
+
+
+		tester= new Backend(25, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
+	
+	@Test
+	public void resolveSnapshotLoad() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "load_snapshot");
+		obj.put("Name", "testing");
+
+
+		tester= new Backend(25, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
+	
+	@Test
+	public void resolveSnapshotExtraction() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "Snapshot");
+		obj.put("name", "francisco");
+		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
+		obj.put("timespan", "6");
+		obj.put("Id", "839");
+		obj.put("type", "Extraction");
+		obj.put("user", "test");
+
+		tester= new Backend(24, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
+	
+	@Test
+	public void resolveSnapshotLoadExtraction() throws JSONException {
+		
+		obj = new JSONObject();
+		obj.put("Op", "load_snapshot");
+		obj.put("Name", "francisco");
+		obj.put("Type", "all");
+
+
+
+		tester= new Backend(25, obj);
+		result ="[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
 
 }
