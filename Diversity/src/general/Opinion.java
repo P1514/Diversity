@@ -1,7 +1,7 @@
 package general;
 
 import java.util.ArrayList;
-import java.sql.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 // TODO: Auto-generated Javadoc
@@ -12,9 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Opinion {
 
 	private Post main;
+	private long id;
 	private long author_id; // String
 	private String author_id2;
-	private ArrayList<Post> comments = new ArrayList<Post>();
+	private List<Post> comments = new ArrayList<>();
 	private String URI = "";
 	private double reach = 0;
 	private double polarity = 0;
@@ -36,6 +37,7 @@ public class Opinion {
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
+		this.id=this.main.getID();
 
 	}
 	
@@ -54,6 +56,7 @@ public class Opinion {
 		pss = _pss;
 		product = _product;
 		URI=_URI;
+		this.id=this.main.getID();
 
 	}
 
@@ -186,6 +189,10 @@ public class Opinion {
 	public long getProduct(){
 		return product;
 	}
+	
+	public long getID(){
+		return this.id;
+	}
 
 	/**
 	 * Number of comments.
@@ -280,7 +287,7 @@ public class Opinion {
 	 *
 	 * @return the posts
 	 */
-	public ArrayList<Post> getPosts() {
+	public List<Post> getPosts() {
 		if (!comments.contains(this.main))
 			comments.add(this.main);
 		return comments;

@@ -221,7 +221,6 @@ public class GetPosts {
 			obj.put("Comments", pre_results[9]);
 			obj.put("Message", pre_results[10]);
 			result.put(obj);
-
 		}
 
 		return result;
