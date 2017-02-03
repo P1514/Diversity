@@ -581,8 +581,10 @@ function drawChart() {
 			}
 		}
 */
+
 	var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
 	var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
+
 
 		var options = {
 			hAxis : {
@@ -786,6 +788,7 @@ function drawChart() {
 				max : start
 			}
 		}
+
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		//google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
