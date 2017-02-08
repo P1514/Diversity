@@ -1,5 +1,5 @@
 projectKey=diversity
 serverUrl=http://localhost:9000
 dashboardUrl=http://localhost:9000/dashboard/index/diversity
-ceTaskId=AVoeKK0-TdGYv_JiDsDL
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AVoeKK0-TdGYv_JiDsDL
+ceTaskId=AVoecp8yTdGYv_JiDsDQ
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVoecp8yTdGYv_JiDsDQ

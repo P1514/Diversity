@@ -19,8 +19,8 @@ import org.json.JSONObject;
 
 public class Prediction extends Globalsentiment {
 	
-	double totalSentiment, totalWeight, totalGsweight, variance, numbOfProd, maxValue, mean;
-	int month;
+	double totalSentiment, totalWeight, totalGsweight, variance, numbOfProd, maxValue, mean,tempvalue, stDeviation;
+	int month,i;
 
 	
 	public Prediction(){
@@ -69,7 +69,7 @@ public class Prediction extends Globalsentiment {
 			maxValue=0;
 			pssweights.forEach((k,v)->{
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
-				double tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
+				tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
 				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
 				Data.delmodel((long) -1);
 				totalWeight+=(tempvalue == -1 ? 0 : v);
@@ -78,14 +78,20 @@ public class Prediction extends Globalsentiment {
 				});
 			
 			mean=(totalGsweight)/(totalWeight==0?1:totalWeight);
-			variance=maxValue-mean;
-
+			variance=0;
+			pssweights.forEach((k,v)->{
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
+			tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
+			variance+=Math.pow(tempvalue-mean, 2);
+			});
+			variance=variance/numbOfProd;
+			stDeviation=Math.sqrt(variance);
 				
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",mean);
-				obj.put("Variance",(1.96*variance)/Math.sqrt(numbOfProd));
+				obj.put("Variance",(1.96*stDeviation)/Math.sqrt(numbOfProd));
 				result.put(obj);
 
 			} catch (JSONException e) {
