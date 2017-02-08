@@ -9,7 +9,8 @@ var jsonData; /* = [{"Op":"Tree"},{"Id":1,"Name":"Morris Ground 1"},{"Id":2,"Nam
 */
 var count; // for timespan
 var snapshots;
-
+var snap = false;
+var snap_name;
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -31,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
+
+    if (snap) {
+      $('#page_title').html('Snapshot: ' + snap_name);
+    }
 
     //If the message Op is 'Tree', build the products and services list as an interactive tree
     if (json[0].Op == "Tree") {
@@ -175,7 +180,8 @@ function submit() {
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined
   }
-
+  snap = false;
+  $('#page_title').html('Create Prediction');
   ws.send(JSON.stringify(json));
 }
 
@@ -242,7 +248,8 @@ function requestSnapshot(val) {
     "Op" : "load_snapshot",
     "Name" : val,
   }
-
+  snap = true;
+  snap_name = val;
   ws.send(JSON.stringify(json));
 }
 

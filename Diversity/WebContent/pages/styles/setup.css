@@ -138,8 +138,10 @@ table, th, td {
   padding-left: 10px;
   padding-bottom: 20px;
   margin-bottom: 0;
-  display: inline;
-  margin-left:40px;
+}
+
+tr {
+  margin-bottom: 15px;
 }
 
 #overlay-back {

@@ -206,6 +206,13 @@ function connect() {
 				}
 			} else {
 				//console.log("redone");
+				if (snap) {
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + name;
+				} else {
+					document.getElementById("Cookie").innerHTML = "Model: "
+							+ window.sessionStorage.model + "; PSS: "
+							+ window.sessionStorage.pss;
+				}
 				drawChart();
 			}
 
@@ -774,18 +781,20 @@ function drawChart() {
 			options["series"][series[v]] = { lineDashStyle: [4, 4] }
 		}
 
-		if (start != 0 && end != 0) {
-			options.hAxis.viewWindow = {
-				min : start,
-				max : end
-			}
-		} else if (start != 0 && end == 0) {
-			 options.hAxis.viewWindow = {
-				min : start
-			}
-		} else if (start == 0 && end != 0) {
-			 options.hAxis.viewWindow = {
-				max : start
+		if (!extra) {
+			if (start != 0 && end != 0) {
+				options.hAxis.viewWindow = {
+					min : start,
+					max : end
+				}
+			} else if (start != 0 && end == 0) {
+				 options.hAxis.viewWindow = {
+					min : start
+				}
+			} else if (start == 0 && end != 0) {
+				 options.hAxis.viewWindow = {
+					max : start
+				}
 			}
 		}
 
