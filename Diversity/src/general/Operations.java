@@ -33,6 +33,7 @@ public class Operations {
 		op.put("prediction",23);
 		op.put("Snapshot",24);
 		op.put("load_snapshot",25);
+		op.put("tagcloud", 26);
 		op.put("testing", 99);
 		
 		
