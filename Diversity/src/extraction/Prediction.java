@@ -78,7 +78,7 @@ public class Prediction extends Globalsentiment {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",totalGsweight/(totalWeight==0?1:totalWeight));
+				obj.put("Value",(totalGsweight+2*variance)/(totalWeight==0?1:totalWeight)+2);
 				obj.put("Variance",variance-totalGsweight/(totalWeight==0?1:totalWeight));
 				result.put(obj);
 
