@@ -24,21 +24,23 @@ public class GetModels {
 		JSONArray result = new JSONArray();
 		result.put(new JSONObject().put("Op", "Models"));
 
-		Data.modeldb.forEach((k, v) -> {
-			if (v.getArchived() == false) {
+		
+		
+		
+		for(Model model : Data.dbmodelall()){
+			if (model.getArchived() == false) {
 				JSONObject obj = new JSONObject();
 				try {
-					obj.put("Name", v.getName());
-					obj.put("Id", v.getId());
-					obj.put("PSS", Data.pssdb.get(v.getPSS()).getName());
+					obj.put("Name", model.getName());
+					obj.put("Id", model.getId());
+					obj.put("PSS", Data.getpss(model.getPSS()).getName());
 					result.put(obj);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-
-		});
+		}
 		return result;
 	}
 
@@ -56,7 +58,7 @@ public class GetModels {
 		JSONArray result;
 		result = add.add_model(msg);
 		if (!(result.getJSONObject(0).getString("Op").equals("Error"))) {
-			Data.modeldb.put(add.getId(), add);
+			Data.addmodel(add.getId(), add);
 			// long id = add.getId();
 			// System.out.println(id);
 		}
@@ -80,19 +82,19 @@ public class GetModels {
 		JSONObject obj = new JSONObject();
 		Model model = new Model();
 
-		model = Data.modeldb.get(msg.getLong("Id"));
+		model = Data.getmodel(msg.getLong("Id"));
 		if (model != null) {
 			obj.put("Op", "Model");
 			obj.put("Name", model.getName());
 			obj.put("URI", model.getURI());
 			obj.put("Update", model.getFrequency());
-			obj.put("PSS", Data.pssdb.get(model.getPSS()).getName());
+			obj.put("PSS", Data.getpss(model.getPSS()).getName());
 			// obj.put("Age", model.getAge());
 			// obj.put("Gender", model.getGender());
 			String Products = new String();
 			if (!model.getProducts().isEmpty()) {
 				for (String a : model.getProducts().split(",")) {
-					Products += Data.productdb.get(Long.valueOf(a)).get_Name() + ";";
+					Products += Data.getProduct(Long.valueOf(a)).get_Name() + ";";
 				}
 				obj.put("Final_products", Products);
 			}
@@ -120,7 +122,7 @@ public class GetModels {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		Model model = new Model();
-		model = Data.modeldb.get(msg.getLong("Id"));
+		model = Data.getmodel(msg.getLong("Id"));
 		if (model != null) {
 			return model.update_model(msg);
 		} else {

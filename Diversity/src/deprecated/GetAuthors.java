@@ -15,6 +15,7 @@ import general.Settings;
 /**
  * The Class GetAuthors.
  */
+@Deprecated
 public class GetAuthors {
 
 	/** The cnlocal. */

@@ -29,7 +29,7 @@ public class GetProducts {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		result.put(new JSONObject().put("Op", "Tree"));
-		for (PSS pss : Data.pssdb.values()) {
+		for (PSS pss : Data.dbpssall()) {
 			if (pss_in != null && !pss.getName().equals(pss_in))
 				continue;
 			obj = new JSONObject();
@@ -37,12 +37,12 @@ public class GetProducts {
 			JSONArray sub_products = new JSONArray();
 			for (Long id : pss.get_products()) {
 				JSONArray sub_products2 = new JSONArray();
-				Product product = Data.productdb.get(id);
+				Product product = Data.getProduct(id);
 				if (!product.getFinal())
 					continue;
 				if (product.getParent() == 0) {
 					sub_products.put(new JSONObject().put("Name", product.get_Name()));
-					for (Product product2 : Data.productdb.values()) {
+					for (Product product2 : Data.dbproductall()) {
 						if (product2.getParent() == product.get_Id()) {
 							sub_products2.put(new JSONObject().put("Name", product2.get_Name()));
 						}
@@ -68,7 +68,16 @@ public class GetProducts {
 	}
 
 	public static final JSONArray getTree(JSONObject msg) throws JSONException {
-		return (!msg.has("All")) ? getTree(msg.has("Pss") ? msg.getString("Pss") : (new String())) : getPSTree();
+		if (!msg.has("All")) {
+			if (msg.has("Pss")) {
+				return getTree(msg.getString("Pss"));
+			} else {
+				
+				return getTree((String) null);
+			}
+		} else {
+			return getPSTree();
+		}
 	}
 
 	public static final JSONArray getPSTree() throws JSONException {
@@ -77,7 +86,7 @@ public class GetProducts {
 		obj.put("Op", "Tree");
 		result.put(obj);
 
-		for (Product pro : Data.productdb.values()) {
+		for (Product pro : Data.dbproductall()) {
 			if (pro.getParent() != 0)
 				continue;
 			obj = new JSONObject();
@@ -98,7 +107,7 @@ public class GetProducts {
 	private static final JSONObject subproducts(long id) throws JSONException {
 		JSONObject result = new JSONObject();
 		JSONArray array = new JSONArray();
-		Product pro = Data.productdb.get(id);
+		Product pro = Data.getProduct(id);
 		result.put("Name", pro.get_Name());
 		result.put("Id", pro.get_Id());
 		if (!pro.getsubproducts().isEmpty()) {
