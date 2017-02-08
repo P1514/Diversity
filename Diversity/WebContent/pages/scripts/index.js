@@ -1,4 +1,4 @@
-google.charts.load('current', {packages:['corechart','controls']});
+google.charts.load('current', {packages:['corechart']});
 ws = new WebSocket('ws://' + window.location.hostname + ':'
     + window.location.port + '/Diversity/server');
 var json;
@@ -315,7 +315,6 @@ function drawChart() {
   var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
   var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
 
-
   var options = {
    backgroundColor: { fill:'transparent' },
    lineWidth: 3,
@@ -347,7 +346,7 @@ function drawChart() {
     position: 'bottom'
   }
  };
-/*
+
  if (start != 0 && end != 0) {
    options.hAxis.viewWindow = {
      min : start,
@@ -362,42 +361,8 @@ function drawChart() {
      max : start
    }
  }
-*/
- var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'));
 
-  var control = new google.visualization.ControlWrapper({
-    controlType: 'ChartRangeFilter',
-    containerId: 'control',
-    options : {
-     'filterColumnIndex': 0,
-     ui : {
-       chartOptions : {
-         backgroundColor: { fill:'transparent' },
-         chartArea: {
-           height: '100%',
-           width: '40%'
-         }
-       }
-     },
-    },
-    state: {
-      range : {
-        'start': start != 0 ? start : undefined,
-        'end' : end != 0 ? end : undefined
-      }
-    }
-  });
-
-  var chart = new google.visualization.ChartWrapper({
-    'chartType': 'LineChart',
-    'containerId': 'top5',
-    'dataTable' : globaldata,
-    'options': options,
-  });
-
-  dashboard.bind(control, chart);
-  dashboard.draw(globaldata);
- //middle.draw(globaldata, options);
+ middle.draw(globaldata, options);
 }
 
 function viewModels(op) {

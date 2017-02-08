@@ -546,6 +546,7 @@ function drawChart() {
 						data.addRow();
 				}
 				if (jsonData[i].Value != 0) {
+
 					data.setCell(ii, 0, new Date(jsonData[i].Year, getMonthFromString(jsonData[i].Month),01)); //month comes as a number from server, if it changes use getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
@@ -581,10 +582,8 @@ function drawChart() {
 			}
 		}
 */
-
 	var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
 	var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
-
 
 		var options = {
 			hAxis : {
@@ -788,7 +787,6 @@ function drawChart() {
 				max : start
 			}
 		}
-
     google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 
 		//google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
