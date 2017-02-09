@@ -19,6 +19,8 @@ var name = "";
 var snapshots;
 var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 	"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+var month;
+var product;
 /*
 * Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
 */
@@ -63,8 +65,8 @@ function connect() {
 		if (selection != undefined && (selection.hasOwnProperty('row') && selection.row != null)) {
 			var row = selection.row ;
 			var col = selection.column;
-			var month = monthNames[sentimentdata.getValue(row, 0).getMonth()] ;
-      var product = sentimentdata.getColumnLabel(selection.column);
+			month = monthNames[sentimentdata.getValue(row, 0).getMonth()] ;
+      product = sentimentdata.getColumnLabel(selection.column);
 
 
       if (product != "Global" && filteredByProduct) {
@@ -251,8 +253,21 @@ function connect() {
 				clicker($(this).find('input[name="id"]').val());
 			});
 
+			var json = {
+				"Op" : "tagcloud",
+				"Id" : sessionStorage.id,
+				"Month" : month != undefined ? month : undefined,
+				"Product" : product != undefined ? product : undefined
+			}
+			ws.send(JSON.stringify(json));
 			return;
 		}
+
+		//If Op is 'words', build the tag cloud
+		if (json[0].Op == "words") {
+			makeCloud(json[0].Words);
+		}
+
 		//If Op is 'graph', draw the charts
 		if (json[0].Op == "graph") {
 			jsonData = JSON.parse(JSON.stringify(json));
@@ -273,6 +288,34 @@ google.charts.load('current', {
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
 });
+
+function makeCloud(words) {
+	var str = '';
+	for (var i=0; i < words.length; i++) {
+		str += '<a onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
+	}
+
+	$('#cloud').html(str);
+
+	$.fn.tagcloud.defaults = {
+	  size: {start: 14, end: 18, unit: 'pt'},
+	  color: {start: '#ADADAD', end: '#604460'}
+	};
+
+	$('#cloud a').tagcloud();
+}
+
+function tagClick(word) {
+	var json = {
+		"Op" : "tagcloud",
+		"Id" : sessionStorage.id,
+		"word" : word,
+		"Month" : month != undefined ? month : undefined,
+		"Product" : product != undefined ? product : undefined
+	}
+
+	ws.send(JSON.stringify(json));
+}
 
 /*
 * Displays an overlay window to save a new snapshot.
