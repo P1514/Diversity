@@ -84,14 +84,14 @@ public class Prediction extends Globalsentiment {
 			tempvalue = globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
 			variance+=Math.pow(tempvalue-mean, 2);
 			});
-			variance=variance/numbOfProd;
+			variance=variance/totalGsweight;
 			stDeviation=Math.sqrt(variance);
 				
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",mean);
-				obj.put("Variance",(1.96*stDeviation)/Math.sqrt(numbOfProd));
+				obj.put("Variance",(1.96*stDeviation)/Math.sqrt(numbOfProd));// 95% confidence interval
 				result.put(obj);
 
 			} catch (JSONException e) {
