@@ -89,6 +89,8 @@ function connect() {
 			ws.send(JSON.stringify(json));
 
 		} else {
+			month = undefined;
+			product = undefined;
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id
@@ -256,7 +258,8 @@ function connect() {
 			var json = {
 				"Op" : "tagcloud",
 				"Id" : sessionStorage.id,
-				"Month" : month != undefined ? month : undefined,
+				"Param" : month != undefined ? "Month" : undefined,
+				"Values" : month != undefined ? month : undefined,
 				"Product" : product != undefined ? product : undefined
 			}
 			ws.send(JSON.stringify(json));
@@ -307,11 +310,9 @@ function makeCloud(words) {
 
 function tagClick(word) {
 	var json = {
-		"Op" : "tagcloud",
+		"Op" : "getposts",
 		"Id" : sessionStorage.id,
-		"word" : word,
-		"Month" : month != undefined ? month : undefined,
-		"Product" : product != undefined ? product : undefined
+		"word" : word
 	}
 
 	ws.send(JSON.stringify(json));

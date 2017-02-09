@@ -447,6 +447,7 @@ public class ChromeTests  {
     
     private static boolean testExtraction(WebDriver driver) throws IOException {
     	w.write("Starting View Opinion Extraction test.\n");
+    	w.write("-----------------------------------\n\n");
     	driver.findElement(By.id("model_box")).click();
     	
     	(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
@@ -522,6 +523,7 @@ public class ChromeTests  {
 				
 				for (WebElement t : tableCells) {
 					
+					//needs to be changed every month
 					if (!t.getText().split("-")[1].equals("05")) { 
 						try {
 							w.write("Top 5 table did not update correctly after clicking chart. Stopping test run.\n");
@@ -551,6 +553,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testDelete(WebDriver driver) throws IOException {
+		w.write("Starting Delete Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("Delete Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -588,6 +592,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testView(WebDriver driver) throws IOException {
+		w.write("Starting View Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("View Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -644,6 +650,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testEdit(WebDriver driver) throws IOException {
+		w.write("Starting Edit Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("Edit Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -695,6 +703,34 @@ public class ChromeTests  {
         	w.write("Errors ocurred during the execution of this test. Please check this log for additional details.\n");
         	return false;
         }
+	}
+
+	private static boolean testSetup(WebDriver driver) throws IOException {
+		w.write("Starting Chart Setup Test\n");
+    	w.write("-----------------------------------\n\n");
+		driver.findElement(By.linkText("Chart Setup")).click();
+		
+		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+
+			public Boolean apply(WebDriver d) {
+
+				if (!d.getCurrentUrl().contains("chart_setup.html")) {
+					try {
+						w.write("Page was not redirected successfully. Stopping test run.\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					pass = false;
+					return false;
+				}
+				return null;
+			}
+			
+		});
+		
+		return pass;
+		
 	}
 }
 
