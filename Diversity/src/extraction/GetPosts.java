@@ -326,6 +326,45 @@ public class GetPosts {
 
 		return result;
 
+	} 
+	
+	/**
+	 * Method that finds and returns all the comments of a given post
+	 * @param post_id - the id of the post 
+	 * @return - JSONArray with the comments
+	 * @throws JSONException 
+	 */
+	public JSONArray getComments(long post_id) throws JSONException {
+		JSONArray result = new JSONArray();
+		String insert = new String();
+		
+		insert = "Select " + Settings.lptable_message + " FROM " + Settings.lptable + " WHERE " + Settings.lptable_opinion + "=?";
+		
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message("Cannot connect to Database Please Try Again Later");
+		}
+		
+		try (PreparedStatement query = cnlocal.prepareStatement(insert)) {
+			query.setLong(1, post_id);
+			try (ResultSet rs = query.executeQuery()) {
+				for (int i=0; rs.next(); i++) {
+					result.put(rs.getString(1));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cnlocal.close();
+			} catch (SQLException e1) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
+			return Backend.error_message("ERROR");
+		}
+		return result;
+		
 	}
 
 	private String trunc(String number) {

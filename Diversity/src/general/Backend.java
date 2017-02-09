@@ -15,6 +15,7 @@ import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
 import extraction.Snapshot;
+import extraction.Tagcloud;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -92,6 +93,17 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 26:
+				obj = new JSONObject();
+				result = new JSONArray();
+				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, "noproduct"));
+				LOGGER.log(Level.INFO, "step 1");
+				obj.put("Op", "words");
+				obj.put("Words", tag.calculateWeights());
+				LOGGER.log(Level.INFO, "step 2");
+				result.put(obj);
+				LOGGER.log(Level.INFO, result.toString());
+				return result.toString();
 			case 25:
 				obj = new JSONObject();
 				result = new JSONArray();
