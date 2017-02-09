@@ -260,7 +260,7 @@ function connect() {
 				"Id" : sessionStorage.id,
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
-				"Product" : product != undefined ? product : undefined
+				"Product" : product != undefined && product != "Global" ? product : undefined
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -301,7 +301,7 @@ function makeCloud(words) {
 	$('#cloud').html(str);
 
 	$.fn.tagcloud.defaults = {
-	  size: {start: 14, end: 18, unit: 'pt'},
+	  size: {start: 12, end: 30, unit: 'pt'},
 	  color: {start: '#ADADAD', end: '#604460'}
 	};
 
