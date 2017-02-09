@@ -312,7 +312,9 @@ function tagClick(word) {
 	var json = {
 		"Op" : "getposts",
 		"Id" : sessionStorage.id,
-		"word" : word
+		"word" : word,
+		"Month" : month != undefined ? month : undefined,
+		"Product" : product != undefined ? product : undefined
 	}
 
 	ws.send(JSON.stringify(json));
