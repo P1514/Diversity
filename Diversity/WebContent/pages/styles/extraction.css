@@ -139,7 +139,7 @@ input[type=radio] {
 	stroke:#DDDDDD;
 	}
 
-#filters {
+#filters, #cloud_wrapper {
 	background-color: #DDDDDD;
 	margin-top: 20px;
 	min-width: 90%;

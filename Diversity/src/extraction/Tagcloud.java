@@ -54,7 +54,7 @@ public class Tagcloud extends GetPosts {
 
 		JSONArray result = new JSONArray();
 		for (Entry<String, Integer> entry : wordWeights.entrySet()) {
-			if (entry.getValue() > 2) {
+			if (entry.getValue() > 1) {
 				JSONObject weight = new JSONObject();
 				weight.put("word", entry.getKey());
 				weight.put("frequency", entry.getValue());
