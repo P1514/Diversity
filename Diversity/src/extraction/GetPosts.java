@@ -50,13 +50,13 @@ public class GetPosts {
 	 * @throws JSONException
 	 *             in case creating json error occurs
 	 */
-	public JSONArray getTop(String param, String month, long id, String product) throws JSONException {
+	public JSONArray getTop(String param, String month, long id, String product, String word) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
 		Calendar inputdate = Calendar.getInstance();
 		obj.put("Op", "table");
-		boolean dateerror=false;
+		boolean dateerror = false;
 		result.put(obj);
 		String insert = new String();
 		int[] topid = new int[MAXTOP];
@@ -67,6 +67,8 @@ public class GetPosts {
 				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_product;
 
 		Model model = Data.getmodel(id);
+		
+		
 
 		if (model == null) {
 			result = new JSONArray();
@@ -76,6 +78,7 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
+
 		if (!model.getProducts().isEmpty()) {
 			if (product == "noproduct")
 				insert += " in (" + model.getProducts() + ")";
@@ -84,6 +87,7 @@ public class GetPosts {
 		} else {
 			insert += "=0";
 		}
+		
 		if (param != null) {
 			insert += " && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?";
 
@@ -94,12 +98,21 @@ public class GetPosts {
 				LOGGER.log(Level.INFO, "ERROR", e1);
 				insert = insert.replace(
 						" && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?", "");
-				dateerror=true;
+				dateerror = true;
 			}
 		}
+		
+		if (word != null) {
+			insert += " AND "+ Settings.lotable_id + " in (Select "+Settings.lptable_opinion +" FROM "+ Settings.lptable + " where " +Settings.lptable_message+ " LIKE '%"+word+"%' and views>0)"; //More than 0 views means that its a post and not a comment
+		}
+		
 		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
+		
+		
+		LOGGER.log(Level.INFO, "TESTE*********"+insert);
+
 
 		try {
 			dbconnect();
@@ -124,8 +137,11 @@ public class GetPosts {
 				rangeindex++;
 
 			}
+
+				
 			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
+			LOGGER.log(Level.INFO, "TESTE*********"+query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {
@@ -183,13 +199,17 @@ public class GetPosts {
 
 		insert = "Select " + Settings.lptable_message + " from " + Settings.lptable + " where " + Settings.lptable_id
 				+ " = ?";
+
 		for (int i = 0; i < n_tops; i++) {
 
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
+
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next())
 						pre_result[i] += rs.getString(Settings.lptable_message);
+					else
+						pre_result[i] += "";
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, "ERROR", e);
@@ -278,15 +298,15 @@ public class GetPosts {
 		if (par.location != null)
 			insert += " AND location=?";
 		insert += " AND timestamp<? AND timestamp>=? AND " + Settings.lotable_timestamp + ">=?)";
-		//ResultSet rs = null;
+		// ResultSet rs = null;
 
 		try {
 			dbconnect();
-		}catch(Exception e){
-		LOGGER.log(Level.SEVERE,"ERROR",e);
-		return Backend.error_message("Cannot connect to database please try again later");
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message("Cannot connect to database please try again later");
 		}
-			try(PreparedStatement query1 = cnlocal.prepareStatement(insert)){
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			int rangeindex = 2;
 			query1.setLong(1, model.getPSS());
 
@@ -306,24 +326,66 @@ public class GetPosts {
 			rangeindex++;
 			query1.setLong(rangeindex, model.getDate());
 
-			try(ResultSet rs = query1.executeQuery()){
-			rs.next();
-			obj.put("Filter", "Global");
-			result.put(obj);
-			obj = new JSONObject();
-			obj.put("Value", rs.getInt("count(*)"));
-			result.put(obj);
+			try (ResultSet rs = query1.executeQuery()) {
+				rs.next();
+				obj.put("Filter", "Global");
+				result.put(obj);
+				obj = new JSONObject();
+				obj.put("Value", rs.getInt("count(*)"));
+				result.put(obj);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 		} finally {
-			try{
-					cnlocal.close();
+			try {
+				cnlocal.close();
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, "ERROR", e);
 			}
 		}
 
+		return result;
+
+	}
+
+	/**
+	 * Method that finds and returns all the comments of a given post
+	 * 
+	 * @param post_id
+	 *            - the id of the post
+	 * @return - JSONArray with the comments
+	 * @throws JSONException
+	 */
+	public JSONArray getComments(long post_id) throws JSONException {
+		JSONArray result = new JSONArray();
+		String insert = new String();
+
+		insert = "Select " + Settings.lptable_message + " FROM " + Settings.lptable + " WHERE "
+				+ Settings.lptable_opinion + "=?";
+
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message("Cannot connect to Database Please Try Again Later");
+		}
+
+		try (PreparedStatement query = cnlocal.prepareStatement(insert)) {
+			query.setLong(1, post_id);
+			try (ResultSet rs = query.executeQuery()) {
+				for (int i = 0; rs.next(); i++) {
+					result.put(rs.getString(1));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			try {
+				cnlocal.close();
+			} catch (SQLException e1) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
+			return Backend.error_message("ERROR");
+		}
 		return result;
 
 	}
@@ -346,12 +408,11 @@ public class GetPosts {
 	}
 
 	private void dbconnect() {
-		try{
+		try {
 			cnlocal = Settings.connlocal();
-		}catch(Exception e){
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 		}
-		
 
 	}
 }

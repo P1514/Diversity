@@ -21,6 +21,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -136,7 +137,7 @@ public class ChromeTests  {
             /* (non-Javadoc)
              * @see com.google.common.base.Function#apply(java.lang.Object)
              */
-            public Boolean apply(WebDriver d) {
+            public Boolean apply(final WebDriver d) {
             	if (!d.getCurrentUrl().contains("models.html")) {
             		try {
 						w.write("Page was not redirected to model creation after clicking. Stopping test run.\n");
@@ -265,7 +266,7 @@ public class ChromeTests  {
             	try {
             	WebElement dateCheck = d.findElement(By.id("start_date"));
             	WebElement dateBox = d.findElement(By.id("date_input"));
-            	dateBox.sendKeys("12152017");
+            	dateBox.sendKeys("12152011");
             	date = dateBox.getAttribute("value");
             	} catch (NoSuchElementException e) {
             		try {
@@ -278,7 +279,17 @@ public class ChromeTests  {
             	}
             	// Submit the form
         		d.findElement(By.id("submit")).click();
-        		d.findElement(By.id("no"));
+        		(new WebDriverWait(d, 10)).until(new ExpectedCondition<Boolean>() {
+
+					public Boolean apply(WebDriver arg0) {
+						// TODO Auto-generated method stub
+						d.findElement(By.id("no")).click();;
+						return true;
+						
+					}
+        			
+        		});
+        		
 
         		try {
 					w.write("Model " + modelName + " created.\n");
@@ -436,6 +447,7 @@ public class ChromeTests  {
     
     private static boolean testExtraction(WebDriver driver) throws IOException {
     	w.write("Starting View Opinion Extraction test.\n");
+    	w.write("-----------------------------------\n\n");
     	driver.findElement(By.id("model_box")).click();
     	
     	(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
@@ -456,6 +468,10 @@ public class ChromeTests  {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
+				WebDriverWait wait = new WebDriverWait(d, 10);
+				wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("overlay")));
+				
 				List<String> ids = new ArrayList<String>();
 				
 				ids.add("Gender");
@@ -507,7 +523,8 @@ public class ChromeTests  {
 				
 				for (WebElement t : tableCells) {
 					
-					if (!t.getText().split("-")[1].equals("03")) { 
+					//needs to be changed every month
+					if (!t.getText().split("-")[1].equals("05")) { 
 						try {
 							w.write("Top 5 table did not update correctly after clicking chart. Stopping test run.\n");
 						} catch (IOException e) {
@@ -536,6 +553,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testDelete(WebDriver driver) throws IOException {
+		w.write("Starting Delete Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("Delete Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -552,16 +571,14 @@ public class ChromeTests  {
             
     		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
     			public Boolean apply(WebDriver d) {
-    				Alert alert = d.switchTo().alert();
-            		alert.accept();
+    				d.findElement(By.id("yes")).click();
             		return true;
     			}
     		});
     		
     		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
     			public Boolean apply(WebDriver d) {
-    				Alert alert = d.switchTo().alert();
-            		alert.accept();
+    				d.findElement(By.id("ok")).click();
             		return true;
     			}
     		});
@@ -575,6 +592,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testView(WebDriver driver) throws IOException {
+		w.write("Starting View Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("View Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -631,6 +650,8 @@ public class ChromeTests  {
 	}
 
 	private static boolean testEdit(WebDriver driver) throws IOException {
+		w.write("Starting Edit Opinion Model Test\n");
+    	w.write("-----------------------------------\n\n");
 		driver.findElement(By.linkText("Edit Opinion Model")).click();
         Select modelsList2 = new Select(driver.findElement(By.id("Models")));
         WebElement el2 = null;
@@ -682,6 +703,34 @@ public class ChromeTests  {
         	w.write("Errors ocurred during the execution of this test. Please check this log for additional details.\n");
         	return false;
         }
+	}
+
+	private static boolean testSetup(WebDriver driver) throws IOException {
+		w.write("Starting Chart Setup Test\n");
+    	w.write("-----------------------------------\n\n");
+		driver.findElement(By.linkText("Chart Setup")).click();
+		
+		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+
+			public Boolean apply(WebDriver d) {
+
+				if (!d.getCurrentUrl().contains("chart_setup.html")) {
+					try {
+						w.write("Page was not redirected successfully. Stopping test run.\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					pass = false;
+					return false;
+				}
+				return null;
+			}
+			
+		});
+		
+		return pass;
+		
 	}
 }
 

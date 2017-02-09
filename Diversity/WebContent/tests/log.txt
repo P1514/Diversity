@@ -1,402 +1,56 @@
 ===============================================
-Starting test run - Chrome Tests - Tue Nov 29 12:21:05 GMT 2016
+Starting test run - Chrome Tests - Wed Feb 08 12:25:51 GMT 2017
 
 Starting Create Opinion Model Test
+-----------------------------------
 
-Model 70192976 created. The test will now attempt to edit the model to check if the data is correct.
+Clicking: 'Create Opinion Model'...
+Waiting for page to redirect to 'models.html'...
+Page redirected to 'models.html'.
+Model 237719420 created.
 Attempting to open edit page...
 Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
+Selected products list does not match. Expected Morris Sea 1000;Morris Sea 2099;, got Morris Sea 1000;Morris Sea 2099;Morris Sea 1000;Morris Sea 2099; instead.
 Test Create Opinion Model reached the end.
-All steps were completed successfully. 
+Errors ocurred during the execution of this test. Please check this log for additional details.
 Edit opinion model page was opened successfully.
 Test Edit Opinion Model reached the end.
 All steps were completed successfully. 
 View opinion model page was opened successfully.
 Test View Opinion Model reached the end.
 All steps were completed successfully. 
+Starting View Opinion Extraction test.
+Opinion Extraction page opened successfully.
+Checking if dropdowns disable correctly.
+All dropdowns behave as expected.
+Starting Top 5 table tests.
+Selecting chart point...
+Top 5 table updated successfully.
 Test View Opinion Extraction reached the end.
- All steps completed successfully.
+All steps completed successfully.
 Test Delete Opinion Model reached the end.
 All steps completed successfully.
 -----------------------------------------------
 Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
+Test 1 - Create Opinion Model: failed
 Test 2 - Edit Opinion Model: passed
 Test 3 - View Opinion Model: passed
 Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 13844 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 14:30:52 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 3122369014 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 13364 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 14:31:21 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 3596787459 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: failed
 Test 5 - Delete Opinion Model: passed
 
 Tests passed: 4
 Tests failed: 1
-Elapsed time: 12775 milliseconds
+Elapsed time: 22388 milliseconds
 ===============================================
-Starting test run - Chrome Tests - Wed Nov 30 14:42:11 GMT 2016
+Starting test run - Chrome Tests - Thu Feb 09 10:29:28 GMT 2017
 
 Starting Create Opinion Model Test
+-----------------------------------
 
-Model 3238277686 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 14258 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:19:07 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 1479105765 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 13714 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:19:58 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 3259782493 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 13452 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:24:04 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 2892605705 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 14053 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:25:12 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 2136493783 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 15957 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:29:12 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 2308068563 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 14822 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:31:20 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 2776013507 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 14747 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:38:42 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 1975366610 created. The test will now attempt to edit the model to check if the data is correct.
-Attempting to open edit page...
-Edit page opened successfully. Now checking if data matches...
-All fields match the input data.
-Test Create Opinion Model reached the end.
-All steps were completed successfully. 
-Edit opinion model page was opened successfully.
-Test Edit Opinion Model reached the end.
-All steps were completed successfully. 
-View opinion model page was opened successfully.
-Test View Opinion Model reached the end.
-All steps were completed successfully. 
-Starting View Opinion Extraction test.
-Opinion Extraction page opened successfully.
-Checking if dropdowns disable correctly.
-All dropdowns behave as expected.
-Starting Top 5 table tests.
-Selecting chart point...
-Test View Opinion Extraction reached the end.
- All steps completed successfully.
-Test Delete Opinion Model reached the end.
-All steps completed successfully.
------------------------------------------------
-Test run finished. Results: 
-Test 1 - Create Opinion Model: passed
-Test 2 - Edit Opinion Model: passed
-Test 3 - View Opinion Model: passed
-Test 4 - View Opinion Extraction: passed
-Test 5 - Delete Opinion Model: passed
-
-Tests passed: 5
-Tests failed: 0
-Elapsed time: 14463 milliseconds
-===============================================
-Starting test run - Chrome Tests - Wed Nov 30 15:47:28 GMT 2016
-
-Starting Create Opinion Model Test
-
-Model 686534607 created. The test will now attempt to edit the model to check if the data is correct.
+Clicking: 'Create Opinion Model'...
+Waiting for page to redirect to 'models.html'...
+Page redirected to 'models.html'.
+Model 1713264713 created.
 Attempting to open edit page...
 Edit page opened successfully. Now checking if data matches...
 All fields match the input data.
@@ -416,7 +70,7 @@ Starting Top 5 table tests.
 Selecting chart point...
 Top 5 table updated successfully.
 Test View Opinion Extraction reached the end.
- All steps completed successfully.
+All steps completed successfully.
 Test Delete Opinion Model reached the end.
 All steps completed successfully.
 -----------------------------------------------
@@ -429,4 +83,4 @@ Test 5 - Delete Opinion Model: passed
 
 Tests passed: 5
 Tests failed: 0
-Elapsed time: 14734 milliseconds
+Elapsed time: 25613 milliseconds

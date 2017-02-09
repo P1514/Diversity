@@ -38,11 +38,11 @@
 				</div>
 				<div id="pss" class="col-md-6">
 					<p>Choose the PSSs to be displayed in the Sentiment Analysis home page:</p>
-					<label for="pss1" style="margin-right:20px;">PSS 1: </label><select id="pss1"></select><br>
-					<label for="pss2" style="margin-right:20px;">PSS 2: </label><select id="pss2"></select><br>
-					<label for="pss3" style="margin-right:20px;">PSS 3: </label><select id="pss3"></select><br>
-					<label for="pss4" style="margin-right:20px;">PSS 4: </label><select id="pss4"></select><br>
-					<label for="pss5" style="margin-right:20px;">PSS 5: </label><select id="pss5"></select><br>
+					<label for="pss1" style="margin-right:20px;">PSS 1: </label><select style="margin-top:10px;margin-bottom:10px;width:200px;height:34px;" id="pss1"></select><br>
+					<label for="pss2" style="margin-right:20px;">PSS 2: </label><select style="margin-bottom:10px;width:200px;height:34px;" id="pss2"></select><br>
+					<label for="pss3" style="margin-right:20px;">PSS 3: </label><select style="margin-bottom:10px;width:200px;height:34px;" id="pss3"></select><br>
+					<label for="pss4" style="margin-right:20px;">PSS 4: </label><select style="margin-bottom:10px;width:200px;height:34px;" id="pss4"></select><br>
+					<label for="pss5" style="margin-right:20px;">PSS 5: </label><select style="margin-bottom:10px;width:200px;height:34px;" id="pss5"></select><br>
 				</div>
 			</div>
 		</div>
@@ -50,7 +50,7 @@
 			<h2>Opinion Extraction</h2>
 			<div id="filters" class="row" style="margin-top:30px;">
 				<p style="margin-left:20px;margin-bottom:10px;">Choose the segments for the age, gender and location filters:</p>
-
+				<div class="col-md-4">
 					<table id="age" class="inlineTable" style="display:inline;">
 						<thead>
 							<tr>
@@ -59,6 +59,8 @@
 						</thead>
 						<tbody></tbody>
 					</table>
+				</div>
+				<div class="col-md-4">
 					<table id="gender" class="inlineTable">
 						<thead>
 							<tr>
@@ -67,6 +69,8 @@
 						</thead>
 						<tbody></tbody>
 					</table>
+				</div>
+				<div class="col-md-4">
 					<table id="location" class="inlineTable">
 						<thead>
 							<tr>
@@ -76,6 +80,7 @@
 						<tbody></tbody>
 					</table>
 				</div>
+			</div>
 
 			<div style="float:left;">
 				<p style="margin-left:5px;margin-top:20px;">Choose the time period to display (optional):</p><br>
