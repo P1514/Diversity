@@ -16,23 +16,24 @@ import org.json.JSONObject;
 
 import general.Backend;
 import general.Data;
-import general.Model;
 import general.Settings;
 
 public class Snapshot {
 	private Connection cnlocal;
 	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
 
-	public Snapshot() {
 
-	}
+	
+	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	Date dateaux = null;
+	String error="error";
 
 	public boolean create(String name, long date, int timespan, String user, String type, String result) {
 		ResultSet rs;
 		try {
 			dbconnect();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 			return false;
 		}
 		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=? && type=?;");
@@ -44,7 +45,7 @@ public class Snapshot {
 				return false;
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 		}
 
 		insert = new String("Insert into " + "snapshots(name,creation_date,creation_user,result,type,timespan)"
@@ -59,7 +60,7 @@ public class Snapshot {
 			query1.execute();
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 		}
 		try {
 			if (cnlocal != null)
@@ -88,8 +89,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateaux = null;
+
 		try {
 			dateaux = df.parse(date);
 		} catch (ParseException e) {
@@ -113,8 +113,7 @@ public class Snapshot {
 		JSONObject obj = new JSONObject();
 		long cdate;
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Date dateaux = null;
+
 		try {
 			dateaux = df.parse(date);
 		} catch (ParseException e) {
@@ -180,7 +179,7 @@ public class Snapshot {
 		try {
 			dbconnect();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
 		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
@@ -193,7 +192,7 @@ public class Snapshot {
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
 			// rs.next();//verify
-			for (int i = 0; rs.next(); i++) {
+			while(rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
 				aux.put(obj);
@@ -202,7 +201,7 @@ public class Snapshot {
 			result.put(aux);
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 		}
 		try {
 			if (cnlocal != null)
@@ -220,7 +219,7 @@ public class Snapshot {
 		try {
 			dbconnect();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
 		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=? && type=?;");
@@ -235,13 +234,13 @@ public class Snapshot {
 				return rs.getString("result");
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return Backend.error_message("ERROR").toString();
+			LOGGER.log(Level.SEVERE, error, e);
+			return Backend.error_message(error).toString();
 		} finally {
 			try {
 				cnlocal.close();
 			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, error, e);
 			}
 		}
 	}
