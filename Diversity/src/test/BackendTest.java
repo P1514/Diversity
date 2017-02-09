@@ -385,5 +385,38 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 
 	}
+	
+	@Test
+	public void resolveGetpostsWord() throws JSONException {
+
+		obj = new JSONObject();
+		obj.put("Op", "getposts");
+		obj.put("Id", "838");
+		obj.put("Product", "Morris Ground 1");
+		obj.put("word", "average");		
+		tester = new Backend(4, obj);
+		result = "[{\"Op\":\"table\"},{\"Reach\":\"1.93\",\"Mes" + "sage\":\"Check the new Morris Ground 1! I say phen"
+				+ "omenal! No?\",\"Comments\":\"26\",\"Influence\":\"1.66\",\"Po"
+				+ "larity\":\"87.42\",\"Id\":\"487\",\"Gender\":\"Female\",\"Ag"
+				+ "e\":\"15\",\"Date\":\"2016-03-22\",\"Name\":\"Sandra Goodr"
+				+ "ich\",\"Location\":\"Europe\"},{\"Reach\":\"1.93\",\"Messag"
+				+ "e\":\"Have you tested the Morris Ground 1? Hum, phenomenal!\",\"Com"
+				+ "ments\":\"26\",\"Influence\":\"1.66\",\"Polarity\":\"75.45\",\"Id\":\"9"
+				+ "08\",\"Gender\":\"Female\",\"Age\":\"15\",\"Date\":\"2016-07-08\",\"Na"
+				+ "me\":\"Sandra Goodrich\",\"Location\":\"Europe\"},{\"Reach\":\"1.86\",\"Mess"
+				+ "age\":\"Tell me what you think of the new Morris Ground 1! These sneakers a"
+				+ "re phenomenal!\",\"Comments\":\"25\",\"Influence\":\"1.66\",\"Polarity\":\"73"
+				+ ".8\",\"Id\":\"989\",\"Gender\":\"Female\",\"Age\":\"15\",\"Date\":\"2016-07-3"
+				+ "0\",\"Name\":\"Sandra Goodrich\",\"Location\":\"Europe\"},{\"Reach\":\"1.86\",\"M"
+				+ "essage\":\"Tell me what you think of the new Morris Ground 1! phenomenal!\",\"Com"
+				+ "ments\":\"25\",\"Influence\":\"1.66\",\"Polarity\":\"81.14\",\"Id\":\"822\",\"Gend"
+				+ "er\":\"Female\",\"Age\":\"15\",\"Date\":\"2016-06-16\",\"Name\":\"Sandra Goodric"
+				+ "h\",\"Location\":\"Europe\"},{\"Reach\":\"1.86\",\"Message\":\"They launched the n"
+				+ "ew Morris Ground 1! I say phenomenal! No?\",\"Comments\":\"25\",\"Influence\":\"1."
+				+ "66\",\"Polarity\":\"87.56\",\"Id\":\"576\",\"Gender\":\"Female\",\"Age\":\"15\",\"D"
+				+ "ate\":\"2016-04-13\",\"Name\":\"Sandra Goodrich\",\"Location\":\"Europe\"}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+
+	}
 
 }
