@@ -42,26 +42,36 @@ public class Tagcloud extends GetPosts {
 					String message = postComments.getString(i).toLowerCase();
 					message = message.replaceAll("[^A-Za-z0-9 ]", "");
 					String[] wordArray = message.split(" ");
-
 					for (String word : wordArray) {
 						if (!ignoreWords.contains(word)) {
 							wordWeights.put(word, wordWeights.get(word) != null ? wordWeights.get(word) + 1 : 1);
 						}
 					}
 				}
+				
+				
+				String message = posts.getJSONObject(i).getString("Message").toLowerCase();
+				message = message.replaceAll("[^A-Za-z0-9 ]", "");
+				String[] wordArray = message.split(" ");
+				for (String word : wordArray) {
+					if (!ignoreWords.contains(word)) {
+						wordWeights.put(word, wordWeights.get(word) != null ? wordWeights.get(word) + 1 : 1);
+					}
+				}
+				
 			}
 		}
 
 		JSONArray result = new JSONArray();
 		for (Entry<String, Integer> entry : wordWeights.entrySet()) {
-			if (entry.getValue() > 1) {
+//			if (entry.getValue() > 0) {
 				JSONObject weight = new JSONObject();
 				weight.put("word", entry.getKey());
 				weight.put("frequency", entry.getValue());
 				result.put(weight);
-			}
+//			}
 		}
-
+		
 		return result;
 	}
 
@@ -106,5 +116,9 @@ public class Tagcloud extends GetPosts {
 		ignoreWords.add("hum");
 		ignoreWords.add("are");
 		ignoreWords.add("say");
+		ignoreWords.add("in");
+		ignoreWords.add("what");
+		ignoreWords.add("theyre");
+		ignoreWords.add("have");
 	}
 }

@@ -294,8 +294,14 @@ $(document).ready(function () {
 
 function makeCloud(words) {
 	var str = '';
+	var word_counter = 0;
+
 	for (var i=0; i < words.length; i++) {
 		str += '<a onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
+		if (word_counter > 5) {
+			str += "<br>"
+			word_counter = 0;
+		}
 	}
 
 	$('#cloud').html(str);
@@ -304,7 +310,7 @@ function makeCloud(words) {
 	  size: {start: 12, end: 30, unit: 'pt'},
 	  color: {start: '#ADADAD', end: '#604460'}
 	};
-
+	word_counter++;
 	$('#cloud a').tagcloud();
 }
 
