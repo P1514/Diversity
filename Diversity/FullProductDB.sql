@@ -152,6 +152,7 @@ CREATE TABLE `models` (
   `gender` varchar(45) DEFAULT NULL,
   `created_date` bigint(45) DEFAULT NULL,
   `next_update` bigint(45) DEFAULT NULL,
+  `design_project` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
@@ -164,7 +165,7 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
-INSERT INTO `models` VALUES (838,'D522-1 PSS','Facebook,123;','1',7,0,'1,',1,NULL,NULL,0,1484301475293),(839,'Morris Ground 1','Facebook,123;','1',8,0,'1,',1,NULL,NULL,0,1484301489363),(841,'D522-2 PSS','Facebook,123;','2',14,0,'2,3,',1,NULL,NULL,0,1484301522995),(842,'Austin Basket','Facebook,12345;','2',15,0,'2,',1,NULL,NULL,0,1484301569427),(843,'Austin Soccer','Facebook,123;','2',16,0,'3,',1,NULL,NULL,0,1484301583115),(845,'D341-1 PSS','Facebook,123;','3',14,0,'4,5,6,',1,NULL,NULL,0,1484301611723),(846,'Morris Sea 1000','Facebook,123;','3',16,0,'4,',1,NULL,NULL,0,1484301624795),(847,'Morris Sea 2099','Facebook,123;','3',15,0,'5,',1,NULL,NULL,0,1484301640811),(848,'Morris Wind','Facebook,123;','3',27,0,'6,',1,NULL,NULL,0,1484301686803),(849,'D231-1 PSS','Facebook,123;','4',13,0,'7,8,',1,NULL,NULL,0,1484301700603),(852,'Austin Polo','Facebook,123;','4',17,0,'7,',1,NULL,NULL,0,1484301825434),(853,'Austin Cricket','Facebook,123;','4',23,0,'8,',1,NULL,NULL,0,1484301837315),(854,'D231-2 PSS','Facebook,123;','5',23,0,'9,10,',1,NULL,NULL,0,1484301854939),(855,'Austin XC','Facebook,123;','5',23,0,'9,',1,NULL,NULL,0,1484301867787),(856,'Austin Base','Facebook,123;','5',24,0,'10,',1,NULL,NULL,0,1484301878570),(857,'dsfgdsfg','Facebook,abcd;','1',1,0,'1,',1,NULL,NULL,82800000,82800000);
+INSERT INTO `models` VALUES (838,'D522-1 PSS','Facebook,123;','1',7,0,'1,',1,NULL,NULL,0,1484301475293,1),(839,'Morris Ground 1','Facebook,123;','1',8,0,'1,',1,NULL,NULL,0,1484301489363,1),(841,'D522-2 PSS','Facebook,123;','2',14,0,'2,3,',1,NULL,NULL,0,1484301522995,1),(842,'Austin Basket','Facebook,12345;','2',15,0,'2,',1,NULL,NULL,0,1484301569427,2),(843,'Austin Soccer','Facebook,123;','2',16,0,'3,',1,NULL,NULL,0,1484301583115,2),(845,'D341-1 PSS','Facebook,123;','3',14,0,'4,5,6,',1,NULL,NULL,0,1484301611723,2),(846,'Morris Sea 1000','Facebook,123;','3',16,0,'4,',1,NULL,NULL,0,1484301624795,3),(847,'Morris Sea 2099','Facebook,123;','3',15,0,'5,',1,NULL,NULL,0,1484301640811,3),(848,'Morris Wind','Facebook,123;','3',27,0,'6,',1,NULL,NULL,0,1484301686803,3),(849,'D231-1 PSS','Facebook,123;','4',13,0,'7,8,',1,NULL,NULL,0,1484301700603,3),(852,'Austin Polo','Facebook,123;','4',17,0,'7,',1,NULL,NULL,0,1484301825434,3),(853,'Austin Cricket','Facebook,123;','4',23,0,'8,',1,NULL,NULL,0,1484301837315,4),(854,'D231-2 PSS','Facebook,123;','5',23,0,'9,10,',1,NULL,NULL,0,1484301854939,4),(855,'Austin XC','Facebook,123;','5',23,0,'9,',1,NULL,NULL,0,1484301867787,4),(856,'Austin Base','Facebook,123;','5',24,0,'10,',1,NULL,NULL,0,1484301878570,4),(857,'dsfgdsfg','Facebook,abcd;','1',1,0,'1,',1,NULL,NULL,82800000,82800000,4);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 

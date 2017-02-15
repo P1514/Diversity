@@ -494,7 +494,8 @@ public class Data {
 								rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
-								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
+								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
+								rs.getLong(Settings.lmtable_designproject));
 						Data.modeldb.put(model.getId(), model);
 
 					}
@@ -1302,7 +1303,8 @@ public class Data {
 							rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
-							rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
+							rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
+							rs.getLong(Settings.lmtable_designproject));
 					Data.modeldb.put(model.getId(), model);
 
 				}
@@ -2058,7 +2060,8 @@ public class Data {
 								rs.getString(Settings.lmtable_uri), rs.getLong(Settings.lmtable_pss),
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
-								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate));
+								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
+								rs.getLong(Settings.lmtable_designproject));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}
