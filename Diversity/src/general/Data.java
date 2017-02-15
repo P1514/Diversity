@@ -26,6 +26,8 @@ public class Data {
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 
+	private static final ConcurrentHashMap<String, Role> roledb= new ConcurrentHashMap<>();
+	
 	/** The modeldb. */
 	private static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 
@@ -62,6 +64,10 @@ public class Data {
 	/**
 	 * Instantiates a new data.
 	 */
+	public static boolean verify_permission(String role, int op){
+		Role tmp = roledb.get(role);
+		return tmp.getPermission(Operations.return_main_permission(op));
+	}
 	public Data() {
 		/**
 		 * No construct variables needed, class only used to load data into the
@@ -165,6 +171,38 @@ public class Data {
 		}
 
 		return 0;
+	}
+	
+	private String loadroles() throws JSONException{
+		
+		String query;
+
+		try {
+			cndata = Settings.conndata();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+		}
+			query = "SELECT * from "+Settings.lartable;
+			try(PreparedStatement stmt = cnlocal.prepareStatement(query)){
+			try(ResultSet rs = stmt.executeQuery()){
+			while(rs.next()){
+				String name = rs.getString(Settings.lartable_name);
+				String description = rs.getString(Settings.lartable_description);
+				Boolean perm0 = rs.getBoolean(Settings.lartable_vom);
+				Boolean perm1 = rs.getBoolean(Settings.lartable_create_edit_delete_model);
+				Boolean perm2 = rs.getBoolean(Settings.lartable_view_opinion_results);
+				Boolean perm3 = rs.getBoolean(Settings.lartable_save_delete_snapshots);
+				Boolean perm4 = rs.getBoolean(Settings.lartable_use_opinion_prediction);
+				Data.roledb.put(name, new Role(name, description, perm0, perm1, perm2, perm3, perm4, false));
+			}
+			}
+			}catch(Exception e){
+				LOGGER.log(Level.SEVERE, "ERROR LOADING ROLES", e);
+			}
+			
+			return null;
+		
 	}
 
 	private String loaduniqueopinionid() throws JSONException {
@@ -1357,8 +1395,10 @@ public class Data {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 		loadPSS();
-
-		String err = loadGeneral();
+		String err = loadroles();
+		if (err != null)
+			return err;
+		err = loadGeneral();
 		if (err != null)
 			return err;
 		err = loadmodels();

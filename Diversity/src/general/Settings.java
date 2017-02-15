@@ -194,14 +194,17 @@ public class Settings {
 	public static final String crrpssproducttable_product = "product_id";
 
 	// Access rights Table
-	public static final String artable_vom = "view_opinion_model";
-	public static final String arttable_pss = "pss_id";
-	public static final String artable_product = "product_id";
-	public static final String artable_create_edit_delete_model = "create_edit_delete_model";
-	public static final String artable_view_opinion_results = "view_opinion_results";
-	public static final String artable_save_delete_snapshots = "save_delete_snapshots";
-	public static final String artable_use_opinion_prediction = "use_opinion_prediction";
-	public static final String artable_role = "role";
+	public static final String lartable = "access_rights";
+	public static final String lartable_name = "role";
+	public static final String lartable_description = "description";
+	public static final String lartable_vom = "view_opinion_model";
+	public static final String larttable_pss = "pss_id";
+	public static final String lartable_product = "product_id";
+	public static final String lartable_create_edit_delete_model = "create_edit_delete_model";
+	public static final String lartable_view_opinion_results = "view_opinion_results";
+	public static final String lartable_save_delete_snapshots = "save_delete_snapshots";
+	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
+	public static final String lartable_role = "role";
 
 	// Errors
 	public static final String err_unknown = "ERROR ";
