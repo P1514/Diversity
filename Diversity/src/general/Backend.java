@@ -15,6 +15,7 @@ import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
 import extraction.Snapshot;
+import extraction.Tagcloud;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -92,12 +93,21 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 26:
+				obj = new JSONObject();
+				result = new JSONArray();
+				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
+				obj.put("Op", "words");
+				obj.put("Words", tag.calculateWeights());
+				result.put(obj);
+				LOGGER.log(Level.INFO, result.toString());
+				return result.toString();
 			case 25:
 				obj = new JSONObject();
 				result = new JSONArray();
 				String resul;
 				if (msg.has("Name")) {
-					return snapshot.load(msg.getString("Name"), msg.has("Type")?msg.getString("Type"):"");
+					return snapshot.load(msg.getString("Name"), msg.has("Type") ? msg.getString("Type") : "");
 				} else {
 					result = snapshot.loadNames(msg.getString("Type"));
 					resul = result.toString();
@@ -108,27 +118,27 @@ public final class Backend {
 			case 24:
 				obj = new JSONObject();
 				result = new JSONArray();
-				String res="";
+				String res = "";
 
 				if (msg.getString("type").equals("Prediction")) {
-					res = snapshot.savePrediction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
-							msg.getString("user"), msg.has("Products") ? msg.getString("Products") : "",
+					res = snapshot.savePrediction(msg.getString("name"), msg.getString("creation_date"),
+							msg.getInt("timespan"), msg.getString("user"),
+							msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : "");
+				} else {
+					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"),
+							msg.getInt("timespan"), msg.getString("user"), msg.has("Id") ? msg.getInt("Id") : 0);
+
 				}
-				else{
-					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"), msg.getInt("timespan"),
-							msg.getString("user"),msg.has("Id")?msg.getInt("Id"):0);
-					
-				}
-				
-				if(res.equals("name_in_use")){
+
+				if (res.equals("name_in_use")) {
 					obj.put("Message", "Name Already in Use");
 					obj.put("Op", "Error");
-					
+
 				}
-				if(res.equals("success")){	
-				obj.put("Message", "Snapshot Saved Successfully");
-				obj.put("Op", "Error");
+				if (res.equals("success")) {
+					obj.put("Message", "Snapshot Saved Successfully");
+					obj.put("Op", "Error");
 				}
 				result.put(obj);
 
@@ -205,30 +215,33 @@ public final class Backend {
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
 							gs.getPolarityDistribution(id, param + "," + filtering,
-									values + "," + (filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									(filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i])),
+									values + ","
+											+ (filtering.equals("Product")
+													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i])),
 							"Graph", "Top_Middle");
 
-				result = convert(result, gs.getAvgSentiment( param, values, id), "Graph", "Top_Right");
+				result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
 							gr.globalreach(param + "," + filtering,
-									values + "," + (filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									(filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									values + ","
+											+ (filtering.equals("Product")
+													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									id),
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
 							gs.globalsentiment(param + "," + filtering,
-									values + "," + (filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									(filtering.equals("Product")
-											? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									values + ","
+											+ (filtering.equals("Product")
+													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									id),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
@@ -257,11 +270,10 @@ public final class Backend {
 					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
 					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
 							"Top_Middle");
-					result = convert(result, gs.getAvgSentiment( param, values, id), "Graph", "Top_Right");
+					result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 					result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 					result = convert(result, gr.globalreach(param, values, "Global", id), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph",
-							"Bottom_Right");
+					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph", "Bottom_Right");
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
@@ -283,11 +295,17 @@ public final class Backend {
 			 * param, values, id).toString(); return tmp;
 			 */
 			case 4:
-				if (msg.has("Product"))
-					tmp = gp.getTop(param, values, id, msg.getString("Product")).toString();
-				else
-					tmp = gp.getTop(param, values, id, "noproduct").toString();
-
+				if (msg.has("Product")) {
+					if (msg.has("word"))
+						tmp = gp.getTop(param, values, id, msg.getString("Product"), msg.getString("word")).toString();
+					else
+						tmp = gp.getTop(param, values, id, msg.getString("Product"), null).toString();
+				} else{
+					if (msg.has("word"))
+						tmp = gp.getTop(param, values, id, "noproduct", msg.getString("word")).toString();
+					else
+						tmp = gp.getTop(param, values, id, "noproduct", null).toString();
+				}
 				return tmp;
 			case 5:
 				model = new GetModels();

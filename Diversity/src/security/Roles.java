@@ -12,6 +12,7 @@ import general.Settings;
  */
 public class Roles {
 
+
 	/**
 	 * Gets the restrictions.
 	 *
@@ -21,7 +22,7 @@ public class Roles {
 	 * @throws JSONException
 	 *             the JSON exception
 	 */
-	public static JSONArray getRestrictions(String Role) throws JSONException {
+	public static JSONArray getRestrictions(String role) throws JSONException {
 
 		Connection cnlocal = null;
 		String query;
@@ -37,9 +38,8 @@ public class Roles {
 					+ Settings.artable_use_opinion_prediction + " FROM `sentimentanalysis`.`access_rights`" + " WHERE "
 					+ Settings.artable_role + " = ?";
 			stmt = cnlocal.prepareStatement(query);
-			stmt.setString(1, Role);
+			stmt.setString(1, role);
 			rs = stmt.executeQuery();
-
 			if (rs.next()) {
 				obj.put("Op", "Rights");
 				obj.put("view_OM", rs.getBoolean(Settings.artable_vom));
@@ -47,10 +47,8 @@ public class Roles {
 				obj.put("view_opinion_results", rs.getBoolean(Settings.artable_view_opinion_results));
 				obj.put("view_use_opinion_prediction", rs.getBoolean(Settings.artable_use_opinion_prediction));
 				obj.put("save_delete_snapshots", rs.getBoolean(Settings.artable_save_delete_snapshots));
-				// System.out.println(Role +" - " + obj);
 				result.put(obj);
 				rs.close();
-				stmt.close();
 				cnlocal.close();
 			} else { // in case the role dosen't exist on the database it gives
 						// the user no rights
@@ -72,22 +70,20 @@ public class Roles {
 			try {
 				if (rs != null)
 					rs.close();
+
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -17,6 +17,28 @@
 	vertical-align: bottom;
 }
 
+a {
+	color: #604460;
+	margin-left: 10px;
+}
+
+a:link {
+	color: #604460;
+}
+
+a:visited {
+	color: #604460;
+}
+
+a:hover {
+	color: #604460;
+}
+
+a:active {
+	color: #604460;
+}
+
+
 table.sortable th:not (.sorttable_sorted ):not (.sorttable_sorted_reverse
 	 ):not (.sorttable_nosort ):after {
 	content: " \25B4\25BE"
@@ -117,7 +139,7 @@ input[type=radio] {
 	stroke:#DDDDDD;
 	}
 
-#filters {
+#filters, #cloud_wrapper {
 	background-color: #DDDDDD;
 	margin-top: 20px;
 	min-width: 90%;
@@ -126,6 +148,12 @@ input[type=radio] {
 	min-height: 200px;
 	overflow: hidden;
 }
+
+
+#cloud a{
+	display: inline-block;
+}
+
 
 #graphs {
 	background-color: #DDDDDD;
