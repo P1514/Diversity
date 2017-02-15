@@ -11,10 +11,7 @@ import general.Settings;
  * The Class Roles.
  */
 public class Roles {
-	
-	private Roles(){
-		
-	}
+
 
 	/**
 	 * Gets the restrictions.
@@ -75,21 +72,18 @@ public class Roles {
 					rs.close();
 
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -25,7 +25,7 @@ public class Operations {
 		op.put("get_model", 15);
 		op.put("update_model",16);
 		op.put("getpss", 17);
-		op.put("opinion_extraction", 18); // TODO correct date
+		op.put("opinion_extraction", 18);
 		op.put("oe_refresh", 19);
 		op.put("Top5Reach", 20);
 		op.put("gettree", 21);

@@ -89,6 +89,11 @@ public class Monitor {
 
 	}
 
+	
+	public static void load(String uri, long pss) {//TODO
+		
+	}
+	
 	/**
 	 * Delete.
 	 *
