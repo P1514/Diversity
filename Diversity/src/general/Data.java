@@ -64,15 +64,22 @@ public class Data {
 	/**
 	 * Instantiates a new data.
 	 */
-	public static boolean verify_permission(String role, int op){
-		Role tmp = roledb.get(role);
-		return tmp.getPermission(Operations.return_main_permission(op));
-	}
+	
 	public Data() {
 		/**
 		 * No construct variables needed, class only used to load data into the
 		 * software
 		 **/
+	}
+	public static boolean verify_permission(String role, int op){
+		Role tmp = roledb.get(role);
+		return tmp.getPermission(Operations.return_main_permission(op));
+	}
+	public static Role getRole(String role){
+		if(roledb.containsKey(role)){
+			return roledb.get(role);
+		}
+		return new Role();
 	}
 
 	public static Model getmodel(long id) {
@@ -178,7 +185,7 @@ public class Data {
 		String query;
 
 		try {
-			cndata = Settings.conndata();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 			return Backend.error_message(Settings.err_dbconnect).toString();
