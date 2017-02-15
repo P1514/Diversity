@@ -309,6 +309,9 @@ public final class Backend {
 				return tmp;
 			case 5:
 				model = new GetModels();
+				if (msg.has("Project")) {
+					return model.get_models(msg.getLong("Project")).toString();
+				}
 				return model.get_models().toString();
 			case 6:
 				GetComments gc = new GetComments();

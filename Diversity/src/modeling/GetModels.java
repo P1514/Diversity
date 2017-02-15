@@ -24,20 +24,42 @@ public class GetModels {
 		JSONArray result = new JSONArray();
 		result.put(new JSONObject().put("Op", "Models"));
 
-		
-		
-		
-		for(Model model : Data.dbmodelall()){
+		for (Model model : Data.dbmodelall()) {
 			if (model.getArchived() == false) {
 				JSONObject obj = new JSONObject();
 				try {
 					obj.put("Name", model.getName());
 					obj.put("Id", model.getId());
 					obj.put("PSS", Data.getpss(model.getPSS()).getName());
+					obj.put("Project", model.getProject());
 					result.put(obj);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+			}
+		}
+		return result;
+	}
+
+	public JSONArray get_models(long design_project) throws JSONException {
+		JSONArray result = new JSONArray();
+		result.put(new JSONObject().put("Op", "Models"));
+
+		for (Model model : Data.dbmodelall()) {
+			if (model.getArchived() == false) {
+				if (model.getProject() == design_project) {
+					JSONObject obj = new JSONObject();
+					try {
+						obj.put("Name", model.getName());
+						obj.put("Id", model.getId());
+						obj.put("PSS", Data.getpss(model.getPSS()).getName());
+						obj.put("Project", model.getProject());
+						result.put(obj);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}

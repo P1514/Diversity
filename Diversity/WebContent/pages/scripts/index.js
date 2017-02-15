@@ -138,6 +138,8 @@ function setCookie2(name, id, pss) {
 ws.onopen = function() {
 	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
   getRole();
+
+
 }
 
 
@@ -174,8 +176,16 @@ ws.onmessage = function(event) {
   //If Op is 'Rights', assign the access rights and request the availiable models list
   if (json[0].Op == 'Rights') {
     giveAcessRights(json);
+    var url = window.location.href.toString();
+    var dp = "";
+    if (url.indexOf("design_project_id=") != -1) {
+      dp = url.split("design_project_id=")[1].split("&")[0];
+    }
+
+    dp = dp.replace(/%20/g," ");
     var jsonData = {
         'Op' : 'getmodels',
+        'Project' : dp != "" ? dp : undefined
       }
       ws.send(JSON.stringify(jsonData));
   }

@@ -51,10 +51,10 @@ public class Tagcloud extends GetPosts {
 				
 				
 				String message = posts.getJSONObject(i).getString("Message").toLowerCase();
-				message = message.replaceAll("[^A-Za-z0-9 ]", "");
+				message = message.replaceAll("[^A-Za-z0-9 ]", " ");
 				String[] wordArray = message.split(" ");
 				for (String word : wordArray) {
-					if (!ignoreWords.contains(word)) {
+					if (!ignoreWords.contains(word) && word != "") {
 						wordWeights.put(word, wordWeights.get(word) != null ? wordWeights.get(word) + 1 : 1);
 					}
 				}

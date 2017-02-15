@@ -64,7 +64,8 @@ public class GetPosts {
 		// System.out.print("TEST:"+product);
 
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_product;
+				+ "=? AND " + Settings.lotable_timestamp + ">=?";
+		if(!"Global".equals(product)) insert += " AND " + Settings.lotable_product;
 
 		Model model = Data.getmodel(id);
 		
@@ -78,14 +79,15 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-
-		if (!model.getProducts().isEmpty()) {
+		if(!"Global".equals(product)){
+		if (!model.getProducts().isEmpty() ) {
 			if (product == "noproduct")
 				insert += " in (" + model.getProducts() + ")";
 			else
 				insert += "=" + Data.identifyProduct(product);
 		} else {
 			insert += "=0";
+		}
 		}
 		
 		if (param != null) {
