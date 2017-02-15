@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.mysql.jdbc.Connection;
@@ -131,11 +132,11 @@ public class Oversight extends TimerTask {
 					requesturl.put(d.pss.toString(), local);
 				};
 				requesturl.forEach((k, v) -> {
-					String request = uri + a.split(";;;")[0] + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\""
-							+ k + "\"";
+					//String request = uri + a.split(";;;")[0] + "/getPosts/" + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId=\"" + k + "\"";
+					String request = Settings.JSON_uri;
 					System.out.println(request);
 					try {
-						// dat.load(new JSONArray(readUrl(request)));
+						dat.load(new JSONArray(readUrl(request)));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -187,7 +188,7 @@ public class Oversight extends TimerTask {
 		}
 		}else{
 			try {
-				dat.load();
+				dat.load(null);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

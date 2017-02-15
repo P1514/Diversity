@@ -26,6 +26,10 @@ public class Data {
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 
+	private static final ConcurrentHashMap<String, String> roledb = new ConcurrentHashMap<>(); // Designer,
+																								// 0000001000
+
+	private static final ConcurrentHashMap<String, String> usersdb = new ConcurrentHashMap<>(); // 167584473655,0000001000
 	/** The modeldb. */
 	private static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 
@@ -167,7 +171,7 @@ public class Data {
 		return 0;
 	}
 
-	private String loaduniqueopinionid() throws JSONException {
+	private String loaduniqueopinionid(JSONArray json) throws JSONException {
 		try {
 			cndata = Settings.conndata();
 		} catch (Exception e) {
@@ -175,69 +179,101 @@ public class Data {
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
 		// Load Opinions id first
-		Calendar cal = Calendar.getInstance();
-		lastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
-		String query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
-				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
-				+ Settings.rptable_rpostid + " end from " + Settings.rptable + " Where " + Settings.ptime + " > \'"
-				+ lastUpdated + "\' && " + Settings.ptime + " <= \'" + lastUpdated2 + "\' ORDER BY ID ASC");
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				if (!rs.next()) {
-					try {
-						cndata.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+		if (json == null) {
+			Calendar cal = Calendar.getInstance();
+			lastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
+			String query = ("Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
+					+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
+					+ Settings.rptable_rpostid + " end from " + Settings.rptable + " Where " + Settings.ptime + " > \'"
+					+ lastUpdated + "\' && " + Settings.ptime + " <= \'" + lastUpdated2 + "\' ORDER BY ID ASC");
+			try (Statement stmt = cndata.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					if (!rs.next()) {
+						try {
+							cndata.close();
+						} catch (Exception e) {
+							LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+						}
+						try {
+							cnlocal.close();
+						} catch (Exception e) {
+							LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+						}
+						return Backend.error_message("Loaded Successfully").toString();
 					}
+					rs.beforeFirst();
+					ExecutorService es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(new Topinions(rs.getLong(1)));
+					es.shutdown();
 					try {
-						cnlocal.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+						es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+					} catch (InterruptedException e) {
+						LOGGER.log(Level.SEVERE, "Error on Thread that loads Opinions");
+						return Backend.error_message("Error on Thread that Loads posts").toString();
 					}
-					return Backend.error_message("Loaded Successfully").toString();
-				}
-				rs.beforeFirst();
-				ExecutorService es = Executors.newFixedThreadPool(50);
-				while (rs.next())
-					es.execute(new Topinions(rs.getLong(1)));
-				es.shutdown();
-				try {
-					es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-				} catch (InterruptedException e) {
-					LOGGER.log(Level.SEVERE, "Error on Thread that loads Opinions");
-					return Backend.error_message("Error on Thread that Loads posts").toString();
-				}
-				rs.beforeFirst();
-				es = Executors.newFixedThreadPool(50);
-				while (rs.next())
-					es.execute(new Tposts(rs.getLong(1)));
-				es.shutdown();
-				try {
-					es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-				} catch (InterruptedException e) {
-					LOGGER.log(Level.SEVERE, "Error on Thread that Loads posts");
-					return Backend.error_message("Error on Thread that Loads posts").toString();
-				}
+					rs.beforeFirst();
+					es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(new Tposts(rs.getLong(1)));
+					es.shutdown();
 
+					try {
+						es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+					} catch (InterruptedException e) {
+						LOGGER.log(Level.SEVERE, "Error on Thread that Loads posts");
+						return Backend.error_message("Error on Thread that Loads posts").toString();
+					}
+
+				}
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return Backend.error_message("Error Loading opinions ids").toString();
-		} finally
 
-		{
+			catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "ERROR", e);
+				return Backend.error_message("Error Loading opinions ids").toString();
+			}
+
+			finally
+
+			{
+				try {
+					cndata.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.INFO, "Nothing can be done here", e);
+				}
+			}
+
+		} else {
+			ExecutorService es = Executors.newFixedThreadPool(50);
+			for (int i = 0; i < json.length(); i++)
+				es.execute(new Topinions(json.getJSONObject(i)));
+			es.shutdown();
 			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, "Nothing can be done here", e);
+				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.SEVERE, "Error on Thread that loads Opinions");
+				return Backend.error_message("Error on Thread that Loads posts").toString();
 			}
+
+			es = Executors.newFixedThreadPool(50);
+			for (int i = 0; i < json.length(); i++)
+				es.execute(new Tposts(json.getJSONObject(i)));
+			es.shutdown();
+
+			try {
+				es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.SEVERE, "Error on Thread that Loads posts");
+				return Backend.error_message("Error on Thread that Loads posts").toString();
+			}
+
 		}
 		LOGGER.log(Level.INFO, " Load posts from remote " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 		return null;
 	}
 
-	private String loadUsers() throws JSONException {
+	private String loadUsers(JSONArray json) throws JSONException {
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -249,68 +285,85 @@ public class Data {
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
 		// From local DB
+		
+			String query = (selectall + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
+			try (Statement stmt = cnlocal.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
 
-		String query = (selectall + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
-		try (Statement stmt = cnlocal.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-
-				while (rs.next()) {
-					if (authordb.containsKey(rs.getLong("id"))) {
-					} else {
-						Author auth = new Author(rs.getLong(Settings.latable_id), rs.getString(Settings.latable_name),
-								rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
-								rs.getString(Settings.latable_location));
-						auth.setComments(rs.getLong(Settings.latable_comments));
-						auth.setLikes(rs.getLong(Settings.latable_likes));
-						auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
-						auth.setViews(rs.getLong(Settings.latable_views));
-						authordb.put(rs.getLong(Settings.latable_id), auth);
+					while (rs.next()) {
+						if (authordb.containsKey(rs.getLong("id"))) {
+						} else {
+							Author auth = new Author(rs.getLong(Settings.latable_id),
+									rs.getString(Settings.latable_name), rs.getLong(Settings.latable_age),
+									rs.getString(Settings.latable_gender), rs.getString(Settings.latable_location));
+							auth.setComments(rs.getLong(Settings.latable_comments));
+							auth.setLikes(rs.getLong(Settings.latable_likes));
+							auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
+							auth.setViews(rs.getLong(Settings.latable_views));
+							authordb.put(rs.getLong(Settings.latable_id), auth);
+						}
 					}
 				}
-			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return Backend.error_message(Settings.err_unknown).toString();
-		} finally {
-			try {
-				cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, "Nothing can de done here", e);
-			}
-		}
-		LOGGER.log(Level.INFO, " Load users local " + (System.nanoTime() - stime));
-		stime = System.nanoTime();
-
-		// Load users from foreign DB
-		query = (selectall + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
-		try {
-			cndata = Settings.conndata();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				while (rs.next()) {
-					if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
-					} else {
-						authordb.put(rs.getLong(Settings.rutable_userid),
-								new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-										rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-										rs.getString(Settings.rutable_loc)));
-					}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "ERROR", e);
+				return Backend.error_message(Settings.err_unknown).toString();
+			} finally {
+				try {
+					cnlocal.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.INFO, "Nothing can de done here", e);
 				}
 			}
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
-			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
-		} finally {
+			LOGGER.log(Level.INFO, " Load users local " + (System.nanoTime() - stime));
+			stime = System.nanoTime();
+
+			// Load users from foreign DB
+			if (json == null) {
+			query = (selectall + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
 			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+				cndata = Settings.conndata();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+				return Backend.error_message(Settings.err_dbconnect).toString();
 			}
+			try (Statement stmt = cndata.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					while (rs.next()) {
+						if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
+						} else {
+							authordb.put(rs.getLong(Settings.rutable_userid),
+									new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
+											rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
+											rs.getString(Settings.rutable_loc)));
+						}
+					}
+				}
+			} catch (SQLException e) {
+				LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
+				return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated")
+						.toString();
+			} finally {
+				try {
+					cndata.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
+				}
+			}
+		} else {
+			
+			for(int i=0;i<json.length();i++) {
+
+				if (authordb.containsKey(json.getJSONObject(i).getLong("id"))) {//ask guilherme
+				} else {
+					authordb.put(json.getJSONObject(i).getLong("id"),
+							new Author(json.getJSONObject(i).getLong("id"), json.getJSONObject(i).getString("name"),
+									json.getJSONObject(i).getLong("age"), json.getJSONObject(i).getString("gender"),
+									json.getJSONObject(i).getString("location")));
+				}
+			}
+
 		}
+
 		LOGGER.log(Level.INFO, " Load users remote " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 		return null;
@@ -571,12 +624,6 @@ public class Data {
 	 * @throws JSONException
 	 *             the JSON exception
 	 */
-	public String load(JSONArray json) throws JSONException {
-
-		// return loadJSON(json);
-		return Backend.error_message("not implemented").toString();
-	}
-
 	private void evaluatedata() {
 		authordb.forEach((k, v) -> {
 			v.calcInfluence((totalcomments / ((double) totalposts)), totallikes / ((double) totalposts),
@@ -1353,7 +1400,7 @@ public class Data {
 		return null;
 	}
 
-	public String load() throws JSONException {
+	public String load(JSONArray json) throws JSONException {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 		loadPSS();
@@ -1365,12 +1412,12 @@ public class Data {
 		if (err != null)
 			return err;
 
-		err = loaduniqueopinionid();
+		err = loaduniqueopinionid(json);
 
 		if (err != null) {
 			return err;
 		}
-		err = loadUsers();
+		err = loadUsers(json);
 		if (err != null)
 			return err;
 
