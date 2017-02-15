@@ -117,5 +117,8 @@ public class Tagcloud extends GetPosts {
 		ignoreWords.add("are");
 		ignoreWords.add("say");
 		ignoreWords.add("in");
+		ignoreWords.add("what");
+		ignoreWords.add("theyre");
+		ignoreWords.add("have");
 	}
 }

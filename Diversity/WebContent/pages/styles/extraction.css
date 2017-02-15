@@ -149,6 +149,12 @@ input[type=radio] {
 	overflow: hidden;
 }
 
+
+#cloud a{
+	display: inline-block;
+}
+
+
 #graphs {
 	background-color: #DDDDDD;
 	margin-top: 20px;
