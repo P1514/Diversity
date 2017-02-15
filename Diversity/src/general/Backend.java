@@ -96,11 +96,9 @@ public final class Backend {
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
-				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, "noproduct", ""));
-				LOGGER.log(Level.INFO, "step 1");
+				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
-				LOGGER.log(Level.INFO, "step 2");
 				result.put(obj);
 				LOGGER.log(Level.INFO, result.toString());
 				return result.toString();
