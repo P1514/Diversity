@@ -67,8 +67,6 @@ public class GetPosts {
 				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_product;
 
 		Model model = Data.getmodel(id);
-		
-		
 
 		if (model == null) {
 			result = new JSONArray();
@@ -87,7 +85,7 @@ public class GetPosts {
 		} else {
 			insert += "=0";
 		}
-		
+
 		if (param != null) {
 			insert += " && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?";
 
@@ -101,18 +99,29 @@ public class GetPosts {
 				dateerror = true;
 			}
 		}
-		
+
 		if (word != null) {
-			insert += " AND "+ Settings.lotable_id + " in (Select "+Settings.lptable_opinion +" FROM "+ Settings.lptable + " where " +Settings.lptable_message+ " LIKE '%"+word+"%' and views>0)"; //More than 0 views means that its a post and not a comment
+			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
+					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%' and views>0)"; // More
+																														// than
+																														// 0
+																														// views
+																														// means
+																														// that
+																														// its
+																														// a
+																														// post
+																														// and
+																														// not
+																														// a
+																														// comment
 		}
-		
+
 		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
-		
-		
-		LOGGER.log(Level.INFO, "TESTE*********"+insert);
 
+		LOGGER.log(Level.INFO, "TESTE*********" + insert);
 
 		try {
 			dbconnect();
@@ -138,10 +147,9 @@ public class GetPosts {
 
 			}
 
-				
 			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
-			LOGGER.log(Level.INFO, "TESTE*********"+query1.toString());
+			LOGGER.log(Level.INFO, "TESTE*********" + query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {
