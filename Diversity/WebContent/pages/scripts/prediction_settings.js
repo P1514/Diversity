@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onopen = function () {
     json = {
       "Op" : "gettree",
-      "All" : 1
+      "All" : 1,
+      'Key' : sessionStorage.userKey
     }
 
     ws.send(JSON.stringify(json));
@@ -178,7 +179,8 @@ function submit() {
   var json = {
     "Op" : "prediction",
     "Products" : products != "" ? products : undefined,
-    "Services" : services != "" ? services : undefined
+    "Services" : services != "" ? services : undefined,
+    'Key' : sessionStorage.userKey
   }
   snap = false;
   $('#page_title').html('Create Prediction');
@@ -201,7 +203,8 @@ function save() {
 function load() {
   var json = {
     "Op" : "load_snapshot",
-    "Type" : "Prediction"
+    "Type" : "Prediction",
+    'Key' : sessionStorage.userKey
   }
 
   ws.send(JSON.stringify(json));
@@ -220,6 +223,7 @@ function send(val) {
     "user" : "test",
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined,
+    'Key' : sessionStorage.userKey
   }
   ws.send(JSON.stringify(json));
 }
@@ -247,6 +251,7 @@ function requestSnapshot(val) {
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
+    'Key' : sessionStorage.userKey
   }
   snap = true;
   snap_name = val;
