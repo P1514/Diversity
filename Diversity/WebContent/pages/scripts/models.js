@@ -44,7 +44,7 @@ function getPss() {
     pss = url.split("pss=")[1].split("&")[0];
   }
 
-  return pss.replace("%20"," ");
+  return pss.replace(/%20/g," ");
 }
 
 var ws;
