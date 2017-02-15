@@ -56,7 +56,6 @@ public class Tagcloud extends GetPosts {
 				String[] wordArray = message.split(" ");
 				for (String word : wordArray) {
 					if (!ignoreWords.contains(word) && word != "") {
-
 						wordWeights.put(word, wordWeights.get(word) != null ? wordWeights.get(word) + 1 : 1);
 					}
 				}
