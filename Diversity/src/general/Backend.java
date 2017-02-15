@@ -222,7 +222,7 @@ public final class Backend {
 											: filter[i])),
 							"Graph", "Top_Middle");
 
-				result = convert(result, gs.getAvgSentiment(param, values, id), "Graph", "Top_Right");
+				result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 				result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
@@ -270,7 +270,7 @@ public final class Backend {
 					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
 					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
 							"Top_Middle");
-					result = convert(result, gs.getAvgSentiment(param, values, id), "Graph", "Top_Right");
+					result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 					result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 					result = convert(result, gr.globalreach(param, values, "Global", id), "Graph", "Bottom_Middle");
 					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph", "Bottom_Right");
