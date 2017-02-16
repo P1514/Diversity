@@ -27,7 +27,7 @@ public final class Extrapolation extends Globalsentiment {
 		instance = new Extrapolation();
 	}
 
-	public JSONArray extrapolate(String param, String values, String output, long id)
+	public JSONArray extrapolate(String param, String values, String output, long id, long frequency)
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -63,8 +63,8 @@ public final class Extrapolation extends Globalsentiment {
 		
 		if(firstDate(id)!=0){
 		for (; today.after(data)/*data.get(Calendar.MONTH) <Calendar.getInstance().get(Calendar.MONTH)*/; data.add(Calendar.MONTH, 1)) {
-			if (globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id) != -1)
-				obs.add(index, globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id));
+			if (globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id) != -1)
+				obs.add(index, globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR) , param, values, id));
 			index++;
 
 		}
@@ -77,9 +77,9 @@ public final class Extrapolation extends Globalsentiment {
 		index--;
 		int monthaux = data.get(Calendar.MONTH);
 		int indexaux = index;
-		double lastvalue = globalsentimentby(monthaux % 12, today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
+		double lastvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), monthaux % 12, today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
 		while (lastvalue == -1 && monthaux > data.get(Calendar.MONTH)) {
-			lastvalue = globalsentimentby(monthaux % 12, today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
+			lastvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), monthaux % 12, today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
 			monthaux--;
 			indexaux--;
 		}

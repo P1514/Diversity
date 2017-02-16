@@ -305,33 +305,58 @@ function drawChart() {
 
 
   var globaldata = new google.visualization.DataTable();
-  globaldata.addColumn('date', 'Month');
+  globaldata.addColumn('date', 'Date');
 
   var counter = data[1];
-
+/*
   var pssNumber = 0;
+
   for (var i = 0; i < counter.length; i++) {							// find the number of PSSs to display (amount of 'Filter' in JSON)
     if (counter[i].hasOwnProperty('Filter')) {
       globaldata.addColumn('number', counter[i].Filter);
       pssNumber++;
     }
   }
-
+*/
+  var pssNumber = 0;
+  for (var i = 0; i < counter.length; i++) {
+    if (counter[i].hasOwnProperty('Filter')) {
+      globaldata.addColumn('number', counter[i].Filter);
+      pssNumber++;
+    } else {
+      globaldata.addRow();
+    }
+  }
+  
+  var column = 0;
+  for (var i = 0; i < counter.length - pssNumber; i++) {
+    if (!counter[i].hasOwnProperty('Filter')) {
+      var time = counter[i].Date.split(" ");
+      globaldata.setCell(i, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
+      if (counter[i].Value != -1) {
+        globaldata.setCell(i, column, counter[i].Value);
+      }
+    } else {
+      column++;
+    }
+  }
+/*
   for (var i = 0; i < pssNumber + 1 ; i++) {							// until we reach the last PSS...
     if (!counter[i].hasOwnProperty('Filter')) {						// if its a month,value pair
+      var time = counter[i].Date.split(" ");
       for (var j = 0; j < 12; j++) {											// for each month
         if (i == 1 && j == 0) {
           globaldata.addRows(12);													// add 12 rows for the 12 months
         }
         //globaldata.setCell(j,0,new Date(new Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) + i+j].Month),01));				// the first cell of each line is the name of the month
-        globaldata.setCell(j,0, new Date(counter[((i-1)*12) + i+j].Year, getMonthFromString(counter[((i-1)*12) + i+j].Month), 01));
+        globaldata.setCell(j,0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
         if (counter[((i-1)*12) + i+j].Value != -1) {
           globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
         }
       }															// if it's the first iteration, the array position is i+j. for the other iterations it
     }																// adds 12 positions per iteration
   }
-
+*/
 
   var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
   var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
