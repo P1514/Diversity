@@ -24,7 +24,7 @@ import monitoring.Monitor;;
 public final class Model {
 
 	private Connection cnlocal;
-	private long id, pss;
+	private long id, pss, design_project;
 	private long frequency, user;
 	private String name, uri, age, gender, products;
 	private boolean archived;
@@ -56,7 +56,7 @@ public final class Model {
 	 *            the archived if deleted or not
 	 */
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
-			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate) {
+			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate, long design_project) {
 		this.id = _id;
 		this.frequency = _frequency;
 		this.user = _user;
@@ -69,6 +69,7 @@ public final class Model {
 		this.archived = _archived;
 		this.cdate = _created_date;
 		this.nextupdate = _nextupdate;
+		this.design_project = design_project;
 	}
 
 	/**
@@ -392,6 +393,10 @@ public final class Model {
 		return this.products.substring(0, this.products.length() - 1);
 	}
 
+	public long getProject() {
+		return this.design_project;
+	}
+	
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();

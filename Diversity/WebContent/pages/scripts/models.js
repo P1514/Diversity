@@ -44,7 +44,7 @@ function getPss() {
     pss = url.split("pss=")[1].split("&")[0];
   }
 
-  return pss.replace("%20"," ");
+  return pss.replace(/%20/g," ");
 }
 
 var ws;
@@ -54,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
     + window.location.port + '/Diversity/server');
 	$('#tree_div').hide();
   ws.onopen = function() {
-      json = {
-        "Op" : "getpss",
-      }
+    json = {
+      "Op" : "getpss",
+      'Key' : sessionStorage.userKey
+    }
 
     ws.send(JSON.stringify(json));
   }
@@ -102,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         var jsonData2 = {
           "Op" : "gettree",
+          'Key' : sessionStorage.userKey
         }
       }
 
@@ -117,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var json2 = {
           "Op" : "get_model",
           "Id" : sessionStorage.id,
+          'Key' : sessionStorage.userKey
         }
         //console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
         ws.send(JSON.stringify(json2));
@@ -435,6 +438,7 @@ function send_config() {
     "User" : 1,//TODO find this field
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
+    'Key' : sessionStorage.userKey
 
   };
   if (erro == true) {

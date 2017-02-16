@@ -76,6 +76,7 @@ function connect() {
           "Param" : "Month",
           "Values" : month,
           "Product" : product,
+          'Key' : sessionStorage.userKey
         }
       } else {
         json = {
@@ -83,6 +84,7 @@ function connect() {
           "Id" : sessionStorage.id,
           "Param" : "Month",
           "Values" : month,
+          'Key' : sessionStorage.userKey
         }
       }
 
@@ -93,7 +95,8 @@ function connect() {
 			product = undefined;
 			json = {
 				"Op" : "getposts",
-				"Id" : sessionStorage.id
+				"Id" : sessionStorage.id,
+        'Key' : sessionStorage.userKey
 			}
 
 			ws.send(JSON.stringify(json));
@@ -113,6 +116,7 @@ function connect() {
 		json = {
 			"Op" : "getconfig",
 			"Id" : sessionStorage.id,
+      'Key' : sessionStorage.userKey
 		}
 
 		ws.send(JSON.stringify(json));
@@ -192,7 +196,8 @@ function connect() {
 			//After the configuration, ask for the opinion extraction (chart) data
 			json = {
 				"Op" : "opinion_extraction",
-				"Id" : window.sessionStorage.id
+				"Id" : window.sessionStorage.id,
+        'Key' : sessionStorage.userKey
 			}
 
 			ws.send(JSON.stringify(json));
@@ -224,6 +229,7 @@ function connect() {
       var json = {
         "Op" : "getposts",
         "Id" : sessionStorage.id,
+        'Key' : sessionStorage.userKey
       }
 
 			ws.send(JSON.stringify(json));
@@ -260,7 +266,8 @@ function connect() {
 				"Id" : sessionStorage.id,
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
-				"Product" : product != undefined && product != "Global" ? product : undefined
+				"Product" : product != undefined && product != "Global" ? product : undefined,
+        'Key' : sessionStorage.userKey
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -320,7 +327,8 @@ function tagClick(word) {
 		"Id" : sessionStorage.id,
 		"word" : word,
 		"Month" : month != undefined ? month : undefined,
-		"Product" : product != undefined ? product : undefined
+		"Product" : product != undefined ? product : undefined,
+    'Key' : sessionStorage.userKey
 	}
 
 	ws.send(JSON.stringify(json));
@@ -343,7 +351,8 @@ function load() {
   // send request for snapshot list
   var json = {
     "Op" : "load_snapshot",
-		"Type" : "Extraction"
+		"Type" : "Extraction",
+    'Key' : sessionStorage.userKey
   }
 
   ws.send(JSON.stringify(json));
@@ -360,7 +369,8 @@ function send(val) {
     "creation_date" : new Date(),
     "timespan" : 12,
     "user" : "test",
-		"Id" : sessionStorage.id
+		"Id" : sessionStorage.id,
+    'Key' : sessionStorage.userKey
   }
   ws.send(JSON.stringify(json));
 }
@@ -390,6 +400,7 @@ function requestSnapshot(val) {
     "Op" : "load_snapshot",
     "Name" : val,
 		"Type" : "All",
+    'Key' : sessionStorage.userKey
   }
 	snap = true;
   ws.send(JSON.stringify(json));
@@ -983,6 +994,7 @@ function changeRequest() {
 			"Filter" : "",
 			"Id" : sessionStorage.id,
 			"Extrapolate" : extrapolate ? 1 : undefined,
+      'Key' : sessionStorage.userKey
 		};
 
 		if (globalradio == true)
