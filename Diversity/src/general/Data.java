@@ -284,9 +284,10 @@ public class Data {
 
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
+		String query;
 		// From local DB
-		
-			String query = (selectall + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
+		if (json == null) {
+			query = (selectall + Settings.latable + " where " + Settings.latable_id + " in " + querycond);
 			try (Statement stmt = cnlocal.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery(query)) {
 
@@ -316,57 +317,47 @@ public class Data {
 			}
 			LOGGER.log(Level.INFO, " Load users local " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
+		}
+		// Load users from foreign DB
+		else {
 
-			// Load users from foreign DB
-			if (json == null) {
-			query = (selectall + Settings.rutable + " where " + Settings.rutable_userid + " in " + querycond);
-			try {
-				cndata = Settings.conndata();
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-				return Backend.error_message(Settings.err_dbconnect).toString();
-			}
-			try (Statement stmt = cndata.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery(query)) {
-					while (rs.next()) {
-						if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
-						} else {
-							authordb.put(rs.getLong(Settings.rutable_userid),
-									new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-											rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-											rs.getString(Settings.rutable_loc)));
-						}
-					}
-				}
-			} catch (SQLException e) {
-				LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
-				return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated")
-						.toString();
-			} finally {
-				try {
-					cndata.close();
-				} catch (SQLException e) {
-					LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-				}
-			}
-		} else {
-			
-			for(int i=0;i<json.length();i++) {
-
-				if (authordb.containsKey(json.getJSONObject(i).getLong("id"))) {//ask guilherme
+			for (int i = 1; i < json.length(); i++) {
+				System.out.println("JSON:" + json.getJSONObject(i).toString());
+				if (authordb2.containsKey(
+						json.getJSONObject(i).getString("account") + json.getJSONObject(i).getString(Settings.latable_source))) {
 				} else {
-					authordb.put(json.getJSONObject(i).getLong("id"),
-							new Author(json.getJSONObject(i).getLong("id"), json.getJSONObject(i).getString("name"),
-									json.getJSONObject(i).getLong("age"), json.getJSONObject(i).getString("gender"),
-									json.getJSONObject(i).getString("location")));
+					Author auth = new Author(json.getJSONObject(i).getString("account"),
+							json.getJSONObject(i).getString(Settings.latable_source), json.getJSONObject(i).getString(Settings.latable_name),
+							json.getJSONObject(i).getLong(Settings.latable_age), json.getJSONObject(i).getString(Settings.latable_gender),
+							json.getJSONObject(i).getString(Settings.latable_location));
+					auth.setComments(json.getJSONObject(i).getLong(Settings.latable_comments));
+					auth.setLikes(json.getJSONObject(i).getLong(Settings.latable_likes));
+					auth.setPosts(json.getJSONObject(i).getLong(Settings.latable_posts) - 1);
+					auth.setViews(json.getJSONObject(i).getLong(Settings.latable_views));
+					authordb2.put(
+							json.getJSONObject(i).getString(Settings.latable_id) + "," + json.getJSONObject(i).getString(Settings.latable_source),
+							auth);
 				}
 			}
 
+		
+		for (int i = 0; i < json.length(); i++) {
+			System.out.println(json.getJSONObject(i).toString());
+
+			if (authordb.containsKey(json.getJSONObject(i).getLong("id"))) {
+
+			} else {
+				authordb.put(json.getJSONObject(i).getLong("id"),
+						new Author(json.getJSONObject(i).getLong("id"), json.getJSONObject(i).getString("name"),
+								json.getJSONObject(i).getLong("age"), json.getJSONObject(i).getString("gender"),
+								json.getJSONObject(i).getString("location")));
+			}
 		}
 
-		LOGGER.log(Level.INFO, " Load users remote " + (System.nanoTime() - stime));
-		stime = System.nanoTime();
-		return null;
+	}
+
+	LOGGER.log(Level.INFO," Load users remote "+(System.nanoTime()-stime));stime=System.nanoTime();return null;
+
 	}
 
 	private void update(String type) {
