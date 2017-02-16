@@ -125,7 +125,6 @@ public class GetPosts {
 
 		insert += " ORDER BY reach DESC LIMIT ?";
 
-		LOGGER.log(Level.INFO, "TESTE*********" + insert);
 
 		try {
 			dbconnect();
@@ -153,7 +152,7 @@ public class GetPosts {
 
 			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
-			LOGGER.log(Level.INFO, "TESTE*********" + query1.toString());
+			
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {

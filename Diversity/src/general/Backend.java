@@ -289,7 +289,7 @@ public final class Backend {
 			 */
 			case 2:
 				Data dat = new Data();
-				return dat.load();
+				return dat.load(null);
 			/*
 			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1,
 			 * param, values, id).toString(); return tmp;
