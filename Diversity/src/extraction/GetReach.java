@@ -103,7 +103,7 @@ public class GetReach {
 		int avg = 0;
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				value += globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id);
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}
 		}
@@ -122,7 +122,7 @@ public class GetReach {
 		return result;
 	}
 
-	private double globalsentimentby(int month, int year, String param, String value, long id) {
+	private double globalsentimentby(int day, int month, int year, String param, String value, long id) {
 
 		Model model = Data.getmodel(id);
 		String insert;
@@ -133,10 +133,10 @@ public class GetReach {
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global("reach", insert, par, month, model, year);
+		return calc_global("reach", insert, par, month, model, year, day);
 	}
 
-	protected double calc_global(String type, String insert, parameters par, int month, Model model, int year) {
+	protected double calc_global(String type, String insert, parameters par, int month, Model model, int year, int day) {
 		avg result = new avg();
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -157,7 +157,7 @@ public class GetReach {
 		}
 		insert += ")";
 		int nmonth = month - 1;
-		Calendar data = new GregorianCalendar(year, nmonth, 1);
+		Calendar data = new GregorianCalendar(year, nmonth, day);
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -256,7 +256,7 @@ public class GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalreach(String param, String values, String output, long id) throws JSONException {
+	public JSONArray globalreach(String param, String values, String output, long id, long frequency) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -267,26 +267,44 @@ public class GetReach {
 		Calendar today = Calendar.getInstance();
 
 		data.setTimeInMillis(firstDate(id));
-		data.add(Calendar.MONTH, 1);
+		if (frequency != -1) {
+			data.add(Calendar.DAY_OF_MONTH, (int) frequency); 
+		} else {
+			data.add(Calendar.MONTH, 1);
+		}
+		
 		if (firstDate(id) != 0) {
-			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				try {
-					obj = new JSONObject();
-					obj.put("Month", time[data.get(Calendar.MONTH)]);
-					obj.put("Year", data.get(Calendar.YEAR));
-					obj.put("Value",
-							globalreachby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
-					result.put(obj);
-
-				} catch (JSONException e) {
-					LOGGER.log(Level.INFO, "ERROR", e);
+			if (frequency != -1) {
+				for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
+					try {
+						obj = new JSONObject();
+						obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
+						obj.put("Value",
+								globalreachby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+						result.put(obj);
+					} catch (JSONException e) {
+						LOGGER.log(Level.INFO, "ERROR", e);
+					}
+				}
+			} else {
+				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+					try {
+						obj = new JSONObject();
+						obj.put("Date", (data.get(Calendar.MONTH) + 1) + " 01 " + data.get(Calendar.YEAR));
+						obj.put("Value",
+								globalreachby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+						result.put(obj);
+	
+					} catch (JSONException e) {
+						LOGGER.log(Level.INFO, "ERROR", e);
+					}
 				}
 			}
 		}
 		return result;
 	}
 
-	private double globalreachby(int month, int year, String param, String value, long id) {
+	private double globalreachby(int day, int month, int year, String param, String value, long id) {
 
 		Model model = Data.getmodel(id);
 		String insert;
@@ -296,7 +314,7 @@ public class GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global("reach", insert, par, month, model, year);
+		return calc_global("reach", insert, par, month, model, year,day);
 
 	}
 

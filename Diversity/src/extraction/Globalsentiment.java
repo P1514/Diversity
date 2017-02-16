@@ -82,10 +82,12 @@ public class Globalsentiment extends GetReach {
 			e1.printStackTrace();
 		}
 
+		long frequency = calcFrequency(psslist);
+		
 		for (long k : psslist) {
 
-			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1));
-			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1).toString());
+			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1));
+			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1, -1).toString());
 			Data.delmodel((long) -1);
 
 		}
@@ -115,6 +117,43 @@ public class Globalsentiment extends GetReach {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
 
+	}
+
+	private long calcFrequency(List<Long> psslist) {
+		
+		long max_freq = -1;
+		
+		for (Long pss : psslist) {
+			try {
+				dbconnect();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "Error Connecting to Database", e);
+				return -1;
+			}
+			String select = "SELECT MAX(" + Settings.lmtable_update + ") FROM " + Settings.lmtable + " WHERE " + Settings.lmtable_pss + "=?";
+
+			try (PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+				query1.setString(1, pss.toString());
+				try (ResultSet rs = query1.executeQuery()) {
+					while (rs.next()) {
+						if (rs.getLong(1) > max_freq) {
+							max_freq = rs.getLong(1);
+						}
+					}
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "ERROR", e);
+			}
+			try {
+				cnlocal.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		System.out.println("MAX FREQUENCY: " + max_freq);
+		return max_freq;
 	}
 
 	/**
@@ -173,7 +212,7 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalsentiment(String param, String values, String output, long id) throws JSONException {
+	public JSONArray globalsentiment(String param, String values, String output, long id, long frequency) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -191,7 +230,11 @@ public class Globalsentiment extends GetReach {
 		// System.out.println("PSS ID:"+ id);
 
 		data.setTimeInMillis(firstDate(id));
-		data.add(Calendar.MONTH, 1);
+		if (frequency != -1) {
+			data.add(Calendar.DAY_OF_MONTH, (int) frequency); 
+		} else {
+			data.add(Calendar.MONTH, 1);
+		}
 
 		// while(today.after(data) &&
 		// globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) ,
@@ -205,15 +248,24 @@ public class Globalsentiment extends GetReach {
 		if (firstDate(id) != 0) {
 			// System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+"
 			// year:"+data.get(Calendar.YEAR));
-			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				obj = new JSONObject();
-				obj.put("Month", time[data.get(Calendar.MONTH)]);
-				obj.put("Year", data.get(Calendar.YEAR));
-				obj.put("Value",
-						globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
-				// System.out.println("mon:"+data.get(Calendar.MONTH)+"
-				// year:"+data.get(Calendar.YEAR));
-				result.put(obj);
+			if (frequency != -1) {
+				for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
+					obj = new JSONObject();
+					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
+					obj.put("Value",
+							globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+					result.put(obj);
+				}
+			} else {
+				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+					obj = new JSONObject();
+					obj.put("Date", "01" + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
+					obj.put("Value",
+							globalsentimentby(data.get(Calendar.DAY_OF_MONTH),(data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param, values, id));
+					// System.out.println("mon:"+data.get(Calendar.MONTH)+"
+					// year:"+data.get(Calendar.YEAR));
+					result.put(obj);
+				}
 			}
 		}
 		return result;
@@ -225,18 +277,18 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 
 		Calendar data = Calendar.getInstance();
-		 data.add(Calendar.MONTH, -1);
+		data.add(Calendar.MONTH, -1);
 		
 		obj = new JSONObject();
 		obj.put("Month", time[data.get(Calendar.MONTH)]);
 		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Value", globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+		obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
 		result.put(obj);
 
 		return result;
 	}
 
-	public double globalsentimentby(int month, int year, String param, String value, long id) {
+	public double globalsentimentby(int day, int month, int year, String param, String value, long id) {
 
 		Model model = Data.getmodel(id);
 		parameters par = split_params(param, value);
@@ -246,8 +298,8 @@ public class Globalsentiment extends GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-
-		return calc_global("polar", insert, par, month, model, year);
+		
+		return calc_global("polar", insert, par, month, model, year, day);
 
 	}
 
@@ -289,7 +341,7 @@ public class Globalsentiment extends GetReach {
 								 * data.get(Calendar.MONTH)
 								 * <Calendar.getInstance().get(Calendar.MONTH)
 								 */; data.add(Calendar.MONTH, 1)) {
-				value += globalsentimentby(data.get(Calendar.YEAR), data.get(Calendar.YEAR), param, values, id);
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.YEAR), data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}
 		}
