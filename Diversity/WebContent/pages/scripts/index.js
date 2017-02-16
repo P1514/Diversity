@@ -327,7 +327,7 @@ function drawChart() {
       globaldata.addRow();
     }
   }
-  
+
   var column = 0;
   for (var i = 0; i < counter.length - pssNumber; i++) {
     if (!counter[i].hasOwnProperty('Filter')) {
@@ -420,8 +420,8 @@ function drawChart() {
        chartOptions : {
          backgroundColor: { fill:'transparent' },
          chartArea: {
-           height: '100%',
-           width: '40%'
+           height: '30%',
+           width: '20%'
          }
        }
      },
