@@ -137,7 +137,7 @@ public class GetReach {
 		int avg = 0;
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			value += globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id);
-			avg++;
+			if(value!=0)avg++;
 		}
 		value = value / ((avg != 0) ? avg : 1);
 		String temp;
