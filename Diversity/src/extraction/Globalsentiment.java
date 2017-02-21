@@ -67,7 +67,7 @@ public class Globalsentiment {
 
 			for (long k : top5) {
 
-				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false,0,0));
+				Data.modeldb.put((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0));
 				result += globalsentiment(timespan, param, values, Data.pssdb.get(k).getName(), -1).toString();
 				Data.modeldb.remove((long) -1);
 			}
@@ -189,14 +189,13 @@ public class Globalsentiment {
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, 1);
 		data.add(Calendar.YEAR, -1);
-
 		for (int month = data.get(Calendar.MONTH); month < timespan * 12 + data.get(Calendar.MONTH); month++) {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",
-						globalsentimentby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
-				result.put(obj);
+						globalsentimentby(	month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
+				if(obj.getInt("Value") != 0 )result.put(obj);
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -248,10 +247,10 @@ public class Globalsentiment {
 		PreparedStatement query1 = null;
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
-				+ Settings.lotable + " WHERE  "+Settings.lotable + "."+Settings.lotable_timestamp+">=? AND " + Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable
-				+ "." + Settings.lptable_opinion + " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?"
-				+ " AND (" + Settings.lptable + "." + Settings.lptable_authorid + "=" + Settings.latable + "."
-				+ Settings.latable_id;
+				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
+				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
+				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 		if (age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
 					+ Settings.latable_age + ">?";
@@ -273,7 +272,6 @@ public class Globalsentiment {
 		// System.out.println(insert);
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		month -= 1;
 		Calendar data = new GregorianCalendar(year, month, 1);
 		double totalreach = 0;
 		try {
@@ -490,8 +488,9 @@ public class Globalsentiment {
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
 				+ "=?" + " AND " + Settings.lotable_product
-				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "+Settings.lotable_timestamp+">?) AND " + Settings.lptable_authorid
-				+ " in (Select " + Settings.latable_id + " from " + Settings.latable;
+				+ (products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND " + Settings.lotable_timestamp
+				+ ">?) AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
+				+ Settings.latable;
 		if (age != null || gender != null || location != null)
 			query += " where 1=1 ";
 		if (age != null)

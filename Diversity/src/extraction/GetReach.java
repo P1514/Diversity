@@ -215,7 +215,6 @@ public class GetReach {
 		// System.out.println(insert);
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		month -= 1;
 		Calendar data = new GregorianCalendar(year, month, 1);
 		double totalreach = 0;
 		try {
@@ -339,7 +338,7 @@ public class GetReach {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value", globalreachby(month % 12, data.get(Calendar.YEAR) + month / 12, param, values, id));
-				result.put(obj);
+				if(obj.getDouble("Value") != (double)0 ) result.put(obj);
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -416,7 +415,6 @@ public class GetReach {
 		 */
 		ResultSet rs = null;
 		Double auxcalc = (double) 0;
-		month -= 1;
 		Calendar data = new GregorianCalendar(year, month, 1);
 		double totalreach = 0;
 		try {
