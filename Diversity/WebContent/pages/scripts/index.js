@@ -332,10 +332,12 @@ function drawChart() {
       globaldata.addRow();
     }
   }
+
   globaldata.addRow();
 
   var column = 0;
   for (var i = 0; i < counter.length - (pssNumber - 1); i++) {
+
     if (!counter[i].hasOwnProperty('Filter')) {
       var time = counter[i].Date.split(" ");
       globaldata.setCell(i, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
