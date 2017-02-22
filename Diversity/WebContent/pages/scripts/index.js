@@ -1,6 +1,11 @@
 google.charts.load('current', {packages:['corechart','controls']});
-ws = new WebSocket('ws://' + window.location.hostname + ':'
-    + window.location.port + '/Diversity/server');
+if (window.location.href.indexOf('https://') != -1) {
+  ws = new WebSocket('wss://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+} else {
+  ws = new WebSocket('ws://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+}
 var json;
 var i = 0;
 var middle;
@@ -88,7 +93,7 @@ function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
       var role;
-      document.getElementById("dropdown").style.display = 'block';//hides dropdown
+      document.getElementById("dropdown").style.display = 'none';//hides dropdown
        if(typeof type[1] != 'undefined'){
           type = type[1].split("&");
           role = type[0];
@@ -327,9 +332,10 @@ function drawChart() {
       globaldata.addRow();
     }
   }
+  globaldata.addRow();
 
   var column = 0;
-  for (var i = 0; i < counter.length - pssNumber; i++) {
+  for (var i = 0; i < counter.length - (pssNumber - 1); i++) {
     if (!counter[i].hasOwnProperty('Filter')) {
       var time = counter[i].Date.split(" ");
       globaldata.setCell(i, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));

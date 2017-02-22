@@ -50,10 +50,16 @@ function getPss() {
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
-  ws = new WebSocket('ws://' + window.location.hostname + ":"
-    + window.location.port + '/Diversity/server');
+  if (window.location.href.indexOf('https://') != -1) {
+		ws = new WebSocket('wss://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	} else {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	}
 	$('#tree_div').hide();
   ws.onopen = function() {
+
     json = {
       "Op" : "getpss",
       'Key' : sessionStorage.userKey
@@ -324,6 +330,9 @@ var str = "";
 */
 function makeTree() {
   str = "";
+  $('#final_input').jstree({
+  "plugins" : [ "checkbox" ]
+  });
   $('#final_input').jstree("destroy");
   document.getElementById('final_input').innerHTML = str;
   str += "<ul>";
