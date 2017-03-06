@@ -135,6 +135,7 @@ public class Settings {
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
 	public static Boolean JSON_use = false;
+	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
@@ -195,14 +196,17 @@ public class Settings {
 	public static final String crrpssproducttable_product = "product_id";
 
 	// Access rights Table
-	public static final String artable_vom = "view_opinion_model";
-	public static final String arttable_pss = "pss_id";
-	public static final String artable_product = "product_id";
-	public static final String artable_create_edit_delete_model = "create_edit_delete_model";
-	public static final String artable_view_opinion_results = "view_opinion_results";
-	public static final String artable_save_delete_snapshots = "save_delete_snapshots";
-	public static final String artable_use_opinion_prediction = "use_opinion_prediction";
-	public static final String artable_role = "role";
+	public static final String lartable = "access_rights";
+	public static final String lartable_name = "role";
+	public static final String lartable_description = "description";
+	public static final String lartable_vom = "view_opinion_model";
+	public static final String larttable_pss = "pss_id";
+	public static final String lartable_product = "product_id";
+	public static final String lartable_create_edit_delete_model = "create_edit_delete_model";
+	public static final String lartable_view_opinion_results = "view_opinion_results";
+	public static final String lartable_save_delete_snapshots = "save_delete_snapshots";
+	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
+	public static final String lartable_role = "role";
 
 	// Errors
 	public static final String err_unknown = "ERROR ";

@@ -1,6 +1,7 @@
 package general;
 
 import java.sql.*;
+import security.SessionClean;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -25,11 +26,36 @@ public class Data {
 	private ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
-
-	private static final ConcurrentHashMap<String, String> roledb = new ConcurrentHashMap<>(); // Designer,
-																								// 0000001000
-
-	private static final ConcurrentHashMap<String, String> usersdb = new ConcurrentHashMap<>(); // 167584473655,0000001000
+	
+	private static final ConcurrentHashMap<String, Role> roledb= new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Timer> security = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, String> security_users = new ConcurrentHashMap<>();
+	
+	
+	public static boolean user_check(String id, int op){
+		if(!security_users.containsKey(id))
+			return false;
+		return verify_permission(security_users.get(id), op);	
+	}
+	public static void deleteSession(String id){
+		security.remove(id);
+		security_users.remove(id);
+	}
+	
+	public static void new_user(String id, String role){
+		Timer tmp;
+		if(security_users.containsKey(id)){
+			if(getRole(role).permissionAmount()<getRole(security_users.get(id)).permissionAmount())
+				security_users.put(id, role);
+			tmp = security.get(id);
+			tmp.cancel();
+		}else{
+			security_users.put(id, role);
+		}
+			tmp = new Timer();
+			tmp.schedule(new SessionClean(id), Settings.session_timeout*60*1000);
+			security.put(id, tmp);
+	}
 	/** The modeldb. */
 	private static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 
@@ -66,11 +92,22 @@ public class Data {
 	/**
 	 * Instantiates a new data.
 	 */
+	
 	public Data() {
 		/**
 		 * No construct variables needed, class only used to load data into the
 		 * software
 		 **/
+	}
+	public static boolean verify_permission(String role, int op){
+		Role tmp = roledb.get(role);
+		return tmp.getPermission(Operations.return_main_permission(op));
+	}
+	public static Role getRole(String role){
+		if(roledb.containsKey(role)){
+			return roledb.get(role);
+		}
+		return new Role();
 	}
 
 	public static Model getmodel(long id) {
@@ -169,6 +206,38 @@ public class Data {
 		}
 
 		return 0;
+	}
+	
+	private String loadroles() throws JSONException{
+		
+		String query;
+
+		try {
+			cnlocal = Settings.connlocal();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+		}
+			query = "SELECT * from "+Settings.lartable;
+			try(PreparedStatement stmt = cnlocal.prepareStatement(query)){
+			try(ResultSet rs = stmt.executeQuery()){
+			while(rs.next()){
+				String name = rs.getString(Settings.lartable_name);
+				String description = rs.getString(Settings.lartable_description);
+				Boolean perm0 = rs.getBoolean(Settings.lartable_vom);
+				Boolean perm1 = rs.getBoolean(Settings.lartable_create_edit_delete_model);
+				Boolean perm2 = rs.getBoolean(Settings.lartable_view_opinion_results);
+				Boolean perm3 = rs.getBoolean(Settings.lartable_save_delete_snapshots);
+				Boolean perm4 = rs.getBoolean(Settings.lartable_use_opinion_prediction);
+				Data.roledb.put(name, new Role(name, description, perm0, perm1, perm2, perm3, perm4, false));
+			}
+			}
+			}catch(Exception e){
+				LOGGER.log(Level.SEVERE, "ERROR LOADING ROLES", e);
+			}
+			
+			return null;
+		
 	}
 
 	private String loaduniqueopinionid(JSONArray json) throws JSONException {
@@ -1397,8 +1466,10 @@ public class Data {
 		long stime = System.nanoTime();
 		System.out.println(" Beginning " + stime);
 		loadPSS();
-
-		String err = loadGeneral();
+		String err = loadroles();
+		if (err != null)
+			return err;
+		err = loadGeneral();
 		if (err != null)
 			return err;
 		err = loadmodels();

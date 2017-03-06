@@ -63,6 +63,22 @@ public final class Backend {
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
+
+			if (!msg.has("Key")) {
+
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+
+			}
+
+			if (msg.has("Role")) {
+				Data.new_user(msg.getString("Key"), msg.getString("Role"));
+			}
+
+			if (!Data.user_check(msg.getString("Key"), op)) {
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+			}
 			if (msg.has("Id")) {
 
 				id = msg.getLong("Id");
@@ -96,7 +112,8 @@ public final class Backend {
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
-				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
+				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
@@ -300,7 +317,7 @@ public final class Backend {
 						tmp = gp.getTop(param, values, id, msg.getString("Product"), msg.getString("word")).toString();
 					else
 						tmp = gp.getTop(param, values, id, msg.getString("Product"), null).toString();
-				} else{
+				} else {
 					if (msg.has("word"))
 						tmp = gp.getTop(param, values, id, "noproduct", msg.getString("word")).toString();
 					else

@@ -11,7 +11,12 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
-
+function getCookie(name) { //not being used
+	  var value = "; " + document.cookie;
+	  var parts = value.split("; " + name + "=");
+	  if (parts.length == 2)
+	    return parts.pop().split(";").shift();
+	}
 document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
@@ -25,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     json = {
       "Op" : "gettree",
       "All" : 1,
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
     }
 
     ws.send(JSON.stringify(json));
@@ -180,7 +185,7 @@ function submit() {
     "Op" : "prediction",
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
   snap = false;
   $('#page_title').html('Create Prediction');
@@ -204,7 +209,7 @@ function load() {
   var json = {
     "Op" : "load_snapshot",
     "Type" : "Prediction",
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
 
   ws.send(JSON.stringify(json));
@@ -223,7 +228,7 @@ function send(val) {
     "user" : "test",
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
   ws.send(JSON.stringify(json));
 }
@@ -251,7 +256,7 @@ function requestSnapshot(val) {
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
   snap = true;
   snap_name = val;
