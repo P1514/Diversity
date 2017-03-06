@@ -45,6 +45,8 @@ public class Data {
 	public static void new_user(String id, String role){
 		Timer tmp;
 		if(security_users.containsKey(id)){
+			if(getRole(role).permissionAmount()<getRole(security_users.get(id)).permissionAmount())
+				security_users.put(id, role);
 			tmp = security.get(id);
 			tmp.cancel();
 		}else{
