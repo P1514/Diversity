@@ -249,7 +249,7 @@ public final class Backend {
 													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i]),
-									id),
+									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
@@ -259,7 +259,7 @@ public final class Backend {
 													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i]),
-									id),
+									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
 					System.out.println("EXTRAPOLATING...");
@@ -270,7 +270,7 @@ public final class Backend {
 												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
 										(filtering.equals("Product")
 												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										id),
+										id, Data.getmodel(id).getFrequency()),
 								"Graph", "Bottom_Right_Ex");
 				}
 				System.out.println(result.toString());
@@ -289,8 +289,8 @@ public final class Backend {
 							"Top_Middle");
 					result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 					result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
-					result = convert(result, gr.globalreach(param, values, "Global", id), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(param, values, "Global", id), "Graph", "Bottom_Right");
+					result = convert(result, gr.globalreach(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Middle");
+					result = convert(result, gs.globalsentiment(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right");
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
@@ -306,7 +306,7 @@ public final class Backend {
 			 */
 			case 2:
 				Data dat = new Data();
-				return dat.load();
+				return dat.load(null);
 			/*
 			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1,
 			 * param, values, id).toString(); return tmp;
