@@ -66,12 +66,19 @@ public final class Backend {
 
 			if (!msg.has("Key")) {
 
-				if (!(msg.has("Op") && Operations.return_main_permission(op) == -1)) {
-					LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
-					return error_message("You're not allowed to be here. What were you expecting to find?").toString();
-				}
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+
 			}
 
+			if (msg.has("Role")) {
+				Data.new_user(msg.getString("Key"), msg.getString("Role"));
+			}
+
+			if (!Data.user_check(msg.getString("Key"), op)) {
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+			}
 			if (msg.has("Id")) {
 
 				id = msg.getLong("Id");

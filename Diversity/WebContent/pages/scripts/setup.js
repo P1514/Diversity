@@ -57,7 +57,7 @@ ws = new WebSocket('ws://' + window.location.hostname + ":"
 ws.onopen = function() {
   var msg = {
     "Op" : "getpss",
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
   ws.send(JSON.stringify(msg));
 }
@@ -73,7 +73,7 @@ ws.onmessage = function(event) {
     if(json.Message.indexOf("updated") !== -1){
       var msg = {
           "Op" : "getconfig",
-          'Key' : sessionStorage.userKey
+          'Key' : getCookie("JSESSIONID")
         }
         ws.send(JSON.stringify(msg));
     }
@@ -89,7 +89,7 @@ ws.onmessage = function(event) {
     populatePSS();
     var msg = {
       "Op" : "getconfig",
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
     }
     ws.send(JSON.stringify(msg));
   }
@@ -172,7 +172,7 @@ function send_config() {
     "Gender" : gstring,
     "Age" : astring,
     "Location" : lstring,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
 
   //console.log(jsonData);

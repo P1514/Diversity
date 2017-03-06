@@ -1,6 +1,7 @@
 package general;
 
 import java.sql.*;
+import security.SessionClean;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -27,7 +28,32 @@ public class Data {
 	private ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 
 	private static final ConcurrentHashMap<String, Role> roledb= new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Timer> security = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, String> security_users = new ConcurrentHashMap<>();
 	
+	
+	public static boolean user_check(String id, int op){
+		if(!security_users.containsKey(id))
+			return false;
+		return verify_permission(security_users.get(id), op);	
+	}
+	public static void deleteSession(String id){
+		security.remove(id);
+		security_users.remove(id);
+	}
+	
+	public static void new_user(String id, String role){
+		Timer tmp;
+		if(security_users.containsKey(id)){
+			tmp = security.get(id);
+			tmp.cancel();
+		}else{
+			security_users.put(id, role);
+		}
+			tmp = new Timer();
+			tmp.schedule(new SessionClean(id), Settings.session_timeout*60*1000);
+			security.put(id, tmp);
+	}
 	/** The modeldb. */
 	private static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 

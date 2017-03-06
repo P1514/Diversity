@@ -71,6 +71,7 @@ public class Operations {
 	}
 	
 	public static int return_main_permission(int id){
-		return permission.get(id);
+		
+		return permission.containsKey(id) ? permission.get(id) : 99;
 	}
 }
