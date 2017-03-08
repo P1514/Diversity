@@ -207,7 +207,13 @@ public class Settings {
 	public static final String lartable_save_delete_snapshots = "save_delete_snapshots";
 	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String lartable_role = "role";
+	public static final String lartable_admin = "admin";
 
+	
+	// SQL Common String
+	
+	public static final String sqlwhere = " Where ";
+	public static final String sqlselectall = "Select * from ";
 	// Errors
 	public static final String err_unknown = "ERROR ";
 	public static final String err_dbconnect = "Cannot connect to database Please Try Again Later.";

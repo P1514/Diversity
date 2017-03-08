@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Data;
+import general.Logging;
 import general.Model;
 import general.Settings;
 
@@ -27,7 +28,7 @@ import general.Settings;
 public class GetReach {
 
 	private Connection cnlocal;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(GetReach.class.getName());
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**

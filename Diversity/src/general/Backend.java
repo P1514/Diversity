@@ -23,7 +23,7 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Backend.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -72,10 +72,10 @@ public final class Backend {
 			}
 
 			if (msg.has("Role")) {
-				Data.new_user(msg.getString("Key"), msg.getString("Role"));
+				Data.newuser(msg.getString("Key"), msg.getString("Role"));
 			}
 
-			if (!Data.user_check(msg.getString("Key"), op)) {
+			if (!Data.usercheck(msg.getString("Key"), op)) {
 				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
 				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
 			}
