@@ -605,8 +605,9 @@ public class Data {
 		for (Author user : users2) {
 			if (user == null)
 				continue;
-			System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
-			System.out.println(" RESULT STRING " + querycond);
+			LOGGER.log(Level.SEVERE,"\n DEBUG IF HAPPENS USERID=" + user.getUID());
+			LOGGER.log(Level.SEVERE," RESULT STRING " + querycond);
+
 			querycond += user.getUID() + ",";
 		}
 		// System.out.println(querycond);
@@ -803,7 +804,8 @@ public class Data {
 		try {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
-			System.out.println("ERROR THREAD OP");
+			
+			LOGGER.log(Level.SEVERE, "ERROR THREAD OP",e);
 			e.printStackTrace();
 		}
 		try {
@@ -1447,7 +1449,7 @@ public class Data {
 	public String load(JSONArray json) throws JSONException {
 
 		long stime = System.nanoTime();
-		System.out.println(" Beginning " + stime);
+		LOGGER.log(Level.INFO," Beginning " + stime);
 		loadPSS();
 		String err = loadroles();
 		if (err != null)
@@ -1670,7 +1672,7 @@ public class Data {
 				try {
 					date = df.parse(rs.getString(Settings.rptable_date));
 				} catch (ParseException e) {
-					System.out.print("Error Parsing Date from Local DB");
+					LOGGER.log(Level.SEVERE,"Error Parsing Date from Local DB",e);
 				}
 				time = date.getTime();
 
@@ -1788,8 +1790,8 @@ public class Data {
 					format.setTimeZone(TimeZone.getTimeZone("GMT"));
 					String formatted = format.format(date);
 					java.util.Date parsed = format.parse(formatted);
-
-					System.out.println(formatted);
+					
+					LOGGER.log(Level.INFO, formatted);
 					long postid;
 					if (obj.has("postId")) {
 						postid = obj.getLong("postId");
@@ -1807,12 +1809,12 @@ public class Data {
 						try {
 							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
 						} catch (ParseException e) {
-							System.out.print("Error Parsing Date from Local DB");
+							LOGGER.log(Level.SEVERE, "Error Parsing Date from Local DB",e);
 						}
 						time = date.getTime();
 
 					}
-					System.out.println("IM HERE");
+					LOGGER.log(Level.INFO, "IM HERE");
 					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
@@ -1855,7 +1857,7 @@ public class Data {
 					if (conlocal != null)
 						conlocal.close();
 				} catch (SQLException | JSONException e) {
-					System.out.println("ERROR loading Opinions");
+					LOGGER.log(Level.SEVERE,"ERROR loading Opinions",e);
 					e.printStackTrace();
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -1963,7 +1965,7 @@ public class Data {
 							try {
 								date = df.parse(rs.getString(Settings.rptable_date));
 							} catch (ParseException e) {
-								System.out.print("Error Parsing Date from Local DB");
+								LOGGER.log(Level.SEVERE,"Error Parsing Date from Local DB",e);
 							}
 							time = date.getTime();
 
@@ -2008,7 +2010,7 @@ public class Data {
 						conlocal.close();
 					opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					System.out.println("ERROR loading Posts");
+					LOGGER.log(Level.SEVERE,"ERROR loading Posts",e);
 					e.printStackTrace();
 				} catch (SQLException e) {
 					//
@@ -2092,7 +2094,7 @@ public class Data {
 
 					}
 
-					System.out.println("HELLO");
+					LOGGER.log(Level.INFO,"HELLO");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {

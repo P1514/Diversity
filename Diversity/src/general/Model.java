@@ -8,6 +8,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +30,7 @@ public final class Model {
 	private String name, uri, age, gender, products;
 	private boolean archived;
 	private long nextupdate, cdate;
+	private static final java.util.logging.Logger LOGGER = new Logging().create(Model.class.getName());
 
 	/**
 	 * Instantiates a new model.
@@ -102,7 +104,7 @@ public final class Model {
 			try {
 				date = df.parse(msg.getString("Start_date"));
 			} catch (ParseException e) {
-				System.out.print("Error Parsing Date from Browser");
+				LOGGER.log(Level.SEVERE,"Error Parsing Date from Browser",e);
 			}
 			cdate = date.getTime();
 			if (cdate < 0) {

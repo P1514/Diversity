@@ -3,6 +3,8 @@ package general;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import com.mysql.jdbc.Connection;
 public class Settings {
 	// To be replaced by properties file
 	// Data Origin DB Specs
+	private static final Logger LOGGER = new Logging().create(Settings.class.getName());
 	private static final String rurl = "jdbc:mysql://127.0.0.1:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	private static final String ruser = "diversity";
 	private static final String rpass = "!diversity!";
@@ -320,7 +323,7 @@ public class Settings {
 			}
 		}
 
-		System.out.print(result.toString());
+		LOGGER.log(Level.INFO,result.toString());
 		return result;
 
 	}
