@@ -77,7 +77,6 @@ public class Tagcloud extends GetPosts {
 	}
 
 	private JSONArray joinArray(JSONArray a1, JSONArray a2) throws JSONException {
-		System.out.println(a1.length());
 		JSONArray result = new JSONArray();
 
 		for (int i = 0; i < a1.length(); i++) {
