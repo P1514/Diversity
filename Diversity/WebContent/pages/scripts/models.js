@@ -27,7 +27,15 @@ function getCookie(name) { //not being used
     return parts.pop().split(";").shift();
 }
 
-$(document).ready(function () {
+$(window).on('load', function() {
+  $('#ex1').slider({
+    formatter: function(value) {
+      return value;
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
   $('#ex1').slider({
     formatter: function(value) {
       return value;
@@ -118,9 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (json[0].Op == "Tree") {
-      jsonData = JSON.parse(JSON.stringify(json))
-      //console.log(jsonData);
+      jsonData = JSON.parse(JSON.stringify(json));
       makeTree();
+      $('#final_input').jstree(true).refresh();
       if (sessionStorage.id != null) {
         var json2 = {
           "Op" : "get_model",
@@ -330,10 +338,8 @@ var str = "";
 */
 function makeTree() {
   str = "";
-  $('#final_input').jstree({
-  "plugins" : [ "checkbox" ]
-  });
-  $('#final_input').jstree("destroy");
+
+  $('#final_input').jstree('destroy');
   document.getElementById('final_input').innerHTML = str;
   str += "<ul>";
   var test = jsonData;
