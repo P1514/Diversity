@@ -6,6 +6,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Handler;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

@@ -28,6 +28,13 @@ function setExtra() {
 	extra = !extra;
 }
 
+function getCookie(name) {
+	  var value = '; ' + document.cookie;
+	  var parts = value.split('; ' + name + '=');
+	  if (parts.length == 2)
+	    return parts.pop().split(';').shift();
+	}
+
 /*
 * Connects to the server and performs some initialization.
 */
@@ -76,7 +83,7 @@ function connect() {
           "Param" : "Month",
           "Values" : month,
           "Product" : product,
-          'Key' : sessionStorage.userKey
+          'Key' : getCookie("JSESSIONID")
         }
       } else {
         json = {
@@ -84,7 +91,7 @@ function connect() {
           "Id" : sessionStorage.id,
           "Param" : "Month",
           "Values" : month,
-          'Key' : sessionStorage.userKey
+          'Key' : getCookie("JSESSIONID")
         }
       }
 
@@ -96,7 +103,7 @@ function connect() {
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id,
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
 			}
 
 			ws.send(JSON.stringify(json));
@@ -116,7 +123,7 @@ function connect() {
 		json = {
 			"Op" : "getconfig",
 			"Id" : sessionStorage.id,
-      'Key' : sessionStorage.userKey
+			"Key" : getCookie("JSESSIONID")
 		}
 
 		ws.send(JSON.stringify(json));
@@ -197,7 +204,7 @@ function connect() {
 			json = {
 				"Op" : "opinion_extraction",
 				"Id" : window.sessionStorage.id,
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
 			}
 
 			ws.send(JSON.stringify(json));
@@ -229,7 +236,7 @@ function connect() {
       var json = {
         "Op" : "getposts",
         "Id" : sessionStorage.id,
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
       }
 
 			ws.send(JSON.stringify(json));
@@ -267,7 +274,7 @@ function connect() {
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
 				"Product" : product != undefined && product != "Global" ? product : undefined,
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -328,7 +335,7 @@ function tagClick(word) {
 		"word" : word,
 		"Month" : month != undefined ? month : undefined,
 		"Product" : product != undefined ? product : undefined,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
 	}
 
 	ws.send(JSON.stringify(json));
@@ -352,7 +359,7 @@ function load() {
   var json = {
     "Op" : "load_snapshot",
 		"Type" : "Extraction",
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
 
   ws.send(JSON.stringify(json));
@@ -370,7 +377,7 @@ function send(val) {
     "timespan" : 12,
     "user" : "test",
 		"Id" : sessionStorage.id,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
   ws.send(JSON.stringify(json));
 }
@@ -400,7 +407,7 @@ function requestSnapshot(val) {
     "Op" : "load_snapshot",
     "Name" : val,
 		"Type" : "All",
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
 	snap = true;
   ws.send(JSON.stringify(json));
@@ -1005,7 +1012,7 @@ function changeRequest() {
 			"Filter" : "",
 			"Id" : sessionStorage.id,
 			"Extrapolate" : extrapolate ? 1 : undefined,
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
 		};
 
 		if (globalradio == true)

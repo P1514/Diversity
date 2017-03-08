@@ -16,11 +16,12 @@ import org.json.JSONObject;
 
 import general.Backend;
 import general.Data;
+import general.Logging;
 import general.Settings;
 
 public class Snapshot {
 	private Connection cnlocal;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 
 
 	
