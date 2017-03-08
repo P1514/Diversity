@@ -288,12 +288,30 @@ function escapeHtml(html)//stops the user from injecting html in forms
 function addline() {
   var name = escapeHtml(document.getElementById("new_name").value);
   var value = escapeHtml(document.getElementById("new_URI").value);
-  //console.log("line added");
+
   if (name == "" || value == "")
     return;
+
+  if (name == "URL") {
+
+    if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
+      name = "Facebook";
+    }
+
+    if (value.toLowerCase().indexOf("twitter") != -1) {
+      name = "Twitter";
+    }
+
+    var tmp = value.split("/");
+    value = tmp[tmp.length - 1];
+
+
+  }
+
   $('#table_div2').append(
-      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
+      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"" checked>'
           + name + " / " + value +  '</label></div>');
+
   document.getElementById("new_name").value = "";
   document.getElementById("new_URI").value = "";
 }
@@ -453,7 +471,8 @@ function send_config() {
     "User" : 1,//TODO find this field
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
-    'Key' : getCookie("JSESSIONID")
+    'Key' : getCookie("JSESSIONID"),
+    'mediawiki' : document.getElementById('mediawikibox').checked ? 1 : undefined
 
   };
   if (erro == true) {
