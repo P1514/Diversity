@@ -20,6 +20,7 @@ import extraction.GetReach.parameters;
 import extraction.GetReach;
 import general.Backend;
 import general.Data;
+import general.Logging;
 import general.Model;
 import general.Settings;
 
@@ -33,7 +34,7 @@ public class GetPosts {
 
 	private Connection cnlocal;
 	private int MAXTOP = 5;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(GetPosts.class.getName());
 
 	/**
 	 * Method that uses the input to get Top 5 parent posts information, uses

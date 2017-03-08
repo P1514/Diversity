@@ -110,7 +110,7 @@ function getRole(){
           var jsonData = {
       "Op" : 'getrestrictions',//create or update
       "Role": role==null?'no_role':role,
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
     };
       ws.send(JSON.stringify(jsonData));
 }
@@ -169,7 +169,7 @@ ws.onmessage = function(event) {
       'PSS' : localStorage.pss != "" ? localStorage.pss : undefined,
       'Start_date' : localStorage.start_date != "" ? localStorage.start_date : undefined,
       'End_date' : localStorage.end_date != "" ? localStorage.end_date : undefined,
-      'Key' : sessionStorage.userKey
+    		  "Key" : getCookie("JSESSIONID")
     }
     timespan
     ws.send(JSON.stringify(jsonData));
@@ -198,7 +198,7 @@ ws.onmessage = function(event) {
     var jsonData = {
         'Op' : 'getmodels',
         'Project' : dp != "" ? dp : undefined,
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
       }
       ws.send(JSON.stringify(jsonData));
   }
@@ -278,20 +278,20 @@ function refreshDB(clean) {
   if (clean == 1) {
     json = {
       'Op' : 'clean',
-      'Key' : sessionStorage.userKey
+      "Key" : getCookie("JSESSIONID")
     }
 
     ws.send(JSON.stringify(json));
     setTimeout(function(){json = {
         'Op' : 'load',
-        'Key' : sessionStorage.userKey
+        'Key' : getCookie("JSESSIONID")
       }
 
       ws.send(JSON.stringify(json));}, 3000);
   }else{
   setTimeout(function(){json = {
     'Op' : 'load',
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
   }
 
   ws.send(JSON.stringify(json));}, 0);
@@ -539,7 +539,7 @@ function ok(val) {
       "User" : 1,//TODO find this field
       "Id": model_data[0],
       "Start_date": 0,
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
     };
     ws.send(JSON.stringify(jsonData));
 	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');

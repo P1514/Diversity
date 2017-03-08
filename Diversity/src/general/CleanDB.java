@@ -19,7 +19,7 @@ public final class CleanDB {
 	
 	/** The cnlocal. */
 	private Connection cnlocal = null;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(CleanDB.class.getName());
 
 	/**
 	 * Instantiates a new clean DB.

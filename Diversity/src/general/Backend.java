@@ -23,7 +23,7 @@ import modeling.GetModels;
  * The Class Backend.
  */
 public final class Backend {
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Backend.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
@@ -63,6 +63,22 @@ public final class Backend {
 		GetReach gr = new GetReach();
 		long id = 0;
 		try {
+
+			if (!msg.has("Key")) {
+
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+
+			}
+
+			if (msg.has("Role")) {
+				Data.newuser(msg.getString("Key"), msg.getString("Role"));
+			}
+
+			if (!Data.usercheck(msg.getString("Key"), op)) {
+				LOGGER.log(Level.INFO, "Unauthorized Access Atempt JSON = " + msg.toString());
+				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
+			}
 			if (msg.has("Id")) {
 
 				id = msg.getLong("Id");
@@ -96,7 +112,8 @@ public final class Backend {
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
-				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
+				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
@@ -199,7 +216,10 @@ public final class Backend {
 				} else
 					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
-				System.out.println(gs.globalsentiment());
+				
+				LOGGER.log(Level.INFO, gs.globalsentiment());
+
+				
 				try {
 					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
@@ -245,7 +265,7 @@ public final class Backend {
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
-					System.out.println("EXTRAPOLATING...");
+					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(param + "," + filtering,
@@ -256,7 +276,9 @@ public final class Backend {
 										id, Data.getmodel(id).getFrequency()),
 								"Graph", "Bottom_Right_Ex");
 				}
-				System.out.println(result.toString());
+				
+				LOGGER.log(Level.INFO,result.toString());
+
 				return result.toString();
 
 			case 18:
@@ -300,7 +322,7 @@ public final class Backend {
 						tmp = gp.getTop(param, values, id, msg.getString("Product"), msg.getString("word")).toString();
 					else
 						tmp = gp.getTop(param, values, id, msg.getString("Product"), null).toString();
-				} else{
+				} else {
 					if (msg.has("word"))
 						tmp = gp.getTop(param, values, id, "noproduct", msg.getString("word")).toString();
 					else

@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     json = {
       "Op" : "getpss",
-      'Key' : sessionStorage.userKey
+      'Key' : getCookie("JSESSIONID")
     }
 
     ws.send(JSON.stringify(json));
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         var jsonData2 = {
           "Op" : "gettree",
-          'Key' : sessionStorage.userKey
+          'Key' : getCookie("JSESSIONID")
         }
       }
 
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var json2 = {
           "Op" : "get_model",
           "Id" : sessionStorage.id,
-          'Key' : sessionStorage.userKey
+          'Key' : getCookie("JSESSIONID")
         }
         //console.log("YOYOYOYOLO -> " +JSON.stringify(json2));
         ws.send(JSON.stringify(json2));
@@ -453,7 +453,7 @@ function send_config() {
     "User" : 1,//TODO find this field
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
-    'Key' : sessionStorage.userKey
+    'Key' : getCookie("JSESSIONID")
 
   };
   if (erro == true) {

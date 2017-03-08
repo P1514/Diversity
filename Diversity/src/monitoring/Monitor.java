@@ -35,8 +35,6 @@ public class Monitor {
 			url += account + "\"&type[]=\"" + source + "\"&";
 		}
 		url = url.substring(0, url.length() - 1);
-		// System.out.println("****TESTE****" + account +"\n" +source+ "\n"+pss+
-		// " ****TESTE****\n");
 		PreparedStatement stmt=null;
 		Connection cnlocal=null;
 		try {

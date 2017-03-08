@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Data;
+import general.Logging;
 import general.PSS;
 import general.Product;
 
@@ -18,7 +19,7 @@ import org.apache.commons.math3.analysis.function.*;
 
 public final class Extrapolation extends Globalsentiment {
 	private static Extrapolation instance;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Extrapolation.class.getName());
 
 	public Extrapolation() {
 	}

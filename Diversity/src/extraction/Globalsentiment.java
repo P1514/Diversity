@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import general.Backend;
 import general.Data;
+import general.Logging;
 import general.Model;
 import general.Settings;
 
@@ -29,7 +30,7 @@ import general.Settings;
 public class Globalsentiment extends GetReach {
 
 	private Connection cnlocal = null;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
@@ -152,7 +153,7 @@ public class Globalsentiment extends GetReach {
 			}
 		}
 
-		System.out.println("MAX FREQUENCY: " + max_freq);
+		LOGGER.log(Level.INFO, "MAX FREQUENCY: " + max_freq);
 		return max_freq;
 	}
 
@@ -334,13 +335,8 @@ public class Globalsentiment extends GetReach {
 
 		int avg = 0;
 		if (firstDate(id) != 0) {
-			// System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+"
-			// year:"+data.get(Calendar.YEAR));
 			for (; today
-					.after(data)/*
-								 * data.get(Calendar.MONTH)
-								 * <Calendar.getInstance().get(Calendar.MONTH)
-								 */; data.add(Calendar.MONTH, 1)) {
+					.after(data); data.add(Calendar.MONTH, 1)) {
 				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.YEAR), data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}

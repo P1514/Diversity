@@ -1,18 +1,15 @@
 package general;
-
-import java.sql.Date;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class Post.
+ * 
+ * @author Uninova - IControl
+ *
  */
-// Post individual Object
 public class Post {
 	private long id;
 	private long userid;
 	private String userid2 = null;
 	private long time = 0;
-	private String message = new String();
+	private String message;
 	private long likes = 0;
 	private long views = 0;
 	private double polarity = 50;
@@ -34,13 +31,13 @@ public class Post {
 	 * @param _message
 	 *            the message
 	 */
-	public Post(long _id, long _userid, long _time, long _likes, long _views, String _message) {
-		this.id = _id;
-		this.userid = _userid;
-		this.time = _time;
-		this.views = _views;
-		this.likes = _likes;
-		this.message = _message;
+	public Post(long id, long userid, long time, long likes, long views, String message) {
+		this.id = id;
+		this.userid = userid;
+		this.time = time;
+		this.views = views;
+		this.likes = likes;
+		this.message = message;
 
 		// To replace with API
 		if (Settings.LocalPolarity) {
@@ -82,14 +79,14 @@ public class Post {
 	 * @param _message
 	 *            the message
 	 */
-	public Post(long _id, String _source, String _userid, long _time, long _likes, long _views, String _message) {
-		this.id = _id;
-		this.userid2 = _userid;
-		this.time = _time;
-		this.views = _views;
-		this.likes = _likes;
-		this.message = _message;
-		this.source = _source;
+	public Post(long id, String source, String userid, long time, long likes, long views, String message) {
+		this.id = id;
+		this.userid2 = userid;
+		this.time = time;
+		this.views = views;
+		this.likes = likes;
+		this.message = message;
+		this.source = source;
 
 		// To replace with API
 		if (Settings.LocalPolarity) {
