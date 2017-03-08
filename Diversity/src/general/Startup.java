@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -23,6 +25,8 @@ import monitoring.Oversight;
  */
 @WebListener
 public class Startup implements ServletContextListener {
+	
+	private static final Logger LOGGER = new Logging().create(Startup.class.getName());
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
@@ -37,7 +41,9 @@ public class Startup implements ServletContextListener {
 				e1.printStackTrace();
 			}*/
 		
-		System.out.println("Starting up!");
+
+		LOGGER.log(Level.INFO,"Starting up!");
+
 		Oversight o = new Oversight(true);
 		o.run();
 		new Oversight();
