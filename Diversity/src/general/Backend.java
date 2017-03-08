@@ -216,7 +216,10 @@ public final class Backend {
 				} else
 					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
-				System.out.println(gs.globalsentiment());
+				
+				LOGGER.log(Level.INFO, gs.globalsentiment());
+
+				
 				try {
 					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
@@ -262,7 +265,7 @@ public final class Backend {
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
-					System.out.println("EXTRAPOLATING...");
+					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(param + "," + filtering,
@@ -273,7 +276,9 @@ public final class Backend {
 										id, Data.getmodel(id).getFrequency()),
 								"Graph", "Bottom_Right_Ex");
 				}
-				System.out.println(result.toString());
+				
+				LOGGER.log(Level.INFO,result.toString());
+
 				return result.toString();
 
 			case 18:

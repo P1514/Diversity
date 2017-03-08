@@ -6,9 +6,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -63,7 +61,7 @@ public class Startup implements ServletContextListener {
 				new Data().load(null);
 			} else {
 				JSONArray json = new JSONArray(readUrl(Settings.JSON_uri));
-				System.out.println(json);
+				LOGGER.log(Level.INFO,json.toString());
 				new Data().load(json);
 			}
 			/*
@@ -74,7 +72,7 @@ public class Startup implements ServletContextListener {
 			// System.out.println(json.get("id"));
 		}  catch (SQLException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR Database Outdated");
+			LOGGER.log(Level.SEVERE,"ERROR Database Outdated",e);
 			
 			//e.printStackTrace();
 		} catch (Exception e) {
@@ -135,7 +133,7 @@ public class Startup implements ServletContextListener {
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		System.out.println("Shutting down!");
+		LOGGER.log(Level.INFO,"Shutting down!");
 	}
 
 	private static String readUrl(String urlString) throws Exception {
