@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import general.Backend;
 import general.Data;
+import general.Logging;
 import general.Model;
 import general.Settings;
 
@@ -29,7 +30,7 @@ import general.Settings;
 public class Globalsentiment extends GetReach {
 
 	private Connection cnlocal = null;
-	private static final Logger LOGGER = Logger.getLogger(Data.class.getName());
+	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
