@@ -42,6 +42,7 @@ function pss_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
   $('#tutorial').html('In this section you can define which PSSs you want to display in your home page. If you select the default settings, the displayed PSSs will be the ones with the highest global sentiment. If you select the custom settings, you will be able to choose up to five PSSs to display.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="filters_tutorial();">Next</button></center>');
+  goToByScroll('tutorial_box');
 }
 
 function filters_tutorial() {
@@ -51,6 +52,7 @@ function filters_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This section allows you to manually define the segments for the age, gender and location filters. You can press the "+" button to add a new segment and simply fill the blank text boxes with the new values. These segments will then be availiable at the Opinion Extraction page.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="pss_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="date_tutorial();">Next</button></center>');
+  goToByScroll('tutorial_box');
 }
 
 function date_tutorial() {
@@ -60,6 +62,7 @@ function date_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('In the start and end date section you can define a time span to be applied to the Sentiment Home and Opinion Extraction charts.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="filters_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+  goToByScroll('tutorial_box');
 }
 
 function end_tutorial() {
@@ -72,6 +75,7 @@ function end_tutorial() {
   if (localStorage.tutorial.indexOf("setup=done") == -1) {
     localStorage.tutorial += "setup=done;";
   }
+  goToByScroll('tutorial_box');
 }
 
 var datefield=document.createElement("input")
@@ -152,6 +156,15 @@ ws.onmessage = function(event) {
   if (localStorage.tutorial.indexOf("setup=done") == -1) {
     request_tutorial();
   }
+}
+
+function goToByScroll(id){
+      // Remove "link" from the ID
+    id = id.replace("link", "");
+      // Scroll
+    $('html,body').animate({
+        scrollTop: $("#"+id).offset().top - 100},
+        'slow');
 }
 
 function populatePSS() {
