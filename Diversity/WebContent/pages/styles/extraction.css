@@ -147,6 +147,7 @@ input[type=radio] {
 	padding-bottom: 20px;
 	min-height: 200px;
 	overflow: hidden;
+  color: #604460;
 }
 
 
@@ -163,6 +164,11 @@ input[type=radio] {
 	padding-bottom: 20px;
 	min-height: 200px;
 	overflow: hidden;
+	color: #604460;
+}
+
+.container {
+		color: #604460;
 }
 
 #table_container {
@@ -177,6 +183,7 @@ input[type=radio] {
 	width:100%;
 	margin-left: 0;
 	margin-right: 0;
+		color: #604460;
 }
 
 b {
@@ -185,8 +192,8 @@ b {
 }
 
 body {
-	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
-		"AppleGothic", sans-serif;
+    color: #604460;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 }
 
 h1 {
@@ -198,6 +205,7 @@ h1 {
 	font-weight: bold;
 	font-size: 24;
 	padding-left:50px;
+	color: #604460;
 }
 
 h2 {
@@ -206,6 +214,7 @@ h2 {
 	font-weight: normal;
 	text-align: left;
 	font-size: 24;
+  color: #604460;
 }
 
 h3 {
@@ -216,6 +225,19 @@ h3 {
 	text-align: center;
 	font-size: 18;
 	color: white;
+}
+
+.navbar {
+	position: relative;
+	margin-left: 0;
+	margin-right: 0;
+	text-align: center;
+	z-index: 4;
+}
+
+#question_mark:hover {
+	cursor: pointer;
+	cursor: hand;
 }
 
 #overlay-back {

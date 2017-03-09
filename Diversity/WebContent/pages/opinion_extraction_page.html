@@ -10,13 +10,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="styles/extraction.css">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<script>
-</script>
+<link rel="stylesheet" href="styles/extraction.css">
 </head>
 <body>
-<h1><b>Sentiment Analysis</b></h1>
+	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" style="color: #604460;" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
+	<div id="tutorial_box" style="z-index:500;position:absolute;display:none;background-color: white;width:300px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;">
+		<nav class="navbar navbar-fixed-top navbar-light"
+			style="background-color: #604460;">
+			<center>
+			<span class="navbar-text" style="color:white;text-align:center;">
+				<b>TUTORIAL</b>
+			</span>
+		</center>
+		</nav>
+		<div id="tutorial" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px;">
+		</div>
+	</div>
+	<h1 style="color: #604460;"><b>Sentiment Analysis</b></h1>
 		<div id="overlay-back"></div>
 		<div id="overlay">
 			<span>
