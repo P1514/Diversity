@@ -24,6 +24,56 @@ $(document).ready(function() {
   });
 });
 
+function request_tutorial() {
+  $('#alert').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function start_tutorial() {
+  pss_tutorial();
+  $('#tutorial_box').toggle();
+}
+
+function pss_tutorial() {
+  var pos=$('#custom_top_radio').offset();
+  var h=$('#custom_top_radio').height() + 10;
+  var w=$('#custom_top_radio').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('In this section you can define which PSSs you want to display in your home page. If you select the default settings, the displayed PSSs will be the ones with the highest global sentiment. If you select the custom settings, you will be able to choose up to five PSSs to display.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="filters_tutorial();">Next</button></center>');
+}
+
+function filters_tutorial() {
+  var pos=$('#filters').offset();
+  var h=$('#filters').height() + 10;
+  var w=$('#filters').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This section allows you to manually define the segments for the age, gender and location filters. You can press the "+" button to add a new segment and simply fill the blank text boxes with the new values. These segments will then be availiable at the Opinion Extraction page.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="pss_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="date_tutorial();">Next</button></center>');
+}
+
+function date_tutorial() {
+  var pos=$('#start_date').offset();
+  var h=$('#start_date').height() + 10;
+  var w=$('#start_date').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('In the start and end date section you can define a time span to be applied to the Sentiment Home and Opinion Extraction charts.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="filters_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+}
+
+function end_tutorial() {
+  var pos=$('#chart_title').offset();
+  var h=$('#chart_title').height();
+  var w=$('#chart_title').width();
+
+  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
+  if (localStorage.tutorial.indexOf("setup=done") == -1) {
+    localStorage.tutorial += "setup=done;";
+  }
+}
+
 var datefield=document.createElement("input")
 datefield.setAttribute("type", "date")
 if (datefield.type!="date"){ //if browser doesn't support input type="date", load files for jQuery UI Date Picker
@@ -51,8 +101,13 @@ function setCookie() {
   document.cookie = "Product=" + $("#Products :selected").text();
   document.cookie = "PSS=" + document.getElementById("Products").value;
 }
-ws = new WebSocket('ws://' + window.location.hostname + ":"
-    + window.location.port + '/Diversity/server');
+if (window.location.href.indexOf('https://') != -1) {
+  ws = new WebSocket('wss://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+} else {
+  ws = new WebSocket('ws://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+}
 
 ws.onopen = function() {
   var msg = {
@@ -92,6 +147,10 @@ ws.onmessage = function(event) {
       'Key' : getCookie("JSESSIONID")
     }
     ws.send(JSON.stringify(msg));
+  }
+
+  if (localStorage.tutorial.indexOf("setup=done") == -1) {
+    request_tutorial();
   }
 }
 
