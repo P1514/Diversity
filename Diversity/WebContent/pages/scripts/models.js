@@ -221,6 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
     //document.getElementById("fcheckbox").style.display = "block";
     //document.getElementById("Archive").disabled = false;
     document.getElementById("submit").value = "Update";
+
+    document.getElementById("mediawikibox").checked = json2[0].hasOwnProperty('mediawiki') ? json2[0].mediawiki : false;
     edit = true;
 
   }
