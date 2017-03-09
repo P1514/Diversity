@@ -84,3 +84,57 @@ Test 5 - Delete Opinion Model: passed
 Tests passed: 5
 Tests failed: 0
 Elapsed time: 25613 milliseconds
+===============================================
+Starting test run - Chrome Tests - Wed Mar 08 14:46:33 GMT 2017
+
+Starting Create Opinion Model Test
+-----------------------------------
+
+Clicking: 'Create Opinion Model'...
+Waiting for page to redirect to 'models.html'...
+Page redirected to 'models.html'.
+Model 3276643706 created.
+Attempting to open edit page...
+Edit page opened successfully. Now checking if data matches...
+All fields match the input data.
+Test Create Opinion Model reached the end.
+All steps were completed successfully. 
+Starting Edit Opinion Model Test
+-----------------------------------
+
+Edit opinion model page was opened successfully.
+Test Edit Opinion Model reached the end.
+All steps were completed successfully. 
+Starting View Opinion Model Test
+-----------------------------------
+
+View opinion model page was opened successfully.
+Test View Opinion Model reached the end.
+All steps were completed successfully. 
+Starting View Opinion Extraction test.
+-----------------------------------
+
+Opinion Extraction page opened successfully.
+Checking if dropdowns disable correctly.
+All dropdowns behave as expected.
+Starting Top 5 table tests.
+Selecting chart point...
+Top 5 table updated successfully.
+Test View Opinion Extraction reached the end.
+All steps completed successfully.
+Starting Delete Opinion Model Test
+-----------------------------------
+
+Test Delete Opinion Model reached the end.
+All steps completed successfully.
+-----------------------------------------------
+Test run finished. Results: 
+Test 1 - Create Opinion Model: passed
+Test 2 - Edit Opinion Model: passed
+Test 3 - View Opinion Model: passed
+Test 4 - View Opinion Extraction: passed
+Test 5 - Delete Opinion Model: passed
+
+Tests passed: 5
+Tests failed: 0
+Elapsed time: 25558 milliseconds

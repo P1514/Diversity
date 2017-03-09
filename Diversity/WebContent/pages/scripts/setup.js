@@ -51,8 +51,13 @@ function setCookie() {
   document.cookie = "Product=" + $("#Products :selected").text();
   document.cookie = "PSS=" + document.getElementById("Products").value;
 }
-ws = new WebSocket('ws://' + window.location.hostname + ":"
-    + window.location.port + '/Diversity/server');
+if (window.location.href.indexOf('https://') != -1) {
+  ws = new WebSocket('wss://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+} else {
+  ws = new WebSocket('ws://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+}
 
 ws.onopen = function() {
   var msg = {

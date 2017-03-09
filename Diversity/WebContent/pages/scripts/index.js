@@ -1,6 +1,11 @@
 google.charts.load('current', {packages:['corechart','controls']});
-ws = new WebSocket('ws://' + window.location.hostname + ':'
-    + window.location.port + '/Diversity/server');
+if (window.location.href.indexOf('https://') != -1) {
+  ws = new WebSocket('wss://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+} else {
+  ws = new WebSocket('ws://' + window.location.hostname + ":"
+      + window.location.port + '/Diversity/server');
+}
 var json;
 var i = 0;
 var middle;
@@ -88,7 +93,7 @@ function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
       var role;
-      document.getElementById("dropdown").style.display = 'block';//hides dropdown
+      document.getElementById("dropdown").style.display = 'none';//hides dropdown
        if(typeof type[1] != 'undefined'){
           type = type[1].split("&");
           role = type[0];
@@ -197,11 +202,100 @@ ws.onmessage = function(event) {
       }
       ws.send(JSON.stringify(jsonData));
   }
+
+  if (localStorage.tutorial != ("done")) {
+    request_tutorial();
+  }
 }
 
 ws.onclose = function (evt) {
     //location.reload();
 };
+
+function request_tutorial() {
+  $('#alert').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function start_tutorial() {
+  create_model_tutorial();
+  $('#tutorial_box').toggle();
+  $('#triangle').toggle();
+}
+
+function create_model_tutorial() {
+  var pos=$('#create').offset();
+  var h=$('#create').height();
+  var w=$('#create').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('The Create Opinion Model option lets you <b>create</b> a new opinion model.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="view_model_tutorial();">Next</button></center>');
+}
+
+function view_model_tutorial() {
+  var pos=$('#view').offset();
+  var h=$('#view').height();
+  var w=$('#view').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The View Opinion Model option lets you <b>view</b> a previously created opinion model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="create_model_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="edit_model_tutorial();">Next</button></center>');
+}
+
+function edit_model_tutorial() {
+  var pos=$('#edit').offset();
+  var h=$('#edit').height();
+  var w=$('#edit').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The Edit Opinion Model option lets you <b>edit</b> a previously created opinion model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="view_model_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="delete_model_tutorial();">Next</button></center>');
+}
+
+function delete_model_tutorial() {
+  var pos=$('#delete').offset();
+  var h=$('#delete').height();
+  var w=$('#delete').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The Delete Opinion Model option lets you <b>delete</b> a previously created opinion model. <b>This action cannot be undone!</b><br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="edit_model_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="models_tutorial();">Next</button></center>');
+}
+
+function models_tutorial() {
+  var pos=$('#_view').offset();
+  var h=$('#_view').height();
+  var w=$('#_view').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The View panel provides an overview of the existing models that you can access. You can click on any of these models to view its opinion extraction page.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="delete_model_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="prediction_tutorial();">Next</button></center>');
+}
+
+function prediction_tutorial() {
+  var pos=$('#create_prediction').offset();
+  var h=$('#create_prediction').height();
+  var w=$('#create_prediction').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The Generate Prediction option lets you choose a group of PSSs and provides an estimate of how their global sentiment will evolve over time.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="models_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="top5_tutorial();">Next</button></center>');
+}
+
+function top5_tutorial() {
+  var pos=$('#chart_title').offset();
+  var h=$('#chart_title').height();
+  var w=$('#chart_title').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This chart displays, by default, the five PSSs with the highest global sentiment values. You can customize the chart by clicking the Chart Setup option, which allows you to choose which PSSs you want to see and the default time span to be displayed. You can also interact with the chart using the slider on the bottom.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="prediction_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+}
+
+function end_tutorial() {
+  var pos=$('#chart_title').offset();
+  var h=$('#chart_title').height();
+  var w=$('#chart_title').width();
+
+  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
+  localStorage.tutorial = "done";
+}
 
 function new_model(){
   var role = sessionStorage.session;
@@ -328,8 +422,11 @@ function drawChart() {
     }
   }
 
+  globaldata.addRow();
+
   var column = 0;
-  for (var i = 0; i < counter.length - pssNumber; i++) {
+  for (var i = 0; i < counter.length - (pssNumber - 1); i++) {
+
     if (!counter[i].hasOwnProperty('Filter')) {
       var time = counter[i].Date.split(" ");
       globaldata.setCell(i, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));

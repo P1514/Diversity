@@ -27,7 +27,15 @@ function getCookie(name) { //not being used
     return parts.pop().split(";").shift();
 }
 
-$(document).ready(function () {
+$(window).on('load', function() {
+  $('#ex1').slider({
+    formatter: function(value) {
+      return value;
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
   $('#ex1').slider({
     formatter: function(value) {
       return value;
@@ -50,10 +58,16 @@ function getPss() {
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
-  ws = new WebSocket('ws://' + window.location.hostname + ":"
-    + window.location.port + '/Diversity/server');
+  if (window.location.href.indexOf('https://') != -1) {
+		ws = new WebSocket('wss://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	} else {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	}
 	$('#tree_div').hide();
   ws.onopen = function() {
+
     json = {
       "Op" : "getpss",
       'Key' : getCookie("JSESSIONID")
@@ -112,9 +126,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (json[0].Op == "Tree") {
-      jsonData = JSON.parse(JSON.stringify(json))
-      //console.log(jsonData);
+      jsonData = JSON.parse(JSON.stringify(json));
       makeTree();
+      $('#final_input').jstree(true).refresh();
       if (sessionStorage.id != null) {
         var json2 = {
           "Op" : "get_model",
@@ -274,12 +288,30 @@ function escapeHtml(html)//stops the user from injecting html in forms
 function addline() {
   var name = escapeHtml(document.getElementById("new_name").value);
   var value = escapeHtml(document.getElementById("new_URI").value);
-  //console.log("line added");
+
   if (name == "" || value == "")
     return;
+
+  if (name == "URL") {
+
+    if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
+      name = "Facebook";
+    }
+
+    if (value.toLowerCase().indexOf("twitter") != -1) {
+      name = "Twitter";
+    }
+
+    var tmp = value.split("/");
+    value = tmp[tmp.length - 1];
+
+
+  }
+
   $('#table_div2').append(
-      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"">'
+      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"" checked>'
           + name + " / " + value +  '</label></div>');
+
   document.getElementById("new_name").value = "";
   document.getElementById("new_URI").value = "";
 }
@@ -324,7 +356,8 @@ var str = "";
 */
 function makeTree() {
   str = "";
-  $('#final_input').jstree("destroy");
+
+  $('#final_input').jstree('destroy');
   document.getElementById('final_input').innerHTML = str;
   str += "<ul>";
   var test = jsonData;
@@ -438,7 +471,8 @@ function send_config() {
     "User" : 1,//TODO find this field
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
-    'Key' : getCookie("JSESSIONID")
+    'Key' : getCookie("JSESSIONID"),
+    'mediawiki' : document.getElementById('mediawikibox').checked ? 1 : undefined
 
   };
   if (erro == true) {

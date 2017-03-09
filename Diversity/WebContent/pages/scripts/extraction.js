@@ -114,8 +114,13 @@ function connect() {
 			+ window.sessionStorage.model + "; PSS: "
 			+ window.sessionStorage.pss;
 
-	ws = new WebSocket('ws://' + window.location.hostname + ":"
-			+ window.location.port + '/Diversity/server');
+	if (window.location.href.indexOf('https://') != -1) {
+		ws = new WebSocket('wss://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	} else {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	}
 
   //When the connection is opened, ask the server for the chart configuration settings (gender, location and age segments to be displayed)
 	ws.onopen = function() {

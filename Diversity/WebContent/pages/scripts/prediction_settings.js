@@ -22,8 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
   $('#overlay-back').hide();
   $('#overlay').hide();
 
-  ws = new WebSocket('ws://' + window.location.hostname + ":"
-    + window.location.port + '/Diversity/server');
+  if (window.location.href.indexOf('https://') != -1) {
+		ws = new WebSocket('wss://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	} else {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	}
 
   //Request products and services tree
   ws.onopen = function () {
