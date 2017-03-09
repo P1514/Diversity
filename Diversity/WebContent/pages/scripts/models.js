@@ -313,7 +313,9 @@ function start_tutorial() {
     }
   }
   $('#tutorial_box').toggle();
+
   goToByScroll('tutorial_box');
+
 }
 
 function define_tutorial() {
@@ -327,7 +329,9 @@ function edit_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
   $('#tutorial').html('When editing a model, the Define section is blocked, which means that the model name, PSS and final products cannot be changed.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="sources_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function view_tutorial() {
@@ -337,7 +341,9 @@ function view_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
   $('#tutorial').html('When viewing a model, you have access to all the settings used to create it, but you can\'t make any changes to those settings.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="end_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function pss_tutorial() {
@@ -347,7 +353,9 @@ function pss_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
   $('#tutorial').html('This dropdown lets you select the PSS for the new model.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="name_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function name_tutorial() {
@@ -357,7 +365,9 @@ function name_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
   $('#tutorial').html('In this text box you can define a name for the new model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="pss_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="final_product_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function final_product_tutorial() {
@@ -367,7 +377,9 @@ function final_product_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('You can toggle this checkbox to specify if you want to include final products in your model. If toggled, you can select one or more final products to be included.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="name_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="sources_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function sources_tutorial() {
@@ -386,7 +398,9 @@ function source_tutorial() {
     $('#tutorial').html('In this section you can select the user accounts to be used in the model. In the dropdown box you can define the source of the account. If you know the user name and social network, you can select Facebook or Twitter. Otherwise, you can select the URL option and the system will extract the user and social network from the provided link.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="final_product_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="account_tutorial();">Next</button></center>');
   }
 
+
   goToByScroll('tutorial_box');
+
 }
 
 function account_tutorial() {
@@ -396,7 +410,9 @@ function account_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('Here you can insert the name of the user you intend to add. If you selected the URL option, simply type the URL of the user\'s Facebook or Twitter page. After you\'ve filled both fields, press the "+" button to add it to the list. You can then add more users or move on to the next section.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="source_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="media_wiki_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function media_wiki_tutorial() {
@@ -406,7 +422,9 @@ function media_wiki_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('The Media Wiki box lets you choose whether to use data from the Media Wiki or not.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="account_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="frequency_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function frequency_tutorial() {
@@ -416,7 +434,9 @@ function frequency_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This slider lets you define the update frequency of the new model. In other words, it defines the number of days (ranging from 1 to 30) that occur until the model displays new data. You can set this value by adjusting the slider or by typing into the text box.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="media_wiki_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="start_date_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function start_date_tutorial() {
@@ -426,7 +446,9 @@ function start_date_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This checkbox lets you choose the start date of the new model. This date determines the point from which the model will start gathering data. If left unchecked, the data monitoring will begin immediately.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="frequency_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 function end_tutorial() {
@@ -435,7 +457,9 @@ function end_tutorial() {
   var w=$('#date').width();
 
   $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
   goToByScroll('tutorial_box');
+
 }
 
 

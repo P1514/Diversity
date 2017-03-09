@@ -314,6 +314,7 @@ $(document).ready(function () {
   }
 });
 
+
 function goToByScroll(id){
       // Remove "link" from the ID
     id = id.replace("link", "");
@@ -322,6 +323,7 @@ function goToByScroll(id){
         scrollTop: $("#"+id).offset().top - 100},
         'slow');
 }
+
 
 function request_tutorial() {
   $('#loading').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
@@ -339,7 +341,9 @@ function start_tutorial() {
 
   $('#tutorial_box').toggle();
 
+
 	goToByScroll('tutorial_box');
+
 }
 
 function snapshot_tutorial() {
@@ -350,7 +354,9 @@ function snapshot_tutorial() {
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed on this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
 
+
 	goToByScroll('tutorial_box');
+
 }
 
 function filter_tutorial() {
@@ -361,7 +367,9 @@ function filter_tutorial() {
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This is the filters section. Here you can change the filter and segmentation settings displayed on the charts below.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="snapshot_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="extrapolation_tutorial();">Next</button></center>');
 
+
 	goToByScroll('tutorial_box');
+
 }
 
 function extrapolation_tutorial() {
@@ -373,6 +381,7 @@ function extrapolation_tutorial() {
   $('#tutorial').html('This checkbox defines whether to extrapolate the results or not. If toggled, the Global Sentiment chart below will display an additional line that represents the extrapolation of the current data for the next 3 months.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="filter_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="opinion_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function opinion_tutorial() {
@@ -384,6 +393,7 @@ function opinion_tutorial() {
   $('#tutorial').html('This is the total opinions number. It represents the number of posts that were used to generate the sentiment analysis for this model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="extrapolation_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="polarity_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function polarity_tutorial() {
@@ -395,6 +405,7 @@ function polarity_tutorial() {
   $('#tutorial').html('The polarity bar chart displays the sentiment distribution over the total number of posts and comments, ranging from \'--\' (negative) to \'++\' (positive).<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="opinion_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="gauge_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function gauge_tutorial() {
@@ -406,6 +417,7 @@ function gauge_tutorial() {
   $('#tutorial').html('This gauge displays the value of the global sentiment for the PSS associated to this model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="polarity_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="avg_reach_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function avg_reach_tutorial() {
@@ -417,6 +429,7 @@ function avg_reach_tutorial() {
   $('#tutorial').html('Here you can see the average reach value of the current model. Reach is a value that indicates the visibility of the posts about this PSS and it takes into account the number of views, comments and likes.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="gauge_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="reach_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function reach_tutorial() {
@@ -428,6 +441,7 @@ function reach_tutorial() {
   $('#tutorial').html('This line chart displays the reach value over time. The time span is 12 months by default, but can be customized in the Chart Setup page. The update frequency, which is the interval between each point in the chart, is defined when creating the model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="avg_reach_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="global_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function global_tutorial() {
@@ -439,6 +453,7 @@ function global_tutorial() {
   $('#tutorial').html('This line chart displays the global sentiment value over time. Like the reach chart, it has a default time span of 12 months that can be customized in the Chart Setup page, and the update frequency was defined when creating the model. By clicking on any point in this chart, the table below will be updated with posts relative to the date of that point. If the Extrapolate Results checkbox is toggled, this chart displays an additional line that maps the extrapolation values for the next 3 months.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="reach_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="table_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function table_tutorial() {
@@ -450,6 +465,7 @@ function table_tutorial() {
   $('#tutorial').html('The Top 5 table displays the five posts with the highest reach relative to the model\'s PSS. By clicking on any post, you can see all the comments associated to that post. If the global sentiment or reach charts have a point selected, the Top 5 table will display the five posts with highest reach on that point\'s date.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="global_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="tag_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function tag_tutorial() {
@@ -461,6 +477,7 @@ function tag_tutorial() {
 	$('#tutorial').html('The tag cloud shows the most mentioned words on the users\' posts and comments. The displayed size of each word is related to the number of occurrences, which means that words displayed in a large font size occur more often than words with a smaller font size.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="table_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
+
 }
 
 function end_tutorial() {
@@ -475,6 +492,7 @@ function end_tutorial() {
   }
 
 	goToByScroll('tutorial_box');
+
 }
 
 function makeCloud(words) {
