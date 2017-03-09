@@ -119,6 +119,8 @@ public class Settings {
 	public static final String lmtable_udate = "next_update";
 	public static final String lmtable_cdate = "created_date";
 	public static final String lmtable_designproject = "design_project";
+	public static final String lmtable_add_mediawiki = "add_mediawiki";
+
 
 	// Sources Table
 	public static final String lutable = "sources";

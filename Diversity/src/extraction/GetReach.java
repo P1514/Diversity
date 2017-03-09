@@ -156,6 +156,8 @@ public class GetReach {
 			if (!"polar".equals(type))
 				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
+		if (!model.getMediawiki()) 
+			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		insert += ")";
 		int nmonth = month - 1;
 		Calendar data = new GregorianCalendar(year, nmonth, day);
@@ -182,6 +184,7 @@ public class GetReach {
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -315,6 +318,7 @@ public class GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
+		
 		return calc_global("reach", insert, par, month, model, year,day);
 
 	}

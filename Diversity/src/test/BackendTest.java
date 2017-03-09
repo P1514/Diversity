@@ -12,7 +12,7 @@ import monitoring.Oversight;
 
 public class BackendTest {
 
-	JSONObject obj;
+	JSONObject obj,obj1;
 	Backend tester;
 	String result;
 	Oversight o = new Oversight(true);
@@ -226,6 +226,9 @@ public class BackendTest {
 	@Test
 	public void resolveCreateModel() throws JSONException {
 
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "create_model");
 		obj.put("PSS", "D522-1 PSS");
@@ -236,7 +239,9 @@ public class BackendTest {
 		obj.put("Update", "1");
 		obj.put("URI", "Facebook,abcd;");
 		obj.put("Start_date", "1970-01-02");
-		obj.put("Name", "dsfgdsfg");
+		obj.put("Name", "guilherme123");
+		obj.put("mediawiki", "true");
+		obj.put("Key", "10");
 		tester = new Backend(14, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully added model dsfgdsfg to monitor module\",\"id\":820}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -244,7 +249,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveUpdateModel() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "update_model");
 		obj.put("PSS", "D522-1 PSS");
@@ -255,8 +262,10 @@ public class BackendTest {
 		obj.put("Update", "10");
 		obj.put("URI", "Facebook,adidas;");
 		obj.put("Start_date", "1970-01-02");
-		obj.put("Name", "Morris Ground 1");
+		obj.put("Name", "D522-1 PSS");
 		obj.put("Id", "838");
+		obj.put("mediawiki", "true");
+		obj.put("Key", "10");
 		tester = new Backend(16, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully updated model Morris Ground 1\",\"id\":838}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
