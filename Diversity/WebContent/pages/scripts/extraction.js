@@ -353,8 +353,8 @@ function snapshot_tutorial() {
   var w=$('#save').width();
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
-  $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed in this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
 
+  $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed in this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
 
@@ -367,7 +367,6 @@ function filter_tutorial() {
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
   $('#tutorial').html('This is the filters section. Here you can change the filter and segmentation settings displayed in the charts below.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="snapshot_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="extrapolation_tutorial();">Next</button></center>');
-
 
 	goToByScroll('tutorial_box');
 
@@ -493,7 +492,6 @@ function end_tutorial() {
   }
 
 	goToByScroll('tutorial_box');
-
 }
 
 var clickedWord = "";
