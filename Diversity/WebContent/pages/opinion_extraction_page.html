@@ -12,9 +12,14 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="styles/extraction.css">
+<script>
+$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip();
+});
+</script>
 </head>
 <body>
-	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" style="color: #604460;" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
+	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" data-toggle="tooltip" data-placement="auto" title="Help" style="color: #604460;" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
 	<div id="tutorial_box" style="z-index:500;position:absolute;display:none;background-color: white;width:300px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;">
 		<nav class="navbar navbar-fixed-top navbar-light"
 			style="background-color: #604460;">
@@ -58,32 +63,32 @@
 					<table id="segmentation">
 						<tr>
 							<th><input type="radio" name="field" id="Gender"
-								value="Gender" onclick="fixbuttons('Gender');"> &nbsp
+								value="Gender" onclick="fixbuttons('Gender');" data-toggle="tooltip" data-placement="auto" title="Filter the data by Gender" > &nbsp
 									Gender</th>
 							<th><input type="radio" name="field" id="Location"
-								value="Location" onclick="fixbuttons('Location');"> &nbsp
+								value="Location" onclick="fixbuttons('Location');" data-toggle="tooltip" data-placement="auto" title="Filter the data by Location"> &nbsp
 									Location </th>
 							<th><input type="radio" name="field" id="Age_radio"
-								value="Age" onclick="fixbuttons('Age');"> &nbsp
+								value="Age" onclick="fixbuttons('Age');" data-toggle="tooltip" data-placement="auto" title="Filter the data by Age"> &nbsp
 									Age </th>
 							<th><input type="radio" name="field" id="Final"
-								value="Final" onclick="fixbuttons('Final');"> &nbsp
+								value="Final" onclick="fixbuttons('Final');" data-toggle="tooltip" data-placement="auto" title="Filter the data by Final Product"> &nbsp
 									Final Product </th>
 							<th><input type="radio" name="field" id="Global"
-								value="Global" onclick="fixbuttons('Global');" checked>
+								value="Global" onclick="fixbuttons('Global');" data-toggle="tooltip" data-placement="auto" title="Display the data without filters" checked>
 									&nbsp All </th>
 						</tr>
 						<tr>
-							<th><select style="margin-left: 0;" id="genderfilt">
+							<th><select style="margin-left: 0;" id="genderfilt" data-toggle="tooltip" data-placement="auto" title="Select a gender segment to display">
 									<option value="All">All Genders
 							</select></th>
-							<th><select style="margin-left: 0;" id="locationfilt">
+							<th><select style="margin-left: 0;" id="locationfilt" data-toggle="tooltip" data-placement="auto" title="Select a location segment to display">
 									<option value="All">All Locations
 							</select></th>
-							<th><select style="margin-left: 0;" id="agefilt">
+							<th><select style="margin-left: 0;" id="agefilt" data-toggle="tooltip" data-placement="auto" title="Select an age segment to display">
 									<option value="All">All Ages
 							</select></th>
-							<th><select style="margin-left: 0;" id="finalfilt">
+							<th><select style="margin-left: 0;" id="finalfilt" data-toggle="tooltip" data-placement="auto" title="Select a final product segment to display">
 									<option value="All">All Products
 							</select></th>
 						</tr>
@@ -91,7 +96,7 @@
 					<div style="min-height:15px"></div>
 					<table style ="padding-top:25px;" id="refresh_table">
 						<tr>
-							<label id="extrapolate_label"><input style="padding-top:15px;" type="checkbox" name="extrapolation" id="extrapolate" value="Extrapolate" onClick="setExtra();"> Extrapolate Results </label>
+							<label id="extrapolate_label" data-toggle="tooltip" data-placement="auto" title="Check to extrapolate global sentiment data"><input style="padding-top:15px;" type="checkbox" name="extrapolation" id="extrapolate" value="Extrapolate" onClick="setExtra();"> Extrapolate Results </label>
 						</tr>
 						<tr>
 							<th></th>
@@ -106,7 +111,7 @@
 			</div>
 			<div class="container" style = "width: 90%;" id="graphs">
 				<h2>Charts</h2>
-				<a href="chart_setup.html" style="text-align: right;"><i class="fa fa-cog" aria-hidden="true"></i> Chart setup </a>
+				<a href="chart_setup.html" style="text-align: right;"><i class="fa fa-cog" aria-hidden="true" data-toggle="tooltip" data-placement="auto" title="Edit chart settings"></i> Chart setup </a>
 				<div class="row">
 					<div style="width:20%;padding-left:2px;padding-right:2px;" class="col-md-4">
 						<div id="opinionpie"></div>
@@ -209,11 +214,15 @@
 	<div class="container" id="cloud_wrapper" style="width:90%">
 		<h2>Tag Cloud</h2>
 		<center>
-			<div id="cloud" style="width:700px;">
+			<div id="cloud" style="width:700px; margin:0px;">
 			</div>
 		</center>
 	</div>
 	</center>
+	<ul class='custom-menu'>
+	  <li data-action="ignore_word">Add word to ignore list</li>
+	</ul>
+
 	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
 
 	<script	src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>

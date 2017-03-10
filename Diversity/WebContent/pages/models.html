@@ -20,10 +20,14 @@
 			$('#overlay').hide();
 			$('#overlay-back').hide();
 		});
+
+		$(document).ready(function(){
+		    $('[data-toggle="tooltip"]').tooltip();
+		});
 	</script>
 </head>
 <body>
-	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
+	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" data-toggle="tooltip" data-placement="auto" title="Help" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
 	<div id="tutorial_box" style="z-index:500;position:absolute;display:none;background-color: white;width:300px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;">
 		<nav class="navbar navbar-fixed-top navbar-light"
 			style="background-color: #604460;">
@@ -57,7 +61,7 @@
 													PSS:
 											</td>
 											<td style="" valign="middle">
-												<select class="form-control" id="pss" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" onchange="makeTree();"></select><br>
+												<select class="form-control" id="pss" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" data-toggle="tooltip" data-placement="auto" title="Select the PSS for this model" onchange="makeTree();"></select><br>
 											</td>
 									</tr>
 									<tr>
@@ -65,7 +69,7 @@
 													Model Name:
 											</td>
 											<td style="" valign="middle">
-												<input type="text" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" class="form-control" id="model_name" placeholder="Model name">
+												<input type="text" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" class="form-control" id="model_name" data-toggle="tooltip" data-placement="auto" title="Enter a name for this model" placeholder="Model name">
 											</td>
 									</tr>
 								</table>
@@ -75,7 +79,7 @@
 					<div class="col-md-3">
 					</div>
 					<div class="col-md-3" >
-						<div class="checkbox" style: "padding-left: 10px;padding-top: 20px;">
+						<div class="checkbox" style: "padding-left: 10px;padding-top: 20px;" data-toggle="tooltip" data-placement="auto" title="Check to include final products in the model">
 							<label id="check_label"><input id="final" type="checkbox" onchange="showTree();" value="">Include Final Product</label>
 						</div>
 
@@ -103,7 +107,7 @@
 							<td>
 								<div id="left_menu" style="margin-top:0;">
 									<div class="form-group" style ="margin-top:0;padding-top:15px;width:250px;">
-										<select class="form-control" id="new_name" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);">
+										<select class="form-control" id="new_name" data-toggle="tooltip" data-placement="auto" title="Select the source of the accounts to be added to the model" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);">
 											<option value="Facebook">Facebook</option>
 											<option value="Twitter">Twitter</option>
 											<option value="URL">URL</option>
@@ -113,11 +117,11 @@
 							</td>
 							<td style="padding-top:0;">
 								<div style="width:250px;padding-top:0;" >
-									<input class="form-control" type="text" id="new_URI" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" placeholder="Account name">
+									<input class="form-control" type="text" id="new_URI" data-toggle="tooltip" data-placement="auto" title="Enter the name of the accounts to be added to the model" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" placeholder="Account name">
 								</div>
 							</td>
 							<td style="padding-top:0;">
-								<button style="margin-left=40px; color: black;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);height:35px;" class="glyphicon glyphicon-plus" onclick="addline();"></button>
+								<button style="margin-left=40px; color: black;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);height:35px;" data-toggle="tooltip" data-placement="auto" title="Add the account to the model" class="glyphicon glyphicon-plus" onclick="addline();"></button>
 							</td>
 						</tr>
 
@@ -125,8 +129,8 @@
 					<p><i>(unchecked items will not be included in the opinion model)</i></p>
 				</div>
 				<br>
-				<div id="mediawiki">
-					<label><input id="mediawikibox" type="checkbox"> Use media wiki</label>
+				<div id="mediawiki" data-toggle="tooltip" data-placement="auto" title="Check to use data from the Media Wiki">
+					<label><input id="mediawikibox" type="checkbox"> Use Media Wiki</label>
 				</div>
 			</div>
 
@@ -135,17 +139,17 @@
 				<div class="col-md-4" id="slider" style="width:500px;height:60px;text-align:left;margin-top:50px;display:inline;">
 					<div class="wrapper" style="Width:500px;display:inline;">
 						<input id="ex1" style="display:inline;height:80px;" data-slider-ticks="[1, 7, 15, 23, 30]" data-slider-selection="none" data-slider-ticks-labels="['1', '7', '15', '23', '30']" ticks_positions="[0, 25, 50, 75, 100]" data-slider-id='ex1Slider' type="text" data-slider-min="1" data-slider-max="30" data-slider-step="1" />
-						<input type="number" style="display:inline;padding: 0 10px; 0 0;margin-left:10px;border-radius:0;border-color:#604460;width:55px;background: transparent;" class="form-control"style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);width:75px;border:0" id="frequency" onKeyUp="checknumber(this)" value="1" min="1"> <label for="number">days</label>
+						<input data-toggle="tooltip" data-placement="auto" title="Set the number of days between each update" type="number" style="display:inline;padding: 0 10px; 0 0;margin-left:10px;border-radius:0;border-color:#604460;width:55px;background: transparent;" class="form-control"style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);width:75px;border:0" id="frequency" onKeyUp="checknumber(this)" value="1" min="1"> <label for="number">days</label>
 					</div>
 				</div>
 				<div class="col-md-4" id="date" style="float: right;margin-top:30px;">
-					<div class="checkbox">
+					<div class="checkbox" data-toggle="tooltip" data-placement="auto" title="Check to define a start date for this model">
 						<label><input id="start_date"  type="checkbox" onchange="showdate();">
 							Define start date:
 						</label>
 					</div>
 					<div>
-						<input id="date_input" class="form-control" type="date" style = "width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);display:none" >
+						<input id="date_input" data-toggle="tooltip" data-placement="auto" title="Enter the start date for this model" class="form-control" type="date" style = "width:260px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);display:none" >
 					</div>
 					<i>(if unchecked, monitoring starts immediatly)<i>
 				</div>
