@@ -282,7 +282,7 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 		obj.put("Month", time[data.get(Calendar.MONTH)]);
 		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+		obj.put("Value", Math.round(globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id)));
 		result.put(obj);
 
 		return result;

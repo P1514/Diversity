@@ -22,8 +22,8 @@ import com.mysql.jdbc.Connection;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import general.Data;
+import general.Loader;
 import general.Logging;
-import general.Server;
 import general.Settings;
 
 /**
@@ -143,7 +143,7 @@ public class Oversight extends TimerTask {
 					//System.out.println(request+"/n");
 					try {
 						//System.out.println(readUrl(request));					
-						dat.load(new JSONArray(readUrl(request)));
+						(new Loader()).load(new JSONArray(readUrl(request)));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -196,7 +196,7 @@ public class Oversight extends TimerTask {
 		}
 		}else{
 			try {
-				dat.load(null);
+				(new Loader()).load(null);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
