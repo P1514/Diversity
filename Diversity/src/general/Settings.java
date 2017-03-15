@@ -222,6 +222,12 @@ public class Settings {
 ;
 
 	
+	//Tag cloud table
+	public static final String tctable = "tagcloud";
+	public static final String tctable_user = "userid";
+	public static final String tctable_model = "modelid";
+	public static final String tctable_ignored_words = "ignoredwords";
+	
 	// SQL Common String
 	
 	public static final String sqlwhere = " Where ";

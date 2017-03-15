@@ -13,12 +13,15 @@
 <link rel='stylesheet' href='styles/index.css'>
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'></script>
 <script>
-
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
 </script>
 </head>
 <body>
-	<div id="help" style="float: right;margin-right:30px;"><i class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
-	<div id="triangle" style="display:none;z-index:500;position:absolute;"></div>
+
+	<div id="help" style="float: right;margin-right:30px;"><i id="question_mark" data-toggle="tooltip" data-placement="auto" title="Help" class="fa fa-question-circle fa-2x" aria-hidden="true" onclick="start_tutorial();"></i></div>
+
 	<div id="tutorial_box" style="z-index:500;position:absolute;display:none;background-color: white;width:300px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;">
 		<nav class="navbar navbar-fixed-top navbar-light"
 			style="background-color: #604460;">
@@ -68,7 +71,7 @@
 								<h3>DEFINE</h3>
 							</span>
 						</nav>
-						<div class="row" id="create" style="display: none">
+						<div class="row" id="create" data-toggle="tooltip" data-placement="auto" title="Create a new opinion model" style="display: none">
 							<div class="col-sm-8 offset-0">
 								<a onClick="new_model();" href="models.html"
 									style="cursor: pointer; cursor: hand;">Create Opinion Model</a>
@@ -88,7 +91,7 @@
 									src="..\images\icons\button_add_gray.png"></a>
 							</div>
 						</div>
-						<div class="row" id="view" style="display: none">
+						<div class="row" id="view" style="display: none" data-toggle="tooltip" data-placement="auto" title="View an existing opinion model">
 							<div class="col-sm-8 offset-0">
 								<a onClick="viewModels('view');"
 									style="cursor: pointer; cursor: hand;">View Opinion Model</a>
@@ -109,7 +112,7 @@
 									src="..\images\icons\button_view_gray.png"></a>
 							</div>
 						</div>
-						<div class="row" id="edit" style="display: none">
+						<div class="row" id="edit" style="display: none" data-toggle="tooltip" data-placement="auto" title="Edit an existing opinion model">
 							<div class="col-sm-8 offset-0">
 								<a onClick="viewModels('edit');"
 									style="cursor: pointer; cursor: hand;">Edit Opinion Model</a>
@@ -130,7 +133,7 @@
 									src="..\images\icons\button_edit_gray.png"></a>
 							</div>
 						</div>
-						<div class="row" id="delete" style="display: none">
+						<div class="row" id="delete" style="display: none" data-toggle="tooltip" data-placement="auto" title="Delete an existing opinion model">
 							<div class="col-sm-8 offset-0">
 								<a onClick="viewModels('delete');"
 									style="cursor: pointer; cursor: hand;">Delete Opinion Model</a>
@@ -202,7 +205,7 @@
 								<h3>PREDICT</h3>
 							</span>
 						</nav>
-						<div class="row" id="create_prediction" style="display: none">
+						<div class="row" id="create_prediction" style="display: none" data-toggle="tooltip" data-placement="auto" title="Generate a prediction based on a set of products and services">
 							<div class="col-sm-8 offset-0">
 								<a href="prediction_settings.html"
 									style="cursor: pointer; cursor: hand;">Generate Prediction</a>
@@ -229,7 +232,9 @@
 
 		<div class="container">
 			<h2 id="chart_title">Top 5 PSS Global Sentiment</h2>
-			<div style="width: 60%; text-align:right;margin-bottom:0;padding-bottom:0;"><a href="chart_setup.html"><i class="fa fa-cog" aria-hidden="true"></i> Chart setup </a></div>
+			<div style="width: 60%; text-align:right;margin-bottom:0;padding-bottom:0;">
+				<a href="chart_setup.html" data-toggle="tooltip" data-placement="auto" title="Edit chart settings"><i class="fa fa-cog" aria-hidden="true"></i> Chart setup </a>
+			</div>
 			<div id="dashboard">
 				<div class="container" style="box-shadow: none;margin-top:0;padding-top:0;" id="top5"></div>
 				<div id="control" style="margin-bottom: 20px; padding-bottom:0;height:70px;"></div>
