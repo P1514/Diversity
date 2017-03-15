@@ -54,11 +54,11 @@ public class Startup implements ServletContextListener {
 				rs.getLong("asdasasd");
 			//System.out.println(clean.clean());
 			if (Settings.JSON_use == false) {
-				new Data().load(null);
+				new Loader().load(null);
 			} else {
 				JSONArray json = new JSONArray(readUrl(Settings.JSON_uri));
 				System.out.println(json);
-				new Data().load(json);
+				new Loader().load(json);
 			}
 			/*
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
