@@ -153,7 +153,6 @@ public class Globalsentiment extends GetReach {
 			}
 		}
 
-		LOGGER.log(Level.INFO, "MAX FREQUENCY: " + max_freq);
 		return max_freq;
 	}
 

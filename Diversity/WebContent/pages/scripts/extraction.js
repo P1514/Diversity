@@ -21,6 +21,35 @@ var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 	"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 var month;
 var product;
+var user = 1;
+
+// DEBUG STUFF - DELETE WHEN TESTED --------------------------------------------
+
+$(window).on('load', function() {
+ if(getCookie("Developer") == "Guilherme") {
+	 $("#DEBUG_USER").toggle();
+ }
+});
+
+$("#USER_LIST").on("change", function() {
+    user = parseInt(this.value.split(" ")[1]);
+
+		var json = {
+			"Op" : "tagcloud",
+			"Id" : sessionStorage.id,
+			"Param" : month != undefined ? "Month" : undefined,
+			"Values" : month != undefined ? month : undefined,
+			"Product" : product != undefined && product != "Global" ? product : undefined,
+			'Key' : getCookie("JSESSIONID"),
+			'User' : user
+		}
+		ws.send(JSON.stringify(json));
+
+		console.log("Selected user: " + user);
+});
+
+// -----------------------------------------------------------------------------
+
 /*
 * Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
 */
@@ -279,7 +308,8 @@ function connect() {
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
 				"Product" : product != undefined && product != "Global" ? product : undefined,
-        'Key' : getCookie("JSESSIONID")
+        'Key' : getCookie("JSESSIONID"),
+				'User' : user
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -320,8 +350,8 @@ function goToByScroll(id){
     id = id.replace("link", "");
       // Scroll
     $('html,body').animate({
-        scrollTop: $("#"+id).offset().top - 100},
-        'slow');
+        scrollTop: $("#"+id).offset().top - 200},
+        'ease');
 }
 
 
@@ -352,8 +382,8 @@ function snapshot_tutorial() {
   var w=$('#save').width();
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
-  $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed on this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
 
+  $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed in this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
 
@@ -365,8 +395,7 @@ function filter_tutorial() {
   var w=$('#genderfilt').width();
 
   $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
-  $('#tutorial').html('This is the filters section. Here you can change the filter and segmentation settings displayed on the charts below.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="snapshot_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="extrapolation_tutorial();">Next</button></center>');
-
+  $('#tutorial').html('This is the filters section. Here you can change the filter and segmentation settings displayed in the charts below.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="snapshot_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="extrapolation_tutorial();">Next</button></center>');
 
 	goToByScroll('tutorial_box');
 
@@ -492,7 +521,53 @@ function end_tutorial() {
   }
 
 	goToByScroll('tutorial_box');
+}
 
+var clickedWord = "";
+$(document).bind("contextmenu", function (event) { //override right click
+	if ($(event.target).is(".word")) {
+    event.preventDefault(); // avoid browser default
+    $(".custom-menu").finish().toggle(100).css({
+        top: event.pageY - 50 + "px",
+        left: event.pageX - 50 + "px"
+    });
+		clickedWord = event.target.text;
+	} else {
+	}
+});
+
+$(document).bind("mousedown", function (e) {
+    // If the clicked element is not the menu
+    if (!$(e.target).parents(".custom-menu").length > 0) {
+        // Hide it
+        $(".custom-menu").hide(100);
+    }
+});
+
+
+// If the menu element is clicked
+$(".custom-menu li").click(function(e){
+
+    // This is the triggered action name
+    switch($(this).attr("data-action")) {
+
+			case "ignore_word":
+				ignore_words(clickedWord);
+			break;
+	 }
+	 $(".custom-menu").hide(100);
+});
+
+function ignore_words(word) {
+	var json = {
+		'Op' : 'set_ignore_word',
+		"Id" : sessionStorage.id,
+		'Word' : word,
+		'User' : user,
+ 		'Key' : getCookie("JSESSIONID")
+	}
+
+	ws.send(JSON.stringify(json));
 }
 
 function makeCloud(words) {
@@ -500,7 +575,7 @@ function makeCloud(words) {
 	var word_counter = 0;
 
 	for (var i=0; i < words.length; i++) {
-		str += '<a onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
+		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
 		if (word_counter > 5) {
 			str += "<br>"
 			word_counter = 0;
@@ -679,7 +754,6 @@ function drawChart() {
 	if (jsonData[i].Graph == "Top_Middle") {
 		var data = new google.visualization.DataTable();
 		data.addColumn('string', 'Polarity')
-		// console.log(jsonData);
 		for (filt = 1; i < jsonData.length && jsonData[i].Graph == "Top_Middle"; filt++) {
 			data.addColumn('number', jsonData[i].Filter);
 			i++;
@@ -938,7 +1012,6 @@ function drawChart() {
 			}
 			i++;
 
-			console.log(filt);
 			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right')
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				var time = jsonData[i].Date.split(" ");
@@ -959,7 +1032,6 @@ function drawChart() {
 				}
 			}
 			var time2;
-			console.log(count);
 			for (var iii = count-1; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right_Ex') && !jsonData[i].hasOwnProperty('Filter');iii++,ii++,i++) {
 				if (jsonData[i].Graph == 'Bottom_Right_Ex') {
 					if (jsonData[i].hasOwnProperty('Date')) {

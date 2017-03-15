@@ -32,6 +32,7 @@ CREATE TABLE `access_rights` (
   `view_opinion_results` tinyint(1) DEFAULT NULL,
   `save_delete_snapshots` tinyint(1) DEFAULT NULL,
   `use_opinion_prediction` tinyint(1) DEFAULT NULL,
+  `admin` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -42,7 +43,7 @@ CREATE TABLE `access_rights` (
 
 LOCK TABLES `access_rights` WRITE;
 /*!40000 ALTER TABLE `access_rights` DISABLE KEYS */;
-INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1),('PROD_MAN',NULL,0,0,1,0,0),('SYS_ENG',NULL,1,0,1,0,0);
+INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1,0),('PROD_MAN',NULL,0,0,1,0,0,0),('SYS_ENG',NULL,1,0,1,0,0,0),('DEVELOPER',NULL,1,1,1,1,1,1);
 /*!40000 ALTER TABLE `access_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -280,6 +281,22 @@ LOCK TABLES `sources` WRITE;
 INSERT INTO `sources` VALUES ('Facebook','123',0,'1'),('Facebook','123',0,'2'),('Facebook','123',0,'3'),('Facebook','123',0,'4'),('Facebook','123',0,'5'),('Facebook','12345',0,'2'),('Facebook','abcd',0,'1'),('Facebook','teste',0,'1'),('Facebook','teste2',123123,'1'),('Facebook','teste2',0,'3');
 /*!40000 ALTER TABLE `sources` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `tagcloud`
+--
+
+DROP TABLE IF EXISTS `tagcloud`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tagcloud` (
+  `userid` int(11) NOT NULL,
+  `modelid` int(11) NOT NULL,
+  `ignoredwords` text DEFAULT NULL,
+  PRIMARY KEY (`userid`,`modelid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 
 --
 -- Dumping events for database 'sentimentanalysis'

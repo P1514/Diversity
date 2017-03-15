@@ -109,11 +109,24 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-			case 26:
+			case 27:
 				obj = new JSONObject();
 				result = new JSONArray();
 				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				if (msg.has("Word")) {
+					tag.addIgnoreWord(msg.getString("Word"));
+				}
+				obj.put("Op", "words");
+				obj.put("Words", tag.calculateWeights());
+				result.put(obj);
+				LOGGER.log(Level.INFO, result.toString());
+				return result.toString();
+			case 26:
+				obj = new JSONObject();
+				result = new JSONArray();
+				tag = new Tagcloud(gp.getTop(param, values, id,
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
