@@ -213,6 +213,13 @@ public class Settings {
 	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String lartable_role = "role";
 	public static final String lartable_admin = "admin";
+	
+	// Media wiki Table
+	public static final String lmwtable = "media_wiki";
+	public static final String lmwtable_id = "id";
+	public static final String lmwtable_name = "name";
+	public static final String lmwtable_pss = "pss";
+;
 
 	
 	// SQL Common String

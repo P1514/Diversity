@@ -38,7 +38,7 @@ public class GetMediawiki {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT name FROM sentimentanalysis.media_wiki where pss=?;");
+		String insert = new String("SELECT "+Settings.lmwtable_name+" FROM "+Settings.lmwtable+" where "+Settings.lmwtable_pss+"=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 		
 				query1.setString(1, pss);
