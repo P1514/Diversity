@@ -1,4 +1,31 @@
+#ignore_words:hover {
+	cursor: pointer;
+	cursor: hand;
+}
 
+.custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+    padding: 0;
+}
+
+.custom-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+    list-style-type: none;
+    transition: all .3s ease;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
 
 #displaybox {
 	z-index: 10000;
@@ -147,6 +174,7 @@ input[type=radio] {
 	padding-bottom: 20px;
 	min-height: 200px;
 	overflow: hidden;
+  color: #604460;
 }
 
 
@@ -163,6 +191,11 @@ input[type=radio] {
 	padding-bottom: 20px;
 	min-height: 200px;
 	overflow: hidden;
+	color: #604460;
+}
+
+.container {
+		color: #604460;
 }
 
 #table_container {
@@ -177,6 +210,7 @@ input[type=radio] {
 	width:100%;
 	margin-left: 0;
 	margin-right: 0;
+		color: #604460;
 }
 
 b {
@@ -185,8 +219,8 @@ b {
 }
 
 body {
-	font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic,
-		"AppleGothic", sans-serif;
+    color: #604460;
+    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 }
 
 h1 {
@@ -198,6 +232,7 @@ h1 {
 	font-weight: bold;
 	font-size: 24;
 	padding-left:50px;
+	color: #604460;
 }
 
 h2 {
@@ -206,6 +241,7 @@ h2 {
 	font-weight: normal;
 	text-align: left;
 	font-size: 24;
+  color: #604460;
 }
 
 h3 {
@@ -216,6 +252,19 @@ h3 {
 	text-align: center;
 	font-size: 18;
 	color: white;
+}
+
+.navbar {
+	position: relative;
+	margin-left: 0;
+	margin-right: 0;
+	text-align: center;
+	z-index: 4;
+}
+
+#question_mark:hover {
+	cursor: pointer;
+	cursor: hand;
 }
 
 #overlay-back {

@@ -21,6 +21,35 @@ var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 	"JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 var month;
 var product;
+var user = 1;
+
+// DEBUG STUFF - DELETE WHEN TESTED --------------------------------------------
+
+$(window).on('load', function() {
+ if(getCookie("Developer") == "Guilherme") {
+	 $("#DEBUG_USER").toggle();
+ }
+});
+
+$("#USER_LIST").on("change", function() {
+    user = parseInt(this.value.split(" ")[1]);
+
+		var json = {
+			"Op" : "tagcloud",
+			"Id" : sessionStorage.id,
+			"Param" : month != undefined ? "Month" : undefined,
+			"Values" : month != undefined ? month : undefined,
+			"Product" : product != undefined && product != "Global" ? product : undefined,
+			'Key' : getCookie("JSESSIONID"),
+			'User' : user
+		}
+		ws.send(JSON.stringify(json));
+
+		console.log("Selected user: " + user);
+});
+
+// -----------------------------------------------------------------------------
+
 /*
 * Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
 */
@@ -114,8 +143,13 @@ function connect() {
 			+ window.sessionStorage.model + "; PSS: "
 			+ window.sessionStorage.pss;
 
-	ws = new WebSocket('ws://' + window.location.hostname + ":"
-			+ window.location.port + '/Diversity/server');
+	if (window.location.href.indexOf('https://') != -1) {
+		ws = new WebSocket('wss://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	} else {
+		ws = new WebSocket('ws://' + window.location.hostname + ":"
+				+ window.location.port + '/Diversity/server');
+	}
 
   //When the connection is opened, ask the server for the chart configuration settings (gender, location and age segments to be displayed)
 	ws.onopen = function() {
@@ -274,7 +308,8 @@ function connect() {
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
 				"Product" : product != undefined && product != "Global" ? product : undefined,
-        'Key' : getCookie("JSESSIONID")
+        'Key' : getCookie("JSESSIONID"),
+				'User' : user
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -304,14 +339,243 @@ google.charts.load('current', {
 });
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
+	if (localStorage.tutorial.indexOf("extraction=done") == -1) {
+    request_tutorial();
+  }
 });
+
+
+function goToByScroll(id){
+      // Remove "link" from the ID
+    id = id.replace("link", "");
+      // Scroll
+    $('html,body').animate({
+        scrollTop: $("#"+id).offset().top - 200},
+        'ease');
+}
+
+
+function request_tutorial() {
+  $('#loading').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function start_tutorial() {
+	var pos=$('#Cookie').offset();
+	var h=$('#Cookie').height() + 10;
+	var w=$('#Cookie').width();
+
+	$('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+	$('#tutorial').html('In the Opinion Extraction page you can find data about the selected model. At the top of the page you can see which model you selected and the PSS associated to that model.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="snapshot_tutorial();">Next</button></center>');
+
+  $('#tutorial_box').toggle();
+
+
+	goToByScroll('tutorial_box');
+
+}
+
+function snapshot_tutorial() {
+  var pos=$('#save').offset();
+  var h=$('#save').height() + 10;
+  var w=$('#save').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+
+  $('#tutorial').html('This is the snapshot menu. Here you can choose to save the data displayed in this page, or load a previously saved snapshot. This allows you to access the data at a specific point in time, without any updates.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="filter_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function filter_tutorial() {
+  var pos=$('#genderfilt').offset();
+  var h=$('#genderfilt').height() + 10;
+  var w=$('#genderfilt').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This is the filters section. Here you can change the filter and segmentation settings displayed in the charts below.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="snapshot_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="extrapolation_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function extrapolation_tutorial() {
+  var pos=$('#extrapolate').offset();
+  var h=$('#extrapolate').height() + 10;
+  var w=$('#extrapolate').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This checkbox defines whether to extrapolate the results or not. If toggled, the Global Sentiment chart below will display an additional line that represents the extrapolation of the current data for the next 3 months.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="filter_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="opinion_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function opinion_tutorial() {
+  var pos=$('#opinionpie').offset();
+  var h=$('#opinionpie').height() + 10;
+  var w=$('#opinionpie').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This is the total opinions number. It represents the number of posts that were used to generate the sentiment analysis for this model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="extrapolation_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="polarity_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function polarity_tutorial() {
+  var pos=$('#polaritybar').offset();
+  var h=$('#polaritybar').height() + 10;
+  var w=$('#polaritybar').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The polarity bar chart displays the sentiment distribution over the total number of posts and comments, ranging from \'--\' (negative) to \'++\' (positive).<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="opinion_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="gauge_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function gauge_tutorial() {
+  var pos=$('#globalgauge').offset();
+  var h=$('#globalgauge').height() + 10;
+  var w=$('#globalgauge').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This gauge displays the value of the global sentiment for the PSS associated to this model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="polarity_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="avg_reach_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function avg_reach_tutorial() {
+  var pos=$('#reachpie').offset();
+  var h=$('#reachpie').height() + 10;
+  var w=$('#reachpie').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('Here you can see the average reach value of the current model. Reach is a value that indicates the visibility of the posts about this PSS and it takes into account the number of views, comments and likes.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="gauge_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="reach_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function reach_tutorial() {
+  var pos=$('#reachline').offset();
+  var h=$('#reachline').height() + 10;
+  var w=$('#reachline').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This line chart displays the reach value over time. The time span is 12 months by default, but can be customized in the Chart Setup page. The update frequency, which is the interval between each point in the chart, is defined when creating the model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="avg_reach_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="global_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function global_tutorial() {
+  var pos=$('#globalline').offset();
+  var h=$('#globalline').height() + 10;
+  var w=$('#globalline').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This line chart displays the global sentiment value over time. Like the reach chart, it has a default time span of 12 months that can be customized in the Chart Setup page, and the update frequency was defined when creating the model. By clicking on any point in this chart, the table below will be updated with posts relative to the date of that point. If the Extrapolate Results checkbox is toggled, this chart displays an additional line that maps the extrapolation values for the next 3 months.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="reach_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="table_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function table_tutorial() {
+  var pos=$('#table_container').offset();
+  var h=$('#table_container').height() + 10;
+  var w=$('#table_container').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The Top 5 table displays the five posts with the highest reach relative to the model\'s PSS. By clicking on any post, you can see all the comments associated to that post. If the global sentiment or reach charts have a point selected, the Top 5 table will display the five posts with highest reach on that point\'s date.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="global_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="tag_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function tag_tutorial() {
+	var pos=$('#cloud_wrapper').offset();
+	var h=$('#cloud_wrapper').height() + 10;
+	var w=$('#cloud_wrapper').width();
+
+	$('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+	$('#tutorial').html('The tag cloud shows the most mentioned words on the users\' posts and comments. The displayed size of each word is related to the number of occurrences, which means that words displayed in a large font size occur more often than words with a smaller font size.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="table_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+
+	goToByScroll('tutorial_box');
+
+}
+
+function end_tutorial() {
+  var pos=$('#chart_title').offset();
+  var h=$('#chart_title').height();
+  var w=$('#chart_title').width();
+
+  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
+  if (localStorage.tutorial.indexOf("extraction=done") == -1) {
+    localStorage.tutorial += "extraction=done;";
+  }
+
+	goToByScroll('tutorial_box');
+}
+
+var clickedWord = "";
+$(document).bind("contextmenu", function (event) { //override right click
+	if ($(event.target).is(".word")) {
+    event.preventDefault(); // avoid browser default
+    $(".custom-menu").finish().toggle(100).css({
+        top: event.pageY - 50 + "px",
+        left: event.pageX - 50 + "px"
+    });
+		clickedWord = event.target.text;
+	} else {
+	}
+});
+
+$(document).bind("mousedown", function (e) {
+    // If the clicked element is not the menu
+    if (!$(e.target).parents(".custom-menu").length > 0) {
+        // Hide it
+        $(".custom-menu").hide(100);
+    }
+});
+
+
+// If the menu element is clicked
+$(".custom-menu li").click(function(e){
+
+    // This is the triggered action name
+    switch($(this).attr("data-action")) {
+
+			case "ignore_word":
+				ignore_words(clickedWord);
+			break;
+	 }
+	 $(".custom-menu").hide(100);
+});
+
+function ignore_words(word) {
+	var json = {
+		'Op' : 'set_ignore_word',
+		"Id" : sessionStorage.id,
+		'Word' : word,
+		'User' : user,
+ 		'Key' : getCookie("JSESSIONID")
+	}
+
+	ws.send(JSON.stringify(json));
+}
 
 function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
 
 	for (var i=0; i < words.length; i++) {
-		str += '<a onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
+		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word + '");\' rel=' + words[i].frequency + '>' + words[i].word + '</a>';
 		if (word_counter > 5) {
 			str += "<br>"
 			word_counter = 0;
@@ -490,7 +754,6 @@ function drawChart() {
 	if (jsonData[i].Graph == "Top_Middle") {
 		var data = new google.visualization.DataTable();
 		data.addColumn('string', 'Polarity')
-		// console.log(jsonData);
 		for (filt = 1; i < jsonData.length && jsonData[i].Graph == "Top_Middle"; filt++) {
 			data.addColumn('number', jsonData[i].Filter);
 			i++;
@@ -749,7 +1012,6 @@ function drawChart() {
 			}
 			i++;
 
-			console.log(filt);
 			for (ii = 0; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right')
 					&& !jsonData[i].hasOwnProperty('Filter'); ii++, i++) {
 				var time = jsonData[i].Date.split(" ");
@@ -770,7 +1032,6 @@ function drawChart() {
 				}
 			}
 			var time2;
-			console.log(count);
 			for (var iii = count-1; i < jsonData.length && (jsonData[i].Graph == 'Bottom_Right_Ex') && !jsonData[i].hasOwnProperty('Filter');iii++,ii++,i++) {
 				if (jsonData[i].Graph == 'Bottom_Right_Ex') {
 					if (jsonData[i].hasOwnProperty('Date')) {

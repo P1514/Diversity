@@ -626,7 +626,7 @@ public class LoadThreads {
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
 								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
-								rs.getLong(Settings.lmtable_designproject));
+								rs.getLong(Settings.lmtable_designproject),rs.getBoolean(Settings.lmtable_add_mediawiki));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}

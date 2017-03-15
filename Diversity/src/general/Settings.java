@@ -3,6 +3,8 @@ package general;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import com.mysql.jdbc.Connection;
 public class Settings {
 	// To be replaced by properties file
 	// Data Origin DB Specs
+	private static final Logger LOGGER = new Logging().create(Settings.class.getName());
 	private static final String rurl = "jdbc:mysql://127.0.0.1:3306/sentimentposts?autoReconnect=true&useSSL=false";
 	private static final String ruser = "diversity";
 	private static final String rpass = "!diversity!";
@@ -116,6 +119,8 @@ public class Settings {
 	public static final String lmtable_udate = "next_update";
 	public static final String lmtable_cdate = "created_date";
 	public static final String lmtable_designproject = "design_project";
+	public static final String lmtable_add_mediawiki = "add_mediawiki";
+
 
 	// Sources Table
 	public static final String lutable = "sources";
@@ -208,7 +213,20 @@ public class Settings {
 	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String lartable_role = "role";
 	public static final String lartable_admin = "admin";
+	
+	// Media wiki Table
+	public static final String lmwtable = "media_wiki";
+	public static final String lmwtable_id = "id";
+	public static final String lmwtable_name = "name";
+	public static final String lmwtable_pss = "pss";
+;
 
+	
+	//Tag cloud table
+	public static final String tctable = "tagcloud";
+	public static final String tctable_user = "userid";
+	public static final String tctable_model = "modelid";
+	public static final String tctable_ignored_words = "ignoredwords";
 	
 	// SQL Common String
 	
@@ -320,7 +338,7 @@ public class Settings {
 			}
 		}
 
-		System.out.print(result.toString());
+		LOGGER.log(Level.INFO,result.toString());
 		return result;
 
 	}

@@ -14,6 +14,7 @@ import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
+import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
@@ -61,6 +62,7 @@ public final class Backend {
 		Prediction pre = new Prediction();
 		Snapshot snapshot = new Snapshot();
 		GetReach gr = new GetReach();
+		GetMediawiki wiki = new GetMediawiki();
 		long id = 0;
 		try {
 
@@ -109,11 +111,28 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-			case 26:
+				
+			case 28:
+				return wiki.getNames(msg.getString("PSS")).toString();
+
+			case 27:
 				obj = new JSONObject();
 				result = new JSONArray();
 				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""));
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				if (msg.has("Word")) {
+					tag.addIgnoreWord(msg.getString("Word"));
+				}
+				obj.put("Op", "words");
+				obj.put("Words", tag.calculateWeights());
+				result.put(obj);
+				LOGGER.log(Level.INFO, result.toString());
+				return result.toString();
+			case 26:
+				obj = new JSONObject();
+				result = new JSONArray();
+				tag = new Tagcloud(gp.getTop(param, values, id,
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
@@ -216,7 +235,10 @@ public final class Backend {
 				} else
 					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
-				System.out.println(gs.globalsentiment());
+				
+				LOGGER.log(Level.INFO, gs.globalsentiment());
+
+				
 				try {
 					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
@@ -262,7 +284,7 @@ public final class Backend {
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
-					System.out.println("EXTRAPOLATING...");
+					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(param + "," + filtering,
@@ -273,7 +295,9 @@ public final class Backend {
 										id, Data.getmodel(id).getFrequency()),
 								"Graph", "Bottom_Right_Ex");
 				}
-				System.out.println(result.toString());
+				
+				LOGGER.log(Level.INFO,result.toString());
+
 				return result.toString();
 
 			case 18:

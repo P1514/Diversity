@@ -54,8 +54,12 @@ public class ChromeTests  {
 		System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
 		WebDriver driver = new ChromeDriver();
 
-		// Set the website URL
-		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DESIGNER");
+		// Set the website URL and permissions
+
+		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
+		JavascriptExecutor JavascriptExecutor = ((JavascriptExecutor)driver);
+		JavascriptExecutor.executeScript("document.cookie = \"JSESSIONID=3D43211234DDDFFGGT542; expires=Fri, 31 Dec 9999 23:59:59 GMT\";");
+		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
 
 		boolean create = testCreate(driver);
 		boolean edit = testEdit(driver);

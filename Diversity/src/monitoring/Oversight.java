@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +23,7 @@ import extraction.GetReach;
 import extraction.Globalsentiment;
 import general.Data;
 import general.Loader;
+import general.Logging;
 import general.Settings;
 
 /**
@@ -36,6 +39,8 @@ public class Oversight extends TimerTask {
 	private HashMap<String, url> requesturl = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
+	private static final Logger LOGGER = new Logging().create(Oversight.class.getName());
+
 
 	/**
 	 * Instantiates a new oversight.
@@ -142,7 +147,7 @@ public class Oversight extends TimerTask {
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						System.out.println("ERROR ON JSON OVERWATCH");
+						LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 					}
 					String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate + "=? where (" + Settings.lutable_pss + "=? AND "
 							+ Settings.lutable_source + "=?) AND (";
@@ -176,7 +181,8 @@ public class Oversight extends TimerTask {
 						 * } }
 						 */
 					} catch (Exception e) {
-						System.out.println("ERROR ON SQL OVERWATCH");
+						LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH",e);
+
 						e.printStackTrace();
 					}
 
@@ -186,7 +192,7 @@ public class Oversight extends TimerTask {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("ERROR ON OVERWATCH");
+			LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH",e);
 		}
 		}else{
 			try {
@@ -231,7 +237,7 @@ public class Oversight extends TimerTask {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
-			System.out.println("URL:"+url.toString());
+			//System.out.println("URL:"+url.toString());
 			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			StringBuffer buffer = new StringBuffer();
 			int read;

@@ -2,6 +2,9 @@
 package general;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -12,6 +15,8 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
+
+import extraction.Globalsentiment;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -24,6 +29,8 @@ public class Server {
 	public static boolean isloading = false;
 	private Session session;
 	private Operations op = new Operations();
+	private static final Logger LOGGER = new Logging().create(Server.class.getName());
+
 	
 	/** The Assyncronous variable. */
 	Async as;
@@ -84,7 +91,7 @@ public class Server {
 	 * @param msg the msg
 	 */
 	public void send_message(String msg) {
-			System.out.println("\r\nOUT: "+ msg);
+			LOGGER.log(Level.INFO,"\r\nOUT: "+ msg);
 			as.sendText(msg);
 			return;
 	}
@@ -126,7 +133,7 @@ public class Server {
 		public void runn(JSONObject msg) {
 			JSONArray result = new JSONArray();
 			JSONObject obj = new JSONObject();
-		    System.out.println("IN:"+msg);
+			LOGGER.log(Level.INFO,"\r\nIN:"+msg);
 			Backend be;
 
 			try {

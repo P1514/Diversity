@@ -87,7 +87,7 @@ public class Globalsentiment extends GetReach {
 		
 		for (long k : psslist) {
 
-			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1));
+			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
 			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1, -1).toString());
 			Data.delmodel((long) -1);
 
@@ -153,7 +153,6 @@ public class Globalsentiment extends GetReach {
 			}
 		}
 
-		System.out.println("MAX FREQUENCY: " + max_freq);
 		return max_freq;
 	}
 
@@ -335,13 +334,8 @@ public class Globalsentiment extends GetReach {
 
 		int avg = 0;
 		if (firstDate(id) != 0) {
-			// System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+"
-			// year:"+data.get(Calendar.YEAR));
 			for (; today
-					.after(data)/*
-								 * data.get(Calendar.MONTH)
-								 * <Calendar.getInstance().get(Calendar.MONTH)
-								 */; data.add(Calendar.MONTH, 1)) {
+					.after(data); data.add(Calendar.MONTH, 1)) {
 				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.YEAR), data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}

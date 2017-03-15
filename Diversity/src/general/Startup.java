@@ -6,7 +6,7 @@ import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Handler;
+import java.util.logging.*;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -23,6 +23,8 @@ import monitoring.Oversight;
  */
 @WebListener
 public class Startup implements ServletContextListener {
+	
+	private static final Logger LOGGER = new Logging().create(Startup.class.getName());
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
@@ -37,7 +39,9 @@ public class Startup implements ServletContextListener {
 				e1.printStackTrace();
 			}*/
 		
-		System.out.println("Starting up!");
+
+		LOGGER.log(Level.INFO,"Starting up!");
+
 		Oversight o = new Oversight(true);
 		o.run();
 		new Oversight();
@@ -57,8 +61,9 @@ public class Startup implements ServletContextListener {
 				new Loader().load(null);
 			} else {
 				JSONArray json = new JSONArray(readUrl(Settings.JSON_uri));
-				System.out.println(json);
+				LOGGER.log(Level.INFO,json.toString());
 				new Loader().load(json);
+
 			}
 			/*
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
@@ -68,7 +73,7 @@ public class Startup implements ServletContextListener {
 			// System.out.println(json.get("id"));
 		}  catch (SQLException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR Database Outdated");
+			LOGGER.log(Level.SEVERE,"ERROR Database Outdated",e);
 			
 			//e.printStackTrace();
 		} catch (Exception e) {
@@ -129,7 +134,7 @@ public class Startup implements ServletContextListener {
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		System.out.println("Shutting down!");
+		LOGGER.log(Level.INFO,"Shutting down!");
 	}
 
 	private static String readUrl(String urlString) throws Exception {
