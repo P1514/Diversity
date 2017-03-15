@@ -119,7 +119,7 @@ public class Settings {
 	public static final String lmtable_udate = "next_update";
 	public static final String lmtable_cdate = "created_date";
 	public static final String lmtable_designproject = "design_project";
-	public static final String lmtable_add_mediawiki = "add_mediawiki";
+	public static final String lmtable_add_mediawiki = "media_wiki";
 
 
 	// Sources Table
@@ -227,6 +227,16 @@ public class Settings {
 	public static final String tctable_user = "userid";
 	public static final String tctable_model = "modelid";
 	public static final String tctable_ignored_words = "ignoredwords";
+	
+	// Snapshots Table
+	public static final String lsstable = "snapshots";
+	public static final String lsstable_id = "id";
+	public static final String lsstable_name = "name";
+	public static final String lsstable_creation_user = "creation_user";
+	public static final String lsstable_creation_date = "creation_date";
+	public static final String lsstable_result = "result";
+	public static final String lsstable_type = "type";
+	public static final String lsstable_timespan = "timespan";
 	
 	// SQL Common String
 	

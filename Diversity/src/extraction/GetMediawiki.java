@@ -11,12 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import general.Backend;
-import general.Data;
-import general.Logging;
-import general.PSS;
-import general.Product;
-import general.Settings;
+import general.*;
 import extraction.Snapshot;
 
 public class GetMediawiki {

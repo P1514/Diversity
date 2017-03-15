@@ -91,7 +91,7 @@ public class Prediction extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value",mean);
-				obj.put("Variance",(1.96*stDeviation)/Math.sqrt(numbOfProd));// 95% confidence interval
+				obj.put("Variance",Math.round((1.96*stDeviation)/Math.sqrt(numbOfProd)));// 95% confidence interval
 				result.put(obj);
 
 			} catch (JSONException e) {
