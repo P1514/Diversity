@@ -130,7 +130,7 @@ public class GetComments {
 	 *            the number
 	 * @return the string
 	 */
-	private String trunc(String number) {
+	static String trunc(String number) {
 
 		double result = Double.valueOf(number);
 		number = String.format("%.1f", result);
