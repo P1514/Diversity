@@ -57,6 +57,8 @@ public class Tagcloud extends GetPosts {
 		// getComments(posts.getJSONObject(i).getLong("Id")));
 		// }
 		// }
+		
+		fillMaps();
 
 		for (int i = 0; i < posts.length(); i++) {
 			if (posts.getJSONObject(i).has("Id")) {
@@ -130,10 +132,12 @@ public class Tagcloud extends GetPosts {
 			setIgnoreWords();
 		}
 		
-		fillMaps();
+//		fillMaps();
 	}
 
 	private void fillMaps() {
+		
+		ignoreWords = new ArrayList<String>();
 		String select = "SELECT " + Settings.tctable_ignored_words + " FROM " + Settings.tctable + " WHERE " + Settings.tctable_user + " =? AND "
 				+ Settings.tctable_model + " = ?";
 

@@ -22,6 +22,34 @@ var monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
 var month;
 var product;
 var user = 1;
+
+// DEBUG STUFF - DELETE WHEN TESTED --------------------------------------------
+
+$(window).on('load', function() {
+ if(getCookie("Developer") == "Guilherme") {
+	 $("#DEBUG_USER").toggle();
+ }
+});
+
+$("#USER_LIST").on("change", function() {
+    user = parseInt(this.value.split(" ")[1]);
+
+		var json = {
+			"Op" : "tagcloud",
+			"Id" : sessionStorage.id,
+			"Param" : month != undefined ? "Month" : undefined,
+			"Values" : month != undefined ? month : undefined,
+			"Product" : product != undefined && product != "Global" ? product : undefined,
+			'Key' : getCookie("JSESSIONID"),
+			'User' : user
+		}
+		ws.send(JSON.stringify(json));
+
+		console.log("Selected user: " + user);
+});
+
+// -----------------------------------------------------------------------------
+
 /*
 * Toggles the 'extra' variable, which determines whether the extrapolation checkbox is checked or not.
 */
@@ -280,7 +308,8 @@ function connect() {
 				"Param" : month != undefined ? "Month" : undefined,
 				"Values" : month != undefined ? month : undefined,
 				"Product" : product != undefined && product != "Global" ? product : undefined,
-        'Key' : getCookie("JSESSIONID")
+        'Key' : getCookie("JSESSIONID"),
+				'User' : user
 			}
 			ws.send(JSON.stringify(json));
 			return;

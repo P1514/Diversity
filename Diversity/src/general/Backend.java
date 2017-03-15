@@ -113,7 +113,7 @@ public final class Backend {
 				obj = new JSONObject();
 				result = new JSONArray();
 				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, 1);
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
 				if (msg.has("Word")) {
 					tag.addIgnoreWord(msg.getString("Word"));
 				}
@@ -126,7 +126,7 @@ public final class Backend {
 				obj = new JSONObject();
 				result = new JSONArray();
 				tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, 1);
+						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
