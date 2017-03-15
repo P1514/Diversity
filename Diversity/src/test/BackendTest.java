@@ -25,7 +25,9 @@ public class BackendTest {
 	// before running test, import test.db from the test directory
 	@Test
 	public void resolveRole() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Role", "DESIGNER");
 		tester = new Backend(22, obj);
@@ -38,7 +40,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetTree() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "gettree");
 		tester = new Backend(21, obj);
@@ -55,7 +59,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetTreePss() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "gettree");
 		obj.put("Pss", "D231-2 PSS");
@@ -67,7 +73,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveTopreachglobalsentiment() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Top5Reach");
 		tester = new Backend(20, obj);
@@ -78,7 +86,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveLoad() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		tester = new Backend(2, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Loaded Successfully\"}]";
@@ -88,7 +98,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetposts() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
 		obj.put("Id", "838");
@@ -120,7 +132,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetmodels() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getmodels");
 
@@ -143,7 +157,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetconfig() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getconfig");
 		obj.put("Id", "838");
@@ -154,7 +170,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetModel() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "get_model");
 		obj.put("Id", "838");
@@ -165,7 +183,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetPSS() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getpss");
 		tester = new Backend(17, obj);
@@ -175,7 +195,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveOpinionExtraction() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "opinion_extraction");
 		obj.put("Id", "838");
@@ -212,7 +234,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveOeRefresh() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		// obj.put("Param", "Global");
 		// obj.put("Values", "");
@@ -282,7 +306,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveOeRefreshExtrapolate() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "oe_refresh");
 		obj.put("Param", "Age,Gender,Location,");
@@ -297,7 +323,9 @@ public class BackendTest {
 
 	@Test
 	public void resolvePrediction() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Prediction");
 		obj.put("Products", "14;15");
@@ -309,7 +337,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveTopreachglobalsentiment5pss() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Top5Reach");
 		obj.put("PSS", "D522-1 PSS;D231-1 PSS;D522-1 PSS;D522-1 PSS;D522-1 PSS;D522-1 PSS");
@@ -321,7 +351,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotPrediction() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15;");
@@ -339,7 +371,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoadNames() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Type", "Prediction");
@@ -352,7 +386,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoad() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Name", "testing");
@@ -365,7 +401,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotExtraction() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("name", "francisco");
@@ -383,7 +421,9 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoadExtraction() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Name", "francisco");
@@ -397,7 +437,9 @@ public class BackendTest {
 	
 	@Test
 	public void resolveGetpostsWord() throws JSONException {
-
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
 		obj.put("Id", "838");
@@ -428,4 +470,19 @@ public class BackendTest {
 
 	}
 
+	@Test
+	public void resolveWiki() throws JSONException {
+
+		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		System.out.println(obj1.toString());
+
+		obj = new JSONObject();
+		obj.put("Op", "get_mediawiki");
+		obj.put("PSS", "pss1");
+
+		tester = new Backend(27, obj);
+		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully added model dsfgdsfg to monitor module\",\"id\":820}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
 }

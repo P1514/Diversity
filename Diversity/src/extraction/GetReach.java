@@ -184,7 +184,7 @@ public class GetReach {
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			System.out.println(query1.toString());
+			//System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 

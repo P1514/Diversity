@@ -14,6 +14,7 @@ import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
+import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
@@ -61,6 +62,7 @@ public final class Backend {
 		Prediction pre = new Prediction();
 		Snapshot snapshot = new Snapshot();
 		GetReach gr = new GetReach();
+		GetMediawiki wiki = new GetMediawiki();
 		long id = 0;
 		try {
 
@@ -109,6 +111,11 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+				
+			case 27:
+
+				return wiki.getNames(msg.getString("PSS")).toString();
+
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
