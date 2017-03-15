@@ -133,7 +133,7 @@ public class Server {
 		public void runn(JSONObject msg) {
 			JSONArray result = new JSONArray();
 			JSONObject obj = new JSONObject();
-			LOGGER.log(Level.INFO,"IN:"+msg);
+			LOGGER.log(Level.INFO,"\r\nIN:"+msg);
 			Backend be;
 
 			try {

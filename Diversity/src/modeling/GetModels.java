@@ -110,6 +110,7 @@ public class GetModels {
 			obj.put("Name", model.getName());
 			obj.put("URI", model.getURI());
 			obj.put("Update", model.getFrequency());
+			obj.put("mediawiki", model.getMediawiki());
 			obj.put("PSS", Data.getpss(model.getPSS()).getName());
 			// obj.put("Age", model.getAge());
 			// obj.put("Gender", model.getGender());

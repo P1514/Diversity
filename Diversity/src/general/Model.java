@@ -30,6 +30,7 @@ public final class Model {
 	private String name, uri, age, gender, products;
 	private boolean archived;
 	private long nextupdate, cdate;
+	private Boolean add_mediawiki;
 	private static final java.util.logging.Logger LOGGER = new Logging().create(Model.class.getName());
 
 	/**
@@ -58,7 +59,8 @@ public final class Model {
 	 *            the archived if deleted or not
 	 */
 	public Model(long _id, long _frequency, long _user, String _name, String _uri, Long _pss, String _age,
-			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate, long design_project) {
+			String _gender, String _products, Boolean _archived, long _created_date, long _nextupdate,
+			long design_project, Boolean _add_mediawiki) {
 		this.id = _id;
 		this.frequency = _frequency;
 		this.user = _user;
@@ -72,6 +74,7 @@ public final class Model {
 		this.cdate = _created_date;
 		this.nextupdate = _nextupdate;
 		this.design_project = design_project;
+		this.add_mediawiki = _add_mediawiki;
 	}
 
 	/**
@@ -104,7 +107,7 @@ public final class Model {
 			try {
 				date = df.parse(msg.getString("Start_date"));
 			} catch (ParseException e) {
-				LOGGER.log(Level.SEVERE,"Error Parsing Date from Browser",e);
+				LOGGER.log(Level.SEVERE, "Error Parsing Date from Browser", e);
 			}
 			cdate = date.getTime();
 			if (cdate < 0) {
@@ -151,11 +154,14 @@ public final class Model {
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
 				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator + "," + Settings.lmtable_cdate + ","
-				+ Settings.lmtable_udate /*
-											 * + "," + Settings.lmtable_age +
-											 * "," + Settings.lmtable_gender
-											 */
-				+ ") values (?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
+				+ Settings.lmtable_udate + ","
+				+ Settings.lmtable_add_mediawiki /*
+													 * + "," +
+													 * Settings.lmtable_age +
+													 * "," +
+													 * Settings.lmtable_gender
+													 */
+				+ ") values (?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -168,6 +174,10 @@ public final class Model {
 			query1.setLong(7, user);
 			query1.setLong(8, cdate);
 			query1.setLong(9, nextupdate);
+			if (msg.has("mediawiki"))
+				query1.setBoolean(10, msg.getBoolean("mediawiki"));
+			else
+				query1.setBoolean(10, false);
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
 			query1.executeUpdate();
@@ -227,7 +237,7 @@ public final class Model {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		Boolean delete = msg.has("Archive") ? msg.getBoolean("Archive") : false;
-		int rangeindex=1;
+		int rangeindex = 1;
 		if (!msg.get("Name").equals(this.name)
 				|| Data.getpss(Data.identifyPSSbyname(msg.getString("PSS"))).getID() != this.pss) {
 			obj.put("id", msg.getInt("Id"));
@@ -242,8 +252,11 @@ public final class Model {
 				+ " Set "/*
 							 * + Settings.lmtable_age + "=?, " +
 							 * Settings.lmtable_gender + "=?, "
-							 */ + Settings.lmtable_archived + "=? " + (delete ? "" : Settings.lmtable_monitorfinal + "=?, "
-				+ Settings.lmtable_uri + "=?, " + Settings.lmtable_update + "=? " )+ "Where " + Settings.lmtable_id + "=?";
+							 */ + Settings.lmtable_archived + "=?"
+				+ (delete ? ""
+						: ", "+Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
+								+ Settings.lmtable_update + "=?, " + Settings.lmtable_add_mediawiki + "=? ")
+				+ "Where " + Settings.lmtable_id + "=?";
 		PreparedStatement query1 = null;
 		try {
 			dbconnect();
@@ -255,17 +268,23 @@ public final class Model {
 					product += Data.identifyProduct(a) + ",";
 				}
 			}
-			
+
 			if (!delete) {
 				query1.setString(rangeindex++, products);
 				query1.setString(rangeindex++, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
 				query1.setInt(rangeindex++, msg.getInt("Update"));
 			}
-			
-			query1.setInt(rangeindex++, msg.getInt("Id"));
+
+			if (msg.has("mediawiki")) {
+				query1.setBoolean(rangeindex++, true);
+			} else
+				query1.setBoolean(rangeindex++, false);
+
+
+				query1.setInt(rangeindex++, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
-			//System.out.println(query1);
+			 System.out.println(query1);
 			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -398,7 +417,11 @@ public final class Model {
 	public long getProject() {
 		return this.design_project;
 	}
-	
+
+	public Boolean getMediawiki() {
+		return this.add_mediawiki;
+	}
+
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
