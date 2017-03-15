@@ -30,6 +30,7 @@ public class Operations {
 		permission.put(24, 3);
 		permission.put(25, 3);
 		permission.put(26, 2);
+		permission.put(28, 1);
 		permission.put(27, 3);
 		permission.put(99, 99);
 	}
@@ -62,6 +63,7 @@ public class Operations {
 		op.put("Snapshot", 24);	// Save_delete snapshot	
 		op.put("load_snapshot", 25); // Save delete snapshot
 		op.put("tagcloud", 26); // View Results
+		op.put("get_mediawiki", 28); // Create model
 		op.put("set_ignore_word", 27); // set user ignored words
 		op.put("testing", 99); // Admin only
 	}

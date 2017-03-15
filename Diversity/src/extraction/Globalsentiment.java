@@ -87,7 +87,7 @@ public class Globalsentiment extends GetReach {
 		
 		for (long k : psslist) {
 
-			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1));
+			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
 			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1, -1).toString());
 			Data.delmodel((long) -1);
 
