@@ -219,7 +219,7 @@ public class Settings {
 	public static final String lmwtable_id = "id";
 	public static final String lmwtable_name = "name";
 	public static final String lmwtable_pss = "pss";
-;
+	
 
 	
 	//Tag cloud table

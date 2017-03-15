@@ -485,7 +485,7 @@ public class BackendTest {
 		obj.put("Op", "get_mediawiki");
 		obj.put("PSS", "pss1");
 		obj.put("Key", "10");
-		tester = new Backend(27, obj);
+		tester = new Backend(28, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully added model dsfgdsfg to monitor module\",\"id\":820}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
