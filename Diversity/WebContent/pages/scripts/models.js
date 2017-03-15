@@ -55,6 +55,15 @@ function getPss() {
   return pss.replace(/%20/g," ");
 }
 
+function goToByScroll(id){
+      // Remove "link" from the ID
+    id = id.replace("link", "");
+      // Scroll
+    $('html,body').animate({
+        scrollTop: $("#"+id).offset().top - 100},
+        'slow');
+}
+
 var ws;
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById("page_title").innerHTML = "<h1>Create Opinion Model</h1>"
@@ -66,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				+ window.location.port + '/Diversity/server');
 	}
 	$('#tree_div').hide();
+
   ws.onopen = function() {
 
     json = {
@@ -220,7 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
     //document.getElementById("fcheckbox").style.display = "block";
     //document.getElementById("Archive").disabled = false;
     document.getElementById("submit").value = "Update";
+
+    document.getElementById("mediawikibox").checked = json2[0].hasOwnProperty('mediawiki') ? json2[0].mediawiki : false;
     edit = true;
+
   }
   if(json2 != null && json2[0].Op=="Model" && sessionStorage.getItem('view') == 'true'){
     document.getElementById("page_title").innerHTML = "<h1>View Opinion Model</h1>"
@@ -262,10 +275,192 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 		});
 	}
+
+
   }
+  request_tutorial();
+
   }
 
+
 }, false);
+
+function request_tutorial() {
+  if (($('#page_title').text().indexOf('Create') != -1 && localStorage.tutorial.indexOf("create=done") == -1)
+            || ($('#page_title').text().indexOf('View') != -1 && localStorage.tutorial.indexOf("view=done") == -1)
+            || ($('#page_title').text().indexOf('Edit') != -1 && localStorage.tutorial.indexOf("edit=done") == -1)) {
+    $('#alert').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+    $('#overlay').show();
+    $('#overlay-back').show();
+  }
+}
+
+function start_tutorial() {
+  if ($('#page_title').text().indexOf('Create') != -1) {
+    define_tutorial();
+    if (localStorage.tutorial.indexOf("create=done") == -1) {
+      localStorage.tutorial += "create=done;";
+    }
+  } else if ($('#page_title').text().indexOf('Edit') != -1) {
+    edit_tutorial();
+    if (localStorage.tutorial.indexOf("edit=done") == -1) {
+      localStorage.tutorial += "edit=done;";
+    }
+  } else if ($('#page_title').text().indexOf('View') != -1) {
+    view_tutorial();
+    if (localStorage.tutorial.indexOf("view=done") == -1) {
+      localStorage.tutorial += "view=done;";
+    }
+  }
+  $('#tutorial_box').toggle();
+
+  goToByScroll('tutorial_box');
+
+}
+
+function define_tutorial() {
+  pss_tutorial();
+}
+
+function edit_tutorial() {
+  var pos=$('#define').offset();
+  var h=$('#define').height() + 10;
+  var w=$('#define').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('When editing a model, the Define section is blocked, which means that the model name, PSS and final products cannot be changed.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="sources_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function view_tutorial() {
+  var pos=$('#define').offset();
+  var h=$('#define').height() + 10;
+  var w=$('#define').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('When viewing a model, you have access to all the settings used to create it, but you can\'t make any changes to those settings.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="end_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function pss_tutorial() {
+  var pos=$('#pss').offset();
+  var h=$('#pss').height() + 10;
+  var w=$('#pss').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('This dropdown lets you select the PSS for the new model.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="name_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function name_tutorial() {
+  var pos=$('#model_name').offset();
+  var h=$('#model_name').height() + 10;
+  var w=$('#model_name').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('In this text box you can define a name for the new model.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="pss_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="final_product_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function final_product_tutorial() {
+  var pos=$('#final').offset();
+  var h=$('#final').height() + 10;
+  var w=$('#final').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('You can toggle this checkbox to specify if you want to include final products in your model. If toggled, you can select one or more final products to be included.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="name_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="sources_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function sources_tutorial() {
+  source_tutorial();
+}
+
+function source_tutorial() {
+  var pos=$('#new_name').offset();
+  var h=$('#new_name').height() + 10;
+  var w=$('#new_name').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  if ($('#page_title').text().indexOf('Edit') != -1) {
+    $('#tutorial').html('In this section you can select the user accounts to be used in the model. In the dropdown box you can define the source of the account. If you know the user name and social network, you can select Facebook or Twitter. Otherwise, you can select the URL option and the system will extract the user and social network from the provided link.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="account_tutorial();">Next</button></center>');
+  } else {
+    $('#tutorial').html('In this section you can select the user accounts to be used in the model. In the dropdown box you can define the source of the account. If you know the user name and social network, you can select Facebook or Twitter. Otherwise, you can select the URL option and the system will extract the user and social network from the provided link.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="final_product_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="account_tutorial();">Next</button></center>');
+  }
+
+
+  goToByScroll('tutorial_box');
+
+}
+
+function account_tutorial() {
+  var pos=$('#new_URI').offset();
+  var h=$('#new_URI').height() + 10;
+  var w=$('#new_URI').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('Here you can insert the name of the user you intend to add. If you selected the URL option, simply type the URL of the user\'s Facebook or Twitter page. After you\'ve filled both fields, press the "+" button to add it to the list. You can then add more users or move on to the next section.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="source_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="media_wiki_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function media_wiki_tutorial() {
+  var pos=$('#mediawikibox').offset();
+  var h=$('#mediawikibox').height() + 10;
+  var w=$('#mediawikibox').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('The Media Wiki box lets you choose whether to use data from the Media Wiki or not.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="account_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="frequency_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function frequency_tutorial() {
+  var pos=$('#slider').offset();
+  var h=$('#slider').height() + 10;
+  var w=$('#slider').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This slider lets you define the update frequency of the new model. In other words, it defines the number of days (ranging from 1 to 30) that occur until the model displays new data. You can set this value by adjusting the slider or by typing into the text box.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="media_wiki_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="start_date_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function start_date_tutorial() {
+  var pos=$('#date').offset();
+  var h=$('#date').height() + 10;
+  var w=$('#date').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('This checkbox lets you choose the start date of the new model. This date determines the point from which the model will start gathering data. If left unchecked, the data monitoring will begin immediately.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="frequency_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
+
+function end_tutorial() {
+  var pos=$('#date').offset();
+  var h=$('#date').height();
+  var w=$('#date').width();
+
+  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
+  goToByScroll('tutorial_box');
+
+}
 
 
 function populatePSS() {

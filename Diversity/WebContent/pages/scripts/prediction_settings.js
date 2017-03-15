@@ -57,6 +57,10 @@ document.addEventListener('DOMContentLoaded', function() {
       start = true;
       makeTree("serv_list",jsonData);
       $('#serv_list').jstree(true).refresh();
+
+			if (localStorage.tutorial.indexOf("prediction=done") == -1) {
+				request_tutorial();
+			}
     }
 
     //If the message Op is 'Prediction', draw the predicted global sentiment chart
@@ -84,6 +88,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+function request_tutorial() {
+  $('#error').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+  $('#overlay').show();
+  $('#overlay-back').show();
+}
+
+function start_tutorial() {
+  options_tutorial();
+  $('#tutorial_box').toggle();
+}
+
+function options_tutorial() {
+  var pos=$('#back').offset();
+  var h=$('#back').height() + 10;
+  var w=$('#back').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h });
+  $('#tutorial').html('At the top of the prediction page, you can load a previously saved snapshot.<br><br><center><button class="btn btn-default" id="next" style="margin-left:5px;" onclick="generate_tutorial();">Next</button></center>');
+}
+
+function generate_tutorial() {
+  var pos=$('#submit').offset();
+  var h=$('#submit').height() + 10;
+  var w=$('#submit').width();
+
+  $('#tutorial_box').css({ left: pos.left, top: pos.top + h});
+  $('#tutorial').html('To generate a prediction, you can start by selecting a combination of products and services from the lists above. When you\'re finished, click the \'Generate Prediction\' button to view the results. When the results are displayed, you can also click the \'Save Snapshot\' button that appears in order to be able to access the data later.<br><br><center><button class="btn btn-default" id="previous" style="margin-left:5px;" onclick="options_tutorial();">Previous</button><button class="btn btn-default" style="margin-left:5px;" id="next" onclick="end_tutorial();">Next</button></center>');
+}
+
+function end_tutorial() {
+  var pos=$('#submit').offset();
+  var h=$('#submit').height() + 10;
+  var w=$('#submit').width();
+
+  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
+
+  if (localStorage.tutorial.indexOf("prediction=done") == -1) {
+    localStorage.tutorial += "prediction=done;";
+  }
+}
 
 /*
 * Uses JSTree to make a tree view from an unordered HTML list

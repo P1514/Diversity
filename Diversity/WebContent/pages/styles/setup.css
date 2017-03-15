@@ -133,6 +133,19 @@ p {
   padding-bottom: 0;
 }
 
+.navbar {
+	position: relative;
+	margin-left: 0;
+	margin-right: 0;
+	text-align: center;
+	z-index: 4;
+}
+
+#question_mark:hover {
+	cursor: pointer;
+	cursor: hand;
+}
+
 table, th, td {
   text-align: left;
   padding-left: 10px;
