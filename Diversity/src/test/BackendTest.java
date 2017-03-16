@@ -12,7 +12,7 @@ import monitoring.Oversight;
 
 public class BackendTest {
 
-	JSONObject obj,obj1;
+	JSONObject obj, obj1;
 	Backend tester;
 	String result;
 	Oversight o = new Oversight(true);
@@ -25,11 +25,11 @@ public class BackendTest {
 	// before running test, import test.db from the test directory
 	@Test
 	public void resolveRole() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Role", "DESIGNER");
+		obj.put("Key", "10");
 		tester = new Backend(22, obj);
 		result = "[{\"Op\":\"Rights\",\"view_use_opinion_prediction\":t"
 				+ "rue,\"create_edit_delete_model\":true,\"view_opinion_re"
@@ -40,11 +40,11 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetTree() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "gettree");
+		obj.put("Key", "10");
 		tester = new Backend(21, obj);
 		result = "[{\"Op\":\"Tree\"},{\"PSS\":\"D522-1 PSS\",\"Products\":[{\"Name\":\"Morr"
 				+ "is Ground 1\"}]},{\"PSS\":\"D522-2 PSS\",\"Products\":"
@@ -59,12 +59,13 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetTreePss() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
+
 		obj = new JSONObject();
 		obj.put("Op", "gettree");
 		obj.put("Pss", "D231-2 PSS");
+		obj.put("Key", "10");
 		tester = new Backend(21, obj);
 		result = "[{\"Op\":\"Tree\"},{\"PSS\":\"D231-2 PSS\",\"Products\":[{\"Name\":\"Austin XC\"},{\"Name\":\"Austin Base\"}]}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -73,23 +74,23 @@ public class BackendTest {
 
 	@Test
 	public void resolveTopreachglobalsentiment() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Top5Reach");
+		obj.put("Key", "10");
 		tester = new Backend(20, obj);
-		result = "[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
+		result = "[{\"Op\":\"Graph\"},[{\"Filter\":\"D341-1 PSS\"},{\"Value\":48.15,\"Date\":\"01 2 2016\"},{\"Value\":47.92,\"Date\":\"01 3 2016\"},{\"Value\":48.1,\"Date\":\"01 4 2016\"},{\"Value\":48.07,\"Date\":\"01 5 2016\"},{\"Value\":48.07,\"Date\":\"01 6 2016\"},{\"Value\":47.75,\"Date\":\"01 7 2016\"},{\"Value\":48,\"Date\":\"01 8 2016\"},{\"Value\":48.06,\"Date\":\"01 9 2016\"},{\"Value\":48.01,\"Date\":\"01 10 2016\"},{\"Value\":48.33,\"Date\":\"01 11 2016\"},{\"Value\":47.88,\"Date\":\"01 12 2016\"},{\"Value\":0,\"Date\":\"01 1 2017\"},{\"Value\":0,\"Date\":\"01 2 2017\"},{\"Filter\":\"D231-2 PSS\"},{\"Value\":47.15,\"Date\":\"01 2 2016\"},{\"Value\":40.52,\"Date\":\"01 3 2016\"},{\"Value\":32.64,\"Date\":\"01 4 2016\"},{\"Value\":26.64,\"Date\":\"01 5 2016\"},{\"Value\":28.78,\"Date\":\"01 6 2016\"},{\"Value\":32.66,\"Date\":\"01 7 2016\"},{\"Value\":40.18,\"Date\":\"01 8 2016\"},{\"Value\":44.65,\"Date\":\"01 9 2016\"},{\"Value\":44.75,\"Date\":\"01 10 2016\"},{\"Value\":40.28,\"Date\":\"01 11 2016\"},{\"Value\":30.75,\"Date\":\"01 12 2016\"},{\"Value\":0,\"Date\":\"01 1 2017\"},{\"Value\":0,\"Date\":\"01 2 2017\"},{\"Filter\":\"D522-2 PSS\"},{\"Value\":69.52,\"Date\":\"01 2 2016\"},{\"Value\":68.9,\"Date\":\"01 3 2016\"},{\"Value\":68.55,\"Date\":\"01 4 2016\"},{\"Value\":68.53,\"Date\":\"01 5 2016\"},{\"Value\":68.49,\"Date\":\"01 6 2016\"},{\"Value\":68.18,\"Date\":\"01 7 2016\"},{\"Value\":68.47,\"Date\":\"01 8 2016\"},{\"Value\":68.63,\"Date\":\"01 9 2016\"},{\"Value\":68.67,\"Date\":\"01 10 2016\"},{\"Value\":69.03,\"Date\":\"01 11 2016\"},{\"Value\":68.51,\"Date\":\"01 12 2016\"},{\"Value\":0,\"Date\":\"01 1 2017\"},{\"Value\":0,\"Date\":\"01 2 2017\"},{\"Filter\":\"D231-1 PSS\"},{\"Value\":48.15,\"Date\":\"01 2 2016\"},{\"Value\":47.92,\"Date\":\"01 3 2016\"},{\"Value\":48.1,\"Date\":\"01 4 2016\"},{\"Value\":48.07,\"Date\":\"01 5 2016\"},{\"Value\":48.07,\"Date\":\"01 6 2016\"},{\"Value\":47.75,\"Date\":\"01 7 2016\"},{\"Value\":48,\"Date\":\"01 8 2016\"},{\"Value\":48.06,\"Date\":\"01 9 2016\"},{\"Value\":48.01,\"Date\":\"01 10 2016\"},{\"Value\":48.33,\"Date\":\"01 11 2016\"},{\"Value\":47.88,\"Date\":\"01 12 2016\"},{\"Value\":0,\"Date\":\"01 1 2017\"},{\"Value\":0,\"Date\":\"01 2 2017\"},{\"Filter\":\"D522-1 PSS\"},{\"Value\":48.15,\"Date\":\"01 2 2016\"},{\"Value\":47.92,\"Date\":\"01 3 2016\"},{\"Value\":48.1,\"Date\":\"01 4 2016\"},{\"Value\":48.07,\"Date\":\"01 5 2016\"},{\"Value\":48.07,\"Date\":\"01 6 2016\"},{\"Value\":47.75,\"Date\":\"01 7 2016\"},{\"Value\":48,\"Date\":\"01 8 2016\"},{\"Value\":48.06,\"Date\":\"01 9 2016\"},{\"Value\":48.01,\"Date\":\"01 10 2016\"},{\"Value\":48.33,\"Date\":\"01 11 2016\"},{\"Value\":47.88,\"Date\":\"01 12 2016\"},{\"Value\":0,\"Date\":\"01 1 2017\"},{\"Value\":0,\"Date\":\"01 2 2017\"}]]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 
 	}
 
 	@Test
 	public void resolveLoad() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
+		obj.put("Key", "10");
 		tester = new Backend(2, obj);
 		result = "[{\"Op\":\"Error\",\"Message\":\"Loaded Successfully\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -98,10 +99,10 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetposts() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
+		obj.put("Key", "10");
 		obj.put("Op", "getposts");
 		obj.put("Id", "838");
 		obj.put("Product", "Morris Ground 1");
@@ -132,11 +133,11 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetmodels() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getmodels");
+		obj.put("Key", "10");
 
 		tester = new Backend(5, obj);
 		result = "[{\"Op\":\"Models\"},{\"PSS\":\"D522-1 PSS\",\"Id\":838,\"Name\":\"Morris "
@@ -157,12 +158,12 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetconfig() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getconfig");
 		obj.put("Id", "838");
+		obj.put("Key", "10");
 		tester = new Backend(12, obj);
 		result = "[{\"Op\":\"Configs\"},{\"Size\":3,\"Param\":\"Age\"},{\"Min\":\"0\",\"Max\":\"30\"},{\"Min\":\"31\",\"Max\":\"60\"},{\"Min\":\"61\",\"Max\":\"90\"},{\"Size\":2,\"Param\":\"Gender\"},{\"Gender\":\"Female\"},{\"Gender\":\"Male\"},{\"Size\":2,\"Param\":\"Location\"},{\"Location\":\"Asia\"},{\"Location\":\"Europe\"},{\"Size\":1,\"Param\":\"Product\"},{\"Product\":\"Morris Ground 1\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -170,10 +171,10 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetModel() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
+		obj.put("Key", "10");
 		obj.put("Op", "get_model");
 		obj.put("Id", "838");
 		tester = new Backend(15, obj);
@@ -183,11 +184,11 @@ public class BackendTest {
 
 	@Test
 	public void resolveGetPSS() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getpss");
+		obj.put("Key", "10");
 		tester = new Backend(17, obj);
 		result = "[{\"Op\":\"pss\"},{\"Pss\":\"D522-1 PSS\"},{\"Pss\":\"D522-2 PSS\"},{\"Pss\":\"D341-1 PSS\"},{\"Pss\":\"D231-1 PSS\"},{\"Pss\":\"D231-2 PSS\"}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -195,12 +196,12 @@ public class BackendTest {
 
 	@Test
 	public void resolveOpinionExtraction() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "opinion_extraction");
 		obj.put("Id", "838");
+		obj.put("Key", "10");
 		tester = new Backend(18, obj);
 		result = "[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Left\",\"Filter\":\"Global\"},{\"Gra"
 				+ "ph\":\"Top_Left\",\"Value\":87},{\"Graph\":\"Top_Middle\",\"Filter\":\"Glo"
@@ -234,14 +235,14 @@ public class BackendTest {
 
 	@Test
 	public void resolveOeRefresh() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		// obj.put("Param", "Global");
 		// obj.put("Values", "");
 		obj.put("Filter", "");
 		obj.put("Id", "838");
+		obj.put("Key", "10");
 		tester = new Backend(19, obj);
 		result = "[{\"Op\":\"OE_Redone\"},{\"Graph\":\"Top_Middle\",\"Filter\":\"Global\"},{\"Graph\":\"Top_Middle\",\"Param\":\"--\",\"Value\":200},{\"Graph\":\"Top_Middle\",\"Param\":\"-\",\"Value\":169},{\"Graph\":\"Top_Middle\",\"Param\":\"0\",\"Value\":123},{\"Graph\":\"Top_Middle\",\"Param\":\"+\",\"Value\":166},{\"Graph\":\"Top_Middle\",\"Param\":\"++\",\"Value\":653},{\"Graph\":\"Top_Right\",\"Param\":\"Global\",\"Value\":70},{\"Graph\":\"Bottom_Left\",\"Param\":\"Global\",\"Value\":1},{\"Graph\":\"Bottom_Middle\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.04},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Middle\",\"Value\":0.97},{\"Month\":\"APR\",\"Graph\":\"Bottom_Middle\",\"Value\":1.1},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Middle\",\"Value\":1.03},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Middle\",\"Value\":0.99},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Middle\",\"Value\":1.02},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Middle\",\"Value\":1},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Middle\",\"Value\":0.91},{\"Graph\":\"Bottom_Right\",\"Filter\":\"Global\"},{\"Month\":\"DEC\",\"Graph\":\"Bottom_Right\",\"Value\":84.64},{\"Month\":\"JAN\",\"Graph\":\"Bottom_Right\",\"Value\":89.02},{\"Month\":\"FEB\",\"Graph\":\"Bottom_Right\",\"Value\":89.63},{\"Month\":\"MAR\",\"Graph\":\"Bottom_Right\",\"Value\":81.96},{\"Month\":\"APR\",\"Graph\":\"Bottom_Right\",\"Value\":73.27},{\"Month\":\"MAY\",\"Graph\":\"Bottom_Right\",\"Value\":64.02},{\"Month\":\"JUN\",\"Graph\":\"Bottom_Right\",\"Value\":52.45},{\"Month\":\"JUL\",\"Graph\":\"Bottom_Right\",\"Value\":41.65},{\"Month\":\"AUG\",\"Graph\":\"Bottom_Right\",\"Value\":44.41},{\"Month\":\"SEP\",\"Graph\":\"Bottom_Right\",\"Value\":48.71},{\"Month\":\"OCT\",\"Graph\":\"Bottom_Right\",\"Value\":74.6},{\"Month\":\"NOV\",\"Graph\":\"Bottom_Right\",\"Value\":95.58}]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
@@ -250,11 +251,11 @@ public class BackendTest {
 	@Test
 	public void resolveCreateModel() throws JSONException {
 
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "create_model");
+		obj.put("Key", "10");
 		obj.put("PSS", "D522-1 PSS");
 		obj.put("Products", "Morris Ground 1;");
 		obj.put("Archive", "false");
@@ -263,7 +264,7 @@ public class BackendTest {
 		obj.put("Update", "1");
 		obj.put("URI", "Facebook,abcd;");
 		obj.put("Start_date", "1970-01-02");
-		obj.put("Name", "guiss");
+		obj.put("Name", "guffiss");
 		obj.put("mediawiki", "true");
 		obj.put("Key", "10");
 		tester = new Backend(14, obj);
@@ -273,9 +274,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveUpdateModel() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "update_model");
 		obj.put("PSS", "D522-1 PSS");
@@ -306,9 +306,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveOeRefreshExtrapolate() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "oe_refresh");
 		obj.put("Param", "Age,Gender,Location,");
@@ -324,9 +323,8 @@ public class BackendTest {
 
 	@Test
 	public void resolvePrediction() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Prediction");
 		obj.put("Products", "14;15");
@@ -339,9 +337,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveTopreachglobalsentiment5pss() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Top5Reach");
 		obj.put("PSS", "D522-1 PSS;D231-1 PSS;D522-1 PSS;D522-1 PSS;D522-1 PSS;D522-1 PSS");
@@ -354,17 +351,16 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotPrediction() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
-		obj.put("Products", "13;14;15;");
-		obj.put("name", "test");
+		obj.put("Products", "13;14;15");
+		obj.put("name", "test121");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
-		obj.put("user", "test");
+		obj.put("user", "testeee");
 		obj.put("Key", "10");
 		tester = new Backend(24, obj);
 		result = "[{\"Op\":\"Graph\"},[{\"Filter\":\"D522-1 PSS\"},{\"Month\":\"DEC\",\"Value\":84.91},{\"Month\":\"JAN\",\"Value\":88.52},{\"Month\":\"FEB\",\"Value\":91.97},{\"Month\":\"MAR\",\"Value\":86.78},{\"Month\":\"APR\",\"Value\":85.7},{\"Month\":\"MAY\",\"Value\":85.01},{\"Month\":\"JUN\",\"Value\":82.67},{\"Month\":\"JUL\",\"Value\":74.79},{\"Month\":\"AUG\",\"Value\":72.76},{\"Month\":\"SEP\",\"Value\":70.39},{\"Month\":\"OCT\",\"Value\":70.98},{\"Month\":\"NOV\",\"Value\":84.5},{\"Filter\":\"D522-2 PSS\"},{\"Month\":\"DEC\",\"Value\":39.12},{\"Month\":\"JAN\",\"Value\":33.87},{\"Month\":\"FEB\",\"Value\":34.19},{\"Month\":\"MAR\",\"Value\":37.55},{\"Month\":\"APR\",\"Value\":36.87},{\"Month\":\"MAY\",\"Value\":36.58},{\"Month\":\"JUN\",\"Value\":37.07},{\"Month\":\"JUL\",\"Value\":40.04},{\"Month\":\"AUG\",\"Value\":40.79},{\"Month\":\"SEP\",\"Value\":43.15},{\"Month\":\"OCT\",\"Value\":44.79},{\"Month\":\"NOV\",\"Value\":47.41},{\"Filter\":\"D341-1 PSS\"},{\"Month\":\"DEC\",\"Value\":35.92},{\"Month\":\"JAN\",\"Value\":38.44},{\"Month\":\"FEB\",\"Value\":41.27},{\"Month\":\"MAR\",\"Value\":43.51},{\"Month\":\"APR\",\"Value\":42.88},{\"Month\":\"MAY\",\"Value\":41.91},{\"Month\":\"JUN\",\"Value\":43.81},{\"Month\":\"JUL\",\"Value\":49.87},{\"Month\":\"AUG\",\"Value\":49},{\"Month\":\"SEP\",\"Value\":56.18},{\"Month\":\"OCT\",\"Value\":63.26},{\"Month\":\"NOV\",\"Value\":65.5},{\"Filter\":\"D231-2 PSS\"},{\"Month\":\"DEC\",\"Value\":31.38},{\"Month\":\"JAN\",\"Value\":44.66},{\"Month\":\"FEB\",\"Value\":58.39},{\"Month\":\"MAR\",\"Value\":67.25},{\"Month\":\"APR\",\"Value\":72.34},{\"Month\":\"MAY\",\"Value\":72.36},{\"Month\":\"JUN\",\"Value\":72.31},{\"Month\":\"JUL\",\"Value\":72.53},{\"Month\":\"AUG\",\"Value\":70.55},{\"Month\":\"SEP\",\"Value\":62.21},{\"Month\":\"OCT\",\"Value\":49.82},{\"Month\":\"NOV\",\"Value\":35.39},{\"Filter\":\"D231-1 PSS\"},{\"Month\":\"DEC\",\"Value\":60.99},{\"Month\":\"JAN\",\"Value\":67.53},{\"Month\":\"FEB\",\"Value\":65.01},{\"Month\":\"MAR\",\"Value\":65.15},{\"Month\":\"APR\",\"Value\":55.77},{\"Month\":\"MAY\",\"Value\":48.76},{\"Month\":\"JUN\",\"Value\":40.06},{\"Month\":\"JUL\",\"Value\":38.7},{\"Month\":\"AUG\",\"Value\":40.45},{\"Month\":\"SEP\",\"Value\":39.61},{\"Month\":\"OCT\",\"Value\":46.79},{\"Month\":\"NOV\",\"Value\":68.12}]]";
@@ -374,9 +370,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoadNames() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Type", "Prediction");
@@ -389,9 +384,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoad() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Name", "testing");
@@ -404,9 +398,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotExtraction() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("name", "francisco");
@@ -424,9 +417,8 @@ public class BackendTest {
 
 	@Test
 	public void resolveSnapshotLoadExtraction() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
 		obj.put("Name", "francisco");
@@ -437,17 +429,16 @@ public class BackendTest {
 		assertEquals("Should be equal to the string", result, tester.resolve());
 
 	}
-	
+
 	@Test
 	public void resolveGetpostsWord() throws JSONException {
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
 		obj.put("Id", "838");
 		obj.put("Product", "Morris Ground 1");
-		obj.put("word", "average");		
+		obj.put("word", "average");
 		obj.put("Key", "10");
 		tester = new Backend(4, obj);
 		result = "[{\"Op\":\"table\"},{\"Reach\":\"1.93\",\"Mes" + "sage\":\"Check the new Morris Ground 1! I say phen"
@@ -477,16 +468,29 @@ public class BackendTest {
 	@Test
 	public void resolveWiki() throws JSONException {
 
-		obj1=new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		System.out.println(obj1.toString());
-
 		obj = new JSONObject();
 		obj.put("Op", "get_mediawiki");
 		obj.put("PSS", "pss1");
 		obj.put("Key", "10");
 		tester = new Backend(28, obj);
-		result = "[{\"Op\":\"Error\",\"Message\":\"Successfully added model dsfgdsfg to monitor module\",\"id\":820}]";
+		result = "[\"Media_Wiki\",[{\"Name\":\"wiki1\"},{\"Name\":\"wiki3\"}]]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
+	
+	@Test
+	public void resolveIgnoreWord() throws JSONException {
+
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "set_ignore_word");
+		obj.put("id", "838");
+		obj.put("Word", "phenomenal");
+		obj.put("Key", "10");
+		tester = new Backend(27, obj);
+		result = "[\"Media_Wiki\",[{\"Name\":\"wiki1\"},{\"Name\":\"wiki3\"}]]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
 	

@@ -37,7 +37,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return false;
 		}
-		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=? && type=?;");
+		String insert = new String("SELECT * FROM "+Settings.lsstable+" where "+Settings.lsstable_name+"=? && "+Settings.lsstable_type+"=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setString(2, type);
@@ -49,7 +49,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 		}
 
-		insert = new String("Insert into " + "snapshots(name,creation_date,creation_user,result,type,timespan)"
+		insert = new String("Insert into " + Settings.lsstable+"("+Settings.lsstable_name+","+Settings.lsstable_creation_date+","+Settings.lsstable_creation_user+","+Settings.lsstable_result+","+Settings.lsstable_type+","+Settings.lsstable_timespan+")"
 				+ " values (?,?,?,?,?,?)");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
@@ -76,15 +76,16 @@ public class Snapshot {
 
 	public String savePrediction(String name, String date, int timespan, String user, String products,
 			String services) {
-		String result;
+		JSONObject msg = new JSONObject();
 		JSONObject obj = new JSONObject();
+		Prediction pre = new Prediction();
 		long cdate;
 		try {
-			obj.put("Op", "Prediction");
+			msg.put("Op", "Prediction");
 			if (products != "")
-				obj.put("Products", products);
+				msg.put("Products", products);
 			if (services != "")
-				obj.put("Services", services);
+				msg.put("Services", services);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,11 +102,32 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "ERROR BAD DATE");
 			return "bad date";
 		}
+		
+		JSONArray result = new JSONArray();
+		try {
+			obj.put("Op", "Prediction");
+		if (msg.has("Products") || msg.has("Services")) {
+		
+			
+			result.put(obj);
 
-		Backend b = new Backend(23, obj);
-		result = b.resolve();
+			result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+					msg.has("Services") ? msg.getString("Services") : ""));
+			if (result.getJSONArray(1).getJSONObject(0).has("Op")) {
+				result = result.getJSONArray(1);
+			}
 
-		return create(name, cdate, timespan, user, "prediction", result) == true ? "success" : "name_in_use";
+		} else {
+			obj.put("Message", "No products or services selected");
+			obj.put("Op", "Error");
+			result.put(obj);
+		}
+		} catch (JSONException e) {
+			LOGGER.log(Level.SEVERE, error, e);
+			e.printStackTrace();
+		}
+
+		return create(name, cdate, timespan, user, "prediction", result.toString()) == true ? "success" : "name_in_use";
 
 	}
 
