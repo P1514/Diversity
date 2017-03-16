@@ -23,11 +23,9 @@ public class Snapshot {
 	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 
-
-	
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	Date dateaux = null;
-	String error="error";
+	String error = "error";
 
 	public boolean create(String name, long date, int timespan, String user, String type, String result) {
 		ResultSet rs;
@@ -37,7 +35,8 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return false;
 		}
-		String insert = new String("SELECT * FROM "+Settings.lsstable+" where "+Settings.lsstable_name+"=? && "+Settings.lsstable_type+"=?;");
+		String insert = new String("SELECT * FROM " + Settings.lsstable + " where " + Settings.lsstable_name + "=? && "
+				+ Settings.lsstable_type + "=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setString(2, type);
@@ -49,7 +48,9 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 		}
 
-		insert = new String("Insert into " + Settings.lsstable+"("+Settings.lsstable_name+","+Settings.lsstable_creation_date+","+Settings.lsstable_creation_user+","+Settings.lsstable_result+","+Settings.lsstable_type+","+Settings.lsstable_timespan+")"
+		insert = new String("Insert into " + Settings.lsstable + "(" + Settings.lsstable_name + ","
+				+ Settings.lsstable_creation_date + "," + Settings.lsstable_creation_user + ","
+				+ Settings.lsstable_result + "," + Settings.lsstable_type + "," + Settings.lsstable_timespan + ")"
 				+ " values (?,?,?,?,?,?)");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
@@ -91,7 +92,6 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 
-
 		try {
 			dateaux = df.parse(date);
 		} catch (ParseException e) {
@@ -102,26 +102,25 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "ERROR BAD DATE");
 			return "bad date";
 		}
-		
+
 		JSONArray result = new JSONArray();
 		try {
 			obj.put("Op", "Prediction");
-		if (msg.has("Products") || msg.has("Services")) {
-		
-			
-			result.put(obj);
+			if (msg.has("Products") || msg.has("Services")) {
 
-			result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
-					msg.has("Services") ? msg.getString("Services") : ""));
-			if (result.getJSONArray(1).getJSONObject(0).has("Op")) {
-				result = result.getJSONArray(1);
+				result.put(obj);
+
+				result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+						msg.has("Services") ? msg.getString("Services") : ""));
+				if (result.getJSONArray(1).getJSONObject(0).has("Op")) {
+					result = result.getJSONArray(1);
+				}
+
+			} else {
+				obj.put("Message", "No products or services selected");
+				obj.put("Op", "Error");
+				result.put(obj);
 			}
-
-		} else {
-			obj.put("Message", "No products or services selected");
-			obj.put("Op", "Error");
-			result.put(obj);
-		}
 		} catch (JSONException e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			e.printStackTrace();
@@ -135,7 +134,6 @@ public class Snapshot {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
-
 
 		try {
 			dateaux = df.parse(date);
@@ -205,7 +203,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
+		String insert = new String("SELECT name FROM " + Settings.lsstable + " where type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			if (type.equals("Prediction"))
 				query1.setString(1, "prediction");
@@ -215,7 +213,7 @@ public class Snapshot {
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
 			// rs.next();//verify
-			while(rs.next()) {
+			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
 				aux.put(obj);
@@ -245,7 +243,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=? && type=?;");
+		String insert = new String("SELECT result FROM " + Settings.lsstable + " where name=? && type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))

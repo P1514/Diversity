@@ -50,7 +50,7 @@ public class Startup implements ServletContextListener {
 		ResultSet rs = null;
 		try {
 			cnlocal = Settings.connlocal();
-			String select = "Select * from general WHERE id=1";
+			String select = "Select * from "+Settings.gentable+" WHERE id=1";
 			stmt=cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
