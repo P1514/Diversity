@@ -493,4 +493,21 @@ public class BackendTest {
 		result = "[\"Media_Wiki\",[{\"Name\":\"wiki1\"},{\"Name\":\"wiki3\"}]]";
 		assertEquals("Should be equal to the string", result, tester.resolve());
 	}
+	
+	@Test
+	public void resolveTagcloud() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22,obj1).resolve();
+		System.out.println(obj1.toString());
+		
+		obj = new JSONObject();
+		obj.put("Op", "tagcloud");
+		obj.put("User", "4");
+		obj.put("Id", "838");
+		obj.put("Key", "10");
+		
+		tester = new Backend(26, obj);
+		result = "[{\"Op\":\"words\",\"Words\":[{\"word\":\"\",\"frequency\":11},{\"word\":\"average\",\"frequency\":48},{\"word\":\"new\",\"frequency\":5},{\"word\":\"1\",\"frequency\":5},{\"word\":\"mediocre\",\"frequency\":32},{\"word\":\"think\",\"frequency\":1},{\"word\":\"sneakers\",\"frequency\":47},{\"word\":\"ground\",\"frequency\":5},{\"word\":\"launched\",\"frequency\":3},{\"word\":\"morris\",\"frequency\":5}]}]";
+		assertEquals("Should be equal to the string", result, tester.resolve());
+	}
 }
