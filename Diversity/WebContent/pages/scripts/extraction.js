@@ -343,7 +343,7 @@ google.charts.load('current', {
 });
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
-	if (localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
+	if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
     request_tutorial();
   }
 });

@@ -286,12 +286,14 @@ document.addEventListener('DOMContentLoaded', function() {
 }, false);
 
 function request_tutorial() {
-  if (($('#page_title').text().indexOf('Create') != -1 && localStorage.tutorial.indexOf("create=done") == -1)
-            || ($('#page_title').text().indexOf('View') != -1 && localStorage.tutorial.indexOf("view=done") == -1)
-            || ($('#page_title').text().indexOf('Edit') != -1 && localStorage.tutorial.indexOf("edit=done") == -1)) {
-    $('#alert').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
-    $('#overlay').show();
-    $('#overlay-back').show();
+  if (localStorage.tutorial != undefined) {
+    if (($('#page_title').text().indexOf('Create') != -1 && localStorage.tutorial.indexOf("create=done") == -1)
+              || ($('#page_title').text().indexOf('View') != -1 && localStorage.tutorial.indexOf("view=done") == -1)
+              || ($('#page_title').text().indexOf('Edit') != -1 && localStorage.tutorial.indexOf("edit=done") == -1)) {
+      $('#alert').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
+      $('#overlay').show();
+      $('#overlay-back').show();
+    }
   }
 }
 
@@ -667,7 +669,7 @@ function send_config() {
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),
-    'mediawiki' : document.getElementById('mediawikibox').checked ? 1 : undefined
+    'mediawiki' : document.getElementById('mediawikibox').checked ? true : undefined
 
   };
   if (erro == true) {
@@ -680,8 +682,8 @@ function send_config() {
   }
 
   ws.send(JSON.stringify(jsonData));
-
 }
+
 function checknumber(field) {
   field.value = field.value.replace(/[^0-9]/g, '');
   if (field.value > 99) {

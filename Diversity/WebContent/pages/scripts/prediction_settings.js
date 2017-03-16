@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
       makeTree("serv_list",jsonData);
       $('#serv_list').jstree(true).refresh();
 
-			if (localStorage.tutorial.indexOf("prediction=done") == -1) {
+			if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("prediction=done") == -1) { // if the user never opened this page, start the tutorial
+
 				request_tutorial();
 			}
     }

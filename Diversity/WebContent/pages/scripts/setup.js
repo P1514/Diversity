@@ -161,7 +161,8 @@ ws.onmessage = function(event) {
     ws.send(JSON.stringify(msg));
   }
 
-  if (localStorage.tutorial.indexOf("setup=done") == -1) {
+  if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("setup=done") == -1) { // if the user never opened this page, start the tutorial
+
     request_tutorial();
   }
 
