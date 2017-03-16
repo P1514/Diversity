@@ -323,6 +323,22 @@ CREATE TABLE `sources` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `tagcloud`
+--
+
+DROP TABLE IF EXISTS `tagcloud`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tagcloud` (
+  `userid` int(11) NOT NULL,
+  `modelid` int(11) NOT NULL,
+  `ignoredwords` text DEFAULT NULL,
+  PRIMARY KEY (`userid`,`modelid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
 -- Dumping data for table `sources`
 --
 
