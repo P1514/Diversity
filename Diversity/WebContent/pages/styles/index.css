@@ -93,14 +93,6 @@ form {
 	margin-left: 0px;
 }
 
-#triangle {
-	width: 0;
-	height: 0;
-	border: 0 solid transparent;
-	border-right-width: 8px;
-	border-left-width: 8px;
-	border-bottom: 15px solid white;
-}
 .container {
 	background-color: #DDDDDD;
 	margin-top: 20px;
