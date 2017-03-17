@@ -187,6 +187,7 @@ function connect() {
 
 		//If the message contains 'Snapshots', build a dropdown with the availiable snapshots to be loaded
 		if (json[0] == "Snapshots") {
+			snap = true;
 			snapshots = json[1];
 			displaySnapshots();
 		}
@@ -237,13 +238,24 @@ function connect() {
 				}
 			}
 
-			//After the configuration, ask for the opinion extraction (chart) data
-			json = {
-				"Op" : "opinion_extraction",
-				"Id" : window.sessionStorage.id,
-        'Key' : getCookie("JSESSIONID")
-			}
+			//After the configuration, ask for the opinion extraction (chart) data or the snapshot if the user comes from a snapshot URL
 
+			if (window.location.href.indexOf('snapshot=') != -1) {
+			  var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+				snap = true;
+				json = {
+					"Op" : "load_snapshot",
+					"Name" : snapName,
+					"Type" : "All",
+					'Key' : getCookie("JSESSIONID")
+				}
+			} else {
+				json = {
+					"Op" : "opinion_extraction",
+					"Id" : window.sessionStorage.id,
+	        'Key' : getCookie("JSESSIONID")
+				}
+			}
 			ws.send(JSON.stringify(json));
 			return;
 		}

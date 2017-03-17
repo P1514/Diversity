@@ -62,6 +62,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				request_tutorial();
 			}
+
+			if (window.location.href.indexOf('snapshot=') != -1) {
+				var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+				requestSnapshot(snapName);
+			}
     }
 
     //If the message Op is 'Prediction', draw the predicted global sentiment chart
@@ -84,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
     if (json[0] == "Snapshots") {
-      snapshots = json[1];
-      displaySnapshots();
+	      snapshots = json[1];
+	      displaySnapshots();
     }
   }
 });
