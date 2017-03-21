@@ -19,16 +19,17 @@ import general.Data;
 import general.Logging;
 import general.Settings;
 
-public class Snapshot {
+public class Snapshot{
 	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
+	private final Backend b;
 
-
-	
+	public Snapshot(Backend b){
+		this.b=b;
+	}
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	Date dateaux = null;
-	String error="error";
-
+	String error = "error";
 	public boolean create(String name, long date, int timespan, String user, String type, String result) {
 		ResultSet rs;
 		try {
@@ -37,7 +38,8 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return false;
 		}
-		String insert = new String("SELECT * FROM sentimentanalysis.snapshots where name=? && type=?;");
+		String insert = new String("SELECT * FROM " + Settings.lsstable + " where " + Settings.lsstable_name + "=? && "
+				+ Settings.lsstable_type + "=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setString(2, type);
@@ -49,7 +51,9 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 		}
 
-		insert = new String("Insert into " + "snapshots(name,creation_date,creation_user,result,type,timespan)"
+		insert = new String("Insert into " + Settings.lsstable + "(" + Settings.lsstable_name + ","
+				+ Settings.lsstable_creation_date + "," + Settings.lsstable_creation_user + ","
+				+ Settings.lsstable_result + "," + Settings.lsstable_type + "," + Settings.lsstable_timespan + ")"
 				+ " values (?,?,?,?,?,?)");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
@@ -90,7 +94,6 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 
-
 		try {
 			dateaux = df.parse(date);
 		} catch (ParseException e) {
@@ -102,9 +105,14 @@ public class Snapshot {
 			return "bad date";
 		}
 
-		Backend b = new Backend(23, obj);
+ 		try {
+			b.setMessage(23, obj);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		result = b.resolve();
-
+		System.out.println("TEST"+result);
 		return create(name, cdate, timespan, user, "prediction", result) == true ? "success" : "name_in_use";
 
 	}
@@ -113,7 +121,6 @@ public class Snapshot {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
-
 
 		try {
 			dateaux = df.parse(date);
@@ -128,36 +135,38 @@ public class Snapshot {
 		try {
 			obj.put("Id", id);
 			obj.put("Filter", "");
-			Backend b = new Backend(19, obj);
+			b.setMessage(19, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "all", result);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Location");
-			b = new Backend(19, obj);
+			b.setMessage(19, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "location", result);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Gender");
-			b = new Backend(19, obj);
+			b.setMessage(19, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "gender", result);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Age");
-			b = new Backend(19, obj);
+			b.setMessage(19, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "age", result);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Product");
-			b = new Backend(19, obj);
+			b.setMessage(19, obj);
 			result = b.resolve();
+			
+			
 			return create(name, cdate, timespan, user, "product", result) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {
@@ -166,6 +175,11 @@ public class Snapshot {
 		}
 		return "";
 
+	}
+	
+	private String extraction(JSONObject msg){
+		
+		return "";
 	}
 
 	private void dbconnect() throws ClassNotFoundException, SQLException {
@@ -183,7 +197,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT name FROM sentimentanalysis.snapshots where type=?;");
+		String insert = new String("SELECT name FROM " + Settings.lsstable + " where type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			if (type.equals("Prediction"))
 				query1.setString(1, "prediction");
@@ -193,7 +207,7 @@ public class Snapshot {
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
 			// rs.next();//verify
-			while(rs.next()) {
+			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
 				aux.put(obj);
@@ -223,7 +237,7 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT result FROM sentimentanalysis.snapshots where name=? && type=?;");
+		String insert = new String("SELECT result FROM " + Settings.lsstable + " where name=? && type=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))

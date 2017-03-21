@@ -375,8 +375,8 @@ public class Loader {
 	}
 
 	private String loadGeneral() throws JSONException {
-		lastUpdated=Calendar.getInstance();
-		String select = Settings.sqlselectall + " general WHERE id=1";
+
+		String select = Settings.sqlselectall + " "+Settings.gentable+" WHERE "+Settings.gentable_id+"=1";
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -851,9 +851,13 @@ public class Loader {
 	}
 
 	private String updatelocal() throws JSONException {
-		String update = "UPDATE general SET totalposts=?,totallikes=?,totalcomments=?,totalviews=?,lastupdated=? WHERE id=1";
 		lastUpdated2=Calendar.getInstance();
 		lastUpdated2.add(Calendar.DATE, -1);
+
+		String update = "UPDATE " + Settings.gentable + " SET " + Settings.gentable_totalposts + "=?,"
+				+ Settings.gentable_totallikes + "=?," + Settings.gentable_totalcomments + "=?,"
+				+ Settings.gentable_totalviews + "=?," + Settings.gentable_lastupdated + "=? WHERE "
+				+ Settings.gentable_id + "=1";
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -879,7 +883,7 @@ public class Loader {
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "Nothing can de done here", e);
 		}
-		LOGGER.log(Level.INFO, " update general " + (System.nanoTime() - stime));
+		LOGGER.log(Level.INFO, " update " + Settings.gentable + " " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 		return null;
 	}

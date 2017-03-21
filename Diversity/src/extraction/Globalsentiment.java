@@ -31,7 +31,7 @@ public class Globalsentiment extends GetReach {
 
 	private Connection cnlocal = null;
 	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
-	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+	private static String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
 	 * Class that handles sentiment Requests.
@@ -84,10 +84,11 @@ public class Globalsentiment extends GetReach {
 		}
 
 		long frequency = calcFrequency(psslist);
-		
+
 		for (long k : psslist) {
 
-			Data.addmodel((long) -1, new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
+			Data.addmodel((long) -1,
+					new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1, -1).toString());
 			Data.delmodel((long) -1);
 
@@ -121,9 +122,9 @@ public class Globalsentiment extends GetReach {
 	}
 
 	private long calcFrequency(List<Long> psslist) {
-		
+
 		long max_freq = -1;
-		
+
 		for (Long pss : psslist) {
 			try {
 				dbconnect();
@@ -131,7 +132,8 @@ public class Globalsentiment extends GetReach {
 				LOGGER.log(Level.SEVERE, "Error Connecting to Database", e);
 				return -1;
 			}
-			String select = "SELECT MAX(" + Settings.lmtable_update + ") FROM " + Settings.lmtable + " WHERE " + Settings.lmtable_pss + "=?";
+			String select = "SELECT MAX(" + Settings.lmtable_update + ") FROM " + Settings.lmtable + " WHERE "
+					+ Settings.lmtable_pss + "=?";
 
 			try (PreparedStatement query1 = cnlocal.prepareStatement(select)) {
 				query1.setString(1, pss.toString());
@@ -212,7 +214,8 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalsentiment(String param, String values, String output, long id, long frequency) throws JSONException {
+	public JSONArray globalsentiment(String param, String values, String output, long id, long frequency)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -231,7 +234,7 @@ public class Globalsentiment extends GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		if (frequency != -1) {
-			data.add(Calendar.DAY_OF_MONTH, (int) frequency); 
+			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		} else {
 			data.add(Calendar.MONTH, 1);
 		}
@@ -251,17 +254,18 @@ public class Globalsentiment extends GetReach {
 			if (frequency != -1) {
 				for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
 					obj = new JSONObject();
-					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
-					obj.put("Value",
-							globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
+							+ data.get(Calendar.YEAR));
+					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+							data.get(Calendar.YEAR), param, values, id));
 					result.put(obj);
 				}
 			} else {
 				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
 					obj = new JSONObject();
 					obj.put("Date", "01" + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
-					obj.put("Value",
-							globalsentimentby(data.get(Calendar.DAY_OF_MONTH),(data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param, values, id));
+					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
+							data.get(Calendar.YEAR), param, values, id));
 					// System.out.println("mon:"+data.get(Calendar.MONTH)+"
 					// year:"+data.get(Calendar.YEAR));
 					result.put(obj);
@@ -278,11 +282,12 @@ public class Globalsentiment extends GetReach {
 
 		Calendar data = Calendar.getInstance();
 		data.add(Calendar.MONTH, -1);
-		
+
 		obj = new JSONObject();
 		obj.put("Month", time[data.get(Calendar.MONTH)]);
 		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Value", Math.round(globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id)));
+		obj.put("Value", Math.round(globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+				data.get(Calendar.YEAR), param, values, id)));
 		result.put(obj);
 
 		return result;
@@ -298,7 +303,7 @@ public class Globalsentiment extends GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		
+
 		return calc_global("polar", insert, par, month, model, year, day);
 
 	}
@@ -334,9 +339,9 @@ public class Globalsentiment extends GetReach {
 
 		int avg = 0;
 		if (firstDate(id) != 0) {
-			for (; today
-					.after(data); data.add(Calendar.MONTH, 1)) {
-				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.YEAR), data.get(Calendar.YEAR), param, values, id);
+			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.YEAR),
+						data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}
 		}

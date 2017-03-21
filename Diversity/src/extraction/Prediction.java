@@ -34,7 +34,7 @@ public class Prediction extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 5);
+		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75);
 		if (pssweights.isEmpty())
 		{
 			obj.put("Op", "Error");
@@ -90,8 +90,8 @@ public class Prediction extends Globalsentiment {
 			try {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
-				obj.put("Value",Double.valueOf(GetComments.trunc(String.valueOf(mean))));
-				obj.put("Variance",Double.valueOf(GetComments.trunc(String.valueOf((1.96*stDeviation)/Math.sqrt(numbOfProd)))));// 95% con)fidence interval
+				obj.put("Value",mean);
+				obj.put("Variance",Math.round((1.96*stDeviation)/Math.sqrt(numbOfProd)));// 95% confidence interval
 				result.put(obj);
 
 			} catch (JSONException e) {
