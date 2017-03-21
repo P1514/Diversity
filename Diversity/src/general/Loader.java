@@ -2,6 +2,7 @@ package general;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,12 +30,16 @@ public class Loader {
 	static Connection cnlocal = null;
 	static Connection cncr = null;
 	private long stime = 0;
+	private long stoptime = 0;
+	private long starttime = 0;
+	private long pausetime = 0;
+	private long new_posts = 0;
 	LoadThreads multiThread = new LoadThreads();
 	static long totalposts;
 	static long totalviews;
 	static long totalcomments;
 	static long totallikes;
-	private Calendar lastUpdated = null;
+	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
@@ -45,7 +50,7 @@ public class Loader {
 	public String load(JSONArray json) throws JSONException {
 		loadp1(json);
 		String done = loadp2();
-
+		starttime=System.currentTimeMillis();
 		String err = insertauthors();
 		if (err != null)
 			return err;
@@ -99,16 +104,25 @@ public class Loader {
 		err = updatelocal();
 		if (err != null)
 			return err;
-
+		loadtimescalc();
 		return null;
+	}
+	
+	private void loadtimescalc(){
+		stoptime=System.currentTimeMillis();
+		long runtime=stoptime-starttime-pausetime;
+		double ms_post=((double)runtime)/new_posts;
+		LOGGER.log(Level.INFO, "Took:"+runtime+"ms to finish processing "+new_posts+" posts which averages " + ms_post + "ms/post");
 	}
 
 	private String loadp2() throws JSONException {
-		long waiting_time = 0;
+		
+		pausetime = System.currentTimeMillis();
+		LOGGER.log(Level.INFO, "Started Waiting to Check NULLS");
 		for (Opinion op : opiniondb.values()) {
-			waiting_time += op.newcomments();
+			new_posts += op.newcomments();
 		}
-		if (waiting_time != 0) {
+		if (new_posts != 0) {
 			try {
 				do {
 					Thread.sleep(30 * 1000/* waiting_time*10 */);
@@ -118,14 +132,15 @@ public class Loader {
 				e.printStackTrace();
 			}
 		}
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		pausetime = System.currentTimeMillis() - pausetime;
+		ExecutorService es = Executors.newFixedThreadPool(8);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
 		String err = awaittermination(es, "Opinions");
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(8);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Tposts(op.getID()));
 		es.shutdown();
@@ -168,7 +183,7 @@ public class Loader {
 	@SuppressWarnings("unused")
 	private void loadlocal(JSONArray json) throws JSONException {
 		// Load Data
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(8);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(id)));
 		es.shutdown();
@@ -177,7 +192,7 @@ public class Loader {
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "Error on Thread Opinions while loading data");
 		}
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(8);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(id)));
 		es.shutdown();
@@ -376,7 +391,7 @@ public class Loader {
 
 	private String loadGeneral() throws JSONException {
 
-		String select = Settings.sqlselectall + " "+Settings.gentable+" WHERE "+Settings.gentable_id+"=1";
+		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -472,14 +487,14 @@ public class Loader {
 		if (json == null)
 			return loaduopid();
 
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(8);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(i)));
 		es.shutdown();
 		err = awaittermination(es, "Opinions");
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(8);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(i)));
 		es.shutdown();
@@ -615,8 +630,8 @@ public class Loader {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
 				List<Long> uniqueauthors = new ArrayList<>();
-				HashMap<Long,Post> temppost = v.getPosts();
-				temppost.forEach((k2,v2) -> {
+				HashMap<Long, Post> temppost = v.getPosts();
+				temppost.forEach((k2, v2) -> {
 					if (!uniqueauthors.contains(v2.getUID()))
 						uniqueauthors.add(v2.getUID());
 				});
@@ -748,7 +763,7 @@ public class Loader {
 	}
 
 	private String insertposts() throws JSONException {
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(8);
 
 		try {
 			cnlocal = Settings.connlocal();
@@ -851,7 +866,7 @@ public class Loader {
 	}
 
 	private String updatelocal() throws JSONException {
-		lastUpdated2=Calendar.getInstance();
+		lastUpdated2 = Calendar.getInstance();
 		lastUpdated2.add(Calendar.DATE, -1);
 
 		String update = "UPDATE " + Settings.gentable + " SET " + Settings.gentable_totalposts + "=?,"
@@ -893,7 +908,8 @@ public class Loader {
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
-				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'" + new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
+				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				if (!rs.next()) {
@@ -902,7 +918,7 @@ public class Loader {
 					return Backend.error_message("Loaded Successfully").toString();
 				}
 				rs.beforeFirst();
-				ExecutorService es = Executors.newFixedThreadPool(50);
+				ExecutorService es = Executors.newFixedThreadPool(8);
 				while (rs.next())
 					es.execute(multiThread.new Topinions(rs.getLong(1)));
 				es.shutdown();
@@ -910,7 +926,7 @@ public class Loader {
 				if (err != null)
 					return err;
 				rs.beforeFirst();
-				es = Executors.newFixedThreadPool(50);
+				es = Executors.newFixedThreadPool(8);
 				while (rs.next())
 					es.execute(multiThread.new Tposts(rs.getLong(1)));
 				es.shutdown();
