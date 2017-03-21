@@ -1,6 +1,7 @@
 package general;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,7 +16,7 @@ public class Opinion {
 	private long id;
 	private long author_id; // String
 	private String author_id2;
-	private List<Post> comments = new ArrayList<>();
+	private HashMap<Long,Post> comments = new HashMap<>();
 	private String URI = "";
 	private double reach = 0;
 	private double polarity = 0;
@@ -81,7 +82,7 @@ public class Opinion {
 		total_inf = authordb.get(author_id).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
-		comments.forEach((v) -> {
+		comments.forEach((k,v) -> {
 			total_inf += authordb.get(v.getUID()).getInfluence();
 			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
 
@@ -99,7 +100,7 @@ public class Opinion {
 		total_inf = authordb.get(author_id2).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
-		comments.forEach((v) -> {
+		comments.forEach((k,v) -> {
 			total_inf += authordb.get(v.getUID(false)).getInfluence();
 			polarity += v.getPolarity() * authordb.get(v.getUID(false)).getInfluence();
 
@@ -114,7 +115,7 @@ public class Opinion {
 	 * @param _comment the comment
 	 */
 	public void addcomment(Post _comment) {
-		comments.add(_comment);
+		comments.put(_comment.getID(),_comment);
 	}
 
 	/**
@@ -212,7 +213,7 @@ public class Opinion {
 	public long newcomments() {
 		int newcomm = 0;
 
-		for (Post i : comments) {
+		for (Post i : comments.values()) {
 			if (i.getTime() != 0)
 				newcomm++;
 		}
@@ -228,7 +229,7 @@ public class Opinion {
 	 */
 	public long nlikes() {
 		int num = 0;
-		for (Post i : comments) {
+		for (Post i : comments.values()) {
 			num += i.getLikes();
 		}
 		return num;
@@ -243,7 +244,7 @@ public class Opinion {
 
 		int newlike = 0;
 
-		for (Post i : comments) {
+		for (Post i : comments.values()) {
 			if (i.getTime() != 0)
 				newlike+=i.getLikes();
 		}
@@ -259,7 +260,7 @@ public class Opinion {
 	 */
 	public long nviews() {
 		int num = 0;
-		for (Post i : comments) {
+		for (Post i : comments.values()) {
 			num += i.getViews();
 		}
 		return num;
@@ -274,7 +275,7 @@ public class Opinion {
 
 		int newview = 0;
 
-		for (Post i : comments) {
+		for (Post i : comments.values()) {
 			if (i.getTime() != 0)
 				newview+=i.getViews();
 		}
@@ -287,9 +288,9 @@ public class Opinion {
 	 *
 	 * @return the posts
 	 */
-	public List<Post> getPosts() {
-		if (!comments.contains(this.main))
-			comments.add(this.main);
+	public HashMap<Long,Post> getPosts() {
+		if (!comments.containsKey(this.id))
+			comments.put(this.id,this.main);
 		return comments;
 	}
 }
