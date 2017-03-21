@@ -31,7 +31,7 @@ public class Globalsentiment extends GetReach {
 
 	private Connection cnlocal = null;
 	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
-	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+	private static String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
 	 * Class that handles sentiment Requests.

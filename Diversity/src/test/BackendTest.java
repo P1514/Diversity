@@ -291,7 +291,7 @@ public class BackendTest {
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15");
-		obj.put("name", "test12321");
+		obj.put("name", "test01");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
@@ -337,7 +337,7 @@ public class BackendTest {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
-		obj.put("name", "test12");
+		obj.put("name", "test123");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("Id", "839");
@@ -354,7 +354,7 @@ public class BackendTest {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
-		obj.put("Name", "test12");
+		obj.put("Name", "test123");
 		obj.put("Type", "all");
 		obj.put("Key", "10");
 		tester = new Backend(25, obj);
