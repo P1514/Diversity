@@ -27,8 +27,8 @@ public class Operations {
 		permission.put(21, 0);
 		permission.put(22, -1);
 		permission.put(23, 4);
-		permission.put(24, 3);
-		permission.put(25, 3);
+		permission.put(24, 4);
+		permission.put(25, 4);
 		permission.put(26, 2);
 		permission.put(28, 1);
 		permission.put(27, 3);

@@ -108,24 +108,12 @@ public class GetPosts {
 		if (word != null) {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
 					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%' and views>0)"; // More
-																														// than
-																														// 0
-																														// views
-																														// means
-																														// that
-																														// its
-																														// a
-																														// post
-																														// and
-																														// not
-																														// a
-																														// comment
+																													// comment
 		}
 
 		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
-
 
 		try {
 			dbconnect();
@@ -153,7 +141,7 @@ public class GetPosts {
 
 			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
-			
+
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {

@@ -137,7 +137,7 @@ public class GetReach {
 		return calc_global("reach", insert, par, month, model, year, day);
 	}
 
-	protected double calc_global(String type, String insert, parameters par, int month, Model model, int year, int day) {
+	protected double  calc_global(String type, String insert, parameters par, int month, Model model, int year, int day) {
 		avg result = new avg();
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."

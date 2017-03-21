@@ -284,7 +284,7 @@ public final class Model {
 				query1.setInt(rangeindex++, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
-			 System.out.println(query1);
+			 //System.out.println(query1);
 			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
