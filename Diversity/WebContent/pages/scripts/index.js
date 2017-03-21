@@ -203,7 +203,8 @@ ws.onmessage = function(event) {
       ws.send(JSON.stringify(jsonData));
   }
 
-  if (localStorage.tutorial != ("done")) {
+
+  if (localStorage.tutorial.indexOf("home=done") == -1) {
     request_tutorial();
   }
 }
@@ -221,7 +222,7 @@ function request_tutorial() {
 function start_tutorial() {
   create_model_tutorial();
   $('#tutorial_box').toggle();
-  $('#triangle').toggle();
+
 }
 
 function create_model_tutorial() {
@@ -294,7 +295,11 @@ function end_tutorial() {
 
   $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
 
-  localStorage.tutorial = "done";
+
+  if (localStorage.tutorial.indexOf("home=done") == -1) {
+    localStorage.tutorial += "home=done;";
+  }
+
 }
 
 function new_model(){

@@ -23,7 +23,7 @@ var month;
 var product;
 var user = 1;
 
-// DEBUG STUFF - DELETE WHEN TESTED --------------------------------------------
+// DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
 $(window).on('load', function() {
  if(getCookie("Developer") == "Guilherme") {
@@ -57,12 +57,15 @@ function setExtra() {
 	extra = !extra;
 }
 
+/*
+* Returns the value of a cookie
+*/
 function getCookie(name) {
 	  var value = '; ' + document.cookie;
 	  var parts = value.split('; ' + name + '=');
 	  if (parts.length == 2)
 	    return parts.pop().split(';').shift();
-	}
+}
 
 /*
 * Connects to the server and performs some initialization.
@@ -302,6 +305,7 @@ function connect() {
 				clicker($(this).find('input[name="id"]').val());
 			});
 
+			// Request the tagcloud for the current user
 			var json = {
 				"Op" : "tagcloud",
 				"Id" : sessionStorage.id,
@@ -339,13 +343,13 @@ google.charts.load('current', {
 });
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
-	if (localStorage.tutorial.indexOf("extraction=done") == -1) {
+	if (localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
     request_tutorial();
   }
 });
 
 
-function goToByScroll(id){
+function goToByScroll(id){ //simple scroll to element
       // Remove "link" from the ID
     id = id.replace("link", "");
       // Scroll
@@ -354,6 +358,8 @@ function goToByScroll(id){
         'ease');
 }
 
+
+//tutorial functions, should be refactored?-------------------------------------
 
 function request_tutorial() {
   $('#loading').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
@@ -523,6 +529,8 @@ function end_tutorial() {
 	goToByScroll('tutorial_box');
 }
 
+//------------------------------------------------------------------------------
+
 var clickedWord = "";
 $(document).bind("contextmenu", function (event) { //override right click
 	if ($(event.target).is(".word")) {
@@ -548,17 +556,17 @@ $(document).bind("mousedown", function (e) {
 // If the menu element is clicked
 $(".custom-menu li").click(function(e){
 
-    // This is the triggered action name
+    // triggers data-action, defined in the HTML
     switch($(this).attr("data-action")) {
 
-			case "ignore_word":
+			case "ignore_word": //the only defined action
 				ignore_words(clickedWord);
 			break;
 	 }
 	 $(".custom-menu").hide(100);
 });
 
-function ignore_words(word) {
+function ignore_words(word) { //sends a message to start ignoring the word we clicked on
 	var json = {
 		'Op' : 'set_ignore_word',
 		"Id" : sessionStorage.id,
