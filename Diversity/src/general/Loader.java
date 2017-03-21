@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,8 +34,8 @@ public class Loader {
 	static long totalviews;
 	static long totalcomments;
 	static long totallikes;
-	private java.sql.Date lastUpdated = null;
-	private java.sql.Date lastUpdated2 = null;
+	private Calendar lastUpdated = null;
+	private Calendar lastUpdated2 = Calendar.getInstance();
 	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
@@ -41,6 +43,23 @@ public class Loader {
 	public static List<Author> users2;
 
 	public String load(JSONArray json) throws JSONException {
+		loadp1(json);
+		String done = loadp2();
+
+		String err = insertauthors();
+		if (err != null)
+			return err;
+		err = insertposts();
+		if (err != null)
+			return err;
+		err = updatelocal();
+		if (err != null)
+			return err;
+		return done;
+	}
+
+	private String loadp1(JSONArray json) throws JSONException {
+		Server.isloading = true;
 		users = new ArrayList<Long>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
@@ -71,12 +90,6 @@ public class Loader {
 
 		update("opinions");
 
-		this.totalposts += opiniondb.size();
-
-		/*
-		 * TODO PUT THIS OUTSIDE ON A TIMER WHILE null posts exist on database
-		 */ evaluatedata();
-
 		err = insertauthors();
 		if (err != null)
 			return err;
@@ -87,7 +100,69 @@ public class Loader {
 		if (err != null)
 			return err;
 
+		return null;
+	}
+
+	private String loadp2() throws JSONException {
+		long waiting_time = 0;
+		for (Opinion op : opiniondb.values()) {
+			waiting_time += op.newcomments();
+		}
+		if (waiting_time != 0) {
+			try {
+				do {
+					Thread.sleep(30 * 1000/* waiting_time*10 */);
+				} while (finishcalc());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		ExecutorService es = Executors.newFixedThreadPool(50);
+		for (Opinion op : opiniondb.values())
+			es.execute(multiThread.new Topinions(op.getID()));
+		es.shutdown();
+		String err = awaittermination(es, "Opinions");
+		if (err != null)
+			return err;
+		es = Executors.newFixedThreadPool(50);
+		for (Opinion op : opiniondb.values())
+			es.execute(multiThread.new Tposts(op.getID()));
+		es.shutdown();
+
+		err = awaittermination(es, "posts");
+		if (err != null)
+			return err;
+		/*
+		 * TODO PUT THIS OUTSIDE ON A TIMER WHILE null posts exist on database
+		 */ evaluatedata();
+
+		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();
+	}
+
+	private boolean finishcalc() {
+		String query = "Select * from " + Settings.lptable + " Where " + Settings.lptable_polarity + " is null";
+		boolean done = false;
+		try {
+			cnlocal = Settings.connlocal();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+		}
+
+		try (Statement st = cnlocal.createStatement()) {
+			ResultSet rs;
+			rs = st.executeQuery(query);
+			done = rs.next();
+			rs.close();
+		} catch (Exception e) {
+			try {
+				cnlocal.close();
+			} catch (SQLException e1) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e1);
+			}
+		}
+		return done;
 	}
 
 	@SuppressWarnings("unused")
@@ -134,7 +209,8 @@ public class Loader {
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
 								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
-								rs.getLong(Settings.lmtable_designproject),rs.getBoolean(Settings.lmtable_add_mediawiki));
+								rs.getLong(Settings.lmtable_designproject),
+								rs.getBoolean(Settings.lmtable_add_mediawiki));
 						Data.modeldb.put(model.getId(), model);
 
 					}
@@ -299,6 +375,7 @@ public class Loader {
 	}
 
 	private String loadGeneral() throws JSONException {
+		lastUpdated=Calendar.getInstance();
 		String select = Settings.sqlselectall + " general WHERE id=1";
 		try {
 			cnlocal = Settings.connlocal();
@@ -314,7 +391,7 @@ public class Loader {
 				totalcomments = rs.getLong("totalcomments");
 				totallikes = rs.getLong("totallikes");
 				totalposts = rs.getLong("totalposts");
-				lastUpdated = rs.getDate("lastupdated");
+				lastUpdated.setTime(rs.getDate("lastupdated"));
 				if (rs.getLong("Version") != Settings.dbversion)
 					rs.getLong("asdasasd");
 			}
@@ -363,7 +440,7 @@ public class Loader {
 							rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 							rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
 							rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
-							rs.getLong(Settings.lmtable_designproject),rs.getBoolean(Settings.lmtable_add_mediawiki));
+							rs.getLong(Settings.lmtable_designproject), rs.getBoolean(Settings.lmtable_add_mediawiki));
 					Data.modeldb.put(model.getId(), model);
 
 				}
@@ -538,8 +615,8 @@ public class Loader {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
 				List<Long> uniqueauthors = new ArrayList<>();
-				List<Post> temppost = v.getPosts();
-				temppost.forEach((v2) -> {
+				HashMap<Long,Post> temppost = v.getPosts();
+				temppost.forEach((k2,v2) -> {
 					if (!uniqueauthors.contains(v2.getUID()))
 						uniqueauthors.add(v2.getUID());
 				});
@@ -705,13 +782,13 @@ public class Loader {
 						query1.setLong(13, opinion.ncomments());
 						query1.executeUpdate();
 
-						for (Post post : opinion.getPosts()) {
+						for (Post post : opinion.getPosts().values()) {
 							PreparedStatement query2 = null;
 							try {
 								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 								query2 = cnlocal.prepareStatement(update1);
 								query2.setLong(1, post.getID());
-								if (Settings.LocalPolarity) {
+								if (post.getPolarity() != -1) {
 									query2.setDouble(2, post.getPolarity());
 								} else {
 									query2.setNull(2, java.sql.Types.DOUBLE);
@@ -775,6 +852,8 @@ public class Loader {
 
 	private String updatelocal() throws JSONException {
 		String update = "UPDATE general SET totalposts=?,totallikes=?,totalcomments=?,totalviews=?,lastupdated=? WHERE id=1";
+		lastUpdated2=Calendar.getInstance();
+		lastUpdated2.add(Calendar.DATE, -1);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -782,12 +861,13 @@ public class Loader {
 			return Backend.error_message(Settings.err_dbconnect).toString();
 
 		}
+		totalposts += opiniondb.size();
 		try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 			query1.setLong(1, totalposts);
 			query1.setLong(2, totallikes);
 			query1.setLong(3, totalcomments);
 			query1.setLong(4, totalviews);
-			query1.setDate(5, (Date) lastUpdated2);
+			query1.setDate(5, new java.sql.Date(lastUpdated2.getTimeInMillis()));
 			query1.executeUpdate();
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
@@ -806,12 +886,10 @@ public class Loader {
 
 	private String loaduopid() throws JSONException {
 		String err;
-		Calendar cal = Calendar.getInstance();
-		lastUpdated2 = new java.sql.Date(cal.getTimeInMillis());
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
-				+ " > \'" + lastUpdated + "\' && " + Settings.ptime + " <= \'" + lastUpdated2 + "\' ORDER BY ID ASC";
+				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'" + new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				if (!rs.next()) {
@@ -865,5 +943,4 @@ public class Loader {
 		}
 		return null;
 	}
-
 }
