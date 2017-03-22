@@ -244,6 +244,8 @@ public class Settings {
 	public static final String lsstable_result = "result";
 	public static final String lsstable_type = "type";
 	public static final String lsstable_timespan = "timespan";
+	public static final String lsstable_model_id = "model_id";
+
 
 	// SQL Common String
 
