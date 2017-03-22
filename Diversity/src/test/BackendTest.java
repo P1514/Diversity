@@ -456,11 +456,11 @@ public class BackendTest implements Runnable {
 
 	}
 
-	/*@Test
+	@Test
 	public void multipletests() throws JSONException {
 		for (int i = 0; i < 1000; i++)
 			(new Thread(this)).start();
-	}*/
+	}
 	
 	@Test
 	public void resolveLoadsnapbyPSS() throws JSONException {
