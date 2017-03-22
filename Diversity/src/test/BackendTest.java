@@ -4,13 +4,15 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 
+import javax.security.auth.message.callback.PrivateKeyCallback.Request;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import general.Backend;
 import monitoring.Oversight;
 
-public class BackendTest {
+public class BackendTest implements Runnable {
 
 	JSONObject obj, obj1;
 	Backend tester;
@@ -20,6 +22,47 @@ public class BackendTest {
 	public BackendTest() {
 		o.run();
 
+	}
+
+
+
+	public void run(){
+		System.out.println("Thread");
+		try {
+			double rand = Math.round(Math.random()*13);
+			System.out.println(rand+"\n");
+	        switch ((int)rand) {
+	            case 1:  this.resolveRole();
+	                     break;
+	            case 2:  this.resolveGetTree();
+	                     break;
+	            case 3:  this.resolveGetTreePss();
+	                     break;
+	            case 4:  this.resolveTopreachglobalsentiment();
+	                     break;
+	            case 5:  this.resolveLoad();
+	                     break;
+	            case 6:  this.resolveGetposts();
+	                     break;
+	            case 7:  this.resolveGetmodels();
+	                     break;
+	            case 8:  this.resolveGetconfig();
+	                     break;
+	            case 9:  this.resolveGetModel();
+	                     break;
+	            case 10: this.resolveGetPSS();
+	                     break;
+	            case 11: this.resolveOpinionExtraction();
+	                     break;
+	            case 12: this.resolveOeRefresh();
+	                     break;
+	            default: this.resolveOeRefreshExtrapolate();
+	                     break;
+	        }
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// before running test, import test.db from the test directory
@@ -33,7 +76,6 @@ public class BackendTest {
 		tester = new Backend(22, obj);
 		System.out.println("Role Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -45,7 +87,6 @@ public class BackendTest {
 		obj.put("Key", "10");
 		tester = new Backend(21, obj);
 		System.out.println("Get Tree Test Output: " + tester.resolve().toString());
-
 
 	}
 
@@ -60,7 +101,6 @@ public class BackendTest {
 		obj.put("Key", "10");
 		tester = new Backend(21, obj);
 		System.out.println("Get Tree Pss Test Output: " + tester.resolve().toString());
-
 
 	}
 
@@ -85,7 +125,6 @@ public class BackendTest {
 		tester = new Backend(2, obj);
 		System.out.println("Load Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -100,7 +139,6 @@ public class BackendTest {
 		tester = new Backend(4, obj);
 		System.out.println("Get Posts Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -113,7 +151,6 @@ public class BackendTest {
 
 		tester = new Backend(5, obj);
 		System.out.println("Get Models Test Output: " + tester.resolve().toString());
-
 
 	}
 
@@ -281,7 +318,6 @@ public class BackendTest {
 		tester = new Backend(20, obj);
 		System.out.println("5pss Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -291,7 +327,7 @@ public class BackendTest {
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15");
-		obj.put("name", "test01");
+		obj.put("name", "aapred");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
@@ -299,7 +335,6 @@ public class BackendTest {
 		obj.put("Key", "10");
 		tester = new Backend(24, obj);
 		System.out.println("Snapshot Prediction Test Output: " + tester.resolve().toString());
-
 
 	}
 
@@ -314,7 +349,6 @@ public class BackendTest {
 		tester = new Backend(25, obj);
 		System.out.println("Snapshot Load Names Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -328,7 +362,6 @@ public class BackendTest {
 		tester = new Backend(25, obj);
 		System.out.println("Snapshot Load Test Output: " + tester.resolve().toString());
 
-
 	}
 
 	@Test
@@ -337,7 +370,7 @@ public class BackendTest {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
-		obj.put("name", "test123");
+		obj.put("name", "test12345");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("Id", "839");
@@ -359,7 +392,6 @@ public class BackendTest {
 		obj.put("Key", "10");
 		tester = new Backend(25, obj);
 		System.out.println("Snapshot Extraction Load Test Output: " + tester.resolve().toString());
-
 
 	}
 
@@ -411,7 +443,7 @@ public class BackendTest {
 	public void resolveTagcloud() throws JSONException {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
-		//System.out.println(obj1.toString());
+		// System.out.println(obj1.toString());
 
 		obj = new JSONObject();
 		obj.put("Op", "tagcloud");
@@ -421,6 +453,27 @@ public class BackendTest {
 
 		tester = new Backend(26, obj);
 		System.out.println("Tag Cloud Test Output: " + tester.resolve().toString());
+
+	}
+
+	/*@Test
+	public void multipletests() throws JSONException {
+		for (int i = 0; i < 1000; i++)
+			(new Thread(this)).start();
+	}*/
+	
+	@Test
+	public void resolveLoadsnapbyPSS() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		// System.out.println(obj1.toString());
+
+		obj = new JSONObject();
+		obj.put("PSS", "1");
+		obj.put("Key", "10");
+
+		tester = new Backend(29, obj);
+		System.out.println("Load Snapshot by PSS Test Output: " + tester.resolve().toString());
 
 	}
 }
