@@ -41,10 +41,10 @@ public class Startup implements ServletContextListener {
 		
 
 		LOGGER.log(Level.INFO,"Starting up!");
-
+		Settings.startconnections();
 		Oversight o = new Oversight(true);
 		o.run();
-		new Oversight();
+		//new Oversight();
 		/*Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;

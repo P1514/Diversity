@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 import javax.resource.cci.ResultSet;
 
-import com.mysql.jdbc.Connection;
+import java.sql.Connection;
 
 import general.Settings;
 

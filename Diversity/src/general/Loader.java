@@ -26,9 +26,6 @@ import general.LoadThreads.*;
 
 public class Loader {
 	private static final Logger LOGGER = new Logging().create(Loader.class.getName());
-	static Connection cndata = null;
-	static Connection cnlocal = null;
-	static Connection cncr = null;
 	private long stime = 0;
 	private long stoptime = 0;
 	private long starttime = 0;
@@ -46,11 +43,13 @@ public class Loader {
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 	public static List<Long> users;
 	public static List<Author> users2;
+	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
+		starttime = System.nanoTime();
 		loadp1(json);
+		first_load = false;
 		String done = loadp2();
-		starttime=System.currentTimeMillis();
 		String err = insertauthors();
 		if (err != null)
 			return err;
@@ -60,7 +59,10 @@ public class Loader {
 		err = updatelocal();
 		if (err != null)
 			return err;
+		loadtimescalc();
+		first_load = true;
 		return done;
+
 	}
 
 	private String loadp1(JSONArray json) throws JSONException {
@@ -104,20 +106,20 @@ public class Loader {
 		err = updatelocal();
 		if (err != null)
 			return err;
-		loadtimescalc();
 		return null;
 	}
-	
-	private void loadtimescalc(){
-		stoptime=System.currentTimeMillis();
-		long runtime=stoptime-starttime-pausetime;
-		double ms_post=((double)runtime)/new_posts;
-		LOGGER.log(Level.INFO, "Took:"+runtime+"ms to finish processing "+new_posts+" posts which averages " + ms_post + "ms/post");
+
+	private void loadtimescalc() {
+		stoptime = System.nanoTime();
+		long runtime = stoptime - starttime - pausetime;
+		double ms_post = ((double) runtime) / new_posts;
+		LOGGER.log(Level.SEVERE, "Took:" + runtime + "ms to finish processing " + new_posts + " posts which averages "
+				+ ms_post + "ms/post");
 	}
 
 	private String loadp2() throws JSONException {
-		
-		pausetime = System.currentTimeMillis();
+
+		pausetime = System.nanoTime();
 		LOGGER.log(Level.INFO, "Started Waiting to Check NULLS");
 		for (Opinion op : opiniondb.values()) {
 			new_posts += op.newcomments();
@@ -132,15 +134,15 @@ public class Loader {
 				e.printStackTrace();
 			}
 		}
-		pausetime = System.currentTimeMillis() - pausetime;
-		ExecutorService es = Executors.newFixedThreadPool(8);
+		pausetime = System.nanoTime() - pausetime;
+		ExecutorService es = Executors.newFixedThreadPool(50);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
 		String err = awaittermination(es, "Opinions");
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(8);
+		es = Executors.newFixedThreadPool(50);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Tposts(op.getID()));
 		es.shutdown();
@@ -159,6 +161,7 @@ public class Loader {
 	private boolean finishcalc() {
 		String query = "Select * from " + Settings.lptable + " Where " + Settings.lptable_polarity + " is null";
 		boolean done = false;
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -177,13 +180,18 @@ public class Loader {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e1);
 			}
 		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e1) {
+			LOGGER.log(Level.INFO, Settings.err_unknown, e1);
+		}
 		return done;
 	}
 
 	@SuppressWarnings("unused")
 	private void loadlocal(JSONArray json) throws JSONException {
 		// Load Data
-		ExecutorService es = Executors.newFixedThreadPool(8);
+		ExecutorService es = Executors.newFixedThreadPool(50);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(id)));
 		es.shutdown();
@@ -192,7 +200,7 @@ public class Loader {
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "Error on Thread Opinions while loading data");
 		}
-		es = Executors.newFixedThreadPool(8);
+		es = Executors.newFixedThreadPool(50);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(id)));
 		es.shutdown();
@@ -205,13 +213,14 @@ public class Loader {
 		stime = System.nanoTime();
 
 		// Fetch local DB models
-
+		Connection cnlocal = null;
 		try {
-			Connection cnlocal = Settings.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect);
 		}
 		String select = Settings.sqlselectall + Settings.lmtable;
+
 		try (Statement stmt = cnlocal.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(select)) {
 
@@ -296,6 +305,7 @@ public class Loader {
 	private void loadPSS() {
 
 		String select = Settings.sqlselectall + Settings.crpsstable;
+		Connection cncr = null;
 		try {
 			cncr = Settings.conncr();
 		} catch (Exception e) {
@@ -392,6 +402,7 @@ public class Loader {
 	private String loadGeneral() throws JSONException {
 
 		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -437,6 +448,7 @@ public class Loader {
 	}
 
 	private String loadmodels() throws JSONException {
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -477,24 +489,19 @@ public class Loader {
 
 	private String loaduniqueopinionid(JSONArray json) throws JSONException {
 		String err;
-		try {
-			cndata = Settings.conndata();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
 		// Load Opinions id first
 		if (json == null)
 			return loaduopid();
 
-		ExecutorService es = Executors.newFixedThreadPool(8);
+		ExecutorService es = Executors.newFixedThreadPool(50);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(i)));
 		es.shutdown();
 		err = awaittermination(es, "Opinions");
+		LOGGER.log(Level.INFO, " Load Opinions from remote " + (System.nanoTime() - stime));
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(8);
+		es = Executors.newFixedThreadPool(50);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(i)));
 		es.shutdown();
@@ -510,12 +517,6 @@ public class Loader {
 
 	private String loadUsers(JSONArray json) throws JSONException {
 		String err;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
 
 		String querycond = users.toString();
 		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
@@ -564,7 +565,7 @@ public class Loader {
 	private String loadroles() throws JSONException {
 
 		String query;
-
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -589,6 +590,11 @@ public class Loader {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR LOADING ROLES", e);
 		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e1) {
+			LOGGER.log(Level.INFO, Settings.err_unknown, e1);
+		}
 
 		return null;
 
@@ -597,6 +603,13 @@ public class Loader {
 	private String loadlocalusers(String querycond) throws JSONException {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
+		Connection cnlocal = null;
+		try {
+			cnlocal = Settings.connlocal();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+		}
 		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
@@ -636,12 +649,16 @@ public class Loader {
 						uniqueauthors.add(v2.getUID());
 				});
 				uniqueauthors.forEach((v3) -> {
-					Author tempauthor = authordb.get(v3);
-					tempauthor.addComments(v.newcomments());
-					tempauthor.addLikes(v.newlikes());
-					tempauthor.addViews(v.newviews());
-					tempauthor.addPosts();
-					authordb.put(tempauthor.getID(), tempauthor);
+					if (!authordb.containsKey(v3)) {
+						LOGGER.log(Level.SEVERE, "NULL POINTER UNIQUE AUTHORS" + v3);
+					} else {
+						Author tempauthor = authordb.get(v3);
+						tempauthor.addComments(v.newcomments());
+						tempauthor.addLikes(v.newlikes());
+						tempauthor.addViews(v.newviews());
+						tempauthor.addPosts();
+						authordb.put(tempauthor.getID(), tempauthor);
+					}
 				});
 
 				totalcomments += v.newcomments();
@@ -657,6 +674,7 @@ public class Loader {
 	private String loadsimauthors(String querycond) throws JSONException {
 		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
 				+ querycond);
+		Connection cndata = null;
 		try {
 			cndata = Settings.conndata();
 		} catch (Exception e) {
@@ -703,9 +721,9 @@ public class Loader {
 	}
 
 	private String insertauthors() throws JSONException {
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
-			cnlocal.setAutoCommit(false);
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect);
 			return Backend.error_message(Settings.err_dbconnect).toString();
@@ -736,7 +754,6 @@ public class Loader {
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				try {
-					cnlocal.rollback();
 					cnlocal.close();
 				} catch (Exception e1) {
 					LOGGER.log(Level.INFO, "Nothing can be done here", e1);
@@ -745,15 +762,8 @@ public class Loader {
 			}
 		}
 		try {
-			cnlocal.commit();
 			cnlocal.close();
 		} catch (Exception e) {
-			try {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-				cnlocal.rollback();
-			} catch (SQLException e1) {
-				LOGGER.log(Level.FINE, Settings.err_unknown, e1);
-			}
 			LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
 		}
 
@@ -763,20 +773,18 @@ public class Loader {
 	}
 
 	private String insertposts() throws JSONException {
-		ExecutorService es = Executors.newFixedThreadPool(8);
-
-		try {
-			cnlocal = Settings.connlocal();
-			cnlocal.setAutoCommit(false);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
+		ExecutorService es = Executors.newFixedThreadPool(50);
 
 		for (Opinion opinion : opiniondb.values()) {
 			es.execute(new Runnable() {
 				@Override
 				public void run() {
+					Connection cnlocal = null;
+					try {
+						cnlocal = Settings.connlocal();
+					} catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+					}
 					String update = "INSERT INTO " + Settings.lotable + " "
 							+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 							+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
@@ -795,8 +803,20 @@ public class Loader {
 						query1.setDouble(11, opinion.getPolarity());
 						query1.setDouble(12, opinion.getTotalInf());
 						query1.setLong(13, opinion.ncomments());
-						query1.executeUpdate();
-
+						while (true) {
+							try {
+								query1.executeUpdate();
+							} catch (Exception e) {
+								LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
+								Thread.sleep((long)(Math.random()*1000));
+								continue;
+							}
+							break;
+						}
+						if (!first_load) {
+							cnlocal.close();
+							return;
+						}
 						for (Post post : opinion.getPosts().values()) {
 							PreparedStatement query2 = null;
 							try {
@@ -813,20 +833,29 @@ public class Loader {
 								query2.setLong(5, post.getViews());
 								query2.setLong(6, opinion.getID());
 								query2.setLong(7, post.getUID());
-
-								query2.executeUpdate();
+								while (true) {
+									try {
+										query2.executeUpdate();
+									} catch (Exception e) {
+										LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
+										Thread.sleep((long)(Math.random()*1000));
+										continue;
+									}
+									break;
+								}
 								if (query2 != null)
 									query2.close();
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-							} finally {
-								try {
-									if (query2 != null)
-										query2.close();
-								} catch (Exception e) {
-								}
+								continue;
+							}
+							try {
+								if (query2 != null)
+									query2.close();
+							} catch (Exception e) {
 							}
 						}
+						cnlocal.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -840,23 +869,6 @@ public class Loader {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
 			System.out.println("ERROR THREAD OP");
-			e.printStackTrace();
-		}
-		try {
-			cnlocal.commit();
-			cnlocal.close();
-			cnlocal = Settings.connlocal();
-			cnlocal.setAutoCommit(true);
-		} catch (SQLException e2) {
-			try {
-				cnlocal.rollback();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			e2.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -873,6 +885,7 @@ public class Loader {
 				+ Settings.gentable_totallikes + "=?," + Settings.gentable_totalcomments + "=?,"
 				+ Settings.gentable_totalviews + "=?," + Settings.gentable_lastupdated + "=? WHERE "
 				+ Settings.gentable_id + "=1";
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -910,6 +923,15 @@ public class Loader {
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
 				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
 				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+		Connection cndata = null;
+		Connection cnlocal = null;
+		try {
+			cnlocal = Settings.connlocal();
+			cndata = Settings.conndata();
+		} catch (Exception e1) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+		}
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				if (!rs.next()) {
@@ -918,7 +940,7 @@ public class Loader {
 					return Backend.error_message("Loaded Successfully").toString();
 				}
 				rs.beforeFirst();
-				ExecutorService es = Executors.newFixedThreadPool(8);
+				ExecutorService es = Executors.newFixedThreadPool(50);
 				while (rs.next())
 					es.execute(multiThread.new Topinions(rs.getLong(1)));
 				es.shutdown();
@@ -926,7 +948,7 @@ public class Loader {
 				if (err != null)
 					return err;
 				rs.beforeFirst();
-				es = Executors.newFixedThreadPool(8);
+				es = Executors.newFixedThreadPool(50);
 				while (rs.next())
 					es.execute(multiThread.new Tposts(rs.getLong(1)));
 				es.shutdown();
@@ -946,6 +968,11 @@ public class Loader {
 		{
 			try {
 				cndata.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+			}
+			try {
+				cnlocal.close();
 			} catch (SQLException e) {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
