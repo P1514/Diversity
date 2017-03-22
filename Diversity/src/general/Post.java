@@ -12,7 +12,7 @@ public class Post {
 	private String message;
 	private long likes = 0;
 	private long views = 0;
-	private double polarity = 50;
+	private double polarity = -1;
 	private String source = "N/A";
 
 	/**
@@ -31,6 +31,16 @@ public class Post {
 	 * @param _message
 	 *            the message
 	 */
+	public Post(long id, long userid, long time, long likes, long views, String message, double polarity){
+		this.polarity=polarity;
+		this.id = id;
+		this.userid = userid;
+		this.time = time;
+		this.views = views;
+		this.likes = likes;
+		this.message = message;
+		
+	}
 	public Post(long id, long userid, long time, long likes, long views, String message) {
 		this.id = id;
 		this.userid = userid;
@@ -57,7 +67,7 @@ public class Post {
 
 			this.polarity = sentiment;
 		}else{
-			this.polarity= 0;
+			this.polarity= -1;
 		}
 	}
 
