@@ -121,7 +121,6 @@ public class Settings {
 	public static final String lmtable_designproject = "design_project";
 	public static final String lmtable_add_mediawiki = "media_wiki";
 
-
 	// Sources Table
 	public static final String lutable = "sources";
 	public static final String lutable_source = "source";
@@ -144,7 +143,7 @@ public class Settings {
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final boolean LocalPolarity = true;
+	public static final boolean LocalPolarity = false;
 
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
@@ -170,6 +169,16 @@ public class Settings {
 			+ "?autoReconnect=true&useSSL=false";
 	private static final String cruser = "diversity";
 	private static final String crpass = "!diversity!";
+
+	// General Table
+	public static final String gentable = "general";
+	public static final String gentable_id = "id";
+	public static final String gentable_totalposts = "totalposts";
+	public static final String gentable_totallikes = "totallikes";
+	public static final String gentable_totalcomments = "totalcomments";
+	public static final String gentable_totalviews = "totalviews";
+	public static final String gentable_lastupdated = "lastupdated";
+	public static final String gentable_version = "version";
 
 	// PSS Table
 	public static final String crpsstable = "pss";
@@ -213,21 +222,19 @@ public class Settings {
 	public static final String lartable_use_opinion_prediction = "use_opinion_prediction";
 	public static final String lartable_role = "role";
 	public static final String lartable_admin = "admin";
-	
+
 	// Media wiki Table
 	public static final String lmwtable = "media_wiki";
 	public static final String lmwtable_id = "id";
 	public static final String lmwtable_name = "name";
 	public static final String lmwtable_pss = "pss";
-	
 
-	
-	//Tag cloud table
+	// Tag cloud table
 	public static final String tctable = "tagcloud";
 	public static final String tctable_user = "userid";
 	public static final String tctable_model = "modelid";
 	public static final String tctable_ignored_words = "ignoredwords";
-	
+
 	// Snapshots Table
 	public static final String lsstable = "snapshots";
 	public static final String lsstable_id = "id";
@@ -237,9 +244,11 @@ public class Settings {
 	public static final String lsstable_result = "result";
 	public static final String lsstable_type = "type";
 	public static final String lsstable_timespan = "timespan";
-	
+	public static final String lsstable_model_id = "model_id";
+
+
 	// SQL Common String
-	
+
 	public static final String sqlwhere = " Where ";
 	public static final String sqlselectall = "Select * from ";
 	// Errors
@@ -279,7 +288,7 @@ public class Settings {
 	 * @return the connection
 	 * @throws ClassNotFoundException
 	 *             the class not found exception
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
@@ -348,7 +357,7 @@ public class Settings {
 			}
 		}
 
-		LOGGER.log(Level.INFO,result.toString());
+		LOGGER.log(Level.INFO, result.toString());
 		return result;
 
 	}

@@ -45,12 +45,12 @@ public class Startup implements ServletContextListener {
 		Oversight o = new Oversight(true);
 		o.run();
 		new Oversight();
-		Connection cnlocal = null;
+		/*Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
 			cnlocal = Settings.connlocal();
-			String select = "Select * from general WHERE id=1";
+			String select = "Select * from "+Settings.gentable+" WHERE id=1";
 			stmt=cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
@@ -69,7 +69,7 @@ public class Startup implements ServletContextListener {
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
 			 * System.out.println("\n2:"+json.getJSONObject(2).toString()+"\n");
-			 */
+			 
 			// System.out.println(json.get("id"));
 		}  catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -93,7 +93,7 @@ public class Startup implements ServletContextListener {
 				e.printStackTrace();
 			}
 
-		}
+		}/*
 
 		/*GetModels model = new GetModels();
 

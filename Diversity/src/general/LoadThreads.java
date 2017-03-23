@@ -132,6 +132,7 @@ public class LoadThreads {
 			// System.out.println(id);
 			long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
 			long time = 0;
+			double polarity=-1;
 			if (remote) {
 				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				java.util.Date date = null;
@@ -142,7 +143,9 @@ public class LoadThreads {
 				}
 				time = date.getTime();
 
-			}
+			}else{
+				polarity=rs.getDouble(Settings.lptable_polarity);
+				}
 			long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
 			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
 			;
@@ -152,7 +155,7 @@ public class LoadThreads {
 				return;
 			}
 			Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
-					: new Post(postid, user_id, 0, likes, views, message);
+					: new Post(postid, user_id, 0, likes, views, message,polarity);
 			if (!(Loader.users.contains(user_id))) {
 				Loader.users.add(user_id);
 			}
@@ -184,8 +187,6 @@ public class LoadThreads {
 						} else {
 							load(rs, remote);
 							condata.close();
-							conlocal.close();
-							return;
 						}
 					}
 				} catch (Exception e) {
@@ -193,8 +194,7 @@ public class LoadThreads {
 					try {
 						cndata.close();
 					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						LOGGER.log(Level.INFO, Settings.err_unknown, e1);
 					}
 					try {
 						cnlocal.close();
@@ -211,7 +211,7 @@ public class LoadThreads {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						Loader.totalposts--;
 						if (rs.next()) {
-							load(rs, remote);
+							load(rs, false);
 						}
 
 					}
@@ -460,7 +460,8 @@ public class LoadThreads {
 							long likes = rs.getLong(Settings.lptable_likes);
 							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
-							Post _post = new Post(postid, user_id, 0, likes, views, message);
+							double polarity = rs.getDouble(Settings.lptable_polarity);
+							Post _post = new Post(postid, user_id, 0, likes, views, message,polarity);
 							if (!(Loader.users.contains(user_id)))
 								Loader.users.add(user_id);
 							_opin.addcomment(_post);

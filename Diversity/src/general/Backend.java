@@ -8,6 +8,8 @@ import java.util.logging.Level;
 
 import org.json.*;
 
+import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+
 import extraction.Extrapolation;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -24,7 +26,7 @@ import modeling.GetModels;
 /**
  * The Class Backend.
  */
-public final class Backend {
+public class Backend {
 	private static final Logger LOGGER = new Logging().create(Backend.class.getName());
 	private int op = 0;
 	private JSONObject msg, obj;
@@ -42,6 +44,11 @@ public final class Backend {
 		op = _op;
 		msg = _msg;
 
+	}
+	public void setMessage (int _op, JSONObject _msg) throws JSONException{
+		op = _op;
+		_msg.put("Key", msg.get("Key"));
+		msg = _msg;
 	}
 
 	/**
@@ -61,7 +68,7 @@ public final class Backend {
 		Globalsentiment gs = new Globalsentiment();
 		Extrapolation extra = Extrapolation.getInstance();
 		Prediction pre = new Prediction();
-		Snapshot snapshot = new Snapshot();
+		Snapshot snapshot = new Snapshot(this);
 		GetReach gr = new GetReach();
 		GetMediawiki wiki = new GetMediawiki();
 		long id = 0;
@@ -112,7 +119,8 @@ public final class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-			case 29:
+
+			case 30:
 				try {
 					obj.put("Logs", Logging.getAllLogs());
 					result.put(obj);
@@ -120,6 +128,12 @@ public final class Backend {
 					e.printStackTrace();
 				}
 				return result.toString();
+
+			case 29://TODO integrate with the rest of the snapshot load, when frontend part is implemented
+				result = snapshot.load(msg.getInt("PSS"));
+				return result.toString();
+				
+
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();
 
@@ -211,7 +225,9 @@ public final class Backend {
 					obj.put("Op", "Error");
 					result.put(obj);
 				}
+				if(op==23)
 				return result.toString();
+				
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -446,9 +462,9 @@ public final class Backend {
 		return null;
 	}
 
-	private JSONArray convert(JSONArray result, JSONArray to_add, String param, String graph) throws JSONException {
+	private static JSONArray convert(JSONArray result, JSONArray to_add, String param, String graph) throws JSONException {
 		for (int i = 0; i < to_add.length(); i++) {
-			obj = new JSONObject();
+			JSONObject obj = new JSONObject();
 			JSONObject helper = to_add.getJSONObject(i);
 			obj.put(param, graph);
 			for (String key : JSONObject.getNames(helper)) {
