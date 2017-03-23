@@ -12,7 +12,7 @@ import org.junit.Test;
 import general.Backend;
 import monitoring.Oversight;
 
-public class BackendTest implements Runnable {
+public class BackendTest extends Thread {
 
 	JSONObject obj, obj1;
 	Backend tester;
