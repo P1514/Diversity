@@ -12,7 +12,7 @@ import org.junit.Test;
 import general.Backend;
 import monitoring.Oversight;
 
-public class BackendTest implements Runnable {
+public class BackendTest extends Thread {
 
 	JSONObject obj, obj1;
 	Backend tester;
@@ -456,11 +456,11 @@ public class BackendTest implements Runnable {
 
 	}
 
-	/*@Test
+	@Test
 	public void multipletests() throws JSONException {
 		for (int i = 0; i < 1000; i++)
 			(new Thread(this)).start();
-	}*/
+	}
 	
 	@Test
 	public void resolveLoadsnapbyPSS() throws JSONException {
