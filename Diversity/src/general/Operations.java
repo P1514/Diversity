@@ -32,6 +32,7 @@ public class Operations {
 		permission.put(26, 2);
 		permission.put(28, 1);
 		permission.put(27, 3);
+		permission.put(29, 4);
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;
@@ -65,6 +66,7 @@ public class Operations {
 		op.put("tagcloud", 26); // View Results
 		op.put("get_mediawiki", 28); // Create model
 		op.put("set_ignore_word", 27); // set user ignored words
+		op.put("load_snapshot_pss", 29); // set user ignored words
 		op.put("testing", 99); // Admin only
 	}
 

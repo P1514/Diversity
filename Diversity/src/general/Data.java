@@ -72,7 +72,7 @@ public class Data {
 
 	public static void newuser(String id, String role) {
 		Timer tmp;
-		System.out.println(id + role);
+		//System.out.println(id + role);
 		if (security_users.containsKey(id)) {
 			if (getRole(role).permissionAmount() < getRole(security_users.get(id)).permissionAmount())
 				security_users.put(id, role);
