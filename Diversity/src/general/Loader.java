@@ -34,7 +34,7 @@ public class Loader {
 	static long totalviews;
 	static long totalcomments;
 	static long totallikes;
-	private Calendar lastUpdated = null;
+	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
@@ -376,7 +376,7 @@ public class Loader {
 
 	private String loadGeneral() throws JSONException {
 
-		String select = Settings.sqlselectall + " "+Settings.gentable+" WHERE "+Settings.gentable_id+"=1";
+		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -615,8 +615,8 @@ public class Loader {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
 				List<Long> uniqueauthors = new ArrayList<>();
-				HashMap<Long,Post> temppost = v.getPosts();
-				temppost.forEach((k2,v2) -> {
+				HashMap<Long, Post> temppost = v.getPosts();
+				temppost.forEach((k2, v2) -> {
 					if (!uniqueauthors.contains(v2.getUID()))
 						uniqueauthors.add(v2.getUID());
 				});
@@ -851,7 +851,7 @@ public class Loader {
 	}
 
 	private String updatelocal() throws JSONException {
-		lastUpdated2=Calendar.getInstance();
+		lastUpdated2 = Calendar.getInstance();
 		lastUpdated2.add(Calendar.DATE, -1);
 
 		String update = "UPDATE " + Settings.gentable + " SET " + Settings.gentable_totalposts + "=?,"
@@ -893,7 +893,8 @@ public class Loader {
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
-				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'" + new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
+				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				if (!rs.next()) {

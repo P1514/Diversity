@@ -116,7 +116,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		System.out.println("TEST" + result);
+		//System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}
@@ -278,7 +278,7 @@ public class Snapshot {
 		}
 		String insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
 				+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
-				+ "=?);");
+				+ "=?) AND "+Settings.lsstable_type+"='all';");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 				query1.setInt(1, pss);

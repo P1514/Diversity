@@ -12,7 +12,7 @@ import org.junit.Test;
 import general.Backend;
 import monitoring.Oversight;
 
-public class BackendTest extends Thread {
+public class BackendTest implements Runnable {
 
 	JSONObject obj, obj1;
 	Backend tester;
@@ -327,7 +327,7 @@ public class BackendTest extends Thread {
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15");
-		obj.put("name", "aapred");
+		obj.put("name", "test12");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
@@ -370,7 +370,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
-		obj.put("name", "test12345");
+		obj.put("name", "testp");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("Id", "839");
@@ -472,7 +472,7 @@ public class BackendTest extends Thread {
 		obj.put("PSS", "1");
 		obj.put("Key", "10");
 
-		tester = new Backend(29, obj);
+		tester = new Backend(25, obj);
 		System.out.println("Load Snapshot by PSS Test Output: " + tester.resolve().toString());
 
 	}
