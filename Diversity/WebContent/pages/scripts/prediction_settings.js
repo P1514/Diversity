@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 				request_tutorial();
 			}
+			if (localStorage.tutorial == undefined) {
+				localStorage.tutorial += "";
+				request_tutorial();
+			}
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');

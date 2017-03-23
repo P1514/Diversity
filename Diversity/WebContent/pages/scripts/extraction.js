@@ -242,7 +242,7 @@ function connect() {
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 			  var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
-				snap = true;
+				snap
 				json = {
 					"Op" : "load_snapshot",
 					"Name" : snapName,
@@ -355,7 +355,7 @@ google.charts.load('current', {
 });
 $(document).ready(function () {
 	google.charts.setOnLoadCallback(connect);
-	if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
+	if (localStorage.tutorial != undefined || localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
     request_tutorial();
   }
 });

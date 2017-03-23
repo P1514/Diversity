@@ -34,7 +34,7 @@ public class Loader {
 	static long totalviews;
 	static long totalcomments;
 	static long totallikes;
-	private Calendar lastUpdated = null;
+	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();

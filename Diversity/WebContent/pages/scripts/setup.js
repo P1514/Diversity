@@ -166,6 +166,11 @@ ws.onmessage = function(event) {
     request_tutorial();
   }
 
+  if (localStorage.tutorial == undefined) {
+    localStorage.tutorial += "";
+    request_tutorial();
+  }
+
 }
 
 function goToByScroll(id){

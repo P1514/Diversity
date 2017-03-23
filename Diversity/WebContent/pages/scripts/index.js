@@ -204,7 +204,10 @@ ws.onmessage = function(event) {
   }
 
   if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("home=done") == -1) { // if the user never opened this page, start the tutorial
-
+    request_tutorial();
+  }
+  if (localStorage.tutorial == undefined) {
+    localStorage.tutorial += "";
     request_tutorial();
   }
 }
