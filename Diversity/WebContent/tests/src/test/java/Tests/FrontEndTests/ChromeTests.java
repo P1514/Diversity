@@ -59,6 +59,7 @@ public class ChromeTests  {
 		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
 		JavascriptExecutor JavascriptExecutor = ((JavascriptExecutor)driver);
 		JavascriptExecutor.executeScript("document.cookie = \"JSESSIONID=3D43211234DDDFFGGT542; expires=Fri, 31 Dec 9999 23:59:59 GMT\";");
+		JavascriptExecutor.executeScript("localStorage.tutorial = 'home=done;create=done;view=done;edit=done;extraction=done;setup=done;prediction=done;'");
 		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
 
 		boolean create = testCreate(driver);
@@ -239,16 +240,18 @@ public class ChromeTests  {
             		return false;
             	}
             	// Select the checkboxes added by the account definition
-            	boolean tmp = false; // to ignore the first checkbox (final product)
-            	String checkboxes = "//*[@type='checkbox']";
-            	List<WebElement> elementToClick = d.findElements(By.xpath(checkboxes));
-            	for (WebElement AllCheck : elementToClick) {
-            		if (tmp) {
-            			AllCheck.click();
-            		} else {
-            			tmp = true;
-            		}
-            	}
+//            	boolean tmp = false; // to ignore the first checkbox (final product)
+//            	String checkboxes = "//*[@type='checkbox']";
+//            	List<WebElement> elementToClick = d.findElements(By.xpath(checkboxes));
+//            	for (WebElement AllCheck : elementToClick) {
+//            		if (tmp) {
+//            			AllCheck.click();
+//            		} else {
+//            			tmp = true;
+//            		}
+//            	}
+            	
+            	
             	
             	// Set the update frequency to 13 days
             	try {
@@ -267,11 +270,13 @@ public class ChromeTests  {
             	}
             	
             	// Set a start date
+            	
             	try {
-            	WebElement dateCheck = d.findElement(By.id("start_date"));
-            	WebElement dateBox = d.findElement(By.id("date_input"));
-            	dateBox.sendKeys("12152011");
-            	date = dateBox.getAttribute("value");
+	            	WebElement dateCheck = d.findElement(By.id("start_date"));
+	            	WebElement dateBox = d.findElement(By.id("date_input"));
+	            	dateCheck.click();
+	            	dateBox.sendKeys("12152011");
+	            	date = dateBox.getAttribute("value");
             	} catch (NoSuchElementException e) {
             		try {
 						w.write("ERROR: Failed to find start date box.\n");
@@ -546,14 +551,12 @@ public class ChromeTests  {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				return true;
 			}
 		});
     	w.write("Test View Opinion Extraction reached the end.\nAll steps completed successfully.\n");
     	driver.findElement(By.id("home")).click();
 		return pass;
-		
 	}
 
 	private static boolean testDelete(WebDriver driver) throws IOException {
@@ -634,8 +637,6 @@ public class ChromeTests  {
     					pass = true;
     					return true;
     				}
-    				
-    				
     				return false;
     			}
     		});
