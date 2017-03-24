@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -17,7 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Logging {
-
+	
+	/*
 	public Logger create(String classname) {
 		Logger LOGGER = Logger.getLogger(classname);
 		FileHandler fh;
@@ -42,6 +44,21 @@ public class Logging {
 		}
 		return LOGGER;
 	}
+	*/
+	
+	public Logger create(String classname) {
+		Logger LOGGER = Logger.getLogger(classname);
+		DBHandler dh;
+		
+		dh = new DBHandler(1, System.currentTimeMillis());
+		LOGGER.addHandler(dh);
+		SimpleFormatter formatter = new SimpleFormatter();
+		dh.setFormatter(formatter);
+		LOGGER.info("Logger initialized\n\n\n");
+		
+		return LOGGER;
+	}
+	
 
 	public static JSONArray getAllLogs() throws IOException, JSONException {
 		JSONArray logs = new JSONArray();
