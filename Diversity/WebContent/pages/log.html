@@ -39,7 +39,12 @@
         json = JSON.parse(event.data);
 
         if (json[0].hasOwnProperty('Logs') ) {
-          printLog(json[0].Logs);
+          if (sessionStorage.session.indexOf('DEVELOPER') != -1) {
+            printLog(json[0].Logs);
+          } else {
+            document.getElementById('log').innerHTML = "Your permissions do not allow you to view this page. Press 'Back' on your browser to return where you were before.";
+          }
+
         }
       }
 
