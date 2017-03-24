@@ -32,7 +32,7 @@ public class Operations {
 		permission.put(26, 2);
 		permission.put(27, 3);
 		permission.put(28, 1);
-		permission.put(30, 3);
+		permission.put(30, 4);
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;

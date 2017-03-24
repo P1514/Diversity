@@ -132,6 +132,22 @@ LOCK TABLES `influences` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `logs`
+--
+
+DROP TABLE IF EXISTS `logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `timestamp` date NOT NULL,
+  `log` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `media_wiki`
 --
 
