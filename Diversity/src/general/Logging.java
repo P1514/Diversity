@@ -6,6 +6,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.FileHandler;
@@ -19,6 +23,7 @@ import org.json.JSONObject;
 
 public class Logging {
 	
+	private static Connection cnlocal;
 	/*
 	public Logger create(String classname) {
 		Logger LOGGER = Logger.getLogger(classname);
@@ -61,6 +66,42 @@ public class Logging {
 	
 
 	public static JSONArray getAllLogs() throws IOException, JSONException {
+		
+		String select = "SELECT * FROM " + Settings.ltable;
+
+		PreparedStatement query1 = null;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		JSONArray logs = new JSONArray();
+		
+		try {
+			query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS);
+			try (ResultSet rs = query1.executeQuery()) {
+				
+				while(rs.next()) {
+					JSONObject obj = new JSONObject();
+					obj.put("User", rs.getInt(2));
+					obj.put("Timestamp", rs.getTimestamp(3));
+					obj.put("Log", rs.getString(4));
+					logs.put(obj);
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return logs;
+		/*
 		JSONArray logs = new JSONArray();
 		File homeLoggingDir = new File(System.getProperty("user.home") + "/SentimentAnalysisLogs/");
 		if (!homeLoggingDir.exists()) {
@@ -85,6 +126,7 @@ public class Logging {
 		logs.put(getLogs("monitoring.Oversight.log"));
 
 		return logs;
+		*/
 	}
 	
 	public static JSONObject getLogs(String classname) throws IOException, JSONException {
@@ -99,5 +141,13 @@ public class Logging {
 		logsJSON.put(classname, text);
 		System.out.println(classname);
 		return logsJSON;
+	}
+	
+	private static void dbconnect() {
+		try {
+			cnlocal = Settings.connlocal();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
