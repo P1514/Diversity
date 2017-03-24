@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -40,7 +41,7 @@ public class ChromeTests  {
     static FileWriter w;
     static boolean pass = true;
     
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
 		log = new File("log.txt");
 		w = new FileWriter(log, true);
@@ -63,9 +64,13 @@ public class ChromeTests  {
 		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
 
 		boolean create = testCreate(driver);
+		Thread.sleep(2000);
 		boolean edit = testEdit(driver);
+		Thread.sleep(2000);
 		boolean view = testView(driver);
+		Thread.sleep(2000);
 		boolean extract = testExtraction(driver);
+		Thread.sleep(2000);
 		boolean delete = testDelete(driver);
 		
 		long elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
@@ -523,6 +528,12 @@ public class ChromeTests  {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					((JavascriptExecutor) d).executeScript("bottom_right.setSelection([{column:1, row:3}]);google.visualization.events.trigger(bottom_right, 'select');");
 				}
 				
@@ -554,10 +565,12 @@ public class ChromeTests  {
 				return true;
 			}
 		});
-    	w.write("Test View Opinion Extraction reached the end.\nAll steps completed successfully.\n");
     	driver.findElement(By.id("home")).click();
+    	w.write("Test View Opinion Extraction reached the end.\nAll steps completed successfully.\n");
+    	
 		return pass;
 	}
+
 
 	private static boolean testDelete(WebDriver driver) throws IOException {
 		w.write("Starting Delete Opinion Model Test\n");
