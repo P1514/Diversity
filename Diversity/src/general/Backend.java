@@ -1,5 +1,6 @@
 package general;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import security.*;
 import java.util.logging.Logger;
@@ -53,9 +54,9 @@ public class Backend {
 	/**
 	 * Resolves the query asked by the front-end.
 	 *
-	 * @return the string
+	 * @return the string 
 	 */
-	public String resolve() {
+	public String resolve()  {
 		String param;
 		String values;
 		String filtering;
@@ -118,7 +119,21 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+
+			case 30:
+				try {
+					obj.put("Logs", Logging.getAllLogs());
+					result.put(obj);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return result.toString();
+
+			case 29://TODO integrate with the rest of the snapshot load, when frontend part is implemented
+				result = snapshot.load(msg.getInt("PSS"));
+				return result.toString();
 				
+
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();
 
