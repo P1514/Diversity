@@ -842,53 +842,67 @@ public class Loader {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				if (!rs.next()) {
-					cndata.close();
-					cnlocal.close();
-					return Backend.error_message("Loaded Successfully").toString();
+
+		boolean error = false;
+		
+			try (Statement stmt = cndata.createStatement()) {
+				while (true) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					if (!rs.next()) {
+						cndata.close();
+						cnlocal.close();
+						return Backend.error_message("Loaded Successfully").toString();
+					}
+					rs.beforeFirst();
+					ExecutorService es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(multiThread.new Topinions(rs.getLong(1)));
+					es.shutdown();
+					err = awaittermination(es, "Opinions");
+					if (err != null)
+						return err;
+					rs.beforeFirst();
+					es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(multiThread.new Tposts(rs.getLong(1)));
+					es.shutdown();
+
+					err = awaittermination(es, "posts");
+					if (err != null)
+						return err;
+
+				}catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+					query = "Select id from sentimentposts.post where id in (" + query;
+					query = query.replace("ORDER BY ID ASC", ") order by id asc");
+					if (error)
+						return Backend.error_message("Error Loading opinions ids").toString();
+					error = true;
+					continue;
 				}
-				
-				rs.beforeFirst();
-				ExecutorService es = Executors.newFixedThreadPool(10);
-				while (rs.next())
-					es.execute(multiThread.new Topinions(rs.getLong(1)));
-				es.shutdown();
-				err = awaittermination(es, "Opinions");
-				if (err != null)
-					return err;
-				rs.beforeFirst();
-				es = Executors.newFixedThreadPool(10);
-				while (rs.next())
-					es.execute(multiThread.new Tposts(rs.getLong(1)));
-				es.shutdown();
 
-				err = awaittermination(es, "posts");
-				if (err != null)
-					return err;
+			} 
 
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return null;
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-			return Backend.error_message("Error Loading opinions ids").toString();
-		}
 
-		finally
+			finally
 
-		{
-			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+			{
+				try {
+					cndata.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.INFO, Settings.err_unknown, e);
+				}
+				try {
+					cnlocal.close();
+				} catch (SQLException e) {
+					LOGGER.log(Level.INFO, Settings.err_unknown, e);
+				}
 			}
-			try {
-				cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e);
-			}
-		}
-		return null;
 	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {
