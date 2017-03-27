@@ -242,6 +242,11 @@ public class Settings {
 	public static final String tctable_user = "userid";
 	public static final String tctable_model = "modelid";
 	public static final String tctable_ignored_words = "ignoredwords";
+	
+	public static final String ltable = "logs";
+	public static final String ltable_user = "user_id";
+	public static final String ltable_timestamp = "timestamp";
+	public static final String ltable_log = "log";
 
 	// Snapshots Table
 	public static final String lsstable = "snapshots";

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  	<meta http-equiv="Pragma" content="no-cache" />
+  	<meta http-equiv="Expires" content="0" />
+  	<title>Snapshot Info</title>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.4.1/css/bootstrap-slider.css" />
+  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+      if (window.location.href.indexOf('https://') != -1) {
+        ws = new WebSocket('wss://' + window.location.hostname + ":"
+            + window.location.port + '/Diversity/server');
+      } else {
+        ws = new WebSocket('ws://' + window.location.hostname + ":"
+            + window.location.port + '/Diversity/server');
+      }
+
+      function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2)
+          return parts.pop().split(";").shift();
+      }
+
+      var json;
+      ws.onopen = function() {
+        var msg = {
+          'Op' : 'get_log',
+          'Key' : getCookie("JSESSIONID")
+        }
+        ws.send(JSON.stringify(msg));
+      }
+      ws.onmessage = function(event) {
+        json = JSON.parse(event.data);
+
+        if (json[0].hasOwnProperty('Logs') ) {
+          printLog(json[0].Logs);
+        }
+      }
+
+      function printLog(logs) {
+        var div = document.getElementById('log');
+        for (var i = 0; i < logs.length; i++) {
+          div.innerHTML = div.innerHTML + logs[i].Log + '<br><br>';
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="log" style="margin-left:5px;margin-right:5px;margin-top:5px;margin-bottom:5px; text-align: left;">
+      <h3>Sentiment Analysis log (please wait while the page loads)</h3>
+    </div>
+  </body>
+</html>
