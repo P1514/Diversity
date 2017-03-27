@@ -19,18 +19,20 @@ import general.Data;
 import general.Logging;
 import general.Settings;
 
-public class Snapshot{
+public class Snapshot {
 	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 	private final Backend b;
 
-	public Snapshot(Backend b){
-		this.b=b;
+	public Snapshot(Backend b) {
+		this.b = b;
 	}
+
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 	Date dateaux = null;
 	String error = "error";
-	public boolean create(String name, long date, int timespan, String user, String type, String result) {
+
+	public boolean create(String name, long date, int timespan, String user, String type, String result, int id) {
 		ResultSet rs;
 		try {
 			dbconnect();
@@ -53,8 +55,8 @@ public class Snapshot{
 
 		insert = new String("Insert into " + Settings.lsstable + "(" + Settings.lsstable_name + ","
 				+ Settings.lsstable_creation_date + "," + Settings.lsstable_creation_user + ","
-				+ Settings.lsstable_result + "," + Settings.lsstable_type + "," + Settings.lsstable_timespan + ")"
-				+ " values (?,?,?,?,?,?)");
+				+ Settings.lsstable_result + "," + Settings.lsstable_type + "," + Settings.lsstable_timespan + ","
+				+ Settings.lsstable_model_id + ")" + " values (?,?,?,?,?,?,?)");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setLong(2, date);
@@ -62,6 +64,8 @@ public class Snapshot{
 			query1.setString(4, result);
 			query1.setString(5, type);
 			query1.setInt(6, timespan);
+			query1.setInt(7, id);
+
 			query1.execute();
 
 		} catch (Exception e) {
@@ -105,15 +109,15 @@ public class Snapshot{
 			return "bad date";
 		}
 
- 		try {
+		try {
 			b.setMessage(23, obj);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		System.out.println("TEST"+result);
-		return create(name, cdate, timespan, user, "prediction", result) == true ? "success" : "name_in_use";
+		System.out.println("TEST" + result);
+		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}
 
@@ -137,37 +141,36 @@ public class Snapshot{
 			obj.put("Filter", "");
 			b.setMessage(19, obj);
 			result = b.resolve();
-			create(name, cdate, timespan, user, "all", result);
+			create(name, cdate, timespan, user, "all", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Location");
 			b.setMessage(19, obj);
 			result = b.resolve();
-			create(name, cdate, timespan, user, "location", result);
+			create(name, cdate, timespan, user, "location", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Gender");
 			b.setMessage(19, obj);
 			result = b.resolve();
-			create(name, cdate, timespan, user, "gender", result);
+			create(name, cdate, timespan, user, "gender", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Age");
 			b.setMessage(19, obj);
 			result = b.resolve();
-			create(name, cdate, timespan, user, "age", result);
+			create(name, cdate, timespan, user, "age", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Product");
 			b.setMessage(19, obj);
 			result = b.resolve();
-			
-			
-			return create(name, cdate, timespan, user, "product", result) == true ? "success" : "name_in_use";
+
+			return create(name, cdate, timespan, user, "product", result, id) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -176,9 +179,9 @@ public class Snapshot{
 		return "";
 
 	}
-	
-	private String extraction(JSONObject msg){
-		
+
+	private String extraction(JSONObject msg) {
+
 		return "";
 	}
 
@@ -197,7 +200,8 @@ public class Snapshot{
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT name FROM " + Settings.lsstable + " where type=?;");
+		String insert = new String("SELECT " + Settings.lsstable_name + " FROM " + Settings.lsstable + " where "
+				+ Settings.lsstable_type + "=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			if (type.equals("Prediction"))
 				query1.setString(1, "prediction");
@@ -237,7 +241,8 @@ public class Snapshot{
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT result FROM " + Settings.lsstable + " where name=? && type=?;");
+		String insert = new String("SELECT " + Settings.lsstable_result + " FROM " + Settings.lsstable + " where "
+				+ Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))
@@ -258,6 +263,48 @@ public class Snapshot{
 				LOGGER.log(Level.INFO, error, e);
 			}
 		}
+	}
+
+	public JSONArray load(int pss) throws JSONException {
+		JSONArray result = new JSONArray();
+		JSONArray aux = new JSONArray();
+		JSONObject obj = new JSONObject();
+		ResultSet rs;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, error, e);
+			return null;
+		}
+		String insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
+				+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
+				+ "=?);");
+		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+
+				query1.setInt(1, pss);
+
+			// System.out.println("****Names:" + query1.toString());
+			rs = query1.executeQuery();
+			// rs.next();//verify
+			while (rs.next()) {
+				obj = new JSONObject();
+				obj.put("Name", rs.getString("name"));
+				aux.put(obj);
+			}
+			result.put("Snapshots");
+			result.put(aux);
+
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, error, e);
+		}
+		try {
+			if (cnlocal != null)
+				cnlocal.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }
