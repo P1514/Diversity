@@ -386,6 +386,12 @@ public class GetPosts {
 			}
 			return Backend.error_message("ERROR");
 		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 
 	}
