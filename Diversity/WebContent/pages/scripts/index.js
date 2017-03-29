@@ -214,6 +214,7 @@ ws.onmessage = function(event) {
         request_tutorial();
       }
 <<<<<<< HEAD
+<<<<<<< HEAD
       ws.send(JSON.stringify(jsonData));
   }
 
@@ -225,6 +226,8 @@ ws.onmessage = function(event) {
     request_tutorial();
 =======
 >>>>>>> refs/remotes/origin/master
+=======
+>>>>>>> refs/remotes/origin/FM
   }
 }
 

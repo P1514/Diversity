@@ -377,6 +377,10 @@ public class Loader {
 	private String loadGeneral() throws JSONException {
 
 		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
+<<<<<<< HEAD
+=======
+		Connection cnlocal = null;
+>>>>>>> refs/remotes/origin/FM
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -895,12 +899,61 @@ public class Loader {
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
 				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
 				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+<<<<<<< HEAD
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				if (!rs.next()) {
 					cndata.close();
 					cnlocal.close();
 					return Backend.error_message("Loaded Successfully").toString();
+=======
+		Connection cndata = null;
+		Connection cnlocal = null;
+		try {
+			cnlocal = Settings.connlocal();
+			cndata = Settings.conndata();
+		} catch (Exception e1) {
+			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
+			return Backend.error_message(Settings.err_dbconnect).toString();
+		}
+
+		boolean error = false;
+		
+			try (Statement stmt = cndata.createStatement()) {
+				while (true) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					if (!rs.next()) {
+						cndata.close();
+						cnlocal.close();
+						return Backend.error_message("Loaded Successfully").toString();
+					}
+					rs.beforeFirst();
+					ExecutorService es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(multiThread.new Topinions(rs.getLong(1)));
+					es.shutdown();
+					err = awaittermination(es, "Opinions");
+					if (err != null)
+						return err;
+					rs.beforeFirst();
+					es = Executors.newFixedThreadPool(50);
+					while (rs.next())
+						es.execute(multiThread.new Tposts(rs.getLong(1)));
+					es.shutdown();
+
+					err = awaittermination(es, "posts");
+					if (err != null)
+						return err;
+
+				}catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+					query = "Select id from sentimentposts.post where id in (" + query;
+					query = query.replace("ORDER BY ID ASC", ") order by id asc");
+					if (error)
+						return Backend.error_message("Error Loading opinions ids").toString();
+					error = true;
+					continue;
+>>>>>>> refs/remotes/origin/FM
 				}
 				rs.beforeFirst();
 				ExecutorService es = Executors.newFixedThreadPool(50);
