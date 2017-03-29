@@ -280,6 +280,9 @@ public class Settings {
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 		  try {
+			if (condata == null) {
+			  startconnections();
+			}
 		    Future<Connection> future = condata.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -305,6 +308,9 @@ public class Settings {
 	 */
 	public static Connection connlocal() throws ClassNotFoundException, SQLException {
 		try {
+			if (conlocal == null) {
+				startconnections();
+			}
 		    Future<Connection> future = conlocal.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -331,6 +337,9 @@ public class Settings {
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		try {
+			if (concr == null) {
+				startconnections();
+			}
 		    Future<Connection> future = concr.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -339,13 +348,12 @@ public class Settings {
 		        Thread.currentThread().interrupt();
 		      }
 		    }
-		 
+		    
 		    return future.get(); //should return instantly
 		  }catch(Exception e){
 			  LOGGER.log(Level.SEVERE, err_dbconnect);
 			  return null;
 		  }
-
 	}
 
 	/**

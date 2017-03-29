@@ -50,7 +50,7 @@ public class DBHandler extends Handler {
 			reportError(null, ex, ErrorManager.FORMAT_FAILURE);
 			return;
 		}
-
+		
 		dbconnect();
 
 		String sql = "INSERT INTO " + Settings.ltable + "(" + Settings.ltable_user + "," + Settings.ltable_timestamp
@@ -82,7 +82,7 @@ public class DBHandler extends Handler {
 				e.printStackTrace();
 			}
 		}
-
+	
 	}
 
 	@Override
