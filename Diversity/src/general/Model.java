@@ -273,12 +273,13 @@ public final class Model {
 				query1.setString(rangeindex++, products);
 				query1.setString(rangeindex++, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
 				query1.setInt(rangeindex++, msg.getInt("Update"));
+				if (msg.has("mediawiki")) {
+					query1.setBoolean(rangeindex++, true);
+				} else
+					query1.setBoolean(rangeindex++, false);
 			}
 
-			if (msg.has("mediawiki")) {
-				query1.setBoolean(rangeindex++, true);
-			} else
-				query1.setBoolean(rangeindex++, false);
+
 
 
 				query1.setInt(rangeindex++, msg.getInt("Id"));
