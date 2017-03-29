@@ -20,17 +20,125 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LoadThreads {
-
-	static Connection cndata = Loader.cndata;
-	static Connection cnlocal = Loader.cnlocal;
-	static Connection cncr = Loader.cncr;
 	private static final Logger LOGGER = new Logging().create(LoadThreads.class.getName());
+	
+	class Tinsert implements Runnable {
+		private Author a;
+		private Opinion opinion;
+
+		/**
+		 * Instantiates a new tauthors.
+		 *
+		 * @param _a
+		 *            the a
+		 */
+		public Tinsert(Opinion _op) {
+			this.opinion=_op;
+		}
+		
+		public void run() {
+			Connection cnlocal = null;
+			try {
+				cnlocal = Settings.connlocal();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			}
+			String update = "INSERT INTO " + Settings.lotable + " "
+					+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
+					+ Settings.lotable_comments + "=?";
+			try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
+				query1.setLong(1, opinion.getID());
+				query1.setDouble(2, opinion.getReach());
+				query1.setDouble(3, opinion.getPolarity());
+				query1.setDouble(4, opinion.getTotalInf());
+				query1.setLong(5, opinion.getUID());
+				query1.setLong(6, opinion.getTime());
+				query1.setLong(7, opinion.getPSS());
+				query1.setLong(8, opinion.ncomments());
+				query1.setLong(9, opinion.getProduct());
+				query1.setDouble(10, opinion.getReach());
+				query1.setDouble(11, opinion.getPolarity());
+				query1.setDouble(12, opinion.getTotalInf());
+				query1.setLong(13, opinion.ncomments());
+				while (true) {
+					try {
+						query1.executeUpdate();
+					} catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
+						Thread.sleep((long)(Math.random()*1000));
+						continue;
+					}
+					break;
+				}
+				if (!Loader.first_load) {
+					cnlocal.close();
+					return;
+				}
+				for (Post post : opinion.getPosts().values()) {
+					PreparedStatement query2 = null;
+					try {
+						String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
+						query2 = cnlocal.prepareStatement(update1);
+						query2.setLong(1, post.getID());
+						if (post.getPolarity() != -1) {
+							query2.setDouble(2, post.getPolarity());
+						} else {
+							query2.setNull(2, java.sql.Types.DOUBLE);
+						}
+						query2.setString(3, post.getComment());
+						query2.setLong(4, post.getLikes());
+						query2.setLong(5, post.getViews());
+						query2.setLong(6, opinion.getID());
+						query2.setLong(7, post.getUID());
+						while (true) {
+							try {
+								query2.executeUpdate();
+							} catch (Exception e) {
+								LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
+								Thread.sleep((long)(Math.random()*1000));
+								continue;
+							}
+							break;
+						}
+						if (query2 != null)
+							query2.close();
+					} catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+						continue;
+					}
+					try {
+						if (query2 != null)
+							query2.close();
+					} catch (Exception e) {
+					}
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * The Class Tauthors.
 	 */
 	class Tauthors implements Runnable {
 		private Author a;
+		private int counter=0;
 
 		/**
 		 * Instantiates a new tauthors.
@@ -47,7 +155,10 @@ public class LoadThreads {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
+		
 		public void run() {
+			Connection cnlocal=null;
+			LOGGER.log(Level.SEVERE, "started thread nº"+counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -95,9 +206,8 @@ public class LoadThreads {
 	 */
 	class Topinions implements Runnable {
 		private long id;
-		private Connection condata;
-		private Connection conlocal;
 		private JSONObject obj = null;
+		private long counter;
 
 		/**
 		 * Instantiates a new topinions referenced to local data.
@@ -164,29 +274,74 @@ public class LoadThreads {
 		}
 
 		public void run() {
-			try {
-				conlocal = Settings.connlocal();
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-				return;
-			}
+			Connection cndata;
+			Connection cnlocal;
 			if (obj == null) {
+				
+				
+				///Change load order
+				
+				try{
+					cnlocal= Settings.connlocal();
+					}catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+						return;
+					}
+					String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id + " = "
+							+ id);
+					try (Statement stmt = cnlocal.createStatement()) {
+						try (ResultSet rs = stmt.executeQuery(query)) {
+							if (rs.next()) {
+								if(Loader.first_load)Loader.totalposts--;
+								load(rs, false);
+							}
+
+						}
+					} catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+						try {
+							cnlocal.close();
+						} catch (Exception e1) {
+							LOGGER.log(Level.SEVERE, Settings.err_unknown, e1);
+						}
+						return;
+					}
+					try {
+						cnlocal.close();
+					} catch (Exception e) {
+						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+						return;
+					}
+					
+					// FInished load order
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				try {
-					condata = Settings.conndata();
+					cndata = Settings.conndata();
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
 				boolean remote = true;
-				String query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable_postid
+				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable_postid
 						+ " = " + id);
-				try (Statement stmt = condata.createStatement()) {
+				try (Statement stmt = cndata.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (!rs.next()) {
 							remote = false;
 						} else {
 							load(rs, remote);
-							condata.close();
+							cndata.close();
 						}
 					}
 				} catch (Exception e) {
@@ -196,56 +351,30 @@ public class LoadThreads {
 					} catch (SQLException e1) {
 						LOGGER.log(Level.INFO, Settings.err_unknown, e1);
 					}
-					try {
-						cnlocal.close();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					return;
-				}
-
-				query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id + " = "
-						+ id);
-				try (Statement stmt = conlocal.createStatement()) {
-					try (ResultSet rs = stmt.executeQuery(query)) {
-						Loader.totalposts--;
-						if (rs.next()) {
-							load(rs, false);
-						}
-
-					}
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-					try {
-						conlocal.close();
-					} catch (Exception e1) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown, e1);
-					}
-					return;
-				}
-				try {
-					conlocal.close();
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					return;
 				}
 			} else
 
 			{
+				try {
+					cnlocal= Settings.connlocal();
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+					return;
+				}
 				Statement stmt = null;
 				ResultSet rs = null;
 				try {// TODO AQUI
 					boolean remote = false;
 					String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id
 							+ " = " + id);
-					stmt = conlocal.createStatement();
+					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
 						remote = true;
 						rs.close();
 						stmt.close();
-						conlocal.close();
+						cnlocal.close();
 					} else {
 						Loader.totalposts--;
 					}
@@ -320,8 +449,8 @@ public class LoadThreads {
 						rs.close();
 					if (stmt != null)
 						stmt.close();
-					if (conlocal != null)
-						conlocal.close();
+					if (cnlocal != null)
+						cnlocal.close();
 				} catch (SQLException | JSONException e) {
 					System.out.println("ERROR loading Opinions");
 					e.printStackTrace();
@@ -342,14 +471,8 @@ public class LoadThreads {
 						e.printStackTrace();
 					}
 					try {
-						if (condata != null)
-							condata.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					try {
-						if (conlocal != null)
-							conlocal.close();
+						if (cnlocal != null)
+							cnlocal.close();
 
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -369,8 +492,6 @@ public class LoadThreads {
 	class Tposts implements Runnable {
 		private long id;
 		private Opinion _opin;
-		private Connection condata;
-		private Connection conlocal;
 		private JSONObject obj = null;
 
 		/**
@@ -409,14 +530,15 @@ public class LoadThreads {
 				return;
 			Statement stmt = null;
 			ResultSet rs = null;
+			Connection cndata=null;
+			Connection cnlocal=null;
 			if (obj == null) {
 				try {
 					// System.out.println("HELLO1");
-					condata = Settings.conndata();
-					conlocal = Settings.connlocal();
+					cndata = Settings.conndata();
 					String query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere
 							+ Settings.rptable_rpostid + " = " + id);
-					stmt = condata.createStatement();
+					stmt = cndata.createStatement();
 					// System.out.println(query);
 					rs = stmt.executeQuery(query);
 					if (rs.next()) {
@@ -447,9 +569,11 @@ public class LoadThreads {
 					}
 					rs.close();
 					stmt.close();
+					cndata.close();
+					cnlocal = Settings.connlocal();
 					query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_opinion
 							+ " = " + id);
-					stmt = conlocal.createStatement();
+					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					// System.out.println(query);
 					if (rs.next()) {
@@ -471,10 +595,10 @@ public class LoadThreads {
 						rs.close();
 					if (stmt != null)
 						stmt.close();
-					if (condata != null)
-						condata.close();
-					if (conlocal != null)
-						conlocal.close();
+					if (cndata != null)
+						cndata.close();
+					if (cnlocal != null)
+						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
 					System.out.println("ERROR loading Posts");
@@ -496,14 +620,14 @@ public class LoadThreads {
 						e.printStackTrace();
 					}
 					try {
-						if (condata != null)
-							condata.close();
+						if (cndata != null)
+							cndata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					try {
-						if (conlocal != null)
-							conlocal.close();
+						if (cnlocal != null)
+							cnlocal.close();
 
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -581,14 +705,14 @@ public class LoadThreads {
 						e.printStackTrace();
 					}
 					try {
-						if (condata != null)
-							condata.close();
+						if (cndata != null)
+							cndata.close();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 					try {
-						if (conlocal != null)
-							conlocal.close();
+						if (cnlocal != null)
+							cnlocal.close();
 
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block
@@ -613,8 +737,15 @@ public class LoadThreads {
 			// System.out.println("HELLO1");
 			Statement stmt = null;
 			ResultSet rs = null;
+			Connection cnlocal=null;
 			try {
 				cnlocal = Settings.connlocal();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return;
+			}
+			try {
 				String query = (Settings.sqlselectall + Settings.lmtable);
 				stmt = cnlocal.createStatement();
 				// System.out.println(query);
@@ -634,8 +765,9 @@ public class LoadThreads {
 				rs.close();
 				stmt.close();
 				cnlocal.close();
-			} catch (SQLException | ClassNotFoundException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+				return;
 			} finally {
 				try {
 					if (rs != null)
@@ -650,14 +782,8 @@ public class LoadThreads {
 					e.printStackTrace();
 				}
 				try {
-					if (condata != null)
-						condata.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				try {
-					if (conlocal != null)
-						conlocal.close();
+					if (cnlocal != null)
+						cnlocal.close();
 
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
