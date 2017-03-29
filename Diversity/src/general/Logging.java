@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,11 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Logging {
-
 	
 	private static Connection cnlocal;
 	/*
->>>>>>> refs/remotes/origin/FM
 	public Logger create(String classname) {
 		Logger LOGGER = Logger.getLogger(classname);
 		FileHandler fh;
@@ -52,10 +49,6 @@ public class Logging {
 		}
 		return LOGGER;
 	}
-<<<<<<< HEAD
-
-	public static JSONArray getAllLogs() throws IOException, JSONException {
-=======
 	*/
 	
 	public Logger create(String classname) {
@@ -109,7 +102,6 @@ public class Logging {
 		
 		return logs;
 		/*
->>>>>>> refs/remotes/origin/FM
 		JSONArray logs = new JSONArray();
 		File homeLoggingDir = new File(System.getProperty("user.home") + "/SentimentAnalysisLogs/");
 		if (!homeLoggingDir.exists()) {
@@ -134,10 +126,7 @@ public class Logging {
 		logs.put(getLogs("monitoring.Oversight.log"));
 
 		return logs;
-<<<<<<< HEAD
-=======
 		*/
-
 	}
 	
 	public static JSONObject getLogs(String classname) throws IOException, JSONException {
@@ -152,7 +141,6 @@ public class Logging {
 		logsJSON.put(classname, text);
 		System.out.println(classname);
 		return logsJSON;
-
 	}
 	
 	private static void dbconnect() {
@@ -161,6 +149,5 @@ public class Logging {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 }
