@@ -39,9 +39,9 @@ public class Startup implements ServletContextListener {
 				e1.printStackTrace();
 			}*/
 		
-
-		LOGGER.log(Level.INFO,"Starting up!");
 		Settings.startconnections();
+		LOGGER.log(Level.INFO,"Starting up!");
+		
 		Oversight o = new Oversight(true);
 		o.run();
 		//new Oversight();
