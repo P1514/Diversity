@@ -15,6 +15,7 @@ public class Operations {
 		permission.put(2, 99);
 		permission.put(4, 2);
 		permission.put(5, -1);
+		permission.put(6, 1);
 		permission.put(7, 99);
 		permission.put(12, 2);
 		permission.put(14, 1);
@@ -43,7 +44,7 @@ public class Operations {
 		op.put("globalsentiment", 3); // not used
 		op.put("getposts", 4); // View Results
 		op.put("getmodels", 5); // No particular
-		op.put("getcomments", 6); // not used
+		op.put("getcomments", 6); // Table comments
 		op.put("clean", 7); // ONLY ADMIN
 		op.put("getauthors", 8); // not used
 		op.put("getlastpost", 9); // not used
