@@ -827,7 +827,7 @@ public class Loader {
 	}
 
 	private String loaduopid() throws JSONException {
-		String err;
+		String err=null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
@@ -854,23 +854,23 @@ public class Loader {
 						return Backend.error_message("Loaded Successfully").toString();
 					}
 					rs.beforeFirst();
-					ExecutorService es = Executors.newFixedThreadPool(50);
+					ExecutorService es = Executors.newFixedThreadPool(10);
 					while (rs.next())
 						es.execute(multiThread.new Topinions(rs.getLong(1)));
 					es.shutdown();
 					err = awaittermination(es, "Opinions");
 					if (err != null)
-						return err;
+						break;
 					rs.beforeFirst();
-					es = Executors.newFixedThreadPool(50);
+					es = Executors.newFixedThreadPool(10);
 					while (rs.next())
 						es.execute(multiThread.new Tposts(rs.getLong(1)));
 					es.shutdown();
 
 					err = awaittermination(es, "posts");
 					if (err != null)
-						return err;
-
+						break;
+					break;
 				}catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
@@ -903,6 +903,7 @@ public class Loader {
 					LOGGER.log(Level.INFO, Settings.err_unknown, e);
 				}
 			}
+			return err;
 	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {

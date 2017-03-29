@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	private static DataSource conlocal = null;
+	private static DataSource conlocal;
 	private static DataSource condata;
 	private static DataSource concr;
 	
@@ -151,7 +151,7 @@ public class Settings {
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final boolean LocalPolarity = false;
+	public static final boolean LocalPolarity = true;
 
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
@@ -280,8 +280,9 @@ public class Settings {
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 		  try {
+			  while(condata==null){}
 		    Future<Connection> future = condata.getConnectionAsync();
-		    while (!future.isDone()) {
+		    while (future == null || !future.isDone()) {
 		      try {
 		        Thread.sleep(100); //simulate work
 		      }catch (InterruptedException x) {
@@ -305,9 +306,10 @@ public class Settings {
 	 */
 	public static Connection connlocal() throws ClassNotFoundException, SQLException {
 		try {
-			if (conlocal == null) {
+
+			if(conlocal==null)
 				startconnections();
-			}
+
 		    Future<Connection> future = conlocal.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -334,8 +336,9 @@ public class Settings {
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		try {
+			while(concr==null){}
 		    Future<Connection> future = concr.getConnectionAsync();
-		    while (!future.isDone()) {
+		    while (future == null || !future.isDone()) {
 		      try {
 		        Thread.sleep(100); //simulate work
 		      }catch (InterruptedException x) {

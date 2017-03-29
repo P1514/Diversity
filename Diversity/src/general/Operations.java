@@ -13,7 +13,7 @@ public class Operations {
 		//4- prediction
 		//99- ADMIN
 		permission.put(2, 99);
-		permission.put(4, 2);
+		permission.put(4, 1);
 		permission.put(5, -1);
 		permission.put(6, 1);
 		permission.put(7, 99);
