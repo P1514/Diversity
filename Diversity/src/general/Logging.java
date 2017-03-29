@@ -6,14 +6,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-<<<<<<< HEAD
-=======
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
->>>>>>> refs/remotes/origin/FM
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -25,9 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Logging {
-<<<<<<< HEAD
 
-=======
 	
 	private static Connection cnlocal;
 	/*
@@ -141,7 +137,7 @@ public class Logging {
 <<<<<<< HEAD
 =======
 		*/
->>>>>>> refs/remotes/origin/FM
+
 	}
 	
 	public static JSONObject getLogs(String classname) throws IOException, JSONException {
@@ -156,8 +152,7 @@ public class Logging {
 		logsJSON.put(classname, text);
 		System.out.println(classname);
 		return logsJSON;
-<<<<<<< HEAD
-=======
+
 	}
 	
 	private static void dbconnect() {
@@ -166,6 +161,6 @@ public class Logging {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
->>>>>>> refs/remotes/origin/FM
+
 	}
 }

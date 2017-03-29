@@ -377,10 +377,8 @@ public class Loader {
 	private String loadGeneral() throws JSONException {
 
 		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
-<<<<<<< HEAD
-=======
+
 		Connection cnlocal = null;
->>>>>>> refs/remotes/origin/FM
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -899,14 +897,7 @@ public class Loader {
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
 				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
 				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
-<<<<<<< HEAD
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				if (!rs.next()) {
-					cndata.close();
-					cnlocal.close();
-					return Backend.error_message("Loaded Successfully").toString();
-=======
+
 		Connection cndata = null;
 		Connection cnlocal = null;
 		try {
@@ -953,7 +944,6 @@ public class Loader {
 						return Backend.error_message("Error Loading opinions ids").toString();
 					error = true;
 					continue;
->>>>>>> refs/remotes/origin/FM
 				}
 				rs.beforeFirst();
 				ExecutorService es = Executors.newFixedThreadPool(50);
