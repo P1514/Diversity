@@ -45,7 +45,8 @@ public class Backend {
 		msg = _msg;
 
 	}
-	public void setMessage (int _op, JSONObject _msg) throws JSONException{
+
+	public void setMessage(int _op, JSONObject _msg) throws JSONException {
 		op = _op;
 		_msg.put("Key", msg.get("Key"));
 		msg = _msg;
@@ -120,7 +121,8 @@ public class Backend {
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
 
-			case 30:
+
+			case 29:
 				obj = new JSONObject();
 				result = new JSONArray();
 				try {
@@ -133,19 +135,15 @@ public class Backend {
 				
 				return result.toString();
 
-			case 29://TODO integrate with the rest of the snapshot load, when frontend part is implemented
-				result = snapshot.load(msg.getInt("PSS"));
-				return result.toString();
-				
-
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();
 
 			case 27:
 				obj = new JSONObject();
 				result = new JSONArray();
-				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				Tagcloud tag = new Tagcloud(
+						gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+						id, msg.has("User") ? msg.getLong("User") : 0);
 				if (msg.has("Word")) {
 					tag.addIgnoreWord(msg.getString("Word"));
 				}
@@ -157,8 +155,9 @@ public class Backend {
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
-				tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				tag = new Tagcloud(
+						gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+						id, msg.has("User") ? msg.getLong("User") : 0);
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);
@@ -170,6 +169,9 @@ public class Backend {
 				String resul;
 				if (msg.has("Name")) {
 					return snapshot.load(msg.getString("Name"), msg.has("Type") ? msg.getString("Type") : "");
+				}
+				if (msg.has("PSS")) {
+					return snapshot.load(msg.getInt("PSS")).toString();
 				} else {
 					result = snapshot.loadNames(msg.getString("Type"));
 					resul = result.toString();
@@ -192,7 +194,7 @@ public class Backend {
 							msg.getInt("timespan"), msg.getString("user"), msg.has("Id") ? msg.getInt("Id") : 0);
 
 				}
-
+				result = new JSONArray();
 				if (res.equals("name_in_use")) {
 					obj.put("Message", "Name Already in Use");
 					obj.put("Op", "Error");
@@ -229,9 +231,9 @@ public class Backend {
 					obj.put("Op", "Error");
 					result.put(obj);
 				}
-				if(op==23)
-				return result.toString();
-				
+				if (op == 23)
+					return result.toString();
+
 			case 22:
 				return Roles.getRestrictions(msg.getString("Role")).toString();
 
@@ -263,10 +265,8 @@ public class Backend {
 				} else
 					gs.globalsentiment(null, null, gr.getTOPReach(5));
 
-				
 				LOGGER.log(Level.INFO, gs.globalsentiment());
 
-				
 				try {
 					result.put(new JSONArray(gs.globalsentiment()));
 				} catch (JSONException e) {
@@ -312,7 +312,7 @@ public class Backend {
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
 				if (msg.has("Extrapolate")) {
-					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
+					LOGGER.log(Level.INFO, "EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
 						result = convert(result,
 								extra.extrapolate(param + "," + filtering,
@@ -323,8 +323,8 @@ public class Backend {
 										id, Data.getmodel(id).getFrequency()),
 								"Graph", "Bottom_Right_Ex");
 				}
-				
-				LOGGER.log(Level.INFO,result.toString());
+
+				LOGGER.log(Level.INFO, result.toString());
 
 				return result.toString();
 
@@ -341,8 +341,12 @@ public class Backend {
 							"Top_Middle");
 					result = convert(result, gs.getCurSentiment(param, values, id), "Graph", "Top_Right");
 					result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
-					result = convert(result, gr.globalreach(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Middle");
-					result = convert(result, gs.globalsentiment(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right");
+					result = convert(result,
+							gr.globalreach(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph",
+							"Bottom_Middle");
+					result = convert(result,
+							gs.globalsentiment(param, values, "Global", id, Data.getmodel(id).getFrequency()), "Graph",
+							"Bottom_Right");
 				} else {
 					obj = new JSONObject();
 					obj.put("Error", "No_data");
@@ -466,7 +470,8 @@ public class Backend {
 		return null;
 	}
 
-	private static JSONArray convert(JSONArray result, JSONArray to_add, String param, String graph) throws JSONException {
+	private static JSONArray convert(JSONArray result, JSONArray to_add, String param, String graph)
+			throws JSONException {
 		for (int i = 0; i < to_add.length(); i++) {
 			JSONObject obj = new JSONObject();
 			JSONObject helper = to_add.getJSONObject(i);

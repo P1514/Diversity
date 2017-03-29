@@ -213,6 +213,21 @@ ws.onmessage = function(event) {
         localStorage.tutorial += "";
         request_tutorial();
       }
+<<<<<<< HEAD
+<<<<<<< HEAD
+      ws.send(JSON.stringify(jsonData));
+  }
+
+  if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("home=done") == -1) { // if the user never opened this page, start the tutorial
+    request_tutorial();
+  }
+  if (localStorage.tutorial == undefined) {
+    localStorage.tutorial += "";
+    request_tutorial();
+=======
+>>>>>>> refs/remotes/origin/master
+=======
+>>>>>>> refs/remotes/origin/FM
   }
 }
 
