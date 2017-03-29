@@ -254,7 +254,7 @@ public final class Model {
 							 * Settings.lmtable_gender + "=?, "
 							 */ + Settings.lmtable_archived + "=?"
 				+ (delete ? ""
-						: ", "+Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
+						: ", " + Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
 								+ Settings.lmtable_update + "=?, " + Settings.lmtable_add_mediawiki + "=? ")
 				+ "Where " + Settings.lmtable_id + "=?";
 		PreparedStatement query1 = null;
@@ -279,13 +279,16 @@ public final class Model {
 					query1.setBoolean(rangeindex++, false);
 			}
 
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> refs/remotes/origin/master
 
-
-				query1.setInt(rangeindex++, msg.getInt("Id"));
+			query1.setInt(rangeindex++, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
 			// query1.setString(2, msg.getString("Gender"));
-			 //System.out.println(query1);
+			// System.out.println(query1);
 			query1.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
