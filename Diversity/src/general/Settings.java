@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	private static DataSource conlocal;
+	private static DataSource conlocal = null;
 	private static DataSource condata;
 	private static DataSource concr;
 	
@@ -305,6 +305,9 @@ public class Settings {
 	 */
 	public static Connection connlocal() throws ClassNotFoundException, SQLException {
 		try {
+			if (conlocal == null) {
+				startconnections();
+			}
 		    Future<Connection> future = conlocal.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -339,13 +342,12 @@ public class Settings {
 		        Thread.currentThread().interrupt();
 		      }
 		    }
-		 
+		    
 		    return future.get(); //should return instantly
 		  }catch(Exception e){
 			  LOGGER.log(Level.SEVERE, err_dbconnect);
 			  return null;
 		  }
-
 	}
 
 	/**

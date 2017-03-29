@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.*;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 
@@ -10,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import general.Backend;
+import general.Settings;
 import monitoring.Oversight;
 
 public class BackendTest extends Thread {
@@ -19,8 +21,9 @@ public class BackendTest extends Thread {
 	String result;
 	Oversight o = new Oversight(true);
 
-	public BackendTest() {
+	public BackendTest() throws ClassNotFoundException, SQLException {
 		o.run();
+		Settings.connlocal().close();
 
 	}
 
