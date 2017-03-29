@@ -1,8 +1,11 @@
 package general;
 
 import java.sql.DriverManager;
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,12 +13,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mysql.jdbc.Connection;
+import java.sql.Connection;
 
 /**
  * The Class Settings.
  */
 public class Settings {
+	
+	private static DataSource conlocal;
+	private static DataSource condata;
+	private static DataSource concr;
+	
 	// To be replaced by properties file
 	// Data Origin DB Specs
 	private static final Logger LOGGER = new Logging().create(Settings.class.getName());
@@ -234,6 +242,11 @@ public class Settings {
 	public static final String tctable_user = "userid";
 	public static final String tctable_model = "modelid";
 	public static final String tctable_ignored_words = "ignoredwords";
+	
+	public static final String ltable = "logs";
+	public static final String ltable_user = "user_id";
+	public static final String ltable_timestamp = "timestamp";
+	public static final String ltable_log = "log";
 
 	// Snapshots Table
 	public static final String lsstable = "snapshots";
@@ -266,8 +279,21 @@ public class Settings {
 	 *             the SQL exception
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		return (Connection) DriverManager.getConnection(rurl, ruser, rpass);
+		  try {
+		    Future<Connection> future = condata.getConnectionAsync();
+		    while (!future.isDone()) {
+		      try {
+		        Thread.sleep(100); //simulate work
+		      }catch (InterruptedException x) {
+		        Thread.currentThread().interrupt();
+		      }
+		    }
+		 
+		    return future.get(); //should return instantly
+		  }catch(Exception e){
+			  LOGGER.log(Level.SEVERE, err_dbconnect);
+			  return null;
+		  }
 	}
 
 	/**
@@ -278,8 +304,21 @@ public class Settings {
 	 *             the class not found exception
 	 */
 	public static Connection connlocal() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		return (Connection) DriverManager.getConnection(url2, user2, pass2);
+		try {
+		    Future<Connection> future = conlocal.getConnectionAsync();
+		    while (!future.isDone()) {
+		      try {
+		        Thread.sleep(100); //simulate work
+		      }catch (InterruptedException x) {
+		        Thread.currentThread().interrupt();
+		      }
+		    }
+		 
+		    return future.get(); //should return instantly
+		  }catch(Exception e){
+			  LOGGER.log(Level.SEVERE, err_dbconnect);
+			  return null;
+		  }
 	}
 
 	/**
@@ -291,8 +330,21 @@ public class Settings {
 	 * @throws SQLException
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		return (Connection) DriverManager.getConnection(crurl, cruser, crpass);
+		try {
+		    Future<Connection> future = concr.getConnectionAsync();
+		    while (!future.isDone()) {
+		      try {
+		        Thread.sleep(100); //simulate work
+		      }catch (InterruptedException x) {
+		        Thread.currentThread().interrupt();
+		      }
+		    }
+		 
+		    return future.get(); //should return instantly
+		  }catch(Exception e){
+			  LOGGER.log(Level.SEVERE, err_dbconnect);
+			  return null;
+		  }
 
 	}
 
@@ -393,5 +445,91 @@ public class Settings {
 			msg.put("Message", "Nothing Changed");
 		}
 		return msg;
+	}
+	
+	public static void startconnections(){
+		PoolProperties p = new PoolProperties();
+        p.setUrl(rurl);
+        p.setDriverClassName("com.mysql.jdbc.Driver");
+        p.setUsername(ruser);
+        p.setPassword(rpass);
+        p.setJmxEnabled(true);
+        p.setTestWhileIdle(false);
+        p.setTestOnBorrow(true);
+        p.setFairQueue(true);
+        p.setValidationQuery("SELECT 1");
+        p.setTestOnReturn(false);
+        p.setValidationInterval(30000);
+        p.setTimeBetweenEvictionRunsMillis(30000);
+        p.setMaxActive(40);
+        p.setMaxIdle(1);
+        p.setInitialSize(1);
+        p.setMaxWait(10000);
+        p.setRemoveAbandonedTimeout(60);
+        p.setMinEvictableIdleTimeMillis(30000);
+        p.setMinIdle(1);
+        p.setLogAbandoned(true);
+        p.setRemoveAbandoned(true);
+        p.setJdbcInterceptors(
+          "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+
+          "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
+        condata = new DataSource();
+        condata.setPoolProperties(p);
+        
+        p = new PoolProperties();
+        p.setMaxIdle(40);
+        p.setUrl(url2);
+        p.setDriverClassName("com.mysql.jdbc.Driver");
+        p.setUsername(user2);
+        p.setPassword(pass2);
+        p.setJmxEnabled(true);
+        p.setTestWhileIdle(false);
+        p.setTestOnBorrow(true);
+        p.setFairQueue(true);
+        p.setValidationQuery("SELECT 1");
+        p.setTestOnReturn(false);
+        p.setValidationInterval(30000);
+        p.setTimeBetweenEvictionRunsMillis(30000);
+        p.setMaxActive(80);
+        p.setInitialSize(10);
+        p.setMaxWait(10000);
+        p.setRemoveAbandonedTimeout(60);
+        p.setMinEvictableIdleTimeMillis(30000);
+        p.setMinIdle(30);
+        p.setLogAbandoned(true);
+        p.setRemoveAbandoned(true);
+        p.setJdbcInterceptors(
+          "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+
+          "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
+        conlocal = new DataSource();
+        conlocal.setPoolProperties(p);
+        
+        p = new PoolProperties();
+        p.setMaxIdle(40);
+        p.setUrl(crurl);
+        p.setDriverClassName("com.mysql.jdbc.Driver");
+        p.setUsername(cruser);
+        p.setPassword(crpass);
+        p.setJmxEnabled(true);
+        p.setTestWhileIdle(false);
+        p.setTestOnBorrow(true);
+        p.setFairQueue(true);
+        p.setValidationQuery("SELECT 1");
+        p.setTestOnReturn(false);
+        p.setValidationInterval(30000);
+        p.setTimeBetweenEvictionRunsMillis(30000);
+        p.setMaxActive(40);
+        p.setInitialSize(10);
+        p.setMaxWait(10000);
+        p.setRemoveAbandonedTimeout(60);
+        p.setMinEvictableIdleTimeMillis(30000);
+        p.setMinIdle(10);
+        p.setLogAbandoned(true);
+        p.setRemoveAbandoned(true);
+        p.setJdbcInterceptors(
+          "org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;"+
+          "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer");
+        concr = new DataSource();
+        concr.setPoolProperties(p);
 	}
 }

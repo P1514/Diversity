@@ -15,6 +15,7 @@ public class Operations {
 		permission.put(2, 99);
 		permission.put(4, 2);
 		permission.put(5, -1);
+		permission.put(6, 1);
 		permission.put(7, 99);
 		permission.put(12, 2);
 		permission.put(14, 1);
@@ -33,6 +34,7 @@ public class Operations {
 		permission.put(27, 3);
 		permission.put(28, 1);
 		permission.put(29, 3);
+
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;
@@ -43,7 +45,7 @@ public class Operations {
 		op.put("globalsentiment", 3); // not used
 		op.put("getposts", 4); // View Results
 		op.put("getmodels", 5); // No particular
-		op.put("getcomments", 6); // not used
+		op.put("getcomments", 6); // Table comments
 		op.put("clean", 7); // ONLY ADMIN
 		op.put("getauthors", 8); // not used
 		op.put("getlastpost", 9); // not used
@@ -67,6 +69,7 @@ public class Operations {
 		op.put("set_ignore_word", 27); // set user ignored words
 		op.put("get_mediawiki", 28); // Create model
 		op.put("get_log", 29); // get all logs
+
 
 		op.put("testing", 99); // Admin only
 	}

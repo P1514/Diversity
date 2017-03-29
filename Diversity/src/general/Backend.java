@@ -121,6 +121,7 @@ public class Backend {
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
 
+<<<<<<< HEAD
 
 			case 29:
 				try {
@@ -130,6 +131,25 @@ public class Backend {
 					e.printStackTrace();
 				}
 				return result.toString();
+=======
+			case 30:
+				obj = new JSONObject();
+				result = new JSONArray();
+				try {
+					obj.put("Logs", Logging.getAllLogs());
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				result.put(obj);
+				
+				return result.toString();
+
+			case 29://TODO integrate with the rest of the snapshot load, when frontend part is implemented
+				result = snapshot.load(msg.getInt("PSS"));
+				return result.toString();
+				
+>>>>>>> refs/remotes/origin/master
 
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();

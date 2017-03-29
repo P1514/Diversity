@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.mysql.jdbc.Connection;
+import java.sql.Connection;
 
 import extraction.GetReach;
 import extraction.Globalsentiment;
