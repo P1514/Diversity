@@ -58,8 +58,18 @@ document.addEventListener('DOMContentLoaded', function() {
       makeTree("serv_list",jsonData);
       $('#serv_list').jstree(true).refresh();
 
-			if (localStorage.tutorial.indexOf("prediction=done") == -1) {
+			if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("prediction=done") == -1) { // if the user never opened this page, start the tutorial
+
 				request_tutorial();
+			}
+			if (localStorage.tutorial == undefined) {
+				localStorage.tutorial += "";
+				request_tutorial();
+			}
+
+			if (window.location.href.indexOf('snapshot=') != -1) {
+				var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+				requestSnapshot(snapName);
 			}
     }
 
@@ -83,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
     if (json[0] == "Snapshots") {
-      snapshots = json[1];
-      displaySnapshots();
+	      snapshots = json[1];
+	      displaySnapshots();
     }
   }
 });
