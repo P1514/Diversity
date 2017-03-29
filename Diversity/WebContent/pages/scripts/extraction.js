@@ -251,25 +251,12 @@ function connect() {
 				}
 			}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-			//After the configuration, ask for the opinion extraction (chart) data or the snapshot if the user comes from a snapshot URL
-
-			if (window.location.href.indexOf('snapshot=') != -1) {
-			  var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
-=======
-=======
->>>>>>> refs/remotes/origin/FM
 			// After the configuration, ask for the opinion extraction (chart)
 			// data or the snapshot if the user comes from a snapshot URL
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapName = window.location.href.split("snapshot=")[1]
 						.split("&")[0].replace('%20', ' ');
-<<<<<<< HEAD
->>>>>>> refs/remotes/origin/master
-=======
->>>>>>> refs/remotes/origin/FM
 				snap
 				json = {
 					"Op" : "load_snapshot",
@@ -281,15 +268,7 @@ function connect() {
 				json = {
 					"Op" : "opinion_extraction",
 					"Id" : window.sessionStorage.id,
-<<<<<<< HEAD
-<<<<<<< HEAD
-	        'Key' : getCookie("JSESSIONID")
-=======
 					'Key' : getCookie("JSESSIONID")
->>>>>>> refs/remotes/origin/master
-=======
-					'Key' : getCookie("JSESSIONID")
->>>>>>> refs/remotes/origin/FM
 				}
 			}
 			ws.send(JSON.stringify(json));
@@ -394,16 +373,6 @@ function connect() {
 google.charts.load('current', {
 	packages : [ 'corechart', 'bar', 'gauge' ]
 });
-<<<<<<< HEAD
-<<<<<<< HEAD
-$(document).ready(function () {
-	google.charts.setOnLoadCallback(connect);
-	if (localStorage.tutorial != undefined || localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
-    request_tutorial();
-  }
-=======
-=======
->>>>>>> refs/remotes/origin/FM
 $(document).ready(
 		function() {
 			google.charts.setOnLoadCallback(connect);
@@ -411,10 +380,6 @@ $(document).ready(
 $(window).load(function() {
 	$('#overlay').hide();
 	$('#overlay-back').hide();
-<<<<<<< HEAD
->>>>>>> refs/remotes/origin/master
-=======
->>>>>>> refs/remotes/origin/FM
 });
 
 $(document).ready(function() {
