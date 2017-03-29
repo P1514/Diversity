@@ -44,7 +44,7 @@ public class Operations {
 		op.put("globalsentiment", 3); // not used
 		op.put("getposts", 4); // View Results
 		op.put("getmodels", 5); // No particular
-		op.put("getcomments", 6); // View Results
+		op.put("getcomments", 6); // Table comments
 		op.put("clean", 7); // ONLY ADMIN
 		op.put("getauthors", 8); // not used
 		op.put("getlastpost", 9); // not used
