@@ -184,7 +184,7 @@ public class GetReach {
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			//System.out.println(query1.toString());
+			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -217,6 +217,7 @@ public class GetReach {
 
 	private avg calc_avg(String param, ResultSet rs) throws SQLException {
 		avg result = new avg();
+		boolean notzero = false;
 		switch (param) {
 
 		case "reach":
@@ -231,6 +232,12 @@ public class GetReach {
 				result.auxcalc += (double) rs.getDouble(Settings.lptable_polarity)
 						* rs.getDouble(Settings.lotable_reach);
 				result.total += rs.getDouble(Settings.lotable_reach);
+				System.out.println("\nnot zero\n");
+				notzero = true;
+			}
+			if(!notzero){
+				result.total=1;
+				result.auxcalc=-1;
 			}
 			break;
 		default:
