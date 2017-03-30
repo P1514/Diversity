@@ -252,11 +252,11 @@ public final class Model {
 				+ " Set "/*
 							 * + Settings.lmtable_age + "=?, " +
 							 * Settings.lmtable_gender + "=?, "
-							 */ + Settings.lmtable_archived + "=?"
+							 */ + Settings.lmtable_archived + "=? "
 				+ (delete ? ""
 						: ", " + Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
 								+ Settings.lmtable_update + "=?, " + Settings.lmtable_add_mediawiki + "=? ")
-				+ "Where " + Settings.lmtable_id + "=?";
+				+ "Where " + Settings.lmtable_id + "=? ";
 		PreparedStatement query1 = null;
 		try {
 			dbconnect();
