@@ -205,7 +205,7 @@ ws.onmessage = function(event) {
         'Key' : getCookie("JSESSIONID")
     }
     ws.send(JSON.stringify(jsonData));
-    
+
     if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("home=done") == -1) { // if the user never opened this page, start the tutorial
         request_tutorial();
       }
@@ -412,7 +412,7 @@ function drawChart() {
   var counter = data[1];
 /*
  * var pssNumber = 0;
- * 
+ *
  * for (var i = 0; i < counter.length; i++) { // find the number of PSSs to
  * display (amount of 'Filter' in JSON) if (counter[i].hasOwnProperty('Filter')) {
  * globaldata.addColumn('number', counter[i].Filter); pssNumber++; } }
@@ -484,9 +484,11 @@ function drawChart() {
   height : '100%',
   explorer: {
     axis: 'horizontal',
-    keepInBounds: false,
-    maxZoomIn: 4.0
+    keepInBounds: true,
+    maxZoomIn: 2.0,
+    maxZoomOut : 1,
   },
+  pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
   legend : {
     maxLines: 5,
     position: 'bottom'
@@ -512,7 +514,8 @@ function drawChart() {
            height: '30%',
            width: '20%'
          }
-       }
+       },
+       minRangeSize : 7889238000,
      },
     },
     state: {

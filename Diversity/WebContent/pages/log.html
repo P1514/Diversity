@@ -4,7 +4,7 @@
   	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   	<meta http-equiv="Pragma" content="no-cache" />
   	<meta http-equiv="Expires" content="0" />
-  	<title>Snapshot Info</title>
+  	<title>Sentiment Analysis Logs</title>
   	<meta charset="utf-8">
   	<meta name="viewport" content="width=device-width, initial-scale=1">
   	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -50,14 +50,17 @@
       function printLog(logs) {
         var div = document.getElementById('log');
         for (var i = 0; i < logs.length; i++) {
-          div.innerHTML = div.innerHTML + logs[i].Log + '<br><br>';
+          var logName = logs[i].log;
+          var path = "Logs/" + logName;
+          //div.innerHTML = div.innerHTML + '<a onClick=\'window.location.href=\"' + path + '\"\' style="cursor: pointer; cursor: hand;">' + logName + '</a><br>'
+          div.innerHTML = div.innerHTML + '<a href=\"' + path + '\" style="cursor: pointer; cursor: hand;">' + logName + '</a><br>'
         }
       }
     </script>
   </head>
   <body>
     <div id="log" style="margin-left:5px;margin-right:5px;margin-top:5px;margin-bottom:5px; text-align: left;">
-      <h3>Sentiment Analysis log (please wait while the page loads)</h3>
+      <h3>Sentiment Analysis Logs</h3>
     </div>
   </body>
 </html>
