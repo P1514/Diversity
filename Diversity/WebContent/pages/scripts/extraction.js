@@ -22,6 +22,8 @@ var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 var month;
 var product;
 var user = 1;
+var finalProductColors = [];
+var loaded = false;
 
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
@@ -1023,7 +1025,7 @@ function drawChart() {
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(data.getColumnLabel(color)));
 		}
-
+		finalProductColors = colors;
 		function midSelectHandler() {
 			var selectedItem = bottom_middle.getSelection()[0] != undefined ? bottom_middle
 					.getSelection()[0]
@@ -1089,9 +1091,11 @@ function drawChart() {
 			},
 			explorer : {
 				axis : 'horizontal',
-				keepInBounds : false,
-				maxZoomIn : 4.0
+				keepInBounds : true,
+				maxZoomIn : 4.0,
+				maxZoomOut : 1
 			},
+			pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
 		};
 
 		if (start != 0 && end != 0) {
@@ -1246,7 +1250,7 @@ function drawChart() {
 			legend : {
 				position : 'bottom'
 			},
-			colors : colors,
+			colors : finalProductColors,
 			animation : {
 				duration : 1000,
 				easing : 'out',
@@ -1261,9 +1265,11 @@ function drawChart() {
 			},
 			explorer : {
 				axis : 'horizontal',
-				keepInBounds : false,
-				maxZoomIn : 4.0
+				keepInBounds : true,
+				maxZoomIn : 4.0,
+				maxZoomOut : 1,
 			},
+			pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
 		};
 
 		for (var v = 0; v < series.length; v++) {
@@ -1297,14 +1303,17 @@ function drawChart() {
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);
-	
-	if (localStorage.tutorial != undefined
-			&& localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
-		request_tutorial();
-	}
-	if (localStorage.tutorial == undefined) {
-		localStorage.tutorial += "";
-		request_tutorial();
+
+	if (!loaded) {
+		if (localStorage.tutorial != undefined
+				&& localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
+			request_tutorial();
+		}
+		if (localStorage.tutorial == undefined) {
+			localStorage.tutorial += "";
+			request_tutorial();
+		}
+		loaded = !loaded;
 	}
 }
 
@@ -1510,7 +1519,7 @@ function changeRequest() {
 
 	/*
 	 * if (ageradio == "false") { if (age == "All") {
-	 * 
+	 *
 	 * json.Param += "Age,"; json.Values += "All,"; } else { json.Param +=
 	 * "Age,"; var select = document .getElementById('agefilt');
 	 * console.log(age); json.Values += age + ","; } } else {
@@ -1533,7 +1542,7 @@ function changeRequest() {
 	head.appendChild(style);
 	$('#loading')
 			.html(
-					'<i class="fa fa-ellipsis-h fa-5x" aria-hidden="true"></i><br>Loading, please wait...');
+					'<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	ws.send(JSON.stringify(json));
