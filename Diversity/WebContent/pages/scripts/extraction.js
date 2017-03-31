@@ -259,13 +259,16 @@ function connect() {
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapName = window.location.href.split("snapshot=")[1]
 						.split("&")[0].replace('%20', ' ');
-				snap
+
+				snap = true;
 				json = {
 					"Op" : "load_snapshot",
 					"Name" : snapName,
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
+				$('#Cookie').html = 'Snapshot: ' + snapName;
+				name = snapName;
 			} else {
 				json = {
 					"Op" : "opinion_extraction",
