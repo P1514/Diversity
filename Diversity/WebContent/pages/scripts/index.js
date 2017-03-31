@@ -642,7 +642,9 @@ function ok(val) {
 function deleteModel() {
 	// var confirm = window.confirm("Do you really want to delete model " + name
 	// + "?");
-	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
+  var select = document.getElementById("Models");
+  var selectedModel = select.options[select.selectedIndex].text;
+	$('#alert').html('Do you really want to delete model ' + selectedModel + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
   $('#overlay').show();
 	$('#overlay-back').show();
 
