@@ -266,7 +266,9 @@ public class Snapshot {
 		}
 	}
 
-	public static JSONArray load(int pss) throws JSONException {
+
+	public static JSONArray getAll(int pss) throws JSONException {
+
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
@@ -291,6 +293,8 @@ public class Snapshot {
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
+				obj.put("Id", rs.getString("id"));
+				obj.put("User", rs.getString("creation_user"));
 				aux.put(obj);
 			}
 			result.put("Snapshots");
