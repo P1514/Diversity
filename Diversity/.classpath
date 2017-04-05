@@ -22,5 +22,22 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-jdbc-8.0.14.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javaee-api-7.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-client.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-container-servlet-core.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-server.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hk2-api-2.5.0-b32.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hk2-locator-2.5.0-b32.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/hk2-utils-2.5.0-b32.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javassist-3.20.0-GA.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.inject-2.5.0-b32.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/javax.ws.rs-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-api-2.2.7.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-common.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-container-servlet.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-guava-2.25.1.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-media-jaxb.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
