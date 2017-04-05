@@ -11,7 +11,7 @@
   </welcome-file-list>
   
   <servlet>
-    <servlet-name>Jersey REST Service</servlet-name>
+    <servlet-name>Diversity Endpoints</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
      <!-- Register resources and providers under com.vogella.jersey.first package. -->
     <init-param>
@@ -21,7 +21,7 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Jersey REST Service</servlet-name>
-    <url-pattern>/rest/*</url-pattern>
+    <servlet-name>Diversity Endpoints</servlet-name>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
 </web-app>
