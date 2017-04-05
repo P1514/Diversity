@@ -257,13 +257,13 @@ function connect() {
 			// data or the snapshot if the user comes from a snapshot URL
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
-				var snapName = window.location.href.split("snapshot=")[1]
+				var snapID = window.location.href.split("snapshot=")[1]
 						.split("&")[0].replace('%20', ' ');
 
 				snap = true;
 				json = {
 					"Op" : "load_snapshot",
-					"Name" : snapName,
+					"Id" : snapID,
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
