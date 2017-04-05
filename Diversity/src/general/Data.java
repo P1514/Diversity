@@ -22,7 +22,7 @@ import org.json.JSONObject;
  * The Class Data.
  */
 public class Data {
-	private static final Logger LOGGER = new Logging().create(Data.class.getName());
+	public static final Logger LOGGER = new Logging().create(Data.class.getName());
 	/** The modeldb. */
 	protected static final ConcurrentHashMap<Long, Model> modeldb = new ConcurrentHashMap<>();
 
