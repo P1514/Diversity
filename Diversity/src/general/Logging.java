@@ -1,6 +1,7 @@
 package general;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -81,19 +83,66 @@ public class Logging {
 		try {
 			query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS);
 			try (ResultSet rs = query1.executeQuery()) {
+				try {
+					File logDir = new File("WebContent/pages/Logs/");
+					if (!logDir.exists()) {
+						logDir.mkdir();
+					}
+					
+					Calendar date = Calendar.getInstance();
+					File latest = new File("WebContent/pages/Logs/" + date.get(Calendar.DAY_OF_MONTH) + "-" + (date.get(Calendar.MONTH)+1) + "-" + date.get(Calendar.YEAR) + ".txt");
+					latest.createNewFile();
+					FileWriter writer = new FileWriter(latest, true);
+					while(rs.next()) {
+						writer.write(rs.getString(4));
+						/*
+						JSONObject obj = new JSONObject();
+						obj.put("User", rs.getInt(2));
+						obj.put("Timestamp", rs.getTimestamp(3));
+						obj.put("Log", rs.getString(4));
+						logs.put(obj);
+						*/
+					}
+					writer.close();
+					
+					File[] allLogs = logDir.listFiles();
+					
+					for (File file : allLogs) {
+						logs.put(new JSONObject().put("log", file.getName()));
+					}
 				
-				while(rs.next()) {
-					JSONObject obj = new JSONObject();
-					obj.put("User", rs.getInt(2));
-					obj.put("Timestamp", rs.getTimestamp(3));
-					obj.put("Log", rs.getString(4));
-					logs.put(obj);
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+				
 				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		String delete = "DELETE FROM " + Settings.ltable;
+		try {
+			query1 = cnlocal.prepareStatement(delete);
+			query1.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
 		try {
 			cnlocal.close();
 		} catch (SQLException e) {
