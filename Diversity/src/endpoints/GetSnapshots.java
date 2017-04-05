@@ -40,14 +40,15 @@ public class GetSnapshots {
 	private String getAll(int pss_id) {
 		String url = ui.getBaseUri().toString();
 		url=url.split("Diversity/")[0]+"Diversity/pages/opinion_extraction_page.html?snapshot=";
-		JSONArray snapshots;
+		JSONArray response;
 		try {
-			snapshots = extraction.Snapshot.load(pss_id);
+			response = extraction.Snapshot.getAll(pss_id);
 			JSONObject obj;
+			JSONArray snapshots=response.getJSONArray(1);
 			for(int i=0; i<snapshots.length();i++){
 				obj=snapshots.getJSONObject(i);
-				obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="+obj.getInt("id"));
-				obj.remove("id");
+				obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="+obj.getInt("Id"));
+				obj.remove("Id");
 			}
 			
 		} catch (JSONException e) {
@@ -57,7 +58,7 @@ public class GetSnapshots {
 		}
 		
 		
-		return "Got IN BABY";
+		return "Got IN BABY"+response.toString();
 	}
 
 }
