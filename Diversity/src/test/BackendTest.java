@@ -238,9 +238,10 @@ public class BackendTest extends Thread {
 		obj.put("Final_Products", "Morris Ground 1;");
 		obj.put("Update", "1");
 		obj.put("URI", "Facebook,abcd;");
-		obj.put("Start_date", "1970-01-02");
+		obj.put("Start_date", "1970-01-04");
 		obj.put("Name", "guffiss");
 		obj.put("mediawiki", "true");
+		obj.put("design_project", "1221");
 		obj.put("Key", "10");
 		tester = new Backend(14, obj);
 		System.out.println("Create Model Test Output: " + tester.resolve().toString());
@@ -288,7 +289,7 @@ public class BackendTest extends Thread {
 		obj.put("Param", "Age,Gender,Location,");
 		obj.put("Values", "All,All,All,");
 		obj.put("Filter", "Product");
-		obj.put("Id", "856");
+		obj.put("Id", "838");
 		obj.put("Extrapolate", 1);
 		obj.put("Key", "10");
 		tester = new Backend(19, obj);
@@ -330,7 +331,7 @@ public class BackendTest extends Thread {
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
 		obj.put("Products", "13;14;15");
-		obj.put("name", "aapred");
+		obj.put("name", "aapredfd");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("type", "Prediction");
@@ -373,12 +374,12 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "Snapshot");
-		obj.put("name", "test12345");
+		obj.put("name", "test101");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
 		obj.put("Id", "839");
 		obj.put("type", "Extraction");
-		obj.put("user", "test");
+		obj.put("user", "test12345");
 		obj.put("Key", "10");
 		tester = new Backend(24, obj);
 		System.out.println("Snapshot Extraction Test Output: " + tester.resolve().toString());
@@ -390,7 +391,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "load_snapshot");
-		obj.put("Name", "test123");
+		obj.put("Name", "test101");
 		obj.put("Type", "all");
 		obj.put("Key", "10");
 		tester = new Backend(25, obj);
@@ -462,21 +463,9 @@ public class BackendTest extends Thread {
 	@Test
 	public void multipletests() throws JSONException {
 		for (int i = 0; i < 1000; i++)
+			System.out.println("TEST: "+i+"\n");
 			(new Thread(this)).start();
 	}
 	
-	@Test
-	public void resolveLoadsnapbyPSS() throws JSONException {
-		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
-		new Backend(22, obj1).resolve();
-		// System.out.println(obj1.toString());
 
-		obj = new JSONObject();
-		obj.put("PSS", "1");
-		obj.put("Key", "10");
-
-		tester = new Backend(29, obj);
-		System.out.println("Load Snapshot by PSS Test Output: " + tester.resolve().toString());
-
-	}
 }
