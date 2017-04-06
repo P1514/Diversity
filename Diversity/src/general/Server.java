@@ -12,19 +12,20 @@ import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Async;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 import extraction.Globalsentiment;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Server.
  */
 @ServerEndpoint("/server")
 public class Server {
-
 	/** The isloading. */
 	public static boolean isloading = false;
 	private Session session;

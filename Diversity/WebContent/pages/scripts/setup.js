@@ -3,6 +3,7 @@ var i = 0;
 
 
 $(document).ready(function() {
+  document.getElementById('points').checked = localStorage.showPoints;
   $('input[type=radio][name=top_radio]').change(function() {
       if (this.value == 'default') {
         $('#pss').hide();
@@ -529,4 +530,10 @@ function checknumber(field) {
     field.value = '0';
   }
 
+}
+
+function setPoints() {
+  console.log('2asd')
+  localStorage.showPoints = document.getElementById('points').checked;
+  console.log(localStorage.showPoints);
 }

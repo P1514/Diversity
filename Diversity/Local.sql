@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `sentimentanalysis` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `sentimentanalysis`;
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: sentimentanalysis
 -- ------------------------------------------------------
--- Server version	5.7.13-log
+-- Server version	5.7.17-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -32,6 +32,7 @@ CREATE TABLE `access_rights` (
   `view_opinion_results` tinyint(1) DEFAULT NULL,
   `save_delete_snapshots` tinyint(1) DEFAULT NULL,
   `use_opinion_prediction` tinyint(1) DEFAULT NULL,
+  `admin` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -42,7 +43,7 @@ CREATE TABLE `access_rights` (
 
 LOCK TABLES `access_rights` WRITE;
 /*!40000 ALTER TABLE `access_rights` DISABLE KEYS */;
-INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1),('PROD_MAN',NULL,0,0,1,0,0),('SYS_ENG',NULL,1,0,1,0,0);
+INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1,0),('DEVELOPER',NULL,1,1,1,1,1,1),('PROD_MAN',NULL,0,0,1,0,0,0),('SYS_ENG',NULL,1,0,1,0,0,0);
 /*!40000 ALTER TABLE `access_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,7 +105,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'1970-01-02',1,10);
+INSERT INTO `general` VALUES (0,0,0,0,'1970-01-01',1,10);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -129,6 +130,32 @@ CREATE TABLE `influences` (
 LOCK TABLES `influences` WRITE;
 /*!40000 ALTER TABLE `influences` DISABLE KEYS */;
 /*!40000 ALTER TABLE `influences` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `logs`
+--
+
+DROP TABLE IF EXISTS `logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `timestamp` date NOT NULL,
+  `log` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logs`
+--
+
+LOCK TABLES `logs` WRITE;
+/*!40000 ALTER TABLE `logs` DISABLE KEYS */;
+INSERT INTO `logs` VALUES (1,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(2,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(3,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Startup contextInitialized\r\nINFO: Starting up!\r\n'),(4,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(5,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(6,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(7,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(8,1,'2017-03-29','Mar 29, 2017 2:28:55 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(9,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader loadroles\r\nSEVERE: ERROR LOADING ROLES\r\njava.sql.SQLException: Column \'admin\' not found.\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:963)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:896)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:885)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:860)\r\n	at com.mysql.jdbc.ResultSetImpl.findColumn(ResultSetImpl.java:1077)\r\n	at com.mysql.jdbc.ResultSetImpl.getBoolean(ResultSetImpl.java:1631)\r\n	at general.Loader.loadroles(Loader.java:582)\r\n	at general.Loader.loadp1(Loader.java:79)\r\n	at general.Loader.load(Loader.java:50)\r\n	at monitoring.Oversight.run(Oversight.java:199)\r\n	at general.Startup.contextInitialized(Startup.java:46)\r\n	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4727)\r\n	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5189)\r\n	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)\r\n	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1419)\r\n	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1409)\r\n	at java.util.concurrent.FutureTask.run(Unknown Source)\r\n	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n	at java.lang.Thread.run(Unknown Source)\r\n\r\n'),(10,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader loadGeneral\r\nINFO:  Variable Init 191118183115812\r\n'),(11,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(12,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader loadmodels\r\nSEVERE: Error on SQL Input\r\njava.sql.SQLException: Column \'design_project\' not found.\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:963)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:896)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:885)\r\n	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:860)\r\n	at com.mysql.jdbc.ResultSetImpl.findColumn(ResultSetImpl.java:1077)\r\n	at com.mysql.jdbc.ResultSetImpl.getLong(ResultSetImpl.java:2759)\r\n	at general.Loader.loadmodels(Loader.java:466)\r\n	at general.Loader.loadp1(Loader.java:85)\r\n	at general.Loader.load(Loader.java:50)\r\n	at monitoring.Oversight.run(Oversight.java:199)\r\n	at general.Startup.contextInitialized(Startup.java:46)\r\n	at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4727)\r\n	at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:5189)\r\n	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150)\r\n	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1419)\r\n	at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1409)\r\n	at java.util.concurrent.FutureTask.run(Unknown Source)\r\n	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)\r\n	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)\r\n	at java.lang.Thread.run(Unknown Source)\r\n\r\n'),(13,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(14,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader updatelocal\r\nINFO:  update general 31534147\r\n'),(15,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader loadp2\r\nINFO: Started Waiting to Check NULLS\r\n'),(16,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader evaluatedata\r\nINFO:  calc eval and reach 10221013\r\n'),(17,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader insertauthors\r\nINFO:  insert authors 308543\r\n'),(18,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader insertposts\r\nINFO:  insert opinions and posts 50568\r\n'),(19,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Loader loadtimescalc\r\nSEVERE: Took:148052982 ns to finish processing 0 posts which averages Infinity ns/post\r\n'),(20,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(21,1,'2017-03-29','Mar 29, 2017 2:28:56 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(22,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Server runn\r\nINFO: \r\nIN:{\"Role\":\"DESIGNER\",\"Op\":\"getrestrictions\",\"Key\":\"3D43211234DDDFFGGT542\"}\r\n'),(23,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(24,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(25,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(26,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n'),(27,1,'2017-03-29','Mar 29, 2017 2:28:59 PM general.Logging create\r\nINFO: Logger initialized\n\n\n\r\n');
+/*!40000 ALTER TABLE `logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -178,6 +205,7 @@ CREATE TABLE `models` (
   `created_date` bigint(45) DEFAULT NULL,
   `next_update` bigint(45) DEFAULT NULL,
   `media_wiki` tinyint(4) DEFAULT NULL,
+  `design_project` int(11) NOT NULL,
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
@@ -190,7 +218,7 @@ CREATE TABLE `models` (
 
 LOCK TABLES `models` WRITE;
 /*!40000 ALTER TABLE `models` DISABLE KEYS */;
-INSERT INTO `models` VALUES (838,'D522-1 PSS','Facebook,123;','1',7,0,'1,',1,NULL,NULL,0,1484301475293,NULL),(839,'Morris Ground 1','Facebook,123;','1',8,0,'1,',1,NULL,NULL,0,1484301489363,NULL),(841,'D522-2 PSS','Facebook,123;','2',14,0,'2,3,',1,NULL,NULL,0,1484301522995,NULL),(842,'Austin Basket','Facebook,12345;','2',15,0,'2,',1,NULL,NULL,0,1484301569427,NULL),(843,'Austin Soccer','Facebook,123;','2',16,0,'3,',1,NULL,NULL,0,1484301583115,NULL),(845,'D341-1 PSS','Facebook,123;','3',14,0,'4,5,6,',1,NULL,NULL,0,1484301611723,NULL),(846,'Morris Sea 1000','Facebook,123;','3',16,0,'4,',1,NULL,NULL,0,1484301624795,NULL),(847,'Morris Sea 2099','Facebook,123;','3',15,0,'5,',1,NULL,NULL,0,1484301640811,NULL),(848,'Morris Wind','Facebook,123;','3',27,0,'6,',1,NULL,NULL,0,1484301686803,NULL),(849,'D231-1 PSS','Facebook,123;','4',13,0,'7,8,',1,NULL,NULL,0,1484301700603,NULL),(852,'Austin Polo','Facebook,123;','4',17,0,'7,',1,NULL,NULL,0,1484301825434,NULL),(853,'Austin Cricket','Facebook,123;','4',23,0,'8,',1,NULL,NULL,0,1484301837315,NULL),(854,'D231-2 PSS','Facebook,123;','5',23,0,'9,10,',1,NULL,NULL,0,1484301854939,NULL),(855,'Austin XC','Facebook,123;','5',23,0,'9,',1,NULL,NULL,0,1484301867787,NULL),(856,'Austin Base','Facebook,123;','5',24,0,'10,',1,NULL,NULL,0,1484301878570,NULL);
+INSERT INTO `models` VALUES (838,'D522-1 PSS','Facebook,123;','1',7,0,'1,',1,NULL,NULL,0,1484301475293,NULL,0),(839,'Morris Ground 1','Facebook,123;','1',8,0,'1,',1,NULL,NULL,0,1484301489363,NULL,0),(841,'D522-2 PSS','Facebook,123;','2',14,0,'2,3,',1,NULL,NULL,0,1484301522995,NULL,0),(842,'Austin Basket','Facebook,12345;','2',15,0,'2,',1,NULL,NULL,0,1484301569427,NULL,0),(843,'Austin Soccer','Facebook,123;','2',16,0,'3,',1,NULL,NULL,0,1484301583115,NULL,0),(845,'D341-1 PSS','Facebook,123;','3',14,0,'4,5,6,',1,NULL,NULL,0,1484301611723,NULL,0),(846,'Morris Sea 1000','Facebook,123;','3',16,0,'4,',1,NULL,NULL,0,1484301624795,NULL,0),(847,'Morris Sea 2099','Facebook,123;','3',15,0,'5,',1,NULL,NULL,0,1484301640811,NULL,0),(848,'Morris Wind','Facebook,123;','3',27,0,'6,',1,NULL,NULL,0,1484301686803,NULL,0),(849,'D231-1 PSS','Facebook,123;','4',13,0,'7,8,',1,NULL,NULL,0,1484301700603,NULL,0),(852,'Austin Polo','Facebook,123;','4',17,0,'7,',1,NULL,NULL,0,1484301825434,NULL,0),(853,'Austin Cricket','Facebook,123;','4',23,0,'8,',1,NULL,NULL,0,1484301837315,NULL,0),(854,'D231-2 PSS','Facebook,123;','5',23,0,'9,10,',1,NULL,NULL,0,1484301854939,NULL,0),(855,'Austin XC','Facebook,123;','5',23,0,'9,',1,NULL,NULL,0,1484301867787,NULL,0),(856,'Austin Base','Facebook,123;','5',24,0,'10,',1,NULL,NULL,0,1484301878570,NULL,0);
 /*!40000 ALTER TABLE `models` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -374,4 +402,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-03-22 14:57:17
+-- Dump completed on 2017-03-29 14:33:36

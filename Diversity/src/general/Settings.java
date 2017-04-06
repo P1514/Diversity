@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	private static DataSource conlocal;
+	private static DataSource conlocal = null;
 	private static DataSource condata;
 	private static DataSource concr;
 	
@@ -151,7 +151,7 @@ public class Settings {
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final boolean LocalPolarity = false;
+	public static final boolean LocalPolarity = true;
 
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
@@ -242,6 +242,11 @@ public class Settings {
 	public static final String tctable_user = "userid";
 	public static final String tctable_model = "modelid";
 	public static final String tctable_ignored_words = "ignoredwords";
+	
+	public static final String ltable = "logs";
+	public static final String ltable_user = "user_id";
+	public static final String ltable_timestamp = "timestamp";
+	public static final String ltable_log = "log";
 
 	// Snapshots Table
 	public static final String lsstable = "snapshots";
@@ -275,8 +280,10 @@ public class Settings {
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 		  try {
+
+			  while(condata==null){}
 		    Future<Connection> future = condata.getConnectionAsync();
-		    while (!future.isDone()) {
+		    while (future == null || !future.isDone()) {
 		      try {
 		        Thread.sleep(100); //simulate work
 		      }catch (InterruptedException x) {
@@ -300,6 +307,10 @@ public class Settings {
 	 */
 	public static Connection connlocal() throws ClassNotFoundException, SQLException {
 		try {
+
+			if(conlocal==null)
+				startconnections();
+
 		    Future<Connection> future = conlocal.getConnectionAsync();
 		    while (!future.isDone()) {
 		      try {
@@ -326,21 +337,22 @@ public class Settings {
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		try {
+
+			while(concr==null){}
 		    Future<Connection> future = concr.getConnectionAsync();
-		    while (!future.isDone()) {
+		    while (future == null || !future.isDone()) {
 		      try {
 		        Thread.sleep(100); //simulate work
 		      }catch (InterruptedException x) {
 		        Thread.currentThread().interrupt();
 		      }
 		    }
-		 
+		    
 		    return future.get(); //should return instantly
 		  }catch(Exception e){
 			  LOGGER.log(Level.SEVERE, err_dbconnect);
 			  return null;
 		  }
-
 	}
 
 	/**
@@ -457,12 +469,12 @@ public class Settings {
         p.setValidationInterval(30000);
         p.setTimeBetweenEvictionRunsMillis(30000);
         p.setMaxActive(40);
-        p.setMaxIdle(40);
-        p.setInitialSize(10);
+        p.setMaxIdle(1);
+        p.setInitialSize(1);
         p.setMaxWait(10000);
         p.setRemoveAbandonedTimeout(60);
         p.setMinEvictableIdleTimeMillis(30000);
-        p.setMinIdle(10);
+        p.setMinIdle(1);
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
         p.setJdbcInterceptors(
@@ -485,12 +497,12 @@ public class Settings {
         p.setTestOnReturn(false);
         p.setValidationInterval(30000);
         p.setTimeBetweenEvictionRunsMillis(30000);
-        p.setMaxActive(40);
+        p.setMaxActive(80);
         p.setInitialSize(10);
         p.setMaxWait(10000);
         p.setRemoveAbandonedTimeout(60);
         p.setMinEvictableIdleTimeMillis(30000);
-        p.setMinIdle(10);
+        p.setMinIdle(30);
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
         p.setJdbcInterceptors(

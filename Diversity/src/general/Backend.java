@@ -121,18 +121,17 @@ public class Backend {
 				break;
 
 			case 30:
+				obj = new JSONObject();
+				result = new JSONArray();
 				try {
 					obj.put("Logs", Logging.getAllLogs());
-					result.put(obj);
-				} catch (IOException e) {
-					e.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-				return result.toString();
-
-			case 29://TODO integrate with the rest of the snapshot load, when frontend part is implemented
-				result = snapshot.load(msg.getInt("PSS"));
-				return result.toString();
+				result.put(obj);
 				
+				return result.toString();				
 
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();

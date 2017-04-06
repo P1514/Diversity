@@ -49,14 +49,14 @@ public class Loader {
 		starttime = System.nanoTime();
 		loadp1(json);
 		first_load = false;
+		String err = updatelocal();
+		if (err != null)
+			return err;
 		String done = loadp2();
-		String err = insertauthors();
+		err = insertauthors();
 		if (err != null)
 			return err;
 		err = insertposts();
-		if (err != null)
-			return err;
-		err = updatelocal();
 		if (err != null)
 			return err;
 		loadtimescalc();
@@ -94,7 +94,7 @@ public class Loader {
 		err = loadUsers(json);
 		if (err != null)
 			return err;
-
+		
 		update("opinions");
 
 		err = insertauthors();
@@ -103,18 +103,15 @@ public class Loader {
 		err = insertposts();
 		if (err != null)
 			return err;
-		err = updatelocal();
-		if (err != null)
-			return err;
 		return null;
 	}
 
 	private void loadtimescalc() {
 		stoptime = System.nanoTime();
 		long runtime = stoptime - starttime - pausetime;
-		double ms_post = ((double) runtime) / new_posts;
-		LOGGER.log(Level.SEVERE, "Took:" + runtime + "ms to finish processing " + new_posts + " posts which averages "
-				+ ms_post + "ms/post");
+		double ns_post = ((double) runtime) / new_posts;
+		LOGGER.log(Level.SEVERE, "Took:" + runtime + " ns to finish processing " + new_posts + " posts which averages "
+				+ ns_post + " ns/post");
 	}
 
 	private String loadp2() throws JSONException {
@@ -135,14 +132,14 @@ public class Loader {
 			}
 		}
 		pausetime = System.nanoTime() - pausetime;
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(10);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
 		String err = awaittermination(es, "Opinions");
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(10);
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Tposts(op.getID()));
 		es.shutdown();
@@ -150,9 +147,8 @@ public class Loader {
 		err = awaittermination(es, "posts");
 		if (err != null)
 			return err;
-		/*
-		 * TODO PUT THIS OUTSIDE ON A TIMER WHILE null posts exist on database
-		 */ evaluatedata();
+		
+		evaluatedata();
 
 		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();
@@ -191,7 +187,7 @@ public class Loader {
 	@SuppressWarnings("unused")
 	private void loadlocal(JSONArray json) throws JSONException {
 		// Load Data
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(10);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(id)));
 		es.shutdown();
@@ -200,7 +196,7 @@ public class Loader {
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "Error on Thread Opinions while loading data");
 		}
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(10);
 		for (int id = 0; id < json.length(); id++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(id)));
 		es.shutdown();
@@ -493,7 +489,7 @@ public class Loader {
 		if (json == null)
 			return loaduopid();
 
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(10);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Topinions(json.getJSONObject(i)));
 		es.shutdown();
@@ -501,7 +497,7 @@ public class Loader {
 		LOGGER.log(Level.INFO, " Load Opinions from remote " + (System.nanoTime() - stime));
 		if (err != null)
 			return err;
-		es = Executors.newFixedThreadPool(50);
+		es = Executors.newFixedThreadPool(10);
 		for (int i = 0; i < json.length(); i++)
 			es.execute(multiThread.new Tposts(json.getJSONObject(i)));
 		es.shutdown();
@@ -773,96 +769,10 @@ public class Loader {
 	}
 
 	private String insertposts() throws JSONException {
-		ExecutorService es = Executors.newFixedThreadPool(50);
+		ExecutorService es = Executors.newFixedThreadPool(10);
 
 		for (Opinion opinion : opiniondb.values()) {
-			es.execute(new Runnable() {
-				@Override
-				public void run() {
-					Connection cnlocal = null;
-					try {
-						cnlocal = Settings.connlocal();
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-					}
-					String update = "INSERT INTO " + Settings.lotable + " "
-							+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
-							+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
-							+ Settings.lotable_comments + "=?";
-					try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
-						query1.setLong(1, opinion.getID());
-						query1.setDouble(2, opinion.getReach());
-						query1.setDouble(3, opinion.getPolarity());
-						query1.setDouble(4, opinion.getTotalInf());
-						query1.setLong(5, opinion.getUID());
-						query1.setLong(6, opinion.getTime());
-						query1.setLong(7, opinion.getPSS());
-						query1.setLong(8, opinion.ncomments());
-						query1.setLong(9, opinion.getProduct());
-						query1.setDouble(10, opinion.getReach());
-						query1.setDouble(11, opinion.getPolarity());
-						query1.setDouble(12, opinion.getTotalInf());
-						query1.setLong(13, opinion.ncomments());
-						while (true) {
-							try {
-								query1.executeUpdate();
-							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
-								Thread.sleep((long) (Math.random() * 1000));
-								continue;
-							}
-							break;
-						}
-						if (!first_load) {
-							cnlocal.close();
-							return;
-						}
-						for (Post post : opinion.getPosts().values()) {
-							PreparedStatement query2 = null;
-							try {
-								String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
-								query2 = cnlocal.prepareStatement(update1);
-								query2.setLong(1, post.getID());
-								if (post.getPolarity() != -1) {
-									query2.setDouble(2, post.getPolarity());
-								} else {
-									query2.setNull(2, java.sql.Types.DOUBLE);
-								}
-								query2.setString(3, post.getComment());
-								query2.setLong(4, post.getLikes());
-								query2.setLong(5, post.getViews());
-								query2.setLong(6, opinion.getID());
-								query2.setLong(7, post.getUID());
-								while (true) {
-									try {
-										query2.executeUpdate();
-									} catch (Exception e) {
-										LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
-										Thread.sleep((long) (Math.random() * 1000));
-										continue;
-									}
-									break;
-								}
-								if (query2 != null)
-									query2.close();
-							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-								continue;
-							}
-							try {
-								if (query2 != null)
-									query2.close();
-							} catch (Exception e) {
-							}
-						}
-						cnlocal.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			});
-
+			es.execute(multiThread.new Tinsert(opinion));
 		}
 		es.shutdown();
 		try {
@@ -917,7 +827,7 @@ public class Loader {
 	}
 
 	private String loaduopid() throws JSONException {
-		String err;
+		String err=null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
@@ -944,23 +854,23 @@ public class Loader {
 						return Backend.error_message("Loaded Successfully").toString();
 					}
 					rs.beforeFirst();
-					ExecutorService es = Executors.newFixedThreadPool(50);
+					ExecutorService es = Executors.newFixedThreadPool(10);
 					while (rs.next())
 						es.execute(multiThread.new Topinions(rs.getLong(1)));
 					es.shutdown();
 					err = awaittermination(es, "Opinions");
 					if (err != null)
-						return err;
+						break;
 					rs.beforeFirst();
-					es = Executors.newFixedThreadPool(50);
+					es = Executors.newFixedThreadPool(10);
 					while (rs.next())
 						es.execute(multiThread.new Tposts(rs.getLong(1)));
 					es.shutdown();
 
 					err = awaittermination(es, "posts");
 					if (err != null)
-						return err;
-
+						break;
+					break;
 				}catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
@@ -970,6 +880,7 @@ public class Loader {
 					error = true;
 					continue;
 				}
+
 			} 
 
 			} catch (SQLException e1) {
@@ -992,6 +903,7 @@ public class Loader {
 					LOGGER.log(Level.INFO, Settings.err_unknown, e);
 				}
 			}
+			return err;
 	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {

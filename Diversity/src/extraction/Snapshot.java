@@ -20,7 +20,6 @@ import general.Logging;
 import general.Settings;
 
 public class Snapshot {
-	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 	private final Backend b;
 
@@ -34,8 +33,9 @@ public class Snapshot {
 
 	public boolean create(String name, long date, int timespan, String user, String type, String result, int id) {
 		ResultSet rs;
+		Connection cnlocal;
 		try {
-			dbconnect();
+			cnlocal=Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return false;
@@ -185,8 +185,8 @@ public class Snapshot {
 		return "";
 	}
 
-	private void dbconnect() throws ClassNotFoundException, SQLException {
-		cnlocal = Settings.connlocal();
+	private static void dbconnect() throws ClassNotFoundException, SQLException {
+		Connection cnlocal = Settings.connlocal();
 	}
 
 	public JSONArray loadNames(String type) {
@@ -194,8 +194,9 @@ public class Snapshot {
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
 		ResultSet rs;
+		Connection cnlocal;
 		try {
-			dbconnect();
+			cnlocal=Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
@@ -234,9 +235,9 @@ public class Snapshot {
 	}
 
 	public String load(String name, String type) throws JSONException {
-
+		Connection cnlocal;
 		try {
-			dbconnect();
+			cnlocal=Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
@@ -250,7 +251,7 @@ public class Snapshot {
 			else
 				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
-				rs.next();
+				if(!rs.next()) return "";
 				return rs.getString("result");
 			}
 		} catch (Exception e) {
@@ -265,15 +266,18 @@ public class Snapshot {
 		}
 	}
 
-	public JSONArray load(int pss) throws JSONException {
+
+	public static JSONArray getAll(int pss) throws JSONException {
+
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
 		ResultSet rs;
+		Connection cnlocal;
 		try {
-			dbconnect();
+			cnlocal=Settings.connlocal();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
+			LOGGER.log(Level.SEVERE, "Error", e);
 			return null;
 		}
 		String insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
@@ -289,13 +293,15 @@ public class Snapshot {
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
+				obj.put("Id", rs.getString("id"));
+				obj.put("User", rs.getString("creation_user"));
 				aux.put(obj);
 			}
 			result.put("Snapshots");
 			result.put(aux);
 
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
+			LOGGER.log(Level.SEVERE, "Error", e);
 		}
 		try {
 			if (cnlocal != null)

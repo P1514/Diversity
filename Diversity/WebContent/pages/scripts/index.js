@@ -15,63 +15,64 @@ var all_models = [];
 var timespan;
 
 /*
-* Hides and displays certain UI elements according to the current user's access rights.
-*/
+ * Hides and displays certain UI elements according to the current user's access
+ * rights.
+ */
 function giveAcessRights(json){
       if(json[0].view_OM){
-      document.getElementById("view").style.display = 'block';//show
-      document.getElementById("view_gray").style.display = 'none';//hide
+      document.getElementById("view").style.display = 'block';// show
+      document.getElementById("view_gray").style.display = 'none';// hide
       }
 
       else{
-      document.getElementById("view_gray").style.display = 'block';//show
-      document.getElementById("edit").style.display =  'none';//hide
+      document.getElementById("view_gray").style.display = 'block';// show
+      document.getElementById("edit").style.display =  'none';// hide
       }
 
       if(json[0].create_edit_delete_model){
 
-      document.getElementById("create").style.display = 'block';//show
-      document.getElementById("create_gray").style.display = 'none';//hide
-      document.getElementById("edit").style.display = 'block';//show
-      document.getElementById("edit_gray").style.display = 'none';//hide
-      document.getElementById("delete").style.display = 'block';//show
-      document.getElementById("delete_gray").style.display = 'none';//hide
+      document.getElementById("create").style.display = 'block';// show
+      document.getElementById("create_gray").style.display = 'none';// hide
+      document.getElementById("edit").style.display = 'block';// show
+      document.getElementById("edit_gray").style.display = 'none';// hide
+      document.getElementById("delete").style.display = 'block';// show
+      document.getElementById("delete_gray").style.display = 'none';// hide
 
       }
       else{
-      document.getElementById("create").style.display =  'none';//hide
-      document.getElementById("create_gray").style.display = 'block';//show
-      document.getElementById("edit").style.display =  'none';//hide
-      document.getElementById("edit_gray").style.display = 'block';//show
-      document.getElementById("delete").style.display =  'none';//hide
-      document.getElementById("delete_gray").style.display = 'block';//show
+      document.getElementById("create").style.display =  'none';// hide
+      document.getElementById("create_gray").style.display = 'block';// show
+      document.getElementById("edit").style.display =  'none';// hide
+      document.getElementById("edit_gray").style.display = 'block';// show
+      document.getElementById("delete").style.display =  'none';// hide
+      document.getElementById("delete_gray").style.display = 'block';// show
 
       }
 
       if(json[0].view_opinion_results){
-      document.getElementById("_view").style.display = 'block';//show
-      document.getElementById("_view_gray").style.display = 'none';//hide
+      document.getElementById("_view").style.display = 'block';// show
+      document.getElementById("_view_gray").style.display = 'none';// hide
 
       }
       else{
-      document.getElementById("_view_gray").style.display = 'block';//show
-      document.getElementById("_view").style.display = 'none';//hide
+      document.getElementById("_view_gray").style.display = 'block';// show
+      document.getElementById("_view").style.display = 'none';// hide
 
       }
 
       if(json[0].view_use_opinion_prediction){
-      document.getElementById("predict").style.display = 'block';//show
-      document.getElementById("predict_gray").style.display = 'none';//hide
+      document.getElementById("predict").style.display = 'block';// show
+      document.getElementById("predict_gray").style.display = 'none';// hide
       document.getElementById("create_prediction").style.display = 'block';
       }
       else{
-      document.getElementById("predict").style.display = 'none';//hide
-      document.getElementById("predict_gray").style.display = 'block';//show
+      document.getElementById("predict").style.display = 'none';// hide
+      document.getElementById("predict_gray").style.display = 'block';// show
 
       }
 
       if(json[0].save_delete_snapshots){
-        //not implemented yet
+        // not implemented yet
       }
       else{
 
@@ -79,7 +80,7 @@ function giveAcessRights(json){
 
       if(!json[0].create_edit_delete_model && !json[0].view_OM ){
           document.getElementById("_define").style["background-color"]= "#666666";
-          //console.log('test');
+          // console.log('test');
         }
         else{
 
@@ -87,13 +88,14 @@ function giveAcessRights(json){
 }
 
 /*
-* Extracts the user role from the page URL
-*/
+ * Extracts the user role from the page URL
+ */
 function getRole(){
   var url = window.location.href.toString();
   var type = url.split("role_desc=")
       var role;
-      document.getElementById("dropdown").style.display = 'none';//hides dropdown
+      document.getElementById("dropdown").style.display = 'none';// hides
+																	// dropdown
        if(typeof type[1] != 'undefined'){
           type = type[1].split("&");
           role = type[0];
@@ -108,7 +110,7 @@ function getRole(){
           }
 
           var jsonData = {
-      "Op" : 'getrestrictions',//create or update
+      "Op" : 'getrestrictions',// create or update
       "Role": role==null?'no_role':role,
       'Key' : getCookie("JSESSIONID")
     };
@@ -124,11 +126,11 @@ function getCookie(name) {
 
 function setCookie() {
   // document.cookie='Product=; expires=Thu, 01-Jan-1970 00:00:01 GMT;';
-//	document.cookie = 'Model='
+// document.cookie = 'Model='
       + $('#Models :selected').text();
       var cookiemonster = document.getElementById('Models').value.split(';');
-  //document.cookie = 'Id=' + cookiemonster[0];
-  //document.cookie = 'PSS=' + cookiemonster[1];
+  // document.cookie = 'Id=' + cookiemonster[0];
+  // document.cookie = 'PSS=' + cookiemonster[1];
   sessionStorage.model=$('#Models :selected').text();
   sessionStorage.id=cookiemonster[0];
   sessionStorage.pss=cookiemonster[1];
@@ -140,7 +142,7 @@ function setCookie2(name, id, pss) {
   sessionStorage.pss = pss;
 }
 
-//dev only feature - removes the need to set the user type every time
+// dev only feature - removes the need to set the user type every time
 ws.onopen = function() {
 
   if (sessionStorage.userKey == undefined) {
@@ -157,7 +159,7 @@ ws.onopen = function() {
 ws.onmessage = function(event) {
   json = JSON.parse(event.data);
   if (json[0].Op == 'Error') {
-    //alert(json[0].Message);
+    // alert(json[0].Message);
 	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
 	$('#overlay').show();
 	$('#overlay-back').show();
@@ -175,7 +177,8 @@ ws.onmessage = function(event) {
     ws.send(JSON.stringify(jsonData));
   }
 
-  //If Op is 'Graph' and there is data to display, draw the global sentiment chart
+  // If Op is 'Graph' and there is data to display, draw the global sentiment
+	// chart
   if (json[0].Op == 'Graph') {
     if (!json[1].hasOwnProperty('Graph')) {
       newData = JSON.parse(JSON.stringify(json));
@@ -183,9 +186,10 @@ ws.onmessage = function(event) {
     } else {
       console.log("No data to display");
     }
-    //drawChart();
+    // drawChart();
   }
-  //If Op is 'Rights', assign the access rights and request the availiable models list
+  // If Op is 'Rights', assign the access rights and request the availiable
+	// models list
   if (json[0].Op == 'Rights') {
     giveAcessRights(json);
     var url = window.location.href.toString();
@@ -199,21 +203,21 @@ ws.onmessage = function(event) {
         'Op' : 'getmodels',
         'Project' : dp != "" ? dp : undefined,
         'Key' : getCookie("JSESSIONID")
-      }
-      ws.send(JSON.stringify(jsonData));
-  }
+    }
+    ws.send(JSON.stringify(jsonData));
 
-  if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("home=done") == -1) { // if the user never opened this page, start the tutorial
-    request_tutorial();
-  }
-  if (localStorage.tutorial == undefined) {
-    localStorage.tutorial += "";
-    request_tutorial();
+    if (localStorage.tutorial != undefined && localStorage.tutorial.indexOf("home=done") == -1) { // if the user never opened this page, start the tutorial
+        request_tutorial();
+      }
+      if (localStorage.tutorial == undefined) {
+        localStorage.tutorial += "";
+        request_tutorial();
+      }
   }
 }
 
 ws.onclose = function (evt) {
-    //location.reload();
+    // location.reload();
 };
 
 function request_tutorial() {
@@ -309,26 +313,22 @@ function new_model(){
   var role = sessionStorage.session;
   sessionStorage.clear();
   sessionStorage.session = role;
-  sessionStorage.internal = true; // true if the new model request comes from the homepage
+  sessionStorage.internal = true; // true if the new model request comes from
+									// the homepage
 }
 
 /*
-* Builds a dropdown with all the availiable models
-*/
+ * Builds a dropdown with all the availiable models
+ */
 function populatePSS() {
   /*
-  var x = document.getElementById('Models');
-  var Models = JSON.parse(JSON.stringify(json));
-  for (var i = 1; i < Models.length; i++) {
-    var option = document.createElement('option');
-    option.text = Models[i].Name;
-    option.value = Models[i].Id+';'+Models[i].PSS;
-    if(getCookie('Product') == option.text)
-      option.selected=true;
-    x.add(option);
-  }
-  checkEditable();
-*/
+	 * var x = document.getElementById('Models'); var Models =
+	 * JSON.parse(JSON.stringify(json)); for (var i = 1; i < Models.length; i++) {
+	 * var option = document.createElement('option'); option.text =
+	 * Models[i].Name; option.value = Models[i].Id+';'+Models[i].PSS;
+	 * if(getCookie('Product') == option.text) option.selected=true;
+	 * x.add(option); } checkEditable();
+	 */
   var x = document.getElementById('Models');
   var Models = JSON.parse(JSON.stringify(json));
   for (var i = 1; i < Models.length; i++) {
@@ -341,7 +341,7 @@ function populatePSS() {
   }
   all_models = Models;
   displayModels();
-  //checkEditable();
+  // checkEditable();
 }
 
 
@@ -361,7 +361,7 @@ $(window).resize(function() {
   }, 500);
 });
 
-//redraw graph when window resize is completed
+// redraw graph when window resize is completed
 $(window).on('resizeEnd', function() {
   if (newData != 0) {
     drawChart();
@@ -369,8 +369,8 @@ $(window).on('resizeEnd', function() {
 });
 
 /*
-* Reload the database (currently not availiable in the UI)
-*/
+ * Reload the database (currently not availiable in the UI)
+ */
 function refreshDB(clean) {
   if (clean == 1) {
     json = {
@@ -400,7 +400,7 @@ function getMonthFromString(mon){
 }
 
 function drawChart() {
-  //top 5 PSS
+  // top 5 PSS
   middle = new google.visualization.LineChart(document.getElementById('top5'));
 
   var data = JSON.parse(JSON.stringify(newData));
@@ -411,15 +411,12 @@ function drawChart() {
 
   var counter = data[1];
 /*
-  var pssNumber = 0;
-
-  for (var i = 0; i < counter.length; i++) {							// find the number of PSSs to display (amount of 'Filter' in JSON)
-    if (counter[i].hasOwnProperty('Filter')) {
-      globaldata.addColumn('number', counter[i].Filter);
-      pssNumber++;
-    }
-  }
-*/
+ * var pssNumber = 0;
+ *
+ * for (var i = 0; i < counter.length; i++) { // find the number of PSSs to
+ * display (amount of 'Filter' in JSON) if (counter[i].hasOwnProperty('Filter')) {
+ * globaldata.addColumn('number', counter[i].Filter); pssNumber++; } }
+ */
   var pssNumber = 0;
   for (var i = 0; i < counter.length; i++) {
     if (counter[i].hasOwnProperty('Filter')) {
@@ -446,22 +443,19 @@ function drawChart() {
     }
   }
 /*
-  for (var i = 0; i < pssNumber + 1 ; i++) {							// until we reach the last PSS...
-    if (!counter[i].hasOwnProperty('Filter')) {						// if its a month,value pair
-      var time = counter[i].Date.split(" ");
-      for (var j = 0; j < 12; j++) {											// for each month
-        if (i == 1 && j == 0) {
-          globaldata.addRows(12);													// add 12 rows for the 12 months
-        }
-        //globaldata.setCell(j,0,new Date(new Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) + i+j].Month),01));				// the first cell of each line is the name of the month
-        globaldata.setCell(j,0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
-        if (counter[((i-1)*12) + i+j].Value != -1) {
-          globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of the cell
-        }
-      }															// if it's the first iteration, the array position is i+j. for the other iterations it
-    }																// adds 12 positions per iteration
-  }
-*/
+ * for (var i = 0; i < pssNumber + 1 ; i++) { // until we reach the last PSS...
+ * if (!counter[i].hasOwnProperty('Filter')) { // if its a month,value pair var
+ * time = counter[i].Date.split(" "); for (var j = 0; j < 12; j++) { // for each
+ * month if (i == 1 && j == 0) { globaldata.addRows(12); // add 12 rows for the
+ * 12 months } //globaldata.setCell(j,0,new Date(new
+ * Date(localStorage.start_date).getFullYear(),getMonthFromString(counter[((i-1)*12) +
+ * i+j].Month),01)); // the first cell of each line is the name of the month
+ * globaldata.setCell(j,0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
+ * if (counter[((i-1)*12) + i+j].Value != -1) {
+ * globaldata.setCell(j,i,counter[((i-1)*12) + i+j].Value); // set the value of
+ * the cell } } // if it's the first iteration, the array position is i+j. for
+ * the other iterations it } // adds 12 positions per iteration }
+ */
 
   var start = new Date(localStorage.start_date).toDateString() != "Invalid Date" ? new Date(localStorage.start_date) : 0;
   var end = new Date(localStorage.end_date).toDateString() != "Invalid Date" ? new Date(localStorage.end_date) : 0;
@@ -490,30 +484,22 @@ function drawChart() {
   height : '100%',
   explorer: {
     axis: 'horizontal',
-    keepInBounds: false,
-    maxZoomIn: 4.0
+    keepInBounds: true,
+    maxZoomIn: 2.0,
+    maxZoomOut : 1,
   },
+  pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
   legend : {
     maxLines: 5,
     position: 'bottom'
   }
  };
 /*
- if (start != 0 && end != 0) {
-   options.hAxis.viewWindow = {
-     min : start,
-     max : end
-   }
- } else if (start != 0 && end == 0) {
-    options.hAxis.viewWindow = {
-     min : start
-   }
- } else if (start == 0 && end != 0) {
-    options.hAxis.viewWindow = {
-     max : start
-   }
- }
-*/
+ * if (start != 0 && end != 0) { options.hAxis.viewWindow = { min : start, max :
+ * end } } else if (start != 0 && end == 0) { options.hAxis.viewWindow = { min :
+ * start } } else if (start == 0 && end != 0) { options.hAxis.viewWindow = { max :
+ * start } }
+ */
  var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'));
 
   var control = new google.visualization.ControlWrapper({
@@ -528,7 +514,8 @@ function drawChart() {
            height: '30%',
            width: '20%'
          }
-       }
+       },
+       minRangeSize : 7889238000,
      },
     },
     state: {
@@ -548,7 +535,7 @@ function drawChart() {
 
   dashboard.bind(control, chart);
   dashboard.draw(globaldata);
- //middle.draw(globaldata, options);
+ // middle.draw(globaldata, options);
 }
 
 function viewModels(op) {
@@ -622,18 +609,20 @@ function ok(val) {
 	  var name = $('#Models :selected').text();
     var model_data = document.getElementById('Models').value.split(';');
     var jsonData = {
-      "Op" : "update_model",//create or update
+      "Op" : "update_model",// create or update
       "URI" : true,
       "Update" : 1,
       "PSS" : model_data[1],
-      /*"Age" : document.getElementById('age').value != "" ? document
-          .getElementById('age').value : erro = true,
-      "Gender" : document.getElementById('gender').value != "" ? document
-          .getElementById('gender').value : erro = true,*/
+      /*
+		 * "Age" : document.getElementById('age').value != "" ? document
+		 * .getElementById('age').value : erro = true, "Gender" :
+		 * document.getElementById('gender').value != "" ? document
+		 * .getElementById('gender').value : erro = true,
+		 */
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
-      "User" : 1,//TODO find this field
+      "User" : 1,// TODO find this field
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")
@@ -642,7 +631,7 @@ function ok(val) {
 	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
     $('#overlay').show();
 	  $('#overlay-back').show();
-	  //window.alert("Model " + name + " deleted.");
+	  // window.alert("Model " + name + " deleted.");
   } else {
     $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
   	$('#overlay').show();
@@ -651,15 +640,18 @@ function ok(val) {
  }
 
 function deleteModel() {
-	//var confirm = window.confirm("Do you really want to delete model " + name + "?");
+	// var confirm = window.confirm("Do you really want to delete model " + name
+	// + "?");
 	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
   $('#overlay').show();
 	$('#overlay-back').show();
 
 }
 
-/* When the user clicks on the button,
-toggle between hiding and showing the dropdown content */
+/*
+ * When the user clicks on the button, toggle between hiding and showing the
+ * dropdown content
+ */
 function myFunction() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
