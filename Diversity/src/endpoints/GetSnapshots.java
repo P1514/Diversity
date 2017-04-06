@@ -14,15 +14,15 @@ import org.json.*;
 
 import extraction.Snapshot;
 
-@Path("/hello") // Path of the Endpoint
+@Path("/getSnapshots") // Path of the Endpoint
 public class GetSnapshots {
-	@DefaultValue("")
-	@QueryParam("pss")
-	String pss;// Puts get param into pss otherwise ""
-	@Context UriInfo ui;
+	@DefaultValue("") // Sets pss default value as ""
+	@QueryParam("pss") // Sets pss value as the pss form get if it exists
+	String pss;
+	@Context UriInfo ui; // Get the URL from the requesting Website
 
-	@GET
-  @Produces(MediaType.TEXT_HTML)
+	@GET // Indicates that this method answers a get request
+  @Produces(MediaType.TEXT_HTML) // Indicates this method answers a HTML request
   public Response welcome() {
 	  if("".equals(pss)) return Response.status(Response.Status.BAD_REQUEST).build();
 	  int id;
@@ -58,7 +58,7 @@ public class GetSnapshots {
 		}
 		
 		
-		return "Got IN BABY"+response.toString();
+		return response.toString();
 	}
 
 }

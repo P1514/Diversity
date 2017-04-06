@@ -250,7 +250,7 @@ public class Snapshot {
 			else
 				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
-				rs.next();
+				if(!rs.next()) return "";
 				return rs.getString("result");
 			}
 		} catch (Exception e) {
