@@ -22,6 +22,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>Diversity Endpoints</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/endpoints/*</url-pattern>
   </servlet-mapping>
 </web-app>
