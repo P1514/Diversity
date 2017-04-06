@@ -101,6 +101,7 @@ public final class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
+		design_project = msg.getLong("design_project");
 		if (msg.has("Start_date")) {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			Date date = null;
@@ -154,14 +155,14 @@ public final class Model {
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
 				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator + "," + Settings.lmtable_cdate + ","
-				+ Settings.lmtable_udate + ","
-				+ Settings.lmtable_add_mediawiki /*
+				+ Settings.lmtable_udate + "," + Settings.lmtable_add_mediawiki + ","
+				+ Settings.lmtable_designproject /*
 													 * + "," +
 													 * Settings.lmtable_age +
 													 * "," +
 													 * Settings.lmtable_gender
 													 */
-				+ ") values (?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
+				+ ") values (?,?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
 		try {
 			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -178,6 +179,8 @@ public final class Model {
 				query1.setBoolean(10, msg.getBoolean("mediawiki"));
 			else
 				query1.setBoolean(10, false);
+			query1.setLong(11, design_project);
+
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
 			query1.executeUpdate();
@@ -278,8 +281,6 @@ public final class Model {
 				} else
 					query1.setBoolean(rangeindex++, false);
 			}
-
-
 
 			query1.setInt(rangeindex++, msg.getInt("Id"));
 			// query1.setString(1, msg.getString("Age"));
