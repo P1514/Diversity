@@ -39,5 +39,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-container-servlet.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-guava-2.25.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-media-jaxb.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-juli-7.0.16.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
