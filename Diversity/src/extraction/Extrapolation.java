@@ -32,6 +32,8 @@ public final class Extrapolation extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		double globalSentiment;
+		boolean extraTest=true;
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -53,19 +55,23 @@ public final class Extrapolation extends Globalsentiment {
 		Calendar data = Calendar.getInstance();
 		Calendar today = Calendar.getInstance();
 
-		data.setTimeInMillis(firstDate(id));
-		data.add(Calendar.MONTH, 1);
+		Calendar dataAux= Calendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
 
+		data.setTimeInMillis(firstDate(id));
+		data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		int index = 0;
 
 		WeightedObservedPoints obs = new WeightedObservedPoints();
 
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
-				if (globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-						data.get(Calendar.YEAR), param, values, id) != -1)
-					obs.add(index, globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-							data.get(Calendar.YEAR), param, values, id));
+				globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH)+1,
+						data.get(Calendar.YEAR), param, values, id);
+				if (globalSentiment != -1){
+					obs.add(index, globalSentiment);
+					dataAux.set(data.get(Calendar.YEAR), data.get(Calendar.MONTH), data.get(Calendar.DAY_OF_MONTH));
+				}
 				index++;
 			}
 		}
@@ -74,30 +80,34 @@ public final class Extrapolation extends Globalsentiment {
 		PolynomialCurveFitter fitter = PolynomialCurveFitter.create(3);
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
-		data.add(Calendar.DAY_OF_MONTH, (int) -frequency+1);
+		data.add(Calendar.DAY_OF_MONTH, (int) -frequency);
 		index--;
-		int monthaux = data.get(Calendar.MONTH);
-		int indexaux = index;
-		double lastvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), monthaux % 12,
-				today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
-		while (lastvalue == -1 && monthaux > data.get(Calendar.MONTH)) {
-			lastvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), monthaux % 12,
-					today.get(Calendar.YEAR) + monthaux / 12, param, values, id);
-			monthaux--;
-			indexaux--;
-		}
+		int indexaux;	
+		double lastvalue;
 
-		if (lastvalue != -1)
+		indexaux=obs.toList().size()-1;
+		lastvalue=(double) obs.toList().get(indexaux).getY();
+
+
 			coeff[0] = lastvalue - (coeff[1] * indexaux + coeff[2] * indexaux * indexaux
 					+ coeff[3] * indexaux * indexaux * indexaux);
-
+		
+			
 		today.add(Calendar.MONTH, 3);
-
-		for (; today.after(data); data.add(Calendar.MONTH, 1)) {
+		if(extraTest){
+		data.setTimeInMillis(firstDate(id));
+		data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+		index=0;
+		}
+		else{
+			data=dataAux;
+			index=obs.toList().size()-1;
+		}
+		
+		
+		for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
 			try {
-				if (!((data.get(Calendar.MONTH) == today.get(Calendar.MONTH)
-						&& data.get(Calendar.YEAR) == today.get(Calendar.YEAR))
-						&& data.get(Calendar.DAY_OF_MONTH) > today.get(Calendar.DAY_OF_MONTH)))
+				
 					obj = new JSONObject();
 				obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
 						+ data.get(Calendar.YEAR));
