@@ -683,7 +683,26 @@ function ignore_words(word) { // sends a message to start ignoring the word we
 
 	ws.send(JSON.stringify(json));
 }
+/* NEW TAG CLOUD - CLICK NOT WORKING
+function makeCloud(words) {
+	$('#cloud').html('');
+	var cloud = [];
+	for (var i = 0; i < words.length; i++) {
+		var currWord = words[i].word;
+		cloud[i] = {
+			text: currWord,
+			weight: words[i].frequency,
+			handlers: {click: function() {
+					var word = currWord;
+					return tagClick(word);
+				}
+			}
+		};
+	}
 
+	$('#cloud').jQCloud(cloud);
+}
+*/
 function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
