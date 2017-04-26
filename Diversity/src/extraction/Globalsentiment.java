@@ -31,7 +31,8 @@ public class Globalsentiment extends GetReach {
 
 	private Connection cnlocal = null;
 	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
-	private static String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
+	private static String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV",
+			"DEC" };
 
 	/**
 	 * Class that handles sentiment Requests.
@@ -256,9 +257,10 @@ public class Globalsentiment extends GetReach {
 					obj = new JSONObject();
 					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
 							+ data.get(Calendar.YEAR));
-					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH)+1),
 							data.get(Calendar.YEAR), param, values, id));
 					result.put(obj);
+					
 				}
 			} else {
 				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
@@ -281,13 +283,23 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 
 		Calendar data = Calendar.getInstance();
-		data.add(Calendar.MONTH, -1);
+		double globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
+				data.get(Calendar.YEAR), param, values, id);
+
+		while (globalSentiment == -1) {
+			data.add(Calendar.DAY_OF_MONTH, -1);
+			globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH)+1,
+					data.get(Calendar.YEAR), param, values, id);
+		}
+		
+		
 
 		obj = new JSONObject();
-		obj.put("Month", time[data.get(Calendar.MONTH)]);
+		obj.put("Month", data.get(Calendar.MONTH) + 1);
 		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Value", Math.round(globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-				data.get(Calendar.YEAR), param, values, id)));
+		obj.put("Day", data.get(Calendar.DAY_OF_MONTH));
+
+		obj.put("Value", Math.round(globalSentiment));
 		result.put(obj);
 
 		return result;
@@ -340,7 +352,7 @@ public class Globalsentiment extends GetReach {
 		int avg = 0;
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.YEAR),
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH)+1, data.get(Calendar.YEAR),
 						data.get(Calendar.YEAR), param, values, id);
 				avg++;
 			}
