@@ -173,8 +173,7 @@ public class Backend {
 				return resul;
 
 			case 24:
-				obj = new JSONObject();
-				result = new JSONArray();
+				
 				String res = "";
 
 				if (msg.getString("type").equals("Prediction")) {
@@ -189,17 +188,18 @@ public class Backend {
 				}
 
 				if (res.equals("name_in_use")) {
+					obj = new JSONObject();
 					obj.put("Message", "Name Already in Use");
 					obj.put("Op", "Error");
 
 				}
 				if (res.equals("success")) {
+					obj = new JSONObject();
 					obj.put("Message", "Snapshot Saved Successfully");
 					obj.put("Op", "Error");
 				}
-				result.put(obj);
 
-				return result.toString();
+				return obj.toString();
 
 			case 23:
 				result = new JSONArray();
