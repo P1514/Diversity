@@ -33,7 +33,7 @@ public final class Extrapolation extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		double globalSentiment;
-		boolean extraTest=true;
+		boolean extraTest = true;
 
 		String[] time = new String[12];
 		time[0] = "JAN";
@@ -55,7 +55,7 @@ public final class Extrapolation extends Globalsentiment {
 		Calendar data = Calendar.getInstance();
 		Calendar today = Calendar.getInstance();
 
-		Calendar dataAux= Calendar.getInstance();
+		Calendar dataAux = Calendar.getInstance();
 		today.set(Calendar.HOUR_OF_DAY, 0);
 
 		data.setTimeInMillis(firstDate(id));
@@ -66,9 +66,9 @@ public final class Extrapolation extends Globalsentiment {
 
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
-				globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH)+1,
-						data.get(Calendar.YEAR), param, values, id);
-				if (globalSentiment != -1){
+				globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH) + 1,
+						data.get(Calendar.YEAR), param, values, id, frequency);
+				if (globalSentiment != -1) {
 					obs.add(index, globalSentiment);
 					dataAux.set(data.get(Calendar.YEAR), data.get(Calendar.MONTH), data.get(Calendar.DAY_OF_MONTH));
 				}
@@ -82,33 +82,29 @@ public final class Extrapolation extends Globalsentiment {
 		double[] coeff = fitter.fit(obs.toList());
 		data.add(Calendar.DAY_OF_MONTH, (int) -frequency);
 		index--;
-		int indexaux;	
+		int indexaux;
 		double lastvalue;
 
-		indexaux=obs.toList().size()-1;
-		lastvalue=(double) obs.toList().get(indexaux).getY();
+		indexaux = obs.toList().size() - 1;
+		lastvalue = (double) obs.toList().get(indexaux).getY();
 
+		coeff[0] = lastvalue
+				- (coeff[1] * indexaux + coeff[2] * indexaux * indexaux + coeff[3] * indexaux * indexaux * indexaux);
 
-			coeff[0] = lastvalue - (coeff[1] * indexaux + coeff[2] * indexaux * indexaux
-					+ coeff[3] * indexaux * indexaux * indexaux);
-		
-			
 		today.add(Calendar.MONTH, 3);
-		if(extraTest){
-		data.setTimeInMillis(firstDate(id));
-		data.add(Calendar.DAY_OF_MONTH, (int) frequency);
-		index=0;
+		if (extraTest) {
+			data.setTimeInMillis(firstDate(id));
+			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+			index = 0;
+		} else {
+			data = dataAux;
+			index = obs.toList().size() - 1;
 		}
-		else{
-			data=dataAux;
-			index=obs.toList().size()-1;
-		}
-		
-		
+
 		for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
 			try {
-				
-					obj = new JSONObject();
+
+				obj = new JSONObject();
 				obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
 						+ data.get(Calendar.YEAR));
 				if (getFutureValue(coeff, index) >= 0)

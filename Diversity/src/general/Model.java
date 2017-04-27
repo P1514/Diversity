@@ -354,6 +354,10 @@ public final class Model {
 	public Long getDate() {
 		return this.cdate;
 	}
+	
+	public Long getLastUpdate(){
+		return this.nextupdate-frequency*1000*60*60*24;
+	}
 
 	public Long getUpdate() {
 		return this.nextupdate;

@@ -69,7 +69,7 @@ public class Prediction extends Globalsentiment {
 			maxValue=0;
 			pssweights.forEach((k,v)->{
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
+				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
 				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
 				Data.delmodel((long) -1);
 				totalWeight+=(tempvalue == -1 ? 0 : v);
@@ -81,7 +81,7 @@ public class Prediction extends Globalsentiment {
 			variance=0;
 			pssweights.forEach((k,v)->{
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
-			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1);
+			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
 			variance+=Math.pow(tempvalue-mean, 2);
 			});
 			variance=variance/totalGsweight;
