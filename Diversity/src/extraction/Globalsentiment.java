@@ -223,7 +223,7 @@ public class Globalsentiment extends GetReach {
 		obj.put("Filter", output);
 		result.put(obj);
 		Model model = Data.getmodel(id);
-		if(model==null)
+		if (model == null)
 			return Backend.error_message("Model not found");
 
 		Calendar data = Calendar.getInstance();
@@ -284,14 +284,52 @@ public class Globalsentiment extends GetReach {
 		JSONObject obj;
 		obj = new JSONObject();
 		Model model = Data.getmodel(id);
+		double globalSentiment;
 		if (model == null)
 			return Backend.error_message("Model not found");
 
-		Calendar data = Calendar.getInstance();
-		data.setTimeInMillis(model.getLastUpdate());
-		data.add(Calendar.DAY_OF_MONTH, 1);
-		double globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
-				data.get(Calendar.YEAR), param, values, id, frequency);
+		/*
+		 * Calendar data = Calendar.getInstance();
+		 * data.setTimeInMillis(model.getLastUpdate());
+		 * data.add(Calendar.DAY_OF_MONTH, 1); double globalSentiment =
+		 * globalsentimentby(data.get(Calendar.DAY_OF_MONTH),
+		 * (data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param,
+		 * values, id, frequency);
+		 */
+
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? LIMIT 0, 50000";
+
+
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message(Settings.err_dbconnect);
+		}
+		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+			query1.setLong(1, model.getLastUpdate());
+			query1.setLong(2, model.getUpdate());
+			query1.setLong(3, model.getPSS());
+			System.out.println("Query:"+query1.toString());
+			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
+			obj.put("query", query1.toString());
+			try (ResultSet rs = query1.executeQuery()) {
+				if (!rs.next())
+					globalSentiment = -1;
+				else
+					globalSentiment = rs.getDouble(1);
+
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error", e);
+			return Backend.error_message("Error Fetching Data Please Try Again");
+		} finally {
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
+		}
 
 		/*
 		 * while (globalSentiment == -1) { data.add(Calendar.DAY_OF_MONTH, -1);
@@ -300,11 +338,11 @@ public class Globalsentiment extends GetReach {
 		 * id,frequency); }
 		 */
 
-		data.add(Calendar.DAY_OF_MONTH, (int) frequency);
-		obj = new JSONObject();
-		obj.put("Month", data.get(Calendar.MONTH) + 1);
-		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Day", data.get(Calendar.DAY_OF_MONTH)-1);
+		// data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+		
+		// obj.put("Month", data.get(Calendar.MONTH) + 1);
+		// obj.put("Year", data.get(Calendar.YEAR));
+		
 
 		obj.put("Value", Math.round(globalSentiment));
 		result.put(obj);
