@@ -1,15 +1,5 @@
 var pss;
 var snapshots;
-
-$(window).load(function() {
-  $('#overlay').hide();
-  $('#overlay-back').hide();
-});
-
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
-});
-
 function getCookie(name) {
   var value = "; " + document.cookie;
   var parts = value.split("; " + name + "=");
@@ -49,6 +39,7 @@ ws.onmessage = function(event) {
 }
 
 function displaySnapshots() {
+  /*
   for (var i=0; i < snapshots.length; i++) {
     console.log(snapshots[i].Name);
     var button = document.createElement('button');
@@ -61,5 +52,15 @@ function displaySnapshots() {
 
     $('#snapshot_list').append(button);
   }
-
+*/
+  var res = '["Snapshots",[ <br>';
+  for (var i = 0; i < json[1].length; i++) {
+    if (i == json[1].length - 1) {
+      res += '{"Name" : "' + json[1][i].Name + '", "URL" : "' + window.location.hostname + ':' + window.location.port + '/Diversity/pages/opinion_extraction_page.html?snapshot=' + json[1][i].Name + '"}<br>'; //SWITCH TO ID WHEN BACKEND IS DONE
+    } else {
+      res += '{"Name" : "' + json[1][i].Name + '", "URL" : "' + window.location.hostname + ':' + window.location.port + '/Diversity/pages/opinion_extraction_page.html?snapshot=' + json[1][i].Name + '"},<br>'; //SWITCH TO ID WHEN BACKEND IS DONE
+    }
+  }
+  res += ']]'
+  $('body').html(res);
 }

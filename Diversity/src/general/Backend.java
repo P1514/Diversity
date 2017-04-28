@@ -194,9 +194,12 @@ public class Backend {
 
 				}
 				if (res.equals("success")) {
-					obj = new JSONObject();
+					/*obj = new JSONObject();
 					obj.put("Message", "Snapshot Saved Successfully");
-					obj.put("Op", "Error");
+					obj.put("Op", "Error");*/
+					return error_message("Snapshot Saved Successfully").toString();
+					
+					
 				}
 
 				return obj.toString();

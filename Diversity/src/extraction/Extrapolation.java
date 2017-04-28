@@ -33,7 +33,7 @@ public final class Extrapolation extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		double globalSentiment;
-		boolean extraTest=true;
+		boolean extraTest=false;
 
 		String[] time = new String[12];
 		time[0] = "JAN";
