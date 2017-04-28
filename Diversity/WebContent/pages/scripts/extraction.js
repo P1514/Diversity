@@ -1013,8 +1013,13 @@ function drawChart() {
 		bottom_left.draw(data, options);
 
 	}
+
+
+
 	// Bottom Middle
+	var mid_data;
 	if (jsonData[i].Graph == "Bottom_Middle") {
+
 		var data = new google.visualization.DataTable();
 		data.addColumn('date', 'Date');
 
@@ -1082,7 +1087,7 @@ function drawChart() {
 				localStorage.end_date)
 				: 0;
 
-		var options = {
+		var mid_options = {
 			hAxis : {
 				showTextEvery : 1,
 				textStyle : {
@@ -1121,16 +1126,16 @@ function drawChart() {
 		};
 
 		if (start != 0 && end != 0) {
-			options.hAxis.viewWindow = {
+			mid_options.hAxis.viewWindow = {
 				min : start,
 				max : end
 			}
 		} else if (start != 0 && end == 0) {
-			options.hAxis.viewWindow = {
+			mid_options.hAxis.viewWindow = {
 				min : start
 			}
 		} else if (start == 0 && end != 0) {
-			options.hAxis.viewWindow = {
+			mid_options.hAxis.viewWindow = {
 				max : start
 			}
 		}
@@ -1139,9 +1144,39 @@ function drawChart() {
 
 		// google.visualization.events.addListener(bottom_middle, 'select',
 		// midSelectHandler);
-
-		bottom_middle.draw(data, options);
+		mid_data = data;
+		bottom_middle.draw(data, mid_options);
 	}
+
+
+		function getCoordsMid() {
+			var chartLayout = bottom_middle.getChartLayoutInterface();
+			var chartBounds = chartLayout.getChartAreaBoundingBox();
+			return {
+				x: {
+					min: chartLayout.getHAxisValue(chartBounds.left),
+					max: chartLayout.getHAxisValue(chartBounds.width + chartBounds.left)
+				},
+				/*y: {
+					min: chartLayout.getVAxisValue(chartBounds.top),
+					max: chartLayout.getVAxisValue(chartBounds.height + chartBounds.top)
+				}*/
+			};
+		}
+
+		function setRangeMid(coords) {
+			mid_options.hAxis.viewWindow = {};
+			//options.vAxis.viewWindow = {};
+			if (coords) {
+				mid_options.hAxis.viewWindow.min = coords.x.min;
+				mid_options.hAxis.viewWindow.max = coords.x.max;
+				//options.vAxis.viewWindow.min = coords.y.min;
+				//options.vAxis.viewWindow.max = coords.y.max;
+			}
+			bottom_middle.draw(mid_data, mid_options);
+		}
+
+		var right_data;
 	// Bottom Right
 	if (jsonData[i].Graph == "Bottom_Right"
 			|| jsonData[i].Graph == "Bottom_Right_Ex") {
@@ -1254,7 +1289,7 @@ function drawChart() {
 		 * google.visualization.events.trigger(bottom_middle, 'select'); } } }
 		 */
 
-		var options = {
+		var right_options = {
 			hAxis : {
 				format : 'MMM',
 				showTextEvery : 1,
@@ -1302,16 +1337,16 @@ function drawChart() {
 
 		if (!extra) {
 			if (start != 0 && end != 0) {
-				options.hAxis.viewWindow = {
+				right_options.hAxis.viewWindow = {
 					min : start,
 					max : end
 				}
 			} else if (start != 0 && end == 0) {
-				options.hAxis.viewWindow = {
+				right_options.hAxis.viewWindow = {
 					min : start
 				}
 			} else if (start == 0 && end != 0) {
-				options.hAxis.viewWindow = {
+				right_options.hAxis.viewWindow = {
 					max : start
 				}
 			}
@@ -1321,7 +1356,37 @@ function drawChart() {
 
 		// google.visualization.events.addListener(bottom_right, 'select',
 		// rightSelectHandler);
-		bottom_right.draw(sentimentdata, options);
+		bottom_right.draw(sentimentdata, right_options);
+		right_data = sentimentdata;
+		function getCoordsRight() {
+			var chartLayout = bottom_right.getChartLayoutInterface();
+			var chartBounds = chartLayout.getChartAreaBoundingBox();
+			return {
+				x: {
+					min: chartLayout.getHAxisValue(chartBounds.left),
+					max: chartLayout.getHAxisValue(chartBounds.width + chartBounds.left)
+				},
+				/*y: {
+					min: chartLayout.getVAxisValue(chartBounds.top),
+					max: chartLayout.getVAxisValue(chartBounds.height + chartBounds.top)
+				}*/
+			};
+		}
+
+		function setRangeRight(coords) {
+			right_options.hAxis.viewWindow = {};
+			//options.vAxis.viewWindow = {};
+			if (coords) {
+				right_options.hAxis.viewWindow.min = coords.x.min;
+				right_options.hAxis.viewWindow.max = coords.x.max;
+				//options.vAxis.viewWindow.min = coords.y.min;
+			  //options.vAxis.viewWindow.max = coords.y.max;
+			}
+			bottom_right.draw(right_data, right_options);
+		}
+
+		google.visualization.events.addListener(bottom_right,'scroll', function(){setRangeMid(getCoordsRight())});
+		google.visualization.events.addListener(bottom_middle,'scroll', function(){setRangeRight(getCoordsMid())});
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);

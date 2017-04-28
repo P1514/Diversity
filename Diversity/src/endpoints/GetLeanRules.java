@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.DefaultValue;
@@ -19,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 @Path("/getLeanRules")
@@ -34,9 +37,17 @@ public class GetLeanRules {
 	@Context
 	UriInfo ui;
 
+	/**
+	 * NOT DONE, NEED ENDPOINT TO RETURN ALL DESIGN PROJECTS
+	 * Builds a matrix where the rows are all the rules in the selected design project and 
+	 * the columns are the design projects with those rules. Matrix contains the sentiment
+	 * value for each of those (rule,project) pairs.
+	 * @return
+	 * @throws JSONException
+	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public Response welcome() {
+	public Response welcome() throws JSONException {
 		if ("".equals(dp))
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		int id;
@@ -47,6 +58,18 @@ public class GetLeanRules {
 		}
 		
 	    return Response.status(Response.Status.OK).entity(getRules(id, true)).build();
+	}
+	
+	/**
+	 * Request all design projects (no endpoint yet, so the data is simulated)
+	 * @return - a list of all design projects
+	 */
+	private List<Integer> getAllDesignProjects() {
+		List<Integer> tmp = new ArrayList<Integer>();
+		tmp.add(17);
+		tmp.add(18);
+		tmp.add(19);
+		return tmp;
 	}
 
 	private String getRules(int id, boolean validated) {
