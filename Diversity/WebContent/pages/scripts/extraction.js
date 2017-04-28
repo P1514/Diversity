@@ -1330,7 +1330,7 @@ function drawChart() {
 		};
 
 		for (var v = 0; v < series.length; v++) {
-			options["series"][series[v]] = {
+			right_options["series"][series[v]] = {
 				lineDashStyle : [ 4, 4 ]
 			}
 		}
@@ -1385,8 +1385,8 @@ function drawChart() {
 			bottom_right.draw(right_data, right_options);
 		}
 
-		google.visualization.events.addListener(bottom_right,'scroll', function(){setRangeMid(getCoordsRight())});
-		google.visualization.events.addListener(bottom_middle,'scroll', function(){setRangeRight(getCoordsMid())});
+		//google.visualization.events.addListener(bottom_right,'scroll', function(){setRangeMid(getCoordsRight())});
+		//google.visualization.events.addListener(bottom_middle,'scroll', function(){setRangeRight(getCoordsMid())});
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);
