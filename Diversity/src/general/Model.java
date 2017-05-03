@@ -356,7 +356,7 @@ public final class Model {
 	}
 	
 	public Long getLastUpdate(){
-		return this.nextupdate-(this.frequency*86400);
+		return this.nextupdate-(this.frequency*86400000);
 	}
 
 	public Long getUpdate() {

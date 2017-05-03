@@ -298,7 +298,12 @@ public class Globalsentiment extends GetReach {
 		 */
 
 		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? LIMIT 0, 50000";
-
+		/*Calendar data1 = Calendar.getInstance();
+		data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		Calendar data2 = Calendar.getInstance();
+		data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
+		System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");*/
 
 		try {
 			dbconnect();
@@ -307,8 +312,8 @@ public class Globalsentiment extends GetReach {
 			return Backend.error_message(Settings.err_dbconnect);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setLong(1, model.getLastUpdate());
-			query1.setLong(2, model.getUpdate());
+			query1.setLong(1, model.getLastUpdate()-frequency*86400000);
+			query1.setLong(2, model.getUpdate()-frequency*86400000);
 			query1.setLong(3, model.getPSS());
 			System.out.println("Query:"+query1.toString());
 			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
