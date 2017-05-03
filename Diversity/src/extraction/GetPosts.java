@@ -321,6 +321,9 @@ public class GetPosts {
 			inputdate.add(Calendar.MONTH, 1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
+			/*inputdate.add(Calendar.YEAR, -1);
+			query1.setLong(rangeindex, inputdate.getTimeInMillis());
+			rangeindex++;*/
 			query1.setLong(rangeindex, model.getDate());
 
 			try (ResultSet rs = query1.executeQuery()) {
