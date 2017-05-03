@@ -35,6 +35,7 @@ public final class Extrapolation extends Globalsentiment {
 		double globalSentiment;
 		boolean extraTest = true;
 
+
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";

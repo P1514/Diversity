@@ -280,7 +280,6 @@ public class Settings {
 	 */
 	public static Connection conndata() throws ClassNotFoundException, SQLException {
 		  try {
-
 			  while(condata==null){}
 		    Future<Connection> future = condata.getConnectionAsync();
 		    while (future == null || !future.isDone()) {
@@ -337,7 +336,6 @@ public class Settings {
 	 */
 	public static Connection conncr() throws ClassNotFoundException, SQLException {
 		try {
-
 			while(concr==null){}
 		    Future<Connection> future = concr.getConnectionAsync();
 		    while (future == null || !future.isDone()) {

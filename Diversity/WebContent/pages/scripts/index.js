@@ -14,6 +14,12 @@ var newData;
 var all_models = [];
 var timespan;
 
+$(window).on('load', function() {
+  if (document.cookie.indexOf('JSESSIONID') == -1) {
+    document.cookie = (Math.random().toString(36)+'00000000000000000').slice(2, 15+2);
+  }
+});
+
 /*
  * Hides and displays certain UI elements according to the current user's access
  * rights.
@@ -152,6 +158,9 @@ ws.onopen = function() {
 	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
   getRole();
 
+  if (document.cookie.indexOf('JSESSIONID') == -1) {
+    document.cookie = 'JSESSIONID = ' + (Math.random().toString(36)+'00000000000000000').slice(2, 15+2);
+  }
 
 }
 
@@ -642,7 +651,9 @@ function ok(val) {
 function deleteModel() {
 	// var confirm = window.confirm("Do you really want to delete model " + name
 	// + "?");
-	$('#alert').html('Do you really want to delete model ' + name + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
+  var select = document.getElementById("Models");
+  var selectedModel = select.options[select.selectedIndex].text;
+	$('#alert').html('Do you really want to delete model ' + selectedModel + '?' + '<br><br><button class="btn btn-default" id="yes" onclick="ok(true)">Yes</button><button class="btn btn-default" id="no" onclick="ok(false)">No</button>');
   $('#overlay').show();
 	$('#overlay-back').show();
 

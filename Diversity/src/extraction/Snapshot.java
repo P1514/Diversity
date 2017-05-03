@@ -79,7 +79,6 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		return true;
-
 	}
 
 	public String savePrediction(String name, String date, int timespan, String user, String products,

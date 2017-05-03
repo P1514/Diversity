@@ -57,12 +57,12 @@ public class ChromeTests  {
 
 		// Set the website URL and permissions
 
-		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
+		driver.get("localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
 		driver.manage().window().maximize();
 		JavascriptExecutor JavascriptExecutor = ((JavascriptExecutor)driver);
 		JavascriptExecutor.executeScript("document.cookie = \"JSESSIONID=3D43211234DDDFFGGT542; expires=Fri, 31 Dec 9999 23:59:59 GMT\";");
 		JavascriptExecutor.executeScript("localStorage.tutorial = 'home=done;create=done;view=done;edit=done;extraction=done;setup=done;prediction=done;'");
-		driver.get("http://localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
+		driver.navigate().refresh();
 
 		boolean create = testCreate(driver);
 		Thread.sleep(2000);
