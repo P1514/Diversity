@@ -6,18 +6,26 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.resource.cci.ResultSet;
+import org.json.JSONObject;
+
+import extraction.Globalsentiment;
 
 import java.sql.Connection;
 
+import general.Logging;
 import general.Settings;
 
 /**
  * The Class Monitor.
  */
 public class Monitor {
+	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
+	String error = "error";
 
 	/**
 	 * Update.
@@ -35,8 +43,8 @@ public class Monitor {
 			url += account + "\"&type[]=\"" + source + "\"&";
 		}
 		url = url.substring(0, url.length() - 1);
-		PreparedStatement stmt=null;
-		Connection cnlocal=null;
+		PreparedStatement stmt = null;
+		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
@@ -58,13 +66,15 @@ public class Monitor {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(stmt!=null)stmt.close();
+				if (stmt != null)
+					stmt.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			try {
-				if(cnlocal!=null)cnlocal.close();
+				if (cnlocal != null)
+					cnlocal.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -87,11 +97,10 @@ public class Monitor {
 
 	}
 
-	
-	public static void load(String uri, long pss) {//TODO
-		
+	public static void load(String uri, long pss) {// TODO
+
 	}
-	
+
 	/**
 	 * Delete.
 	 *
@@ -99,7 +108,36 @@ public class Monitor {
 	 *            the uri
 	 */
 	public static void delete(String uri) {
-		// TODO By Francisco Silva
+		String[] urilist = uri.split("(?<=;)");
+		int count=1;
+
+		for (int i = 0; i < urilist.length; i++) {
+			Connection cnlocal = null;
+			ResultSet rs;
+			try {
+				cnlocal = Settings.connlocal();
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "error", e);
+			}
+			//System.out.println(urilist[i]);
+			String insert = new String("SELECT COUNT(id) FROM models WHERE archived=0 and uri=?;");
+			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+				query1.setString(1, urilist[i]);
+				//System.out.println(query1.toString());
+				rs = query1.executeQuery();
+				count = rs.getInt(1);
+
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "error", e);
+			}
+			
+			//System.out.println(count);
+			if(count>0){
+				LOGGER.log(Level.INFO, "Source not deleted");			
+			}
+			else
+				LOGGER.log(Level.INFO, "Source deleted");
+		}
 
 	}
 
