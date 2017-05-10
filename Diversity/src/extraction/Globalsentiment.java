@@ -222,6 +222,9 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 		obj.put("Filter", output);
 		result.put(obj);
+		Model model = Data.getmodel(id);
+		if (model == null)
+			return Backend.error_message("Model not found");
 
 		Calendar data = Calendar.getInstance();
 		Calendar today = Calendar.getInstance();
@@ -233,12 +236,11 @@ public class Globalsentiment extends GetReach {
 		// year:"+data.get(Calendar.YEAR));
 		// System.out.println("PSS ID:"+ id);
 
-		data.setTimeInMillis(firstDate(id));
-		if (frequency != -1) {
-			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
-		} else {
-			data.add(Calendar.MONTH, 1);
-		}
+		data.setTimeInMillis(model.getDate());
+		/*
+		 * if (frequency != -1) { data.add(Calendar.DAY_OF_MONTH, (int)
+		 * frequency); } else { data.add(Calendar.MONTH, 1); }
+		 */
 
 		// while(today.after(data) &&
 		// globalsentimentby(data.get(Calendar.MONTH), data.get(Calendar.YEAR) ,
@@ -248,26 +250,26 @@ public class Globalsentiment extends GetReach {
 		// data.get(Calendar.YEAR) , param, values, id));
 		// data.add(Calendar.MONTH, 1);
 		// }
-
 		if (firstDate(id) != 0) {
 			// System.out.println("DATE:"+"mon:"+data.get(Calendar.MONTH)+"
 			// year:"+data.get(Calendar.YEAR));
 			if (frequency != -1) {
-				for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
+				for (; today.after(data);) {
 					obj = new JSONObject();
+					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
+							data.get(Calendar.YEAR), param, values, id, frequency));
+					data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
 							+ data.get(Calendar.YEAR));
-					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH)+1),
-							data.get(Calendar.YEAR), param, values, id));
 					result.put(obj);
-					
+
 				}
 			} else {
 				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
 					obj = new JSONObject();
 					obj.put("Date", "01" + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
 					obj.put("Value", globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
-							data.get(Calendar.YEAR), param, values, id));
+							data.get(Calendar.YEAR), param, values, id, frequency));
 					// System.out.println("mon:"+data.get(Calendar.MONTH)+"
 					// year:"+data.get(Calendar.YEAR));
 					result.put(obj);
@@ -277,27 +279,75 @@ public class Globalsentiment extends GetReach {
 		return result;
 	}
 
-	public JSONArray getCurSentiment(String param, String values, long id) throws JSONException {
+	public JSONArray getCurSentiment(String param, String values, long id, long frequency) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
+		Model model = Data.getmodel(id);
+		double globalSentiment;
+		if (model == null)
+			return Backend.error_message("Model not found");
 
-		Calendar data = Calendar.getInstance();
-		double globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
-				data.get(Calendar.YEAR), param, values, id);
+		/*
+		 * Calendar data = Calendar.getInstance();
+		 * data.setTimeInMillis(model.getLastUpdate());
+		 * data.add(Calendar.DAY_OF_MONTH, 1); double globalSentiment =
+		 * globalsentimentby(data.get(Calendar.DAY_OF_MONTH),
+		 * (data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param,
+		 * values, id, frequency);
+		 */
 
-		while (globalSentiment == -1) {
-			data.add(Calendar.DAY_OF_MONTH, -1);
-			globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH)+1,
-					data.get(Calendar.YEAR), param, values, id);
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? LIMIT 0, 50000";
+		/*Calendar data1 = Calendar.getInstance();
+		data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		Calendar data2 = Calendar.getInstance();
+		data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
+		System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");*/
+
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "ERROR", e);
+			return Backend.error_message(Settings.err_dbconnect);
 		}
-		
-		
+		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+			query1.setLong(1, model.getLastUpdate()-frequency*86400000);
+			query1.setLong(2, model.getUpdate()-frequency*86400000);
+			query1.setLong(3, model.getPSS());
+			System.out.println("Query:"+query1.toString());
+			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
+			obj.put("query", query1.toString());
+			try (ResultSet rs = query1.executeQuery()) {
+				if (!rs.next())
+					globalSentiment = -1;
+				else
+					globalSentiment = rs.getDouble(1);
 
-		obj = new JSONObject();
-		obj.put("Month", data.get(Calendar.MONTH) + 1);
-		obj.put("Year", data.get(Calendar.YEAR));
-		obj.put("Day", data.get(Calendar.DAY_OF_MONTH));
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, "Error", e);
+			return Backend.error_message("Error Fetching Data Please Try Again");
+		} finally {
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, "ERROR", e);
+			}
+		}
+
+		/*
+		 * while (globalSentiment == -1) { data.add(Calendar.DAY_OF_MONTH, -1);
+		 * globalSentiment = globalsentimentby(data.get(Calendar.DAY_OF_MONTH),
+		 * data.get(Calendar.MONTH)+1, data.get(Calendar.YEAR), param, values,
+		 * id,frequency); }
+		 */
+
+		// data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+		
+		// obj.put("Month", data.get(Calendar.MONTH) + 1);
+		// obj.put("Year", data.get(Calendar.YEAR));
+		
 
 		obj.put("Value", Math.round(globalSentiment));
 		result.put(obj);
@@ -305,7 +355,7 @@ public class Globalsentiment extends GetReach {
 		return result;
 	}
 
-	public double globalsentimentby(int day, int month, int year, String param, String value, long id) {
+	public double globalsentimentby(int day, int month, int year, String param, String value, long id, long frequency) {
 
 		Model model = Data.getmodel(id);
 		parameters par = split_params(param, value);
@@ -316,7 +366,7 @@ public class Globalsentiment extends GetReach {
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		return calc_global("polar", insert, par, month, model, year, day);
+		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
 	}
 
@@ -352,8 +402,8 @@ public class Globalsentiment extends GetReach {
 		int avg = 0;
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH)+1, data.get(Calendar.YEAR),
-						data.get(Calendar.YEAR), param, values, id);
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH) + 1, data.get(Calendar.YEAR),
+						data.get(Calendar.YEAR), param, values, id, -1);
 				avg++;
 			}
 		}

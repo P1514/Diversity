@@ -297,7 +297,7 @@ public class GetPosts {
 			insert += " AND gender=?";
 		if (par.location != null)
 			insert += " AND location=?";
-		insert += " AND timestamp<? AND timestamp>=? AND " + Settings.lotable_timestamp + ">=?)";
+		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=?)";
 		// ResultSet rs = null;
 
 		try {
@@ -321,9 +321,9 @@ public class GetPosts {
 			inputdate.add(Calendar.MONTH, 1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
-			inputdate.add(Calendar.YEAR, -1);
+			/*inputdate.add(Calendar.YEAR, -1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
-			rangeindex++;
+			rangeindex++;*/
 			query1.setLong(rangeindex, model.getDate());
 
 			try (ResultSet rs = query1.executeQuery()) {
