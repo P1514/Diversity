@@ -39,7 +39,7 @@ public class GetLeanRules {
 	private static final String DP_PARAMETER = "design_project_id";
 	private static final String VALIDATED_PARAMETER = "validated";
 
-	private Map<Integer,ArrayList<Integer>> matrix;
+	private Map<Integer, ArrayList<Integer>> matrix;
 	private Connection cnlocal;
 	private int numDp;
 	private int numRules;
@@ -51,12 +51,11 @@ public class GetLeanRules {
 	UriInfo ui;
 
 	/**
-	 * NOT DONE, NEED ENDPOINT TO RETURN ALL DESIGN PROJECTS Builds a matrix
-	 * where the rows are all the rules in the selected design project and the
-	 * columns are the design projects with those rules. Matrix contains the
-	 * sentiment value for each of those (rule,project) pairs.
+	 * Builds a matrix where the rows are all the rules in the selected design
+	 * project and the columns are the design projects with those rules. Still
+	 * need to include the polarity value of each rule.
 	 * 
-	 * @return
+	 * @return - a JSON string with the lean rule matrix
 	 * @throws JSONException
 	 */
 	@GET
@@ -64,21 +63,15 @@ public class GetLeanRules {
 	public Response welcome() throws JSONException {
 		if ("".equals(dp))
 			return Response.status(Response.Status.BAD_REQUEST).build();
-		int id;
-		try {
-			id = Integer.parseInt(dp);
-		} catch (NumberFormatException e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
 
 		// get design project rules
 		List<Integer> rules = getRules();
-		
-		matrix = new HashMap<Integer,ArrayList<Integer>>();
+
+		matrix = new HashMap<Integer, ArrayList<Integer>>();
 		// for each rule get the design projects where it is active
 		for (int r : rules) {
 			List<Integer> designProjects = getDesignProjects(r);
-			
+
 			for (int p : designProjects) {
 				List<Integer> tmp;
 				if (!matrix.containsKey(r)) {
@@ -92,6 +85,7 @@ public class GetLeanRules {
 				}
 			}
 		}
+		
 		JSONObject obj = new JSONObject(matrix);
 		return Response.status(Response.Status.OK).entity(obj.toString()).build();
 	}
@@ -131,10 +125,10 @@ public class GetLeanRules {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return (ArrayList<Integer>) rules;
 	}
-	
+
 	private ArrayList<Integer> getDesignProjects(int ruleId) {
 		List<Integer> designProjects = new ArrayList<Integer>();
 
@@ -162,14 +156,12 @@ public class GetLeanRules {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return (ArrayList<Integer>) designProjects;
 	}
 
 	/**
-	 * Request all design projects (no endpoint yet, so the data is simulated)
-	 * 
-	 * @return - a list of all design projects
+	 * @deprecated
 	 */
 	private List<Integer> getAllDesignProjects() {
 		List<Integer> tmp = new ArrayList<Integer>();
@@ -179,6 +171,9 @@ public class GetLeanRules {
 		return tmp;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	private String getRules(int id, boolean validated) {
 		String jsonString = "";
 		try {
