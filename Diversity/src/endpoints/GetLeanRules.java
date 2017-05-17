@@ -25,12 +25,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sun.media.jfxmedia.logging.Logger;
 
+import general.Data;
 import general.Settings;
+import extraction.Globalsentiment;
 
 @Path("/getLeanRules")
 public class GetLeanRules {
@@ -40,6 +43,7 @@ public class GetLeanRules {
 	private static final String VALIDATED_PARAMETER = "validated";
 
 	private Map<Integer, ArrayList<Integer>> matrix;
+	private Map<Integer, Integer> designProjectSentiment;
 	private Connection cnlocal;
 	private int numDp;
 	private int numRules;
@@ -66,11 +70,11 @@ public class GetLeanRules {
 
 		// get design project rules
 		List<Integer> rules = getRules();
-
+		List<Integer> designProjects = null;
 		matrix = new HashMap<Integer, ArrayList<Integer>>();
 		// for each rule get the design projects where it is active
 		for (int r : rules) {
-			List<Integer> designProjects = getDesignProjects(r);
+			designProjects = getDesignProjects(r);
 
 			for (int p : designProjects) {
 				List<Integer> tmp;
@@ -87,6 +91,17 @@ public class GetLeanRules {
 		}
 		
 		JSONObject obj = new JSONObject(matrix);
+		
+		List<Double> dpSentiment = new ArrayList<Double>();
+		
+		for (int dp : designProjects) {
+			double res = getDesignProjectSentiment(dp);
+			if ( res != -1 ) {
+				dpSentiment.add(res);
+				System.out.println(res + "\n");
+			}
+		}
+		
 		return Response.status(Response.Status.OK).entity(obj.toString()).build();
 	}
 
@@ -158,6 +173,43 @@ public class GetLeanRules {
 		}
 
 		return (ArrayList<Integer>) designProjects;
+	}
+	
+	private double getDesignProjectSentiment(int dpId) throws JSONException {
+		int model = -1;
+		int frequency = 1;
+		String select = "SELECT id, update_frequency FROM sentimentanalysis.models WHERE design_project=?";
+
+		PreparedStatement query1 = null;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			query1 = cnlocal.prepareStatement(select);
+			query1.setInt(1, dpId);
+			try (ResultSet rs = query1.executeQuery()) {
+				while (rs.next()) {
+					model = rs.getInt(1);
+					frequency = rs.getInt(2);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			cnlocal.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		Globalsentiment gs = new Globalsentiment();
+		JSONArray sentiment = model != -1 ? gs.getCurSentiment((String) null, (String) null, model, 2) : null;
+		
+		double val = sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1.0;
+		System.out.println(val);
+		return val;
 	}
 
 	/**
