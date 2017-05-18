@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -68,6 +69,22 @@ public class GetLeanRules {
 		if ("".equals(dp))
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
+		buildMatrix();
+		
+		JSONArray json = buildResult();
+		
+		return Response.status(Response.Status.OK).entity(json.toString()).build();
+	}
+
+	private void dbconnect() {
+		try {
+			cnlocal = Settings.connlocal();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void buildMatrix() {
 		// get design project rules
 		List<Integer> rules = getRules();
 		List<Integer> designProjects = null;
@@ -89,30 +106,48 @@ public class GetLeanRules {
 				}
 			}
 		}
-		
-		JSONObject obj = new JSONObject(matrix);
-		
-		List<Double> dpSentiment = new ArrayList<Double>();
-		
-		for (int dp : designProjects) {
-			double res = getDesignProjectSentiment(dp);
-			if ( res != -1 ) {
-				dpSentiment.add(res);
-				System.out.println(res + "\n");
+	}
+	
+	private JSONArray buildResult() throws JSONException {
+		JSONArray json = new JSONArray();
+
+		Set<Integer> rulesSet = matrix.keySet();
+
+		for (int r : rulesSet) {
+			JSONObject obj = new JSONObject();
+			obj.put("Rule", r);
+			obj.put("Projects", matrix.get(r));
+
+			List<Double> dpSentiment = new ArrayList<Double>();
+
+			for (int dp : matrix.get(r)) {
+				if (dp != -1) {
+					dpSentiment.add(getDesignProjectSentiment(dp));
+				}
 			}
+			double avg = 0;
+			for (double s : dpSentiment) {
+				avg += s;
+			}
+			
+			avg = avg/dpSentiment.size();
+			
+			int res = -1;
+			
+			if (avg > 50) {
+				res = 1;
+			} else if (avg == 50) {
+				res = 0;
+			} else {
+				res = -1;
+			}
+			obj.put("Polarity", res);
+			json.put(obj);
 		}
 		
-		return Response.status(Response.Status.OK).entity(obj.toString()).build();
+		return json;
 	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	private ArrayList<Integer> getRules() {
 		List<Integer> rules = new ArrayList<Integer>();
 
@@ -174,10 +209,11 @@ public class GetLeanRules {
 
 		return (ArrayList<Integer>) designProjects;
 	}
-	
+
 	private double getDesignProjectSentiment(int dpId) throws JSONException {
-		int model = -1;
-		int frequency = 1;
+		List<Integer> models = new ArrayList<Integer>();
+		List<Integer> frequencies = new ArrayList<Integer>();
+		List<Double> sentiments = new ArrayList<Double>();
 		String select = "SELECT id, update_frequency FROM sentimentanalysis.models WHERE design_project=?";
 
 		PreparedStatement query1 = null;
@@ -191,8 +227,8 @@ public class GetLeanRules {
 			query1.setInt(1, dpId);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
-					model = rs.getInt(1);
-					frequency = rs.getInt(2);
+					models.add(rs.getInt(1));
+					frequencies.add(rs.getInt(2));
 				}
 			}
 		} catch (Exception e) {
@@ -204,12 +240,20 @@ public class GetLeanRules {
 			e.printStackTrace();
 		}
 
-		Globalsentiment gs = new Globalsentiment();
-		JSONArray sentiment = model != -1 ? gs.getCurSentiment((String) null, (String) null, model, 2) : null;
-		
-		double val = sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1.0;
-		System.out.println(val);
-		return val;
+		for (int i = 0; i < models.size(); i++) {
+			Globalsentiment gs = new Globalsentiment();
+			JSONArray sentiment = models.get(i) != -1 ? gs.getAvgSentiment((String) null, (String) null, models.get(i))
+					: null;
+			sentiments.add(sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1);
+		}
+		double avg = 0;
+		sentiments.removeIf(i -> i == -1);
+
+		for (double s : sentiments) {
+			avg += s;
+		}
+
+		return avg / sentiments.size();
 	}
 
 	/**
