@@ -214,7 +214,7 @@ public class GetLeanRules {
 		List<Integer> models = new ArrayList<Integer>();
 		List<Integer> frequencies = new ArrayList<Integer>();
 		List<Double> sentiments = new ArrayList<Double>();
-		String select = "SELECT id, update_frequency FROM sentimentanalysis.models WHERE design_project=?";
+		String select = "SELECT " + Settings.lmtable_id + "," + Settings.lmtable_update + " FROM " + Settings.lmtable + "  WHERE " + Settings.lmtable_designproject + "=?";
 
 		PreparedStatement query1 = null;
 		try {
@@ -255,50 +255,4 @@ public class GetLeanRules {
 
 		return avg / sentiments.size();
 	}
-
-	/**
-	 * @deprecated
-	 */
-	private List<Integer> getAllDesignProjects() {
-		List<Integer> tmp = new ArrayList<Integer>();
-		tmp.add(17);
-		tmp.add(18);
-		tmp.add(19);
-		return tmp;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	private String getRules(int id, boolean validated) {
-		String jsonString = "";
-		try {
-			URL url = new URL(ENDPOINT + "?" + DP_PARAMETER + "=" + id + "&" + VALIDATED_PARAMETER + "=" + validated);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/json");
-
-			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("HTTP error " + conn.getResponseCode());
-			}
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-			String tmp;
-			while ((tmp = in.readLine()) != null) {
-				jsonString += tmp;
-			}
-
-			in.close();
-			conn.disconnect();
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return jsonString;
-	}
-
 }
