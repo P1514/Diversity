@@ -150,7 +150,8 @@ public class Settings {
 	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
-	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
+	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
+	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsTo[]=33333333333000&pssId=3&accounts[]=AirForce1";
 	public static final boolean LocalPolarity = true;
 
 	// Received JSON Parameters

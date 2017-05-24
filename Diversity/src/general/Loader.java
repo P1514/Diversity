@@ -73,8 +73,8 @@ public class Loader {
 		totalviews = 0;
 		totalcomments = 0;
 		totallikes = 0;
-		long stime = System.nanoTime();
-		System.out.println(" Beginning " + stime);
+		//long stime = System.nanoTime();
+		//System.out.println(" Beginning " + stime);
 		loadPSS();
 		String err = loadroles();
 		if (err != null)
@@ -94,7 +94,7 @@ public class Loader {
 		err = loadUsers(json);
 		if (err != null)
 			return err;
-		
+
 		update("opinions");
 
 		err = insertauthors();
@@ -147,7 +147,7 @@ public class Loader {
 		err = awaittermination(es, "posts");
 		if (err != null)
 			return err;
-		
+
 		evaluatedata();
 
 		Server.isloading = false;
@@ -514,8 +514,17 @@ public class Loader {
 	private String loadUsers(JSONArray json) throws JSONException {
 		String err;
 
-		String querycond = users.toString();
-		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
+		String querycond ="(";
+		
+		for( Author a : users2){
+			querycond+=a.getUID()+",";
+		}
+		if(querycond.length()>2)
+		querycond=querycond.substring(0, querycond.length()-2);
+		else
+		querycond+="2";
+		querycond+=");";
+		System.out.println(querycond);
 		// From local DB
 		err = loadlocalusers(querycond);
 		if (err != null)
@@ -531,14 +540,17 @@ public class Loader {
 				JSONObject obj = json.getJSONObject(i);
 				if (authordb2.containsKey(obj.getString(Settings.JSON_source) + obj.getString(Settings.latable_source)))
 					continue;
+
 				Author auth = new Author(obj.getString(Settings.JSON_source), obj.getString(Settings.latable_source),
-						obj.getString(Settings.latable_name), obj.getLong(Settings.latable_age),
+						obj.has(Settings.latable_name) ? obj.getString(Settings.latable_name) : "",
+						obj.getString(Settings.latable_age) != "null" ? obj.getLong(Settings.latable_age) : 0,
 						obj.getString(Settings.latable_gender), obj.getString(Settings.latable_location));
-				auth.setComments(obj.getLong(Settings.latable_comments));
-				auth.setLikes(obj.getLong(Settings.latable_likes));
+				auth.setComments(obj.has(Settings.latable_name) ? obj.getLong(Settings.latable_comments) : 0);
+				auth.setLikes(obj.has(Settings.latable_likes) ? obj.getLong(Settings.latable_likes) : 0);
 				auth.setPosts(obj.getLong(Settings.latable_posts) - 1);
 				auth.setViews(obj.getLong(Settings.latable_views));
 				authordb2.put(obj.getString(Settings.latable_id) + "," + obj.getString(Settings.latable_source), auth);
+
 			}
 
 			for (int i = 0; i < json.length(); i++) {
@@ -600,6 +612,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
+		System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -827,7 +840,7 @@ public class Loader {
 	}
 
 	private String loaduopid() throws JSONException {
-		String err=null;
+		String err = null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
@@ -844,9 +857,9 @@ public class Loader {
 		}
 
 		boolean error = false;
-		
-			try (Statement stmt = cndata.createStatement()) {
-				while (true) {
+
+		try (Statement stmt = cndata.createStatement()) {
+			while (true) {
 				try (ResultSet rs = stmt.executeQuery(query)) {
 					if (!rs.next()) {
 						cndata.close();
@@ -871,7 +884,7 @@ public class Loader {
 					if (err != null)
 						break;
 					break;
-				}catch (Exception e) {
+				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
 					query = query.replace("ORDER BY ID ASC", ") order by id asc");
@@ -881,29 +894,29 @@ public class Loader {
 					continue;
 				}
 
-			} 
-
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				return null;
 			}
 
-			finally
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
 
-			{
-				try {
-					cndata.close();
-				} catch (SQLException e) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e);
-				}
-				try {
-					cnlocal.close();
-				} catch (SQLException e) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e);
-				}
+		finally
+
+		{
+			try {
+				cndata.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
-			return err;
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+			}
+		}
+		return err;
 	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {
