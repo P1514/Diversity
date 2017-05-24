@@ -70,9 +70,9 @@ public class GetLeanRules {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 
 		buildMatrix();
-		
+
 		JSONArray json = buildResult();
-		
+
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}
 
@@ -107,7 +107,7 @@ public class GetLeanRules {
 			}
 		}
 	}
-	
+
 	private JSONArray buildResult() throws JSONException {
 		JSONArray json = new JSONArray();
 
@@ -129,11 +129,11 @@ public class GetLeanRules {
 			for (double s : dpSentiment) {
 				avg += s;
 			}
-			
-			avg = avg/dpSentiment.size();
-			
+
+			avg = avg / dpSentiment.size();
+
 			int res = -1;
-			
+
 			if (avg > 50) {
 				res = 1;
 			} else if (avg == 50) {
@@ -144,10 +144,10 @@ public class GetLeanRules {
 			obj.put("Polarity", res);
 			json.put(obj);
 		}
-		
+
 		return json;
 	}
-	
+
 	private ArrayList<Integer> getRules() {
 		List<Integer> rules = new ArrayList<Integer>();
 
@@ -214,7 +214,8 @@ public class GetLeanRules {
 		List<Integer> models = new ArrayList<Integer>();
 		List<Integer> frequencies = new ArrayList<Integer>();
 		List<Double> sentiments = new ArrayList<Double>();
-		String select = "SELECT " + Settings.lmtable_id + "," + Settings.lmtable_update + " FROM " + Settings.lmtable + "  WHERE " + Settings.lmtable_designproject + "=?";
+		String select = "SELECT " + Settings.lmtable_id + "," + Settings.lmtable_update + " FROM " + Settings.lmtable
+				+ "  WHERE " + Settings.lmtable_designproject + "=?";
 
 		PreparedStatement query1 = null;
 		try {
