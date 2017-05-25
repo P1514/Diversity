@@ -59,6 +59,21 @@ public class Data {
 		
 	}
 
+	protected static void addservice(ResultSet rs) throws SQLException{
+		
+		servicedb.put(rs.getLong(Settings.crservicetable_id),
+				new Product(rs.getLong(Settings.crservicetable_id),
+						rs.getString(Settings.crservicetable_name),
+						false,
+						rs.getLong(Settings.crservicetable_supplied_by),
+						rs.getLong(Settings.crservicetable_parent)));
+		if (rs.getLong(Settings.crservicetable_parent) != 0) {
+			Product parent =servicedb.get(rs.getLong(Settings.crservicetable_parent));
+			parent.setParent(rs.getLong(Settings.crservicetable_id));
+		}
+		
+	}
+	
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
 			return false;
@@ -127,6 +142,21 @@ public class Data {
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
 		return null;
 	}
+	
+	public static boolean dbhasservice(long id) {
+		return servicedb.containsKey(id);
+	}
+
+	public static Product getService(long id) {
+		if (dbhasservice(id))
+			return servicedb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get service");
+		return null;
+	}
+
+	public static Collection<Product> dbserviceall() {
+		return servicedb.values();
+	}	
 
 	public static boolean dbhasproduct(long id) {
 		return productdb.containsKey(id);
