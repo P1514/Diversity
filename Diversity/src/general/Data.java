@@ -43,37 +43,31 @@ public class Data {
 	private static final ConcurrentHashMap<String, Timer> security = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, String> security_users = new ConcurrentHashMap<>();
 
-	
-	protected static void addproduct(ResultSet rs) throws SQLException{
-		
+	protected static void addproduct(ResultSet rs) throws SQLException {
+
 		productdb.put(rs.getLong(Settings.crproducttable_id),
-				new Product(rs.getLong(Settings.crproducttable_id),
-						rs.getString(Settings.crproducttable_name),
-						rs.getBoolean(Settings.crproducttable_isfinal),
-						rs.getLong(Settings.crproducttable_supplied_by),
+				new Product(rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
+						rs.getBoolean(Settings.crproducttable_isfinal), rs.getLong(Settings.crproducttable_supplied_by),
 						rs.getLong(Settings.crproducttable_parent)));
 		if (rs.getLong(Settings.crproducttable_parent) != 0) {
 			Product parent = productdb.get(rs.getLong(Settings.crproducttable_parent));
 			parent.setParent(rs.getLong(Settings.crproducttable_id));
 		}
-		
+
 	}
 
-	protected static void addservice(ResultSet rs) throws SQLException{
-		
+	protected static void addservice(ResultSet rs) throws SQLException {
+
 		servicedb.put(rs.getLong(Settings.crservicetable_id),
-				new Product(rs.getLong(Settings.crservicetable_id),
-						rs.getString(Settings.crservicetable_name),
-						false,
-						rs.getLong(Settings.crservicetable_supplied_by),
-						rs.getLong(Settings.crservicetable_parent)));
+				new Product(rs.getLong(Settings.crservicetable_id), rs.getString(Settings.crservicetable_name), false,
+						rs.getLong(Settings.crservicetable_supplied_by), rs.getLong(Settings.crservicetable_parent)));
 		if (rs.getLong(Settings.crservicetable_parent) != 0) {
-			Product parent =servicedb.get(rs.getLong(Settings.crservicetable_parent));
+			Product parent = servicedb.get(rs.getLong(Settings.crservicetable_parent));
 			parent.setParent(rs.getLong(Settings.crservicetable_id));
 		}
-		
+
 	}
-	
+
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
 			return false;
@@ -87,7 +81,7 @@ public class Data {
 
 	public static void newuser(String id, String role) {
 		Timer tmp;
-		//System.out.println(id + role);
+		// System.out.println(id + role);
 		if (security_users.containsKey(id)) {
 			if (getRole(role).permissionAmount() < getRole(security_users.get(id)).permissionAmount())
 				security_users.put(id, role);
@@ -142,7 +136,7 @@ public class Data {
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
 		return null;
 	}
-	
+
 	public static boolean dbhasservice(long id) {
 		return servicedb.containsKey(id);
 	}
@@ -156,7 +150,7 @@ public class Data {
 
 	public static Collection<Product> dbserviceall() {
 		return servicedb.values();
-	}	
+	}
 
 	public static boolean dbhasproduct(long id) {
 		return productdb.containsKey(id);

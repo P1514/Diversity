@@ -101,6 +101,23 @@ public class GetProducts {
 			result.put(obj);
 
 		}
+		
+		for (Product ser : Data.dbserviceall()) {
+			if (ser.getParent() != 0)
+				continue;
+			obj = new JSONObject();
+			obj.put("Name", ser.get_Name());
+			obj.put("Id", ser.get_Id());
+			if (!ser.getsubproducts().isEmpty()) {
+				JSONArray array = new JSONArray();
+				for (long id : ser.getsubproducts())
+					array.put(subservices(id));
+				obj.put("Products", array);
+			}
+			result.put(obj);
+
+		}
+		
 		return result;
 	}
 
@@ -113,6 +130,21 @@ public class GetProducts {
 		if (!pro.getsubproducts().isEmpty()) {
 			for (long id2 : pro.getsubproducts())
 				array.put(subproducts(id2));
+			result.put("Products", array);
+		}
+
+		return result;
+	}
+	
+	private static final JSONObject subservices(long id) throws JSONException {
+		JSONObject result = new JSONObject();
+		JSONArray array = new JSONArray();
+		Product pro = Data.getService(id);
+		result.put("Name", pro.get_Name());
+		result.put("Id", pro.get_Id());
+		if (!pro.getsubproducts().isEmpty()) {
+			for (long id2 : pro.getsubproducts())
+				array.put(subservices(id2));
 			result.put("Products", array);
 		}
 

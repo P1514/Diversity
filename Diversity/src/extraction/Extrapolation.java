@@ -196,12 +196,12 @@ public final class Extrapolation extends Globalsentiment {
 		if (ser1.getParent() != 0) {
 			do {
 				commonid.add(ser1.getParent());
-				ser1 = Data.getProduct(ser1.getParent());
+				ser1 = Data.getService(ser1.getParent());
 				depth1++;
 
 			} while (ser1.getParent() != 0);
 		}
-		Product ser2 = Data.getProduct(service_id2);
+		Product ser2 = Data.getService(service_id2);
 		int depth2 = 2;
 		if (commonid.contains(service_id2))
 			founddepth = 0;
@@ -211,7 +211,7 @@ public final class Extrapolation extends Globalsentiment {
 					if (commonid.contains(ser2.getParent()))
 						founddepth = depth2 - 1;
 				}
-				ser2 = Data.getProduct(ser2.getParent());
+				ser2 = Data.getService(ser2.getParent());
 				depth2++;
 			} while (ser2.getParent() != 0);
 		}
