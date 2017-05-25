@@ -81,8 +81,8 @@ function fillProjects(projects) {
 }
 
 function buildTable() {
-  $('#ldr').html("<tr><th>Rule</th><th># Design Projects</th><th>Score</th></tr>");
+  $('#ldr').html('<tr><th style = "text-align: center;padding-right: 20px;">Rule</th><th style = "text-align: center;padding-right: 20px;"># Design Projects</th><th style = "text-align: center;padding-right: 20px;">Score</th></tr>');
   for (var i = 0; i < jsonData.length; i++) {
-    $('#ldr').append('<tr><td style = "text-align : center;">' + jsonData[i].Rule + '</td><td style = "text-align : center;">' + jsonData[i].Projects.length + '</td><td style = "text-align : center;">' + jsonData[i].Score);
+    $('#ldr').append('<tr><td style = "text-align: center;padding-right: 20px;">' + jsonData[i].Rule + '</td><td style = "text-align : center;padding-right: 20px;">' + jsonData[i].Projects.length + '</td><td style = "text-align : center;padding-right: 20px;">' + jsonData[i].Score);
   }
 }
