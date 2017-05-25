@@ -345,6 +345,26 @@ public class Loader {
 			}
 			return;
 		}
+		
+		if(Settings.include_services){
+		select = Settings.sqlselectall + Settings.crservicetable + " ORDER BY " + Settings.crservicetable_id + " ASC";
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.addservice(rs);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+			}
+			return;
+		}
+		}
 
 		select = Settings.sqlselectall + Settings.crcompanytable;
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
