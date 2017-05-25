@@ -18,21 +18,21 @@ import extraction.Globalsentiment;
 
 public class LeanRules {
 	private Map<Integer, ArrayList<Integer>> matrix;
-	private Connection cnlocal;
+	private static Connection cnlocal;
 	private JSONArray result;
 	private String dp;
-	
+
 	public LeanRules(String dp_id) throws JSONException {
 		this.dp = dp_id;
 		buildMatrix();
 		result = buildResult();
 	}
-	
+
 	public JSONArray getResult() {
 		return result;
 	}
-	
-	private void dbconnect() {
+
+	private static void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -90,14 +90,14 @@ public class LeanRules {
 
 			int res = -1;
 
-			if (avg > 50) {
+			if (avg > 55) {
 				res = 1;
-			} else if (avg == 50) {
-				res = 0;
-			} else {
+			} else if (avg < 45) {
 				res = -1;
+			} else {
+				res = 0;
 			}
-			obj.put("Polarity", res);
+			obj.put("Score", res);
 			json.put(obj);
 		}
 
@@ -135,10 +135,16 @@ public class LeanRules {
 		return (ArrayList<Integer>) rules;
 	}
 
-	private ArrayList<Integer> getDesignProjects(int ruleId) {
+	public static ArrayList<Integer> getDesignProjects(int ruleId) {
 		List<Integer> designProjects = new ArrayList<Integer>();
 
-		String select = "SELECT design_project_id FROM diversity_common_repository.design_project_rule WHERE lean_rule_id =? AND checked = 1";
+		String select;
+
+		if (ruleId == -1) {
+			select = "SELECT DISTINCT design_project_id FROM diversity_common_repository.design_project_rule WHERE checked = 1";
+		} else {
+			select = "SELECT design_project_id FROM diversity_common_repository.design_project_rule WHERE lean_rule_id =? AND checked = 1";
+		}
 
 		PreparedStatement query1 = null;
 		try {
@@ -148,7 +154,9 @@ public class LeanRules {
 		}
 		try {
 			query1 = cnlocal.prepareStatement(select);
-			query1.setInt(1, ruleId);
+			if (ruleId != -1) {
+				query1.setInt(1, ruleId);
+			}
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
 					designProjects.add(rs.getInt(1));

@@ -119,7 +119,30 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-
+			case 32:
+				obj = new JSONObject();
+				result = new JSONArray();
+				obj.put("Op", "design_projects");
+				
+				JSONArray dpList = new JSONArray();
+				for (int i : LeanRules.getDesignProjects(-1)) {
+					dpList.put(i);
+				}
+				obj.put("List", dpList);
+				result.put(obj);
+				
+				return result.toString();
+			case 31:
+				obj = new JSONObject();
+				result = new JSONArray();
+				String dp = msg.getString("dp");
+				LeanRules lr1 = new LeanRules(dp);
+				
+				obj.put("Op", "rules");
+				obj.put("List", lr1.getResult());
+				result.put(obj);
+				
+				return result.toString();
 			case 30:
 				obj = new JSONObject();
 				result = new JSONArray();
