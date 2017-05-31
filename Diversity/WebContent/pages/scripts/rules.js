@@ -7,6 +7,8 @@ $(window).on('load', function() {
 var ws;
 var json;
 var jsonData;
+var dplist;
+var table;
 
 function getCookie(name) { //not being used
   var value = "; " + document.cookie;
@@ -34,13 +36,13 @@ ws.onopen = function() {
   if (document.cookie.indexOf('JSESSIONID') == -1) {
     document.cookie = 'JSESSIONID = ' + (Math.random().toString(36)+'00000000000000000').slice(2, 15+2);
   }
-
-  json = {
-    'Op' : 'get_dp',
+  var json2 = {
+    'Op' : 'get_rules',
+    'dp' : '-1',
     'Key' : getCookie("JSESSIONID")
   };
 
-  ws.send(JSON.stringify(json));
+  ws.send(JSON.stringify(json2));
 };
 
 
@@ -53,12 +55,7 @@ ws.onmessage = function(event) {
 	$('#overlay-back').show();
   }
   if (json[0].Op == 'rules') {
-    jsonData = json[0].List;
     buildTable();
-  }
-
-  if (json[0].Op == 'design_projects') {
-    fillProjects(json[0].List);
   }
 };
 
@@ -74,15 +71,9 @@ function getRules(dp) {
   ws.send(JSON.stringify(json2));
 }
 
-function fillProjects(projects) {
-  for (var i = 0; i < projects.length; i++) {
-    $('#dp_list').append('<option value="'+projects[i] + '">'+ projects[i] +'</option>');
-  }
-}
-
 function buildTable() {
   $('#ldr').html('<tr><th style = "text-align: center;padding-right: 20px;">Rule</th><th style = "text-align: center;padding-right: 20px;"># Design Projects</th><th style = "text-align: center;padding-right: 20px;">Score</th></tr>');
-  for (var i = 0; i < jsonData.length; i++) {
-    $('#ldr').append('<tr><td style = "text-align: center;padding-right: 20px;">' + jsonData[i].Rule + '</td><td style = "text-align : center;padding-right: 20px;">' + jsonData[i].Projects.length + '</td><td style = "text-align : center;padding-right: 20px;">' + jsonData[i].Score);
+  for (var i = 1; i < json.length; i++) {
+    $('#ldr').append('<tr><td style = "text-align: center;padding-right: 20px;">' + json[i].Rule + '</td><td style = "text-align : center;padding-right: 20px;">' + json[i].Projects.length + '</td><td style = "text-align : center;padding-right: 20px;">' + json[i].Score);
   }
 }
