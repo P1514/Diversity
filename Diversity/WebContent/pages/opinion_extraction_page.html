@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="styles/extraction.css">
+<link rel="stylesheet" type="text/css" href="styles/jqcloud.css" />
 <script>
 $(document).ready(function(){
 		$('[data-toggle="tooltip"]').tooltip();
@@ -61,24 +62,24 @@ $(document).ready(function(){
 				<div class="container" style = "width: 90%;" id="filters">
 					<h2>Filters</h2>
 					<table id="segmentation">
-						<tr style="text-align: left;">
-							<th style="text-align: left;"><input type="radio" name="field" id="Gender"
+						<tr>
+							<th><input type="radio" name="field" id="Gender"
 								value="Gender" onclick="fixbuttons('Gender');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Gender" > &nbsp
 									Gender</th>
-							<th style="text-align: left;"><input type="radio" name="field" id="Location"
+							<th><input type="radio" name="field" id="Location"
 								value="Location" onclick="fixbuttons('Location');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Location"> &nbsp
 									Location </th>
-							<th style="text-align: left;"><input type="radio" name="field" id="Age_radio"
+							<th><input type="radio" name="field" id="Age_radio"
 								value="Age" onclick="fixbuttons('Age');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Age"> &nbsp
 									Age </th>
-							<th style="text-align: left;"><input type="radio" name="field" id="Final"
+							<th><input type="radio" name="field" id="Final"
 								value="Final" onclick="fixbuttons('Final');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Final Product"> &nbsp
 									Final Product </th>
-							<th style="text-align: left;"><input type="radio" name="field" id="Global"
+							<th><input type="radio" name="field" id="Global"
 								value="Global" onclick="fixbuttons('Global');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Display the data without filters" checked>
 									&nbsp All </th>
 						</tr>
-						<tr style="text-align: left;">
+						<tr>
 							<th><select style="margin-left: 0;" id="genderfilt" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Select a gender segment to display">
 									<option value="All">All Genders
 							</select></th>
@@ -147,7 +148,7 @@ $(document).ready(function(){
 							<option>User 5</option>
 						</select>
 					</div>
-					<div id="cloud" style="width:700px; margin:0px;">
+					<div id="cloud" style="width:700px;margin:0px;">
 					</div>
 					<hr>
 					Click a word to see the posts in which it appears. Right click a word for more options.
@@ -188,6 +189,7 @@ $(document).ready(function(){
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script src="sorttable.js"></script>
 	<script src="scripts/jquery.tagcloud.js"></script>
+	<script type="text/javascript" src="scripts/jqcloud-1.0.4.min.js"></script>
 	<script src="scripts/extraction.js"></script>
 </body>
 </html>

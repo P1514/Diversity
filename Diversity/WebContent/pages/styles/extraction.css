@@ -126,7 +126,7 @@ product {
 }
 
 input[type=radio] {
-	margin-left: 0;
+	margin-left: 25%;
 	margin-top: 25px;
 }
 
