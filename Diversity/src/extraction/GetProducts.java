@@ -85,13 +85,14 @@ public class GetProducts {
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "Tree");
 		result.put(obj);
-
+		
 		for (Product pro : Data.dbproductall()) {
 			if (pro.getParent() != 0)
 				continue;
 			obj = new JSONObject();
 			obj.put("Name", pro.get_Name());
 			obj.put("Id", pro.get_Id());
+			obj.put("Type", "Product");
 			if (!pro.getsubproducts().isEmpty()) {
 				JSONArray array = new JSONArray();
 				for (long id : pro.getsubproducts())
@@ -101,13 +102,13 @@ public class GetProducts {
 			result.put(obj);
 
 		}
-		
 		for (Product ser : Data.dbserviceall()) {
 			if (ser.getParent() != 0)
 				continue;
 			obj = new JSONObject();
 			obj.put("Name", ser.get_Name());
 			obj.put("Id", ser.get_Id());
+			obj.put("Type", "Service");
 			if (!ser.getsubproducts().isEmpty()) {
 				JSONArray array = new JSONArray();
 				for (long id : ser.getsubproducts())
