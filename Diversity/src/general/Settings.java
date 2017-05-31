@@ -150,8 +150,10 @@ public class Settings {
 	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
-	public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
+	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
+	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsTo[]=33333333333000&pssId=3&accounts[]=AirForce1";
 	public static final boolean LocalPolarity = true;
+	public static Boolean include_services = true;
 
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
@@ -204,6 +206,13 @@ public class Settings {
 	public static final String crproducttable_parent = "parent_product_id";
 	public static final String crproducttable_supplied_by = "supplied_by_company_id";
 	public static final String crproducttable_isfinal = "is_final_product";
+	
+	// Service Table
+	public static final String crservicetable = "service";
+	public static final String crservicetable_id = "id";
+	public static final String crservicetable_name = "name";
+	public static final String crservicetable_parent = "parent_service_id";
+	public static final String crservicetable_supplied_by = "provided_by_company_id";
 
 	// Company Table
 	public static final String crcompanytable = "company";

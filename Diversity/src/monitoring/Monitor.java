@@ -97,8 +97,12 @@ public class Monitor {
 
 	}
 
-	public static void load(String uri, long pss) {// TODO
-
+	public static void load(String uri, long pss) {
+		
+			// Objetos co info sources
+		
+		//String uri = Settings.JSON_uri;
+		
 	}
 
 	/**
