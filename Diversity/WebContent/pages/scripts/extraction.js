@@ -24,6 +24,7 @@ var product;
 var user = 1;
 var finalProductColors = [];
 var loaded = false;
+var mediawiki = false;
 
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
