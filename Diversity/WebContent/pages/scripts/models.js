@@ -676,6 +676,8 @@ function send_config() {
     'mediawiki' : document.getElementById('mediawikibox').checked ? true : undefined
 
   };
+
+  
   if (erro == true) {
       var code = 'All fields must be filled. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
 		  $('#alert').html(code);
