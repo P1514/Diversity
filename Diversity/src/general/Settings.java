@@ -172,8 +172,8 @@ public class Settings {
 	public static final String JSON_lname = "Lname";
 
 	// Common Repository DB Specs
-	private static final String crdbip = "213.249.38.66";
-	private static final String crdbport = "8934";
+	private static final String crdbip = "127.0.0.1";
+	private static final String crdbport = "3306";
 	private static final String crdbname = "diversity_common_repository";
 	private static final String crurl = "jdbc:mysql://" + crdbip + ":" + crdbport + "/" + crdbname
 			+ "?autoReconnect=true&useSSL=false";
@@ -225,6 +225,11 @@ public class Settings {
 	public static final String crpssproducttable = "pss_has_product";
 	public static final String crrpssproducttable_pss = "pss_id";
 	public static final String crrpssproducttable_product = "product_id";
+	
+	// PSS has Service Table
+	public static final String crpssservicetable = "pss_has_service";
+	public static final String crrpssservicetable_pss = "pss_id";
+	public static final String crrpssservicetable_service = "service_id";
 
 	// Access rights Table
 	public static final String lartable = "access_rights";

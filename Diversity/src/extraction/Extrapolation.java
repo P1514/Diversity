@@ -218,14 +218,14 @@ public final class Extrapolation extends Globalsentiment {
 		return result;
 	}
 
-	public static HashMap<Long, Long> get_Similarity_Threshold(String productsId, double threshold,
+	public static HashMap<Long, Double> get_Similarity_Threshold(String productsId, double threshold,
 			boolean is_product) {
 		if (productsId.isEmpty())
-			return new HashMap<Long, Long>();
+			return new HashMap<Long, Double>();
 
-		HashMap<Long, Long> pssweights = new HashMap<Long, Long>();
+		HashMap<Long, Double> pssweights = new HashMap<Long, Double>();
 		String[] products = productsId.split(";");
-		HashMap<Long, Long> id_similarity = new HashMap<Long, Long>();
+		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
 		for (String p : products) {
 			try {
 				id_similarity = get_Similarity_Threshold(Long.parseLong(p), threshold, is_product);
@@ -235,11 +235,23 @@ public final class Extrapolation extends Globalsentiment {
 							if (pss.get_products().contains(k)) {
 								if (pssweights.containsKey(pss.getID())) {
 									pssweights.put(pss.getID(), pssweights.get(pss.getID()) + v);
+									
 								} else {
-
+									
 									pssweights.put(pss.getID(), v);
 								}
 							}
+						}
+						else{
+							if (pss.get_services().contains(k)) {
+								if (pssweights.containsKey(pss.getID())) {
+									pssweights.put(pss.getID(), pssweights.get(pss.getID()) + v);
+									
+								} else {
+									
+									pssweights.put(pss.getID(), v);
+								}
+							}			
 						}
 					}
 				});
@@ -253,8 +265,8 @@ public final class Extrapolation extends Globalsentiment {
 
 	}
 
-	private static HashMap<Long, Long> get_Similarity_Threshold(long product_id, double threshold, boolean is_product) {
-		HashMap<Long, Long> id_similarity = new HashMap<Long, Long>();
+	private static HashMap<Long, Double> get_Similarity_Threshold(long product_id, double threshold, boolean is_product) {
+		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
 		while (threshold > 1)
 			threshold = threshold / ((double) 100);
 		if (is_product) {
@@ -263,7 +275,7 @@ public final class Extrapolation extends Globalsentiment {
 				// continue;
 
 				if (get_Similarity(product_id, pro.get_Id()) >= threshold) {
-					id_similarity.put(pro.get_Id(), (long) get_Similarity(product_id, pro.get_Id()));
+					id_similarity.put(pro.get_Id(), get_Similarity(product_id, pro.get_Id()));
 					System.out.println("SIMILARITY OF PRODUCTS(" + pro.get_Id() + "," + product_id + ") -->"
 							+ get_Similarity(product_id, pro.get_Id()));
 				}
@@ -274,7 +286,7 @@ public final class Extrapolation extends Globalsentiment {
 				// continue;
 
 				if (get_Similarity_Services(product_id, ser.get_Id()) >= threshold) {
-					id_similarity.put(ser.get_Id(), (long) get_Similarity_Services(product_id, ser.get_Id()));
+					id_similarity.put(ser.get_Id(), get_Similarity_Services(product_id, ser.get_Id()));
 					System.out.println("SIMILARITY OF SERVICES(" + ser.get_Id() + "," + product_id + ") -->"
 							+ get_Similarity_Services(product_id, ser.get_Id()));
 				}
