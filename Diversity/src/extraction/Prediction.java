@@ -35,7 +35,14 @@ public class Prediction extends Globalsentiment {
 		JSONObject obj = new JSONObject();
 
 		HashMap<Long, Long> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75,true);
-		if (pssweights.isEmpty())
+		HashMap<Long, Long> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 50,false);
+		
+		pssweights.forEach((k,v)->{
+			System.out.println("SIMILARITY OF PRODUCTS("+k+") -->"
+					+ v);
+			
+		});
+		if (pssweights.isEmpty()&& pssweightss.isEmpty())
 		{
 			obj.put("Op", "Error");
 			obj.put("Message", "No prediction available");
@@ -68,6 +75,16 @@ public class Prediction extends Globalsentiment {
 			numbOfProd=0;
 			maxValue=0;
 			pssweights.forEach((k,v)->{
+				
+				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
+				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
+				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
+				Data.delmodel((long) -1);
+				totalWeight+=(tempvalue == -1 ? 0 : v);
+				numbOfProd++;
+				maxValue=(tempvalue>=Math.abs(maxValue)?Math.abs(tempvalue):Math.abs(maxValue));
+				});
+			pssweightss.forEach((k,v)->{
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
 				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
 				totalGsweight += (tempvalue == -1 ? 0 : v*tempvalue);
