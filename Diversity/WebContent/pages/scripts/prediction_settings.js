@@ -150,7 +150,17 @@ function makeTree(div,test) {
   str += "<ul>";
   //console.log(test);
   for (var i = 1; i < test.length; i++) {
-    makeList(test[i]);//makeList(jsonData[1]);
+		if (div.indexOf("prod") != -1) {
+	    if (test[i].Type == "Product") {
+				makeList(test[i]);
+			}
+		}
+
+		if (div.indexOf("serv") != -1) {
+	    if (test[i].Type == "Service") {
+				makeList(test[i]);
+			}
+		}
   }
   str += "</ul>"
   document.getElementById(div).innerHTML = str;
@@ -355,7 +365,7 @@ function drawChart() {
         variance = chartData[1][i].Variance;
       }
 
-      if (month != "" && value != -1 && variance != -1) {
+      if (month != "" && (value != -1 || variance != -1)) {
         sum += value;
         count += 1;
 

@@ -172,8 +172,8 @@ public class Settings {
 	public static final String JSON_lname = "Lname";
 
 	// Common Repository DB Specs
-	private static final String crdbip = "127.0.0.1";
-	private static final String crdbport = "3306";
+	private static final String crdbip = "213.249.38.66";
+	private static final String crdbport = "8934";
 	private static final String crdbname = "diversity_common_repository";
 	private static final String crurl = "jdbc:mysql://" + crdbip + ":" + crdbport + "/" + crdbname
 			+ "?autoReconnect=true&useSSL=false";

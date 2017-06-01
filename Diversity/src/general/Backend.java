@@ -20,6 +20,7 @@ import extraction.Prediction;
 import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
+import general.LeanRules.LeanRule;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc
@@ -119,7 +120,30 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-
+			case 32:
+				obj = new JSONObject();
+				result = new JSONArray();
+				obj.put("Op", "design_projects");
+				
+				JSONArray dpList = new JSONArray();
+				for (int i : LeanRules.getDesignProjects(-1)) {
+					dpList.put(i);
+				}
+				
+				obj.put("List", dpList);
+				result.put(obj);
+				
+				return result.toString();
+			case 31:
+				obj = new JSONObject();
+				result = new JSONArray();
+				obj.put("Op", "rules");
+				
+				LeanRules lr = new LeanRules("-1");
+				result = lr.getResult();
+				
+				
+				return result.toString();
 			case 30:
 				obj = new JSONObject();
 				result = new JSONArray();

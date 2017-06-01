@@ -34,6 +34,8 @@ public class Operations {
 		permission.put(27, 3);
 		permission.put(28, 1);
 		permission.put(30, 4);
+		permission.put(31, 1);
+		permission.put(32, 1);
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;
@@ -68,6 +70,8 @@ public class Operations {
 		op.put("set_ignore_word", 27); // set user ignored words
 		op.put("get_mediawiki", 28); // Create model
 		op.put("get_log", 30); // get all logs
+		op.put("get_rules", 31); // get lean design rules
+		op.put("get_dp", 32); // get all design projects
 		op.put("testing", 99); // Admin only
 	}
 
