@@ -111,7 +111,7 @@ public class Prediction extends Globalsentiment {
 			});
 			
 
-			variance+=Math.pow(150-mean, 2);
+			variance+=Math.pow(200-mean, 2);
 			
 			if(totalGsweight!=0){
 			variance=variance/totalGsweight;
