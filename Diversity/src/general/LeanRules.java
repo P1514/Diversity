@@ -227,12 +227,12 @@ public class LeanRules {
 		//String select = "SELECT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ?;";
 		PreparedStatement query1 = null;
 		try {
-			localDBconnect();
+			dbconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			query1 = cnlocal.prepareStatement(select1);
+			query1 = cncr.prepareStatement(select1);
 			query1.setInt(1, dpId);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
@@ -243,7 +243,7 @@ public class LeanRules {
 			e.printStackTrace();
 		}
 		try {
-			cnlocal.close();
+			cncr.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -260,7 +260,7 @@ public class LeanRules {
 			query1.setInt(2, pss);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
-					pss = rs.getInt(1);
+					avg = rs.getInt(1);
 				}
 			}
 		} catch (Exception e) {
