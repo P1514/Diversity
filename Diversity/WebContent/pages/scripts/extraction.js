@@ -1234,7 +1234,7 @@ function drawChart() {
 				}
 			}
 			var time2;
-			for (var iii = count - 1; i < jsonData.length
+			for (var iii = count; i < jsonData.length
 					&& (jsonData[i].Graph == 'Bottom_Right_Ex')
 					&& !jsonData[i].hasOwnProperty('Filter'); iii++, ii++, i++) {
 				if (jsonData[i].Graph == 'Bottom_Right_Ex') {
