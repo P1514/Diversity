@@ -155,7 +155,7 @@ ws.onopen = function() {
     sessionStorage.userKey = Math.floor(Math.random() * 100000000);
   }
 
-	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DESIGNER";
+	if(getCookie("Developer") == "Guilherme") sessionStorage.session="DEVELOPER";
   getRole();
 
   if (document.cookie.indexOf('JSESSIONID') == -1) {

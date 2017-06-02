@@ -44,18 +44,18 @@ public class Startup implements ServletContextListener {
 		Oversight o = new Oversight(true);
 		o.run();
 		//new Oversight();
-		/*Connection cnlocal = null;
+		Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
-			cnlocal = Settings.connlocal();
+			/*cnlocal = Settings.connlocal();
 			String select = "Select * from "+Settings.gentable+" WHERE id=1";
 			stmt=cnlocal.createStatement();
 			rs = stmt.executeQuery(select);
 			rs.next();
 			if (rs.getInt("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
-			//System.out.println(clean.clean());
+			//System.out.println(clean.clean());*/
 			if (Settings.JSON_use == false) {
 				new Loader().load(null);
 			} else {
@@ -69,13 +69,13 @@ public class Startup implements ServletContextListener {
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
 			 * System.out.println("\n2:"+json.getJSONObject(2).toString()+"\n");
 			 
-			// System.out.println(json.get("id"));
-		}  catch (SQLException e) {
+			// System.out.println(json.get("id"));*/
+		}  catch (Exception e) {
 			// TODO Auto-generated catch block
 			LOGGER.log(Level.SEVERE,"ERROR Database Outdated",e);
 			
 			//e.printStackTrace();
-		} catch (Exception e) {
+		} /*catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {

@@ -54,11 +54,14 @@ $(document).ready(function(){
 		</product>
 		<button onclick="location.href = 'index.html';" id="home"
 			class="btn btn-default">Home</button>
+			<input type="radio" name="source_radio" value="social" id="radio_social"> Use social network data<br>
+			<input type="radio" name="source_radio" value="wiki" id="radio_wiki"> Use media wiki<br>
 			<center>
 				<button onclick="save();" id="save"
 					class="btn btn-default">Save snapshot</button>
 				<button onclick="load();" id="load"
 					class="btn btn-default">Load snapshot</button>
+				<br>
 				<div class="container" style = "width: 90%;" id="filters">
 					<h2>Filters</h2>
 					<table id="segmentation">
