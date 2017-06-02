@@ -395,7 +395,25 @@ public class Loader {
 				while (rs.next()) {
 					Data.pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
 							.add_product(rs.getLong(Settings.crrpssproducttable_product));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+		select = Settings.sqlselectall + Settings.crpssservicetable;
 
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.pssdb.get(rs.getLong(Settings.crrpssservicetable_pss))
+							.add_service(rs.getLong(Settings.crrpssservicetable_service));
 				}
 			}
 		} catch (Exception e) {

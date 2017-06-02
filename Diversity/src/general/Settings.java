@@ -225,6 +225,11 @@ public class Settings {
 	public static final String crpssproducttable = "pss_has_product";
 	public static final String crrpssproducttable_pss = "pss_id";
 	public static final String crrpssproducttable_product = "product_id";
+	
+	// PSS has Service Table
+	public static final String crpssservicetable = "pss_has_service";
+	public static final String crrpssservicetable_pss = "pss_id";
+	public static final String crrpssservicetable_service = "service_id";
 
 	// Access rights Table
 	public static final String lartable = "access_rights";

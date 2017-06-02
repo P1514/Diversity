@@ -130,7 +130,9 @@ public class LeanRules {
 				res = 0;
 			}
 			
+
 			obj.put("Score", (int) res);
+
 //			obj.put("Score", res);
 			json.put(obj);
 		}
@@ -142,7 +144,9 @@ public class LeanRules {
 		List<LeanRule> rules = new ArrayList<LeanRule>();
 
 		String select = "";
+
 		if (dp == -1) { // if dp is -1 it gets rules from all projects 
+
 			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule,diversity_common_repository.lean_rule WHERE lean_rule_id = diversity_common_repository.lean_rule.id;";
 		} else {
 			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule WHERE design_project_id =? AND lean_rule_id = diversity_common_repository.lean_rule.id;";
@@ -217,6 +221,7 @@ public class LeanRules {
 	}
 
 	private double getDesignProjectSentiment(int dpId) throws JSONException {
+
 		int pss = -1;
 		int avg = -1;
 		List<Integer> frequencies = new ArrayList<Integer>();
@@ -224,25 +229,30 @@ public class LeanRules {
 		String select1 = "SELECT DISTINCT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ? ";
 		String select2 = "SELECT (SELECT SUM(polarity*reach) FROM opinions WHERE pss = ?) / (SELECT SUM(reach) FROM opinions WHERE pss= ?);";
 
+
 		//String select = "SELECT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ?;";
 		PreparedStatement query1 = null;
 		try {
+
 			dbconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
+
 			query1 = cncr.prepareStatement(select1);
 			query1.setInt(1, dpId);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
 					pss = rs.getInt(1);
+
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
+
 			cncr.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -318,5 +328,6 @@ public class LeanRules {
 //		}
 //
 //		return avg / sentiments.size();
+
 	}
 }
