@@ -404,7 +404,7 @@ function drawChart() {
     var chart = new google.visualization.LineChart(document.getElementById('graph'));
     chart.draw(data,options);
 
-    var data = google.visualization.arrayToDataTable([['Indicator', 'Value'], ['Average Global Sentiment', count != 0 ? sum/count : 0]]);
+    var data = google.visualization.arrayToDataTable([['Indicator', 'Value'], ['Average Global Sentiment', count != 0 ? Math.round(sum/count) : 0]]);
 
     var options = {
       title: 'Predicted average global sentiment',
