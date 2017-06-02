@@ -130,7 +130,7 @@ public class LeanRules {
 				res = 0;
 			}
 			
-			obj.put("Score", (int) res);
+			obj.put("Score", (int) avg);
 //			obj.put("Score", res);
 			json.put(obj);
 		}
