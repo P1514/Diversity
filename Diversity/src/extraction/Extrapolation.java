@@ -180,6 +180,23 @@ public final class Extrapolation extends Globalsentiment {
 		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
 		return result;
 	}
+	
+	private static double get_Similarity_Services(long service_id1, long service_id2) {
+		ArrayList<Long> commonid = new ArrayList<Long>();
+		if (service_id1 == service_id2)
+			return 1;
+		if (!(Data.dbhasservice(service_id1) && Data.dbhasservice(service_id2)))
+			return 0;
+
+		Product ser1 = Data.getService(service_id1);
+		commonid.add(service_id1);
+		int depth1 = 2;
+		int founddepth = -1;
+		if (ser1.getParent() != 0) {
+			do {
+				commonid.add(ser1.getParent());
+				ser1 = Data.getService(ser1.getParent());
+				depth1++;
 
 	private static double get_Similarity_Services(long service_id1, long service_id2) {
 		ArrayList<Long> commonid = new ArrayList<Long>();
@@ -197,6 +214,7 @@ public final class Extrapolation extends Globalsentiment {
 				commonid.add(ser1.getParent());
 				ser1 = Data.getService(ser1.getParent());
 				depth1++;
+
 
 			} while (ser1.getParent() != 0);
 		}
@@ -218,8 +236,10 @@ public final class Extrapolation extends Globalsentiment {
 		return result;
 	}
 
+
 	public static HashMap<Long, Double> get_Similarity_Threshold(String productsId, double threshold,
 			boolean is_product) {
+
 		if (productsId.isEmpty())
 			return new HashMap<Long, Double>();
 
@@ -228,6 +248,7 @@ public final class Extrapolation extends Globalsentiment {
 		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
 		for (String p : products) {
 			try {
+
 				id_similarity = get_Similarity_Threshold(Long.parseLong(p), threshold, is_product);
 				id_similarity.forEach((k, v) -> {
 					for (PSS pss : Data.dbpssall()) {
@@ -255,11 +276,13 @@ public final class Extrapolation extends Globalsentiment {
 						}
 					}
 				});
+
 			} catch (NumberFormatException e1) {
 				LOGGER.log(Level.SEVERE, "Parsing String to Long error String = " + p);
 				return null;
 			}
 		}
+
 
 		return pssweights;
 
@@ -290,6 +313,7 @@ public final class Extrapolation extends Globalsentiment {
 					System.out.println("SIMILARITY OF SERVICES(" + ser.get_Id() + "," + product_id + ") -->"
 							+ get_Similarity_Services(product_id, ser.get_Id()));
 				}
+
 			}
 		}
 

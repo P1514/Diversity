@@ -130,7 +130,9 @@ public class LeanRules {
 				res = 0;
 			}
 			
-			obj.put("Score", (int) avg);
+
+			obj.put("Score", (int) res);
+
 //			obj.put("Score", res);
 			json.put(obj);
 		}
@@ -142,7 +144,9 @@ public class LeanRules {
 		List<LeanRule> rules = new ArrayList<LeanRule>();
 
 		String select = "";
-		if (dp == -1) {
+
+		if (dp == -1) { // if dp is -1 it gets rules from all projects 
+
 			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule,diversity_common_repository.lean_rule WHERE lean_rule_id = diversity_common_repository.lean_rule.id;";
 		} else {
 			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule WHERE design_project_id =? AND lean_rule_id = diversity_common_repository.lean_rule.id;";
@@ -217,26 +221,56 @@ public class LeanRules {
 	}
 
 	private double getDesignProjectSentiment(int dpId) throws JSONException {
-		List<Integer> models = new ArrayList<Integer>();
-		//List<Integer> frequencies = new ArrayList<Integer>();
+
+		int pss = -1;
+		int avg = -1;
+		List<Integer> frequencies = new ArrayList<Integer>();
 		List<Double> sentiments = new ArrayList<Double>();
-		String select = "SELECT " + Settings.lmtable_id + "," + Settings.lmtable_update + " FROM " + Settings.lmtable
-				+ "  WHERE " + Settings.lmtable_designproject + "=?";
+		String select1 = "SELECT DISTINCT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ? ";
+		String select2 = "SELECT (SELECT SUM(polarity*reach) FROM opinions WHERE pss = ?) / (SELECT SUM(reach) FROM opinions WHERE pss= ?);";
+
 
 		//String select = "SELECT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ?;";
 		PreparedStatement query1 = null;
+		try {
+
+			dbconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+
+			query1 = cncr.prepareStatement(select1);
+			query1.setInt(1, dpId);
+			try (ResultSet rs = query1.executeQuery()) {
+				while (rs.next()) {
+					pss = rs.getInt(1);
+
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+
+			cncr.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		query1 = null;
 		try {
 			localDBconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		try {
-			query1 = cnlocal.prepareStatement(select);
-			query1.setInt(1, dpId);
+			query1 = cnlocal.prepareStatement(select2);
+			query1.setInt(1, pss);
+			query1.setInt(2, pss);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
-					models.add(rs.getInt(1));
-					//frequencies.add(rs.getInt(2));
+					avg = rs.getInt(1);
 				}
 			}
 		} catch (Exception e) {
@@ -247,20 +281,53 @@ public class LeanRules {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return avg;
+//		List<Integer> models = new ArrayList<Integer>();
+//		List<Integer> frequencies = new ArrayList<Integer>();
+//		List<Double> sentiments = new ArrayList<Double>();
+//		String select = "SELECT DISTINCT " + Settings.lmtable_id + ", " + Settings.lmtable_update + " FROM " + Settings.lmtable
+//				+ "  WHERE " + Settings.lmtable_designproject + "=?";
+//
+//		//String select = "SELECT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ?;";
+//		PreparedStatement query1 = null;
+//		try {
+//			localDBconnect();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			query1 = cnlocal.prepareStatement(select);
+//			query1.setInt(1, dpId);
+//			try (ResultSet rs = query1.executeQuery()) {
+//				while (rs.next()) {
+//					models.add(rs.getInt(1));
+//					frequencies.add(rs.getInt(2));
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			cnlocal.close();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		System.out.println("Design project: " + dpId + "-------------");
+//		for (int i = 0; i < models.size(); i++) {
+//			Globalsentiment gs = new Globalsentiment();
+//			//System.out.println("Model " + models.get(i) + ": " + gs.getAvgSentiment("All", "", models.get(i)));
+//			JSONArray sentiment = models.get(i) != -1 ? gs.globalsentiment(null, null, "Global", models.get(i), frequencies.get(i))	: null;
+//			sentiments.add(sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1);
+//		}
+//		double avg = 0;
+//		sentiments.removeIf(i -> i == -1);
+//		
+//		for (double s : sentiments) {
+//			System.out.println(s);
+//			avg += s;
+//		}
+//
+//		return avg / sentiments.size();
 
-		for (int i = 0; i < models.size(); i++) {
-			Globalsentiment gs = new Globalsentiment();
-			JSONArray sentiment = models.get(i) != -1 ? gs.getAvgSentiment("All", "Global", models.get(i))
-					: null;
-			sentiments.add(sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1);
-		}
-		double avg = 0;
-		sentiments.removeIf(i -> i == -1);
-
-		for (double s : sentiments) {
-			avg += s;
-		}
-
-		return avg / sentiments.size();
 	}
 }

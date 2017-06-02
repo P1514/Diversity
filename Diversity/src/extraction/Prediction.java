@@ -34,6 +34,7 @@ public class Prediction extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
+
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75,true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60,false);
 		
@@ -49,6 +50,7 @@ public class Prediction extends Globalsentiment {
 			
 		});
 		if (pssweights.isEmpty()&& pssweightss.isEmpty())
+
 		{
 			obj.put("Op", "Error");
 			obj.put("Message", "No prediction available");
@@ -104,6 +106,7 @@ public class Prediction extends Globalsentiment {
 			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
 			variance+=Math.pow(tempvalue-mean, 2);
 			});
+
 			pssweightss.forEach((k,v)->{
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1,true));
 			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12, data.get(Calendar.YEAR) + month / 12, "Global", "", (long)-1,-1);
@@ -114,6 +117,7 @@ public class Prediction extends Globalsentiment {
 			variance+=Math.pow(200-mean, 2);
 			
 			if(totalGsweight!=0){
+
 			variance=variance/totalGsweight;
 			stDeviation=Math.sqrt(variance);
 			}
