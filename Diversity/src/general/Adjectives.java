@@ -18,6 +18,7 @@ public final class Adjectives {
 	public Adjectives() {
 		adjectives = new ConcurrentHashMap<String, Double>();
 		adjectives.put("phenomenal", 97.0);
+		adjectives.put("true-color", 96.0);
 		adjectives.put("world-class", 95.0);
 		adjectives.put("incredible", 92.0);
 		adjectives.put("exceptional", 90.0);
@@ -25,6 +26,7 @@ public final class Adjectives {
 		adjectives.put("amazing", 87.0);
 		adjectives.put("terrific", 85.0);
 		adjectives.put("astonishing", 83.0);
+		adjectives.put("High-Def", 82.0);
 		adjectives.put("wonderful", 81.0);
 		adjectives.put("superior", 80.0);
 		adjectives.put("fantastic", 79.0);
@@ -44,6 +46,7 @@ public final class Adjectives {
 		adjectives.put("popular", 65.0);
 		adjectives.put("sweet", 63.0);
 		adjectives.put("fine", 61.0);
+		adjectives.put("good enough", 60.0);
 		adjectives.put("cool", 59.0);
 		adjectives.put("okay", 57.0);
 		adjectives.put("fair", 55.0);

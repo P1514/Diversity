@@ -63,7 +63,7 @@ public class DBHandler extends Handler {
 			insert = cnlocal.prepareStatement(sql);
 			insert.setInt(1, user_id);
 			insert.setTimestamp(2, timestamp);
-			insert.setString(3, msg);
+			insert.setString(3, "errir");
 			insert.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();

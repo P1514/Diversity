@@ -317,7 +317,7 @@ public class Globalsentiment extends GetReach {
 			query1.setLong(3, model.getPSS());
 			System.out.println("Query:"+query1.toString());
 			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
-			obj.put("query", query1.toString());
+			//obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					globalSentiment = -1;

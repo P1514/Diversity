@@ -93,7 +93,7 @@ public class Product {
 	 */
 	public boolean checkMessage(String message){
 		
-		if(message.toLowerCase().contains(this.name.toLowerCase()))
+		if(this.is_final_product == true && message.toLowerCase().contains(this.name.toLowerCase()))
 			return true;
 		return false;
 	}

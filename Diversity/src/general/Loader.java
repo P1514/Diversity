@@ -73,8 +73,8 @@ public class Loader {
 		totalviews = 0;
 		totalcomments = 0;
 		totallikes = 0;
-		//long stime = System.nanoTime();
-		//System.out.println(" Beginning " + stime);
+		// long stime = System.nanoTime();
+		// System.out.println(" Beginning " + stime);
 		loadPSS();
 		String err = loadroles();
 		if (err != null)
@@ -85,6 +85,7 @@ public class Loader {
 		err = loadmodels();
 		if (err != null)
 			return err;
+		
 
 		err = loaduniqueopinionid(json);
 
@@ -345,25 +346,26 @@ public class Loader {
 			}
 			return;
 		}
-		
-		if(Settings.include_services){
-		select = Settings.sqlselectall + Settings.crservicetable + " ORDER BY " + Settings.crservicetable_id + " ASC";
-		try (PreparedStatement query = cncr.prepareStatement(select)) {
-			try (ResultSet rs = query.executeQuery()) {
 
-				while (rs.next()) {
-					Data.addservice(rs);
+		if (Settings.include_services) {
+			select = Settings.sqlselectall + Settings.crservicetable + " ORDER BY " + Settings.crservicetable_id
+					+ " ASC";
+			try (PreparedStatement query = cncr.prepareStatement(select)) {
+				try (ResultSet rs = query.executeQuery()) {
+
+					while (rs.next()) {
+						Data.addservice(rs);
+					}
 				}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+				try {
+					cncr.close();
+				} catch (Exception e1) {
+					LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+				}
+				return;
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-			try {
-				cncr.close();
-			} catch (Exception e1) {
-				LOGGER.log(Level.FINEST, "Nothing can be done here", e);
-			}
-			return;
-		}
 		}
 
 		select = Settings.sqlselectall + Settings.crcompanytable;
@@ -552,16 +554,20 @@ public class Loader {
 	private String loadUsers(JSONArray json) throws JSONException {
 		String err;
 
-		String querycond ="(";
-		
-		for( Author a : users2){
-			querycond+=a.getUID()+",";
+		String querycond = "(";
+
+		for (Author a : users2) {
+			querycond += a.getUID() + ",";
 		}
-		if(querycond.length()>2)
-		querycond=querycond.substring(0, querycond.length()-2);
-		else
-		querycond+="2";
-		querycond+=");";
+		if (querycond.length() > 2)
+			querycond = querycond.substring(0, querycond.length() - 2);
+		else{
+			for (Long a : users){
+				querycond+=a+",";
+			}
+			querycond = querycond.substring(0, querycond.length() - 1);
+		}
+		querycond += ");";
 		System.out.println(querycond);
 		// From local DB
 		err = loadlocalusers(querycond);
@@ -719,15 +725,11 @@ public class Loader {
 	}
 
 	private String loadsimauthors(String querycond) throws JSONException {
+		
 		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
 				+ querycond);
-		Connection cndata = null;
-		try {
-			cndata = Settings.conndata();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
+		///Connection cndata = null;
+		try (Connection cndata = Settings.conndata()){
 		try (Statement stmt = cndata.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(query)) {
 				while (rs.next()) {
@@ -740,15 +742,9 @@ public class Loader {
 					}
 				}
 			}
-		} catch (SQLException e) {
+		} }catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
 			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
-		} finally {
-			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
 		}
 		return null;
 	}
