@@ -56,14 +56,14 @@ public class Startup implements ServletContextListener {
 			if (rs.getInt("Version") != Settings.dbversion)
 				rs.getLong("asdasasd");
 			//System.out.println(clean.clean());*/
-			if (Settings.JSON_use == false) {
+			/*if (Settings.JSON_use == false) {
 				new Loader().load(null);
 			} else {
 				JSONArray json = new JSONArray(readUrl(Settings.JSON_uri));
 				LOGGER.log(Level.INFO,json.toString());
 				new Loader().load(json);
 
-			}
+			}*/
 			/*
 			 * System.out.println("\n0:"+json.getJSONObject(0).toString()+"\n");
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");

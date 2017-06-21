@@ -72,8 +72,7 @@ function getRules(dp) {
 }
 
 function buildTable() {
-  $('#ldr').html('<tr><th style = "text-align: center;padding-right: 20px;">Rule</th><th style = "text-align: center;padding-right: 20px;"># Design Projects</th><th style = "text-align: center;padding-right: 20px;">Score</th></tr>');
   for (var i = 1; i < json.length; i++) {
-    $('#ldr').append('<tr><td style = "text-align: center;padding-right: 20px;">' + json[i].Rule + '</td><td style = "text-align : center;padding-right: 20px;">' + json[i].Projects.length + '</td><td style = "text-align : center;padding-right: 20px;">' + json[i].Score);
+    $('#ldr').append('<tr><td style = "text-align: left;padding-right: 20px;">' + json[i].Rule + '</td><td style = "text-align : left;padding-right: 20px;">' + json[i].Projects.length + '</td><td style = "text-align : left;padding-right: 20px;">' + json[i].Score);
   }
 }

@@ -51,8 +51,11 @@
 	<center>
 			<div class="container" id="dp_selection" style="margin-top: 30px;padding-top:30px;">
 				<center>
-					<table id="ldr">
-
+					<table id="ldr" class="sortable">
+						<tr>
+							<th style = "text-align: center;padding-right: 20px;">Rule</th>
+							<th style = "text-align: center;padding-right: 20px;"># Design Projects</th><th style = "text-align: center;padding-right: 20px;">Score</th>
+						</tr>
 					</table>
 				</center>
 			</div>
@@ -60,10 +63,7 @@
 
 	<input id="submit2" class="btn btn-default pull-right" style="margin-right:30px;margin-top:15px;" onclick="location.href ='index.html';" type="submit" value="Back" />
 	<script type='text/javascript' src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.4.1/bootstrap-slider.js"></script>
-	<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.3/jstree.min.js"></script>
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-	<script type='text/javascript' src='maskedinput.js'></script>
+	<script type='text/javascript' src='sorttable.js'></script>
 	<script type='text/javascript' src='scripts/rules.js'></script>
 </body>
 
