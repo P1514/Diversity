@@ -10,6 +10,8 @@ import org.json.*;
 
 import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
 
+import endpoints.LeanRules;
+import endpoints.LeanRules.LeanRule;
 import extraction.Extrapolation;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -20,7 +22,6 @@ import extraction.Prediction;
 import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
-import general.LeanRules.LeanRule;
 import modeling.GetModels;
 
 // TODO: Auto-generated Javadoc

@@ -1,11 +1,12 @@
-package general;
+package endpoints;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import extraction.Globalsentiment;
+import general.Settings;
 
 public class LeanRules {
 	
@@ -37,7 +39,7 @@ public class LeanRules {
 		}
 	}
 	
-	private Map<LeanRule, ArrayList<Integer>> matrix;
+	private Map<LeanRule, LinkedList<Integer>> matrix;
 	private static Connection cncr;
 	private static Connection cnlocal;
 	private JSONArray result;
@@ -72,7 +74,7 @@ public class LeanRules {
 		// get design project rules
 		List<LeanRule> rules = getRules(Integer.parseInt(dp));
 		List<Integer> designProjects = null;
-		matrix = new HashMap<LeanRule, ArrayList<Integer>>();
+		matrix = new HashMap<LeanRule, LinkedList<Integer>>();
 		// for each rule get the design projects where it is active
 		for (LeanRule r : rules) {
 			designProjects = getDesignProjects(r.getId());
@@ -80,13 +82,13 @@ public class LeanRules {
 			for (int p : designProjects) {
 				List<Integer> tmp;
 				if (!matrix.containsKey(r)) {
-					tmp = new ArrayList<Integer>();
+					tmp = new LinkedList<Integer>();
 					tmp.add(p);
-					matrix.put(r, (ArrayList<Integer>) tmp);
+					matrix.put(r, (LinkedList<Integer>) tmp);
 				} else {
 					tmp = matrix.get(r);
 					tmp.add(p);
-					matrix.replace(r, (ArrayList<Integer>) tmp);
+					matrix.replace(r, (LinkedList<Integer>) tmp);
 				}
 			}
 		}
@@ -106,7 +108,7 @@ public class LeanRules {
 			obj.put("ID", r.getId());
 			obj.put("Projects", matrix.get(r));
 
-			List<Double> dpSentiment = new ArrayList<Double>();
+			List<Double> dpSentiment = new LinkedList<Double>();
 
 			for (int dp : matrix.get(r)) {
 				if (dp != -1) {
@@ -138,14 +140,14 @@ public class LeanRules {
 		return json;
 	}
 
-	public static ArrayList<LeanRule> getRules(int dp) {
-		List<LeanRule> rules = new ArrayList<LeanRule>();
+	public static LinkedList<LeanRule> getRules(int dp) {
+		List<LeanRule> rules = new LinkedList<LeanRule>();
 
 		String select = "";
 		if (dp == -1) { // if dp is -1 it gets rules from all projects 
 			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule,diversity_common_repository.lean_rule WHERE lean_rule_id = diversity_common_repository.lean_rule.id;";
 		} else {
-			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule WHERE design_project_id =? AND lean_rule_id = diversity_common_repository.lean_rule.id;";
+			select = "SELECT DISTINCT lean_rule_id, rule FROM diversity_common_repository.design_project_lean_rule,diversity_common_repository.lean_rule WHERE design_project_id =? AND lean_rule_id = diversity_common_repository.lean_rule.id;";
 		}
 
 		PreparedStatement query1 = null;
@@ -174,11 +176,11 @@ public class LeanRules {
 			e.printStackTrace();
 		}
 
-		return (ArrayList<LeanRule>) rules;
+		return (LinkedList<LeanRule>) rules;
 	}
 
-	public static ArrayList<Integer> getDesignProjects(int ruleId) {
-		List<Integer> designProjects = new ArrayList<Integer>();
+	public static LinkedList<Integer> getDesignProjects(int ruleId) {
+		List<Integer> designProjects = new LinkedList<Integer>();
 
 		String select;
 
@@ -213,14 +215,14 @@ public class LeanRules {
 			e.printStackTrace();
 		}
 
-		return (ArrayList<Integer>) designProjects;
+		return (LinkedList<Integer>) designProjects;
 	}
 
 	private double getDesignProjectSentiment(int dpId) throws JSONException {
 		int pss = -1;
 		int avg = -1;
-		List<Integer> frequencies = new ArrayList<Integer>();
-		List<Double> sentiments = new ArrayList<Double>();
+		List<Integer> frequencies = new LinkedList<Integer>();
+		List<Double> sentiments = new LinkedList<Double>();
 		String select1 = "SELECT DISTINCT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ? ";
 		String select2 = "SELECT (SELECT SUM(polarity*reach) FROM opinions WHERE pss = ?) / (SELECT SUM(reach) FROM opinions WHERE pss= ?);";
 
@@ -272,51 +274,43 @@ public class LeanRules {
 			e.printStackTrace();
 		}
 		return avg;
-//		List<Integer> models = new ArrayList<Integer>();
-//		List<Integer> frequencies = new ArrayList<Integer>();
-//		List<Double> sentiments = new ArrayList<Double>();
-//		String select = "SELECT DISTINCT " + Settings.lmtable_id + ", " + Settings.lmtable_update + " FROM " + Settings.lmtable
-//				+ "  WHERE " + Settings.lmtable_designproject + "=?";
-//
-//		//String select = "SELECT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ?;";
-//		PreparedStatement query1 = null;
-//		try {
-//			localDBconnect();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			query1 = cnlocal.prepareStatement(select);
-//			query1.setInt(1, dpId);
-//			try (ResultSet rs = query1.executeQuery()) {
-//				while (rs.next()) {
-//					models.add(rs.getInt(1));
-//					frequencies.add(rs.getInt(2));
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			cnlocal.close();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println("Design project: " + dpId + "-------------");
-//		for (int i = 0; i < models.size(); i++) {
-//			Globalsentiment gs = new Globalsentiment();
-//			//System.out.println("Model " + models.get(i) + ": " + gs.getAvgSentiment("All", "", models.get(i)));
-//			JSONArray sentiment = models.get(i) != -1 ? gs.globalsentiment(null, null, "Global", models.get(i), frequencies.get(i))	: null;
-//			sentiments.add(sentiment != null ? sentiment.getJSONObject(0).getDouble("Value") : -1);
-//		}
-//		double avg = 0;
-//		sentiments.removeIf(i -> i == -1);
-//		
-//		for (double s : sentiments) {
-//			System.out.println(s);
-//			avg += s;
-//		}
-//
-//		return avg / sentiments.size();
+	}
+	
+	
+	public JSONArray getUnusedRules() throws JSONException {
+		List<Integer> rules = new LinkedList<Integer>();
+		String select = "SELECT DISTINCT lean_rule_id FROM diversity_common_repository.design_project_lean_rule WHERE lean_rule_id NOT IN (SELECT lean_rule_id FROM diversity_common_repository.design_project_lean_rule WHERE checked = 1);";
+	
+		PreparedStatement query1 = null;
+		try {
+			dbconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			query1 = cncr.prepareStatement(select);
+			try (ResultSet rs = query1.executeQuery()) {
+				while (rs.next()) {
+					rules.add(rs.getInt(1));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			cncr.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		JSONArray json = new JSONArray();
+		JSONObject obj;
+		for (int r : rules) {
+			obj = new JSONObject();
+			obj.put("ID", r);
+			json.put(obj);
+		}
+		
+		return json;
 	}
 }
