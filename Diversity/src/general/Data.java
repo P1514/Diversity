@@ -32,6 +32,9 @@ public class Data {
 	/** The productdb. */
 	protected static final ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<>();
 
+	/** The designProjectdb. */
+	protected static final ConcurrentHashMap<Long, Product> designProjectdb = new ConcurrentHashMap<>();
+	
 	/** The servicedb. */
 	@SuppressWarnings("unused")
 	protected static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
@@ -66,6 +69,13 @@ public class Data {
 			parent.setParent(rs.getLong(Settings.crservicetable_id));
 		}
 
+	}
+	
+	protected static void addDesignProject(ResultSet rs) throws SQLException {
+
+		designProjectdb.put(rs.getLong(Settings.crservicetable_id),
+				new Product(rs.getLong(Settings.crservicetable_id), rs.getString(Settings.crservicetable_name), false,
+						rs.getLong(Settings.crservicetable_supplied_by), rs.getLong(Settings.crservicetable_parent)));
 	}
 
 	public static boolean usercheck(String id, int op) {

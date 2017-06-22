@@ -112,7 +112,6 @@ public class Settings {
 	public static final String lotable_comments = "comments";
 
 	// Models table
-
 	public static final String lmtable = "models";
 	public static final String lmtable_id = "id";
 	public static final String lmtable_name = "name";
@@ -146,12 +145,12 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = false;
+	public static Boolean JSON_use = true;
 	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsTo[]=33333333333000&pssId=3&accounts[]=AirForce1";
+	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=1371823834000&epochsTo[]=1498054243000&pssId=3&accounts[]=AirForce1";
 	public static final boolean LocalPolarity = true;
 	public static Boolean include_services = true;
 
@@ -197,6 +196,15 @@ public class Settings {
 	public static final String crpsstable_company = "sold_by_company_id";
 	public static final String crpsstable_author = "user_id";
 	public static final String crpsstable_name = "name";
+	
+	// Design Project Table
+	public static final String crdptable = "design_project";
+	public static final String crdptable_id = "id";
+	public static final String crdptable_time_created = "time_created";
+	public static final String crdptable_wiki_id = "wiki_id";
+	public static final String crdptable_author = "user_id";
+	public static final String crdptable_name = "name";
+	public static final String crdptable_produces_pss_id = "produces_pss_id";
 
 	// Product Table
 	public static final String crproducttable = "product";
