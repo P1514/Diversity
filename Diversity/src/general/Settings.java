@@ -70,7 +70,7 @@ public class Settings {
 			+ "?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
-	public static final Integer dbversion = 10;
+	public static final Integer dbversion = 11;
 
 	// Author Table
 	public static final String latable = "authors";
