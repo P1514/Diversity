@@ -1477,7 +1477,7 @@ function chartcolor(data) {
 	}
 }
 
-function changeRequest() {
+function changeRequest(type) {
 	var gender = document.getElementById("genderfilt").value;
 	var location = document.getElementById("locationfilt").value;
 	var age = document.getElementById("agefilt").value;
@@ -1526,7 +1526,7 @@ function changeRequest() {
 
 	} else {
 		json = {
-			"Op" : "oe_refresh",// OE_Filter
+			"Op" : document.getElementById('radio_wiki').checked ? "oe_wiki" : "oe_refresh",// OE_Filter
 			"Param" : "",
 			"Values" : "",
 			"Filter" : "",
@@ -1674,21 +1674,9 @@ function fixbuttons(data) {
 }
 
 function socialPosts() {
-	json = {
-			"Op" : "opinion_extraction",
-			"Id" : window.sessionStorage.id,
-			'Key' : getCookie("JSESSIONID")
-	}
-	
-	ws.send(JSON.stringify(json));
+	changeRequest("");
 }
 
 function wikiPosts() {
-	json = {
-			"Op" : "oe_wiki",
-			"Id" : window.sessionStorage.id,
-			'Key' : getCookie("JSESSIONID")
-	}
-	
-	ws.send(JSON.stringify(json));
+	changeRequest("wiki");
 }

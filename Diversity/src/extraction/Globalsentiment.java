@@ -373,7 +373,7 @@ public class Globalsentiment extends GetReach {
 		 * values, id, frequency);
 		 */
 
-		String query = "SELECT sum(opinions.polarity*reach)/sum(reach) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
+		String query = "SELECT sum(opinions.polarity*1)/count(polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
 
 		/*Calendar data1 = Calendar.getInstance();
 		data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
@@ -517,10 +517,10 @@ public class Globalsentiment extends GetReach {
 		parameters par = split_params(param, value);
 		String insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
-				+ Settings.lotable + " WHERE  " + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
+				+ Settings.lotable + " WHERE (" + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
-				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id + ") AND posts.id IN (SELECT post_id FROM post_source);";
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id + ") AND posts.id IN (SELECT post_id FROM post_source)";
 
 		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
@@ -638,7 +638,7 @@ public class Globalsentiment extends GetReach {
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
-
+		
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -706,7 +706,6 @@ public class Globalsentiment extends GetReach {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		parameters par = split_params(param, value);
-		System.out.println("before query");
 		Model model = Data.getmodel(id);
 		obj = new JSONObject();
 		obj.put("Filter", output);
@@ -716,11 +715,11 @@ public class Globalsentiment extends GetReach {
 					   "sum(case when (posts.polarity   >40 AND posts.polarity <=60) then 1 else 0 end) '0', " + 
 					   "sum(case when (posts.polarity >60 AND posts.polarity <=80) then 1 else 0 end) '+', " +
 					   "sum(case when (posts.polarity >80 AND posts.polarity <=100) then 1 else 0 end) '++' " +
-					   "from posts where posts.opinions_id in (Select opinions.id from opinions where opinions.pss = ? AND id in (Select id from authors)) " +
-					   "and posts.id in (select post_id from post_source where post_source = 'wiki') " + " AND " + Settings.lotable_product +
-					   (par.products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND " + 
-					   Settings.lotable_timestamp + ">?) AND " + Settings.lptable_authorid + " in (Select " +
-					   Settings.latable_id + " from " + Settings.latable;
+					   "from posts where posts.opinions_id in (Select opinions.id from opinions where opinions.pss = ? AND id in (Select authors_id from authors)" + " AND " + Settings.lotable_product +
+					   (par.products != null ? "=?" : " in (" + model.getProducts() + ") AND " + Settings.lotable_timestamp + ">? AND " + Settings.lptable_authorid + " in (Select " +
+							   Settings.latable_id + " from " + Settings.latable + ")")+
+					   "and posts.id in (select post_id from post_source where post_source LIKE 'wiki')" ;
+					   
 		if (par.age != null || par.gender != null || par.location != null)
 			query += " where 1=1 ";
 		if (par.age != null)
@@ -731,7 +730,6 @@ public class Globalsentiment extends GetReach {
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
-
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -754,7 +752,6 @@ public class Globalsentiment extends GetReach {
 				query1.setString(rangeindex++, par.gender);
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
-
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");
@@ -779,7 +776,6 @@ public class Globalsentiment extends GetReach {
 				obj.put("Param", "++");
 				obj.put("Value", rs.getInt("++"));
 				result.put(obj);
-				System.out.println("after query");
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error", e);

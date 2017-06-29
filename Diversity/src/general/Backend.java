@@ -127,9 +127,9 @@ public class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				System.out.println(1);
+				
 				for (int i = 0; i < filter.length; i++) {
-					System.out.println(i);
+
 					result = convert(result,
 							gs.getWikiPolarityDistribution(id, param + "," + filtering,
 									values + ","
@@ -138,22 +138,23 @@ public class Backend {
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i])),
 							"Graph", "Top_Middle");
+							
 				}
+				
 				result = convert(result, gs.getWikiCurSentiment(param, values, id,Data.getmodel(id).getFrequency()), "Graph", "Top_Right");
-				System.out.println(2);
-				//result = convert(result, null, "Graph", "Bottom_Left");
-				/*
-				 * for (int i = 0; i < filter.length; i++)
-					result = convert(result,
-							gr.globalreach(param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
-											: filter[i]),
-									id, Data.getmodel(id).getFrequency()),
-							"Graph", "Bottom_Middle");
-				*/
+				//result = convert(result, , "Graph", "Bottom_Left");
+				
+//				for (int i = 0; i < filter.length; i++)
+//					result = convert(result,
+//							gr.globalreach(param + "," + filtering,
+//									values + ","
+//											+ (filtering.equals("Product")
+//													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+//									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+//											: filter[i]),
+//									id, Data.getmodel(id).getFrequency()),
+//							"Graph", "Bottom_Middle");
+				
 				for (int i = 0; i < filter.length; i++) {
 					result = convert(result,
 							gs.wikiGlobalSentiment(param + "," + filtering,
@@ -164,7 +165,6 @@ public class Backend {
 											: filter[i]),
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Right");
-					System.out.println(i + 3);
 				}
 				if (msg.has("Extrapolate")) {
 					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
@@ -180,7 +180,7 @@ public class Backend {
 				}
 				
 				LOGGER.log(Level.INFO,result.toString());
-
+				System.out.println(result.toString());
 				return result.toString();
 			case 32:
 				obj = new JSONObject();
