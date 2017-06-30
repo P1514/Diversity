@@ -145,7 +145,7 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = true;
+	public static Boolean JSON_use = false;
 	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
@@ -173,7 +173,7 @@ public class Settings {
 	// Common Repository DB Specs
 	private static final String crdbip = "127.0.0.1";
 	private static final String crdbport = "3306";
-	private static final String crdbname = "diversity_common_repository";
+	public static final String crdbname = "diversity_common_repository";
 	private static final String crurl = "jdbc:mysql://" + crdbip + ":" + crdbport + "/" + crdbname
 			+ "?autoReconnect=true&useSSL=false";
 	private static final String cruser = "diversity";
@@ -205,6 +205,29 @@ public class Settings {
 	public static final String crdptable_author = "user_id";
 	public static final String crdptable_name = "name";
 	public static final String crdptable_produces_pss_id = "produces_pss_id";
+	
+	// Design Project Has Users Table
+	public static final String crdpuserstable = "design_project_has_users";
+	public static final String crdpuserstable_id = "id";
+	public static final String crdpuserstable_user_id = "user_id";
+	public static final String crdpuserstable_design_project_id = "design_project_id";
+	
+	// Users Table
+	public static final String crusertable = "user";
+	public static final String crusertable_id = "id";
+	public static final String crusertable_username = "username";
+	public static final String crusertable_password = "password";
+	public static final String crusertable_email = "email";
+	public static final String crusertable_first_name = "first_name";
+	public static final String crusertable_last_name = "last_name";
+	public static final String crusertable_user_role_id = "user_role_id";
+	public static final String crusertable_company_id = "company_id";
+	
+	// User role  Table
+	public static final String cruserrtable = "user_role";
+	public static final String cruserrtable_id = "id";
+	public static final String cruserrtable_name = "name";
+	public static final String cruserrtable_user_id = "user_id";
 
 	// Product Table
 	public static final String crproducttable = "product";

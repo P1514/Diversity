@@ -76,6 +76,8 @@ public class Loader {
 		// long stime = System.nanoTime();
 		// System.out.println(" Beginning " + stime);
 		loadPSS();
+		loadDesignProjects();
+		loadUsers();
 		String err = loadroles();
 		if (err != null)
 			return err;
@@ -85,7 +87,6 @@ public class Loader {
 		err = loadmodels();
 		if (err != null)
 			return err;
-		
 
 		err = loaduniqueopinionid(json);
 
@@ -435,6 +436,104 @@ public class Loader {
 		}
 	}
 
+	private void loadDesignProjects() {
+
+		String select = Settings.sqlselectall + Settings.crdptable;
+		Connection cncr = null;
+		try {
+			cncr = Settings.conncr();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_cr, e);
+			return;
+		}
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+				while (rs.next()) {
+					Data.designProjectdb.put(rs.getLong(Settings.crdptable_id), new DesignProject(
+							rs.getLong(Settings.crdptable_id), rs.getLong(Settings.crdptable_produces_pss_id),
+							rs.getString(Settings.crdptable_name), rs.getLong(Settings.crdptable_author),
+							rs.getLong(Settings.crdptable_time_created), rs.getLong(Settings.crdptable_wiki_id)));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, Settings.err_unknown, e1);
+			}
+			return;
+		}
+
+		select = Settings.sqlselectall + Settings.crdpuserstable;
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.designProjectdb.get(rs.getLong(Settings.crdpuserstable_design_project_id))
+							.add_team_member_user(rs.getLong(Settings.crrpssproducttable_product));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+
+		try {
+			cncr.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+		}
+	}
+
+	private void loadUsers() {
+
+		String select = Settings.sqlselectall + Settings.crdbname + "." + Settings.crusertable + " INNER JOIN  "
+				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
+				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_user_id + ";";
+		System.out.println(select);
+		Connection cncr = null;
+		try {
+			cncr = Settings.conncr();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_cr, e);
+			return;
+		}
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+				while (rs.next()) {
+					Data.userdb.put(rs.getLong(Settings.crusertable_id), new User(rs.getLong(Settings.crusertable_id),
+							rs.getString(Settings.crusertable_username), rs.getString(Settings.crusertable_password),
+							rs.getString(Settings.crusertable_email), rs.getString(Settings.crusertable_first_name),
+							rs.getString(Settings.crusertable_last_name),
+							rs.getString(Settings.cruserrtable_name), rs.getLong(Settings.crusertable_company_id)));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, Settings.err_unknown, e1);
+			}
+			return;
+		}
+
+		try {
+			cncr.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+		}
+	}
+
 	private String loadGeneral() throws JSONException {
 
 		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
@@ -561,9 +660,9 @@ public class Loader {
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
-		else{
-			for (Long a : users){
-				querycond+=a+",";
+		else {
+			for (Long a : users) {
+				querycond += a + ",";
 			}
 			querycond = querycond.substring(0, querycond.length() - 1);
 		}
@@ -725,24 +824,25 @@ public class Loader {
 	}
 
 	private String loadsimauthors(String querycond) throws JSONException {
-		
+
 		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
 				+ querycond);
-		///Connection cndata = null;
-		try (Connection cndata = Settings.conndata()){
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				while (rs.next()) {
-					if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
-					} else {
-						authordb.put(rs.getLong(Settings.rutable_userid),
-								new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-										rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-										rs.getString(Settings.rutable_loc)));
+		/// Connection cndata = null;
+		try (Connection cndata = Settings.conndata()) {
+			try (Statement stmt = cndata.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					while (rs.next()) {
+						if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
+						} else {
+							authordb.put(rs.getLong(Settings.rutable_userid),
+									new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
+											rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
+											rs.getString(Settings.rutable_loc)));
+						}
 					}
 				}
 			}
-		} }catch (Exception e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
 			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
 		}

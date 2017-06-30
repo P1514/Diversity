@@ -1,5 +1,6 @@
 package general;
 
+import java.util.ArrayList;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -13,6 +14,7 @@ public class DesignProject {
 	private long user_id;
 	private long time_created;
 	private long wiki_id;
+	private ArrayList<Long> team;
 
 	
 
@@ -23,6 +25,7 @@ public class DesignProject {
 		this.user_id=_user_id;
 		this.time_created=_time_created;
 		this.wiki_id=_wiki_id;
+		this.team = new ArrayList<Long>();
 
 	}
 
@@ -81,5 +84,12 @@ public class DesignProject {
 		return this.user_id;
 	}
 	
+	public ArrayList<Long> get_team(){
+		return new ArrayList<>(this.team);
+	}
+	
+	public void add_team_member_user(Long id){
+		this.team.add(id);
+	}
 	
 }

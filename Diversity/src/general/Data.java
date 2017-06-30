@@ -33,7 +33,10 @@ public class Data {
 	protected static final ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<>();
 
 	/** The designProjectdb. */
-	protected static final ConcurrentHashMap<Long, Product> designProjectdb = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Long, DesignProject> designProjectdb = new ConcurrentHashMap<>();
+	
+	/** The userdb. */
+	protected static final ConcurrentHashMap<Long, User> userdb = new ConcurrentHashMap<>();
 	
 	/** The servicedb. */
 	@SuppressWarnings("unused")
@@ -71,12 +74,6 @@ public class Data {
 
 	}
 	
-	protected static void addDesignProject(ResultSet rs) throws SQLException {
-
-		designProjectdb.put(rs.getLong(Settings.crservicetable_id),
-				new Product(rs.getLong(Settings.crservicetable_id), rs.getString(Settings.crservicetable_name), false,
-						rs.getLong(Settings.crservicetable_supplied_by), rs.getLong(Settings.crservicetable_parent)));
-	}
 
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
