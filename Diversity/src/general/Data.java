@@ -136,11 +136,22 @@ public class Data {
 	public static Collection<PSS> dbpssall() {
 		return pssdb.values();
 	}
+	
+	public static Collection<DesignProject> dbdpall() {
+		return designProjectdb.values();
+	}
 
 	public static PSS getpss(long id) {
 		if (pssdb.containsKey(id))
 			return pssdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
+		return null;
+	}
+	
+	public static DesignProject getDp(long id) {
+		if (designProjectdb.containsKey(id))
+			return designProjectdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Deeignproject");
 		return null;
 	}
 

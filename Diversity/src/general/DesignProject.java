@@ -26,7 +26,6 @@ public class DesignProject {
 		this.time_created=_time_created;
 		this.wiki_id=_wiki_id;
 		this.team = new ArrayList<Long>();
-
 	}
 
 	/**

@@ -473,7 +473,7 @@ public class Loader {
 
 				while (rs.next()) {
 					Data.designProjectdb.get(rs.getLong(Settings.crdpuserstable_design_project_id))
-							.add_team_member_user(rs.getLong(Settings.crrpssproducttable_product));
+							.add_team_member_user(rs.getLong( Settings.crdpuserstable_user_id));
 				}
 			}
 		} catch (Exception e) {

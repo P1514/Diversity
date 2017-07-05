@@ -302,9 +302,9 @@ public class BackendTest extends Thread {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
-		obj.put("Op", "Prediction");
-		obj.put("Products", "14;15");
-		obj.put("Services", "14;15");
+		obj.put("Op", "prediction");
+		obj.put("Products", "71;74");
+		obj.put("Services", "69;66");
 		obj.put("Key", "10");
 		tester = new Backend(23, obj);
 		System.out.println("Prediction Test Output: " + tester.resolve().toString());
@@ -459,6 +459,23 @@ public class BackendTest extends Thread {
 		System.out.println("Tag Cloud Test Output: " + tester.resolve().toString());
 
 	}
+	
+	
+	@Test
+	public void resolveCollaboration() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "collaboration");
+		obj.put("Products", "71;74");
+		obj.put("Services", "69;66");
+		obj.put("Key", "10");
+		tester = new Backend(33, obj);
+		System.out.println("Prediction Test Output: " + tester.resolve().toString());
+
+	}
+	
+
 
 	@Test
 	public void multipletests() throws JSONException {
