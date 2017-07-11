@@ -20,7 +20,7 @@ public class Collaboration {
 	public JSONArray teamRating(String productsId, String servicesId) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
+		
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		HashMap<Long, Double> dpSentiment = new HashMap<Long, Double>();
 		HashMap<Long, ArrayList<Double>> userRating = new HashMap<Long, ArrayList<Double>>();

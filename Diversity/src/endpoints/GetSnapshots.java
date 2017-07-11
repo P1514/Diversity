@@ -42,6 +42,7 @@ public class GetSnapshots {
 		url=url.split("Diversity/")[0]+"Diversity/pages/opinion_extraction_page.html?snapshot=";
 		JSONArray response;
 		try {
+			
 			response = extraction.Snapshot.getAll(pss_id);
 			JSONObject obj;
 			JSONArray snapshots=response.getJSONArray(1);
