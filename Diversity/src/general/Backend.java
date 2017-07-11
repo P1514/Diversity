@@ -127,11 +127,12 @@ public class Backend {
 			case 33:
 				obj = new JSONObject();
 				result = new JSONArray();
+
+				result = col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
+						msg.has("Services") ? msg.getString("Services") : "");
 				obj.put("Op", "collaboration");
-				
-				result.put(col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
-						msg.has("Services") ? msg.getString("Services") : ""));
 				result.put(obj);
+				
 				
 				return result.toString();	
 				

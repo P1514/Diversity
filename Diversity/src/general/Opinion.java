@@ -91,6 +91,7 @@ public class Opinion {
 		polarity = polarity / total_inf;
 	}
 	
+	
 	/**
 	 * Calculate polarity 2.
 	 *

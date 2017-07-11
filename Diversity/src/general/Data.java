@@ -151,7 +151,14 @@ public class Data {
 	public static DesignProject getDp(long id) {
 		if (designProjectdb.containsKey(id))
 			return designProjectdb.get(id);
-		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Deeignproject");
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Designproject");
+		return null;
+	}
+	
+	public static User getUser(long id) {
+		if (userdb.containsKey(id))
+			return userdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get user");
 		return null;
 	}
 
