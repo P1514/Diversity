@@ -32,6 +32,12 @@ public class Data {
 	/** The productdb. */
 	protected static final ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<>();
 
+	/** The designProjectdb. */
+	protected static final ConcurrentHashMap<Long, DesignProject> designProjectdb = new ConcurrentHashMap<>();
+	
+	/** The userdb. */
+	protected static final ConcurrentHashMap<Long, User> userdb = new ConcurrentHashMap<>();
+	
 	/** The servicedb. */
 	@SuppressWarnings("unused")
 	protected static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
@@ -67,6 +73,7 @@ public class Data {
 		}
 
 	}
+	
 
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
@@ -129,11 +136,22 @@ public class Data {
 	public static Collection<PSS> dbpssall() {
 		return pssdb.values();
 	}
+	
+	public static Collection<DesignProject> dbdpall() {
+		return designProjectdb.values();
+	}
 
 	public static PSS getpss(long id) {
 		if (pssdb.containsKey(id))
 			return pssdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
+		return null;
+	}
+	
+	public static DesignProject getDp(long id) {
+		if (designProjectdb.containsKey(id))
+			return designProjectdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Deeignproject");
 		return null;
 	}
 

@@ -2,6 +2,8 @@ package general;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+
 import security.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -23,7 +25,7 @@ import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
-
+import general.Collaboration;
 // TODO: Auto-generated Javadoc
 /**
  * The Class Backend.
@@ -70,6 +72,8 @@ public class Backend {
 		Globalsentiment gs = new Globalsentiment();
 		Extrapolation extra = Extrapolation.getInstance();
 		Prediction pre = new Prediction();
+		Collaboration col = new Collaboration();
+
 		Snapshot snapshot = new Snapshot(this);
 		GetReach gr = new GetReach();
 		GetMediawiki wiki = new GetMediawiki();
@@ -121,7 +125,7 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
-			case 33:
+			case 34:
 				//SELECT * FROM sentimentanalysis.posts where id in (select post_id from post_source where post_source = 'wiki');
 				result = new JSONArray();
 				obj = new JSONObject();
@@ -182,6 +186,16 @@ public class Backend {
 				LOGGER.log(Level.INFO,result.toString());
 				System.out.println(result.toString());
 				return result.toString();
+			case 33:
+				obj = new JSONObject();
+				result = new JSONArray();
+				obj.put("Op", "collaboration");
+				
+				result.put(col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
+						msg.has("Services") ? msg.getString("Services") : ""));
+				result.put(obj);
+				
+				return result.toString();	
 			case 32:
 				obj = new JSONObject();
 				result = new JSONArray();
