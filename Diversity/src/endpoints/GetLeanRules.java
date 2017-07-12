@@ -16,9 +16,9 @@ import org.json.JSONException;
 @Path("/getLeanRules")
 public class GetLeanRules {
 
-	private static final String ENDPOINT = "https://www.khira.it/LeanDesignRules/LDRServices/designProject_leanRule";
-	private static final String DP_PARAMETER = "design_project_id";
-	private static final String VALIDATED_PARAMETER = "validated";
+//	private static final String ENDPOINT = "https://www.khira.it/LeanDesignRules/LDRServices/designProject_leanRule";
+//	private static final String DP_PARAMETER = "design_project_id";
+//	private static final String VALIDATED_PARAMETER = "validated";
 
 	@DefaultValue("")
 	@QueryParam("design_project_id") // design projects

@@ -46,6 +46,7 @@ public class Loader {
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
+		System.out.println("json: " + json);
 		starttime = System.nanoTime();
 		loadp1(json);
 		first_load = false;
@@ -473,7 +474,7 @@ public class Loader {
 
 				while (rs.next()) {
 					Data.designProjectdb.get(rs.getLong(Settings.crdpuserstable_design_project_id))
-							.add_team_member_user(rs.getLong( Settings.crdpuserstable_user_id));
+							.add_team_member_user(rs.getLong(Settings.crdpuserstable_user_id));
 				}
 			}
 		} catch (Exception e) {
@@ -497,7 +498,8 @@ public class Loader {
 
 		String select = Settings.sqlselectall + Settings.crdbname + "." + Settings.crusertable + " INNER JOIN  "
 				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
-				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_user_id + ";";
+				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_user_id
+				+ ";";
 		System.out.println(select);
 		Connection cncr = null;
 		try {
@@ -513,8 +515,8 @@ public class Loader {
 					Data.userdb.put(rs.getLong(Settings.crusertable_id), new User(rs.getLong(Settings.crusertable_id),
 							rs.getString(Settings.crusertable_username), rs.getString(Settings.crusertable_password),
 							rs.getString(Settings.crusertable_email), rs.getString(Settings.crusertable_first_name),
-							rs.getString(Settings.crusertable_last_name),
-							rs.getString(Settings.cruserrtable_name), rs.getLong(Settings.crusertable_company_id)));
+							rs.getString(Settings.crusertable_last_name), rs.getString(Settings.cruserrtable_name),
+							rs.getLong(Settings.crusertable_company_id)));
 				}
 			}
 		} catch (Exception e) {
@@ -656,7 +658,7 @@ public class Loader {
 		String querycond = "(";
 
 		for (Author a : users2) {
-			querycond += a.getUID() + ",";
+			querycond += a.getUID() + ",";// um autor está a null
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
@@ -681,29 +683,40 @@ public class Loader {
 			// Load users from JSON
 			for (int i = 1; i < json.length(); i++) {
 				JSONObject obj = json.getJSONObject(i);
-				if (authordb2.containsKey(obj.getString(Settings.JSON_source) + obj.getString(Settings.latable_source)))
+				if (authordb2.containsKey(obj.getString(Settings.JSON_userid) + obj.getString(Settings.JSON_source)))
 					continue;
 
-				Author auth = new Author(obj.getString(Settings.JSON_source), obj.getString(Settings.latable_source),
-						obj.has(Settings.latable_name) ? obj.getString(Settings.latable_name) : "",
-						obj.getString(Settings.latable_age) != "null" ? obj.getLong(Settings.latable_age) : 0,
-						obj.getString(Settings.latable_gender), obj.getString(Settings.latable_location));
-				auth.setComments(obj.has(Settings.latable_name) ? obj.getLong(Settings.latable_comments) : 0);
-				auth.setLikes(obj.has(Settings.latable_likes) ? obj.getLong(Settings.latable_likes) : 0);
-				auth.setPosts(obj.getLong(Settings.latable_posts) - 1);
-				auth.setViews(obj.getLong(Settings.latable_views));
-				authordb2.put(obj.getString(Settings.latable_id) + "," + obj.getString(Settings.latable_source), auth);
+				Author auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+						(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
+								+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+						/*
+						 * (obj.has(Settings.JSON_age) ?
+						 * obj.getLong(Settings.JSON_age) : 0)
+						 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+						(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
+
+				/*
+				 * auth.setComments(obj.has(Settings.JSON_fname) ?
+				 * obj.getLong(Settings.JSON_comments) : 0);
+				 * auth.setLikes(obj.has(Settings.JSON_likes) ?
+				 * obj.getLong(Settings.JSON_likes) : 0);
+				 * auth.setPosts(obj.getLong(Settings.JSON_replies) - 1);
+				 * auth.setViews(obj.getLong(Settings.JSON_views));
+				 */
+				authordb2.put(auth.getUID() + "," + auth.getSource(), auth);
 
 			}
 
-			for (int i = 0; i < json.length(); i++) {
-				JSONObject obj = json.getJSONObject(i);
-				if (authordb.containsKey(obj.getLong("id")))
-					continue;
-				authordb.put(obj.getLong("id"), new Author(obj.getLong("id"), obj.getString("name"), obj.getLong("age"),
-						obj.getString("gender"), obj.getString("location")));
-
-			}
+			/*
+			 * for (int i = 0; i < json.length(); i++) { JSONObject obj =
+			 * json.getJSONObject(i); if
+			 * (authordb.containsKey(obj.getLong("id"))) continue;
+			 * authordb.put(obj.getLong("id"), new Author(obj.getLong("id"),
+			 * obj.getString("name"), obj.getLong("age"),
+			 * obj.getString("gender"), obj.getString("location")));
+			 * 
+			 * }
+			 */
 
 		}
 
@@ -857,7 +870,11 @@ public class Loader {
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			v.evalPolarity(authordb);
+			if (Settings.JSON_use)
+				v.evalPolarity2(authordb2);
+			else
+				v.evalPolarity(authordb);
+
 		});
 		LOGGER.log(Level.INFO, " calc eval and reach " + (System.nanoTime() - stime));
 		stime = System.nanoTime();

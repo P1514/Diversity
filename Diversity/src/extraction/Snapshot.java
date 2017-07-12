@@ -20,6 +20,11 @@ import general.Logging;
 import general.Settings;
 
 public class Snapshot {
+	
+	private static final String ALL_SNAPSHOTS = "all";
+	private static final String EXTRACTION_SNAPSHOTS = "extraction";
+	private static final String PREDICTION_SNAPSHOTS = "prediction";
+	
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 	private final Backend b;
 
@@ -265,8 +270,8 @@ public class Snapshot {
 		}
 	}
 
-
-	public static JSONArray getAll(int pss) throws JSONException {
+	// pss = -1 returns all snapshots from all PSS
+	public static JSONArray getAll(int pss, String type) throws JSONException {
 
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
@@ -279,12 +284,29 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "Error", e);
 			return null;
 		}
-		String insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
-				+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
-				+ "=?) AND "+Settings.lsstable_type+"='all'");
+		String insert;
+		
+		if (pss == -1) {
+			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_type + " like ?");
+		} else {
+			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
+					+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
+					+ "=?) AND "+Settings.lsstable_type+" like '%all%'");
+		}
+		
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-
-				query1.setInt(1, pss);
+			int i = 1;
+			if (pss != -1) {
+				query1.setInt(i++, pss);
+			} else {
+				if (type.equals(ALL_SNAPSHOTS)) {
+					query1.setString(i++, "%%");
+				} else if (type.equals(EXTRACTION_SNAPSHOTS)) {
+					query1.setString(i++, "%all%");
+				} else if (type.endsWith(PREDICTION_SNAPSHOTS)) {
+					query1.setString(i++, PREDICTION_SNAPSHOTS);
+				}
+			}
 
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();

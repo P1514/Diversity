@@ -13,9 +13,11 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-
-@Path("/getUnusedRules")
-public class GetUnusedRules {
+@Path("/getLeanGuidelines")
+public class GetLeanGuidelines {
+	@DefaultValue("")
+	@QueryParam("design_project_id") // design projects
+	String dp;
 	@Context
 	UriInfo ui;
 
@@ -30,9 +32,17 @@ public class GetUnusedRules {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response welcome() throws JSONException {
-
-
-		JSONArray json = LeanRules.getUnusedRules();
+		if ("".equals(dp))
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		
+		int dpInt;
+		try {
+			dpInt = Integer.parseInt(dp);
+		} catch (NumberFormatException e) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
+		}
+		
+		JSONArray json = LeanRules.getGuidelines(dpInt);
 
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}

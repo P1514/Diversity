@@ -13,9 +13,8 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-
-@Path("/getUnusedRules")
-public class GetUnusedRules {
+@Path("/getUnusedGuidelines")
+public class GetUnusedGuidelines {
 	@Context
 	UriInfo ui;
 
@@ -31,8 +30,7 @@ public class GetUnusedRules {
 	@Produces(MediaType.TEXT_HTML)
 	public Response welcome() throws JSONException {
 
-
-		JSONArray json = LeanRules.getUnusedRules();
+		JSONArray json = LeanRules.getUnusedGuidelines();
 
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}

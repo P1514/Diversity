@@ -467,11 +467,11 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "collaboration");
-		obj.put("Products", "71;74");
-		obj.put("Services", "69;66");
+		obj.put("Products", "71,74");
+		obj.put("Services", "69,66");
 		obj.put("Key", "10");
 		tester = new Backend(33, obj);
-		System.out.println("Prediction Test Output: " + tester.resolve().toString());
+		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
 	}
 	

@@ -145,25 +145,25 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = true;
+	public static Boolean JSON_use = false;
 	public static int session_timeout = 30; // in minutes
 	// public static String JSON_uri =
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=1371823834000&epochsTo[]=1498054243000&pssId=3&accounts[]=AirForce1";
+	public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1371823834000&epochsTo[]=1498054243000&pssId=31&accounts[]=AirForce1";
 	public static final boolean LocalPolarity = true;
 	public static Boolean include_services = true;
 
 	// Received JSON Parameters
 	public static final String JSON_postid = "postId";
 	public static final String JSON_replies = "replies";
-	public static final String JSON_userid = "account";
+	public static final String JSON_userid = "userId";
 	public static final String JSON_epoch = "postEpoch";
 	public static final String JSON_message = "post";
 	public static final String JSON_likes = "likes";
 	public static final String JSON_views = "views";
 	public static final String JSON_tweets = "tweets";
-	public static final String JSON_source = "source";
+	public static final String JSON_source = "account";
 	public static final String JSON_age = "age";
 	public static final String JSON_gender = "gender";
 	public static final String JSON_location = "location";

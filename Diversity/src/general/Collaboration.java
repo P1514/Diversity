@@ -19,13 +19,21 @@ public class Collaboration {
 
 	public JSONArray teamRating(String productsId, String servicesId) throws JSONException {
 		JSONArray result = new JSONArray();
-		JSONObject obj = new JSONObject();
-		
+
+		productsId = productsId.replace(",", ";");
+		servicesId = servicesId.replace(",", ";");
+
+		System.out.println(productsId);
+		System.out.println(servicesId);
+
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
-		HashMap<Long, Double> dpSentiment = new HashMap<Long, Double>();
-		HashMap<Long, ArrayList<Double>> userRating = new HashMap<Long, ArrayList<Double>>();
+		HashMap<Long, Double> dpSentiment = new HashMap<>();
+		HashMap<Long, ArrayList<Double>> userRating = new HashMap<>();
 
 		Collection<DesignProject> designprojects = Data.dbdpall();
+
+		if (pssSentiment == null)
+			return result.put("No Team Members");
 
 		pssSentiment.forEach((k, v) -> { // gives design projects average
 											// sentiment
@@ -47,12 +55,23 @@ public class Collaboration {
 		});
 
 		userRating.forEach((k, v) -> {
-			System.out.println("USER: " + k + " -->" + v);
+			User user1 = Data.getUser(k);
 			Double avg = 0.0;
 			for (Double aux : v)
 				avg += aux;
-			avg=avg/v.size();
-			System.out.println("USER: " + k + " -->" + avg);
+			avg = avg / v.size();
+			try {
+				JSONObject obj = new JSONObject();
+				obj.put("First_name", user1.getfirst_name());
+				obj.put("Last_name", user1.getlast_name());
+				obj.put("Company", user1.getlast_name());
+				obj.put("Role", user1.getrole());
+				obj.put("Ranking", avg);
+				result.put(obj);
+
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		});
 
 		return result;

@@ -48,5 +48,57 @@ public class User {
 		return username;
 	}
 
+	/**
+	 * Gets the email.
+	 *
+	 * @return the email
+	 */
+	public String getemail() {
+		return email;
+	}
 
+	/**
+	 * Gets the password.
+	 *
+	 * @return the password
+	 */
+	public String getpassword() {
+		return password;
+	}
+
+	/**
+	 * Gets the first_name.
+	 *
+	 * @return the first_name
+	 */
+	public String getfirst_name() {
+		return first_name;
+	}
+
+	/**
+	 * Gets the last_name.
+	 *
+	 * @return the last_name
+	 */
+	public String getlast_name() {
+		return last_name;
+	}
+
+	/**
+	 * Gets the role.
+	 *
+	 * @return the role
+	 */
+	public String getrole() {
+		return role;
+	}
+	
+	/**
+	 * Gets the company_id.
+	 *
+	 * @return the company_id
+	 */
+	public long getcompany_id() {
+		return company_id;
+	}
 }
