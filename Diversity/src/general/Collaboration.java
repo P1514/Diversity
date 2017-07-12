@@ -16,6 +16,12 @@ public class Collaboration {
 	public Collaboration() {
 
 	}
+	
+	public JSONArray teamRating(String companies) throws JSONException {
+		String productsId="";
+		String servicesId="";
+	return	teamRating(productsId, servicesId);
+	}
 
 	public JSONArray teamRating(String productsId, String servicesId) throws JSONException {
 		JSONArray result = new JSONArray();
