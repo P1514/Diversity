@@ -66,11 +66,12 @@ public class Collaboration {
 			for (Double aux : v)
 				avg += aux;
 			avg = avg / v.size();
+			Company company1 = Data.getCompany(user1.getcompany_id());
 			try {
 				JSONObject obj = new JSONObject();
 				obj.put("First_name", user1.getfirst_name());
 				obj.put("Last_name", user1.getlast_name());
-				obj.put("Company", user1.getlast_name());
+				obj.put("Company", company1.getName());
 				obj.put("Role", user1.getrole());
 				obj.put("Ranking", avg);
 				result.put(obj);

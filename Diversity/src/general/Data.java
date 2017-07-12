@@ -161,6 +161,13 @@ public class Data {
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get user");
 		return null;
 	}
+	
+	public static Company getCompany(long id) {
+		if (companydb.containsKey(id))
+			return companydb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Company");
+		return null;
+	}
 
 	public static boolean dbhasservice(long id) {
 		return servicedb.containsKey(id);
