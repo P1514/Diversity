@@ -105,9 +105,9 @@ function drawTable() {
 	for (var i = 0; i < users.length; i++) {
 		user = users[i];
 		company = user.Company;
-		if ((company == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1) {
+		if ((company == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
 			name = user.First_name + ' ' + user.Last_name;
-			rating = parseInt(user.Ranking, 10);
+			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 			role = user.Role;
 			$('#users_body').append('<tr id=user_' + i + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + i + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
 			userStorage[i] = user;
