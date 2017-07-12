@@ -14,16 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import general.LeanRules;
 
-@Path("/getLeanRules")
-public class GetLeanRules {
-
-//	private static final String ENDPOINT = "https://www.khira.it/LeanDesignRules/LDRServices/designProject_leanRule";
-//	private static final String DP_PARAMETER = "design_project_id";
-//	private static final String VALIDATED_PARAMETER = "validated";
-
-	@DefaultValue("")
-	@QueryParam("design_project_id") // design projects
-	String dp;
+@Path("/getUnusedRules")
+public class GetUnusedRules {
 	@Context
 	UriInfo ui;
 
@@ -38,13 +30,9 @@ public class GetLeanRules {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response welcome() throws JSONException {
-		if ("".equals(dp))
-			return Response.status(Response.Status.BAD_REQUEST).build();
 
-		LeanRules lr = new LeanRules(dp);
+		JSONArray json = LeanRules.getUnusedRules();
 
-		JSONArray json = lr.getResult();
-		json.remove(0);
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}
 }
