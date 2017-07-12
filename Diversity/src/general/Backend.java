@@ -361,7 +361,8 @@ public class Backend {
 					gs.globalsentiment(null, null, pss);
 
 				} else
-					gs.globalsentiment(null, null, gr.getTOPReach(5));
+					gs.globalsentiment(null, null, gr.getTOPReach(5));//computes the value and puts it in the DB
+																		//TODO: change it to compute only if not computed before
 
 				
 				LOGGER.log(Level.INFO, gs.globalsentiment());

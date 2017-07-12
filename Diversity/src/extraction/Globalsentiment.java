@@ -111,7 +111,7 @@ public class Globalsentiment extends GetReach {
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, result);
 			query1.execute();
-			System.out.println("TESTE:" + query1.toString());
+			//System.out.println("TESTE:" + query1.toString());
 
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
