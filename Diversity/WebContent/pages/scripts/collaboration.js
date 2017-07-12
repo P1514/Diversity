@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
     json = {
       "Op" : "collaboration",
       'Key' : getCookie("JSESSIONID"),
-			'Products' : getParam('products').replace(/,/g, ';'),
-			'Services' : getParam('services').replace(/,/g, ';')
+			'Products' : getParam('products'),
+			'Services' : getParam('services')
     }
 
     ws.send(JSON.stringify(json));

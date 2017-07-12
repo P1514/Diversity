@@ -74,7 +74,7 @@ public class Operations {
 		op.put("get_log", 30); // get all logs
 		op.put("get_rules", 31); // get lean design rules
 		op.put("get_dp", 32); // get all design projects
-		op.put("collaboration", 99); // get collaboration info
+		op.put("collaboration", 33); // get collaboration info
 		op.put("oe_wiki", 34);
 		op.put("testing", 99); // Admin only
 	}
