@@ -85,11 +85,12 @@ public class Globalsentiment extends GetReach {
 		}
 
 		long frequency = calcFrequency(psslist);
-
+		Calendar date = Calendar.getInstance();
+		date.add(Calendar.YEAR, -10);
 		for (long k : psslist) {
 
 			Data.addmodel((long) -1,
-					new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+					new Model(-1, frequency, 0, "", "", k, "0,150", "All", "-1", false,date.getTimeInMillis() , 0, -1, true));
 			buildstring.append(globalsentiment(param, values, Data.getpss(k).getName(), -1, -1).toString());
 			Data.delmodel((long) -1);
 
@@ -110,6 +111,7 @@ public class Globalsentiment extends GetReach {
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, result);
 			query1.execute();
+			System.out.println("TESTE:" + query1.toString());
 
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
@@ -235,8 +237,11 @@ public class Globalsentiment extends GetReach {
 		// DATE"+"mon:"+data.get(Calendar.MONTH)+"
 		// year:"+data.get(Calendar.YEAR));
 		// System.out.println("PSS ID:"+ id);
-
+		
 		data.setTimeInMillis(model.getDate());
+	
+		
+		
 		/*
 		 * if (frequency != -1) { data.add(Calendar.DAY_OF_MONTH, (int)
 		 * frequency); } else { data.add(Calendar.MONTH, 1); }
@@ -298,12 +303,16 @@ public class Globalsentiment extends GetReach {
 		 */
 
 		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? LIMIT 0, 50000";
-		/*Calendar data1 = Calendar.getInstance();
-		data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
-		Calendar data2 = Calendar.getInstance();
-		data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
-		System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
-		System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");*/
+		/*
+		 * Calendar data1 = Calendar.getInstance();
+		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		 * Calendar data2 = Calendar.getInstance();
+		 * data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		 * System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(
+		 * Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
+		 * System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(
+		 * Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");
+		 */
 
 		try {
 			dbconnect();
@@ -312,12 +321,12 @@ public class Globalsentiment extends GetReach {
 			return Backend.error_message(Settings.err_dbconnect);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setLong(1, model.getLastUpdate()-frequency*86400000);
-			query1.setLong(2, model.getUpdate()-frequency*86400000);
+			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
+			query1.setLong(2, model.getUpdate() - frequency * 86400000);
 			query1.setLong(3, model.getPSS());
-			System.out.println("Query:"+query1.toString());
-			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
-			//obj.put("query", query1.toString());
+			System.out.println("Query:" + query1.toString());
+			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
+			// obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					globalSentiment = -1;
@@ -344,17 +353,16 @@ public class Globalsentiment extends GetReach {
 		 */
 
 		// data.add(Calendar.DAY_OF_MONTH, (int) frequency);
-		
+
 		// obj.put("Month", data.get(Calendar.MONTH) + 1);
 		// obj.put("Year", data.get(Calendar.YEAR));
-		
 
 		obj.put("Value", Math.round(globalSentiment));
 		result.put(obj);
 
 		return result;
 	}
-	
+
 	public JSONArray getWikiCurSentiment(String param, String values, long id, long frequency) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
@@ -375,12 +383,16 @@ public class Globalsentiment extends GetReach {
 
 		String query = "SELECT sum(opinions.polarity*1)/count(polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
 
-		/*Calendar data1 = Calendar.getInstance();
-		data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
-		Calendar data2 = Calendar.getInstance();
-		data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
-		System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
-		System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");*/
+		/*
+		 * Calendar data1 = Calendar.getInstance();
+		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		 * Calendar data2 = Calendar.getInstance();
+		 * data2.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
+		 * System.out.println(data1.get(Calendar.DAY_OF_MONTH)+"-"+(data1.get(
+		 * Calendar.MONTH)+1)+"-"+data1.get(Calendar.YEAR)+" - ");
+		 * System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(
+		 * Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");
+		 */
 
 		try {
 			dbconnect();
@@ -389,12 +401,12 @@ public class Globalsentiment extends GetReach {
 			return Backend.error_message(Settings.err_dbconnect);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setLong(1, model.getLastUpdate()-frequency*86400000);
-			query1.setLong(2, model.getUpdate()-frequency*86400000);
+			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
+			query1.setLong(2, model.getUpdate() - frequency * 86400000);
 			query1.setLong(3, model.getPSS());
-			System.out.println("Query:"+query1.toString());
-			LOGGER.log(Level.SEVERE,"Query:"+query1.toString());
-			//obj.put("query", query1.toString());
+			System.out.println("Query:" + query1.toString());
+			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
+			// obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					globalSentiment = -1;
@@ -421,10 +433,9 @@ public class Globalsentiment extends GetReach {
 		 */
 
 		// data.add(Calendar.DAY_OF_MONTH, (int) frequency);
-		
+
 		// obj.put("Month", data.get(Calendar.MONTH) + 1);
 		// obj.put("Year", data.get(Calendar.YEAR));
-		
 
 		obj.put("Value", Math.round(globalSentiment));
 		result.put(obj);
@@ -446,7 +457,7 @@ public class Globalsentiment extends GetReach {
 		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
 	}
-	
+
 	public JSONArray wikiGlobalSentiment(String param, String values, String output, long id, long frequency)
 			throws JSONException {
 		JSONArray result = new JSONArray();
@@ -488,8 +499,8 @@ public class Globalsentiment extends GetReach {
 			if (frequency != -1) {
 				for (; today.after(data);) {
 					obj = new JSONObject();
-					obj.put("Value", wikiGlobalSentimentBy(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
-							data.get(Calendar.YEAR), param, values, id, frequency));
+					obj.put("Value", wikiGlobalSentimentBy(data.get(Calendar.DAY_OF_MONTH),
+							(data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param, values, id, frequency));
 					data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 					obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
 							+ data.get(Calendar.YEAR));
@@ -500,8 +511,8 @@ public class Globalsentiment extends GetReach {
 				for (; today.after(data); data.add(Calendar.MONTH, 1)) {
 					obj = new JSONObject();
 					obj.put("Date", "01" + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
-					obj.put("Value", wikiGlobalSentimentBy(data.get(Calendar.DAY_OF_MONTH), (data.get(Calendar.MONTH) + 1),
-							data.get(Calendar.YEAR), param, values, id, frequency));
+					obj.put("Value", wikiGlobalSentimentBy(data.get(Calendar.DAY_OF_MONTH),
+							(data.get(Calendar.MONTH) + 1), data.get(Calendar.YEAR), param, values, id, frequency));
 					// System.out.println("mon:"+data.get(Calendar.MONTH)+"
 					// year:"+data.get(Calendar.YEAR));
 					result.put(obj);
@@ -510,8 +521,9 @@ public class Globalsentiment extends GetReach {
 		}
 		return result;
 	}
-	
-	public double wikiGlobalSentimentBy(int day, int month, int year, String param, String value, long id, long frequency) {
+
+	public double wikiGlobalSentimentBy(int day, int month, int year, String param, String value, long id,
+			long frequency) {
 
 		Model model = Data.getmodel(id);
 		parameters par = split_params(param, value);
@@ -520,7 +532,8 @@ public class Globalsentiment extends GetReach {
 				+ Settings.lotable + " WHERE (" + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
-				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id + ") AND posts.id IN (SELECT post_id FROM post_source)";
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id
+				+ ") AND posts.id IN (SELECT post_id FROM post_source)";
 
 		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
@@ -638,7 +651,7 @@ public class Globalsentiment extends GetReach {
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
-		
+
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -701,8 +714,9 @@ public class Globalsentiment extends GetReach {
 		return result;
 
 	}
-	
-	public JSONArray getWikiPolarityDistribution(long id, String param, String value, String output) throws JSONException {
+
+	public JSONArray getWikiPolarityDistribution(long id, String param, String value, String output)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		parameters par = split_params(param, value);
@@ -710,16 +724,19 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 		obj.put("Filter", output);
 		result.put(obj);
-		String query = "select sum(case when (posts.polarity  <=20) then 1 else 0 end) '--', " +
-					   "sum(case when (posts.polarity  > 20 AND posts.polarity <= 40 ) then 1 else 0 end) '-', " +
-					   "sum(case when (posts.polarity   >40 AND posts.polarity <=60) then 1 else 0 end) '0', " + 
-					   "sum(case when (posts.polarity >60 AND posts.polarity <=80) then 1 else 0 end) '+', " +
-					   "sum(case when (posts.polarity >80 AND posts.polarity <=100) then 1 else 0 end) '++' " +
-					   "from posts where posts.opinions_id in (Select opinions.id from opinions where opinions.pss = ? AND id in (Select authors_id from authors)" + " AND " + Settings.lotable_product +
-					   (par.products != null ? "=?" : " in (" + model.getProducts() + ") AND " + Settings.lotable_timestamp + ">? AND " + Settings.lptable_authorid + " in (Select " +
-							   Settings.latable_id + " from " + Settings.latable + ")")+
-					   "and posts.id in (select post_id from post_source where post_source LIKE 'wiki')" ;
-					   
+		String query = "select sum(case when (posts.polarity  <=20) then 1 else 0 end) '--', "
+				+ "sum(case when (posts.polarity  > 20 AND posts.polarity <= 40 ) then 1 else 0 end) '-', "
+				+ "sum(case when (posts.polarity   >40 AND posts.polarity <=60) then 1 else 0 end) '0', "
+				+ "sum(case when (posts.polarity >60 AND posts.polarity <=80) then 1 else 0 end) '+', "
+				+ "sum(case when (posts.polarity >80 AND posts.polarity <=100) then 1 else 0 end) '++' "
+				+ "from posts where posts.opinions_id in (Select opinions.id from opinions where opinions.pss = ? AND id in (Select authors_id from authors)"
+				+ " AND " + Settings.lotable_product
+				+ (par.products != null ? "=?"
+						: " in (" + model.getProducts() + ") AND " + Settings.lotable_timestamp + ">? AND "
+								+ Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
+								+ Settings.latable + ")")
+				+ "and posts.id in (select post_id from post_source where post_source LIKE 'wiki')";
+
 		if (par.age != null || par.gender != null || par.location != null)
 			query += " where 1=1 ";
 		if (par.age != null)
