@@ -12,7 +12,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import general.LeanRules;
 
 @Path("/getUnusedGuidelines")
 public class GetUnusedGuidelines {

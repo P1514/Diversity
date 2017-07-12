@@ -12,7 +12,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import general.LeanRules;
 
 @Path("/getLeanRules")
 public class GetLeanRules {
@@ -26,13 +25,14 @@ public class GetLeanRules {
 	String dp;
 	@Context
 	UriInfo ui;
-
+	
 	/**
-	 * Builds a matrix where the rows are all the rules in the selected design
-	 * project and the columns are the design projects with those rules. Still
-	 * need to include the polarity value of each rule.
+	 * Builds a JSON with all rules used in a design project, or from all design
+	 * projects if -1 is passed as the design_project_id parameter. The output
+	 * will contain the rule's score, projects where it is used, text and ID
+	 * for each of the rules in the result.
 	 * 
-	 * @return - a JSON string with the lean rule matrix
+	 * @return a JSON array with lean rules
 	 * @throws JSONException
 	 */
 	@GET
@@ -44,7 +44,8 @@ public class GetLeanRules {
 		LeanRules lr = new LeanRules(dp);
 
 		JSONArray json = lr.getResult();
-		json.remove(0);
+		json.remove(0); // remove the "Op" key used in the backend to display the lean rules table in the graphical interface
+
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}
 }

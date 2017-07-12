@@ -12,6 +12,8 @@ import org.json.*;
 
 import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
 
+import endpoints.LeanRules;
+import endpoints.LeanRules.LeanRule;
 import extraction.Extrapolation;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -22,7 +24,6 @@ import extraction.Prediction;
 import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
-import general.LeanRules.LeanRule;
 import modeling.GetModels;
 import general.Collaboration;
 // TODO: Auto-generated Javadoc
@@ -124,6 +125,67 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 34:
+				//SELECT * FROM sentimentanalysis.posts where id in (select post_id from post_source where post_source = 'wiki');
+				result = new JSONArray();
+				obj = new JSONObject();
+				obj.put("Op", "OE_Redone");
+				result.put(obj);
+				
+				for (int i = 0; i < filter.length; i++) {
+
+					result = convert(result,
+							gs.getWikiPolarityDistribution(id, param + "," + filtering,
+									values + ","
+											+ (filtering.equals("Product")
+													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i])),
+							"Graph", "Top_Middle");
+							
+				}
+				
+				result = convert(result, gs.getWikiCurSentiment(param, values, id,Data.getmodel(id).getFrequency()), "Graph", "Top_Right");
+				//result = convert(result, , "Graph", "Bottom_Left");
+				
+//				for (int i = 0; i < filter.length; i++)
+//					result = convert(result,
+//							gr.globalreach(param + "," + filtering,
+//									values + ","
+//											+ (filtering.equals("Product")
+//													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+//									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+//											: filter[i]),
+//									id, Data.getmodel(id).getFrequency()),
+//							"Graph", "Bottom_Middle");
+				
+				for (int i = 0; i < filter.length; i++) {
+					result = convert(result,
+							gs.wikiGlobalSentiment(param + "," + filtering,
+									values + ","
+											+ (filtering.equals("Product")
+													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
+									id, Data.getmodel(id).getFrequency()),
+							"Graph", "Bottom_Right");
+				}
+				if (msg.has("Extrapolate")) {
+					LOGGER.log(Level.INFO,"EXTRAPOLATING...");
+					for (int i = 0; i < filter.length; i++)
+						result = convert(result,
+								extra.extrapolate(param + "," + filtering,
+										values + "," + (filtering.equals("Product")
+												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+										(filtering.equals("Product")
+												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+										id, Data.getmodel(id).getFrequency()),
+								"Graph", "Bottom_Right_Ex");
+				}
+				
+				LOGGER.log(Level.INFO,result.toString());
+				System.out.println(result.toString());
+				return result.toString();
 			case 33:
 				obj = new JSONObject();
 				result = new JSONArray();
@@ -136,7 +198,6 @@ public class Backend {
 				
 				
 				return result.toString();	
-				
 			case 32:
 				obj = new JSONObject();
 				result = new JSONArray();

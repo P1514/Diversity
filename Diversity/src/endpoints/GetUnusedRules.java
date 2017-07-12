@@ -12,7 +12,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import general.LeanRules;
+
 
 @Path("/getUnusedRules")
 public class GetUnusedRules {
@@ -30,6 +30,7 @@ public class GetUnusedRules {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response welcome() throws JSONException {
+
 
 		JSONArray json = LeanRules.getUnusedRules();
 

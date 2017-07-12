@@ -37,6 +37,7 @@ public class Operations {
 		permission.put(31, 1);
 		permission.put(32, 1);
 		permission.put(33, 1);
+		permission.put(34, 2);
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;
@@ -74,6 +75,7 @@ public class Operations {
 		op.put("get_rules", 31); // get lean design rules
 		op.put("get_dp", 32); // get all design projects
 		op.put("collaboration", 33); // get collaboration info
+		op.put("oe_wiki", 34);
 		op.put("testing", 99); // Admin only
 	}
 

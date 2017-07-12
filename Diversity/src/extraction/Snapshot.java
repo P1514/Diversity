@@ -316,6 +316,7 @@ public class Snapshot {
 				obj.put("Name", rs.getString("name"));
 				obj.put("Id", rs.getString("id"));
 				obj.put("User", rs.getString("creation_user"));
+				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}
 			result.put("Snapshots");

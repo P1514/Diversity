@@ -58,11 +58,12 @@ public class ChromeTests  {
 		// Set the website URL and permissions
 
 		driver.get("localhost:8080/Diversity/pages/index.html?role_desc=DEVELOPER");
-		driver.manage().window().maximize();
 		JavascriptExecutor JavascriptExecutor = ((JavascriptExecutor)driver);
-		JavascriptExecutor.executeScript("document.cookie = \"JSESSIONID=3D43211234DDDFFGGT542; expires=Fri, 31 Dec 9999 23:59:59 GMT\";");
+		//JavascriptExecutor.executeScript("document.cookie = \"JSESSIONID=3D43211234DDDFFGGT542; expires=Fri, 31 Dec 9999 23:59:59 GMT\";");
 		JavascriptExecutor.executeScript("localStorage.tutorial = 'home=done;create=done;view=done;edit=done;extraction=done;setup=done;prediction=done;'");
-		driver.navigate().refresh();
+		driver.manage().window().maximize();
+		driver.findElement(By.id("ok")).click();
+//		driver.navigate().refresh();
 
 		boolean create = testCreate(driver);
 		Thread.sleep(2000);
@@ -130,8 +131,9 @@ public class ChromeTests  {
      * @param driver - the selenium webdriver
      * @return - true if the test passes, otherwise returns false
      * @throws IOException - if an error occurs with the log.txt file
+	 * @throws InterruptedException 
      */
-    public static boolean testCreate(WebDriver driver) throws IOException {
+    public static boolean testCreate(WebDriver driver) throws IOException, InterruptedException {
     	w.write("Starting Create Opinion Model Test\n");
     	w.write("-----------------------------------\n\n");
     	w.write("Clicking: 'Create Opinion Model'...\n");
@@ -170,7 +172,7 @@ public class ChromeTests  {
             	try {
 	            	WebElement pssBox = d.findElement(By.id("pss"));
 	            	Select pssList = new Select(pssBox);
-	            	pssList.selectByIndex(2);
+	            	pssList.selectByVisibleText("D522-2 PSS");
 	            	pss = pssList.getFirstSelectedOption().getText();
             	} catch (NoSuchElementException e2) {
             		try {
@@ -315,36 +317,61 @@ public class ChromeTests  {
         	  	return true;
 
             }
+            
+            
         });
         
-        
-        if (driver.getCurrentUrl().contains("index.html")) {
+        (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+
+			public Boolean apply(WebDriver d) {
+				if (d.getCurrentUrl().contains("index.html")) {
+		        	
+		        } else {
+		        	try {
+						w.write("Page was not redirected to index.html after creating model. Stopping test run. \nTest Create Opinion Model failed.\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        	pass = false;
+		        	return false;
+		        }
+		        
+		        d.findElement(By.linkText("Edit Opinion Model")).click();
+		        Select modelsList = new Select(d.findElement(By.id("Models")));
+		        WebElement el = null;
+		        boolean modelExists = false;
+		        for (WebElement model : modelsList.getOptions()) {
+		        	if (model.getText().equals(modelName)) {
+		        		el = model;
+		        		break;
+		        	}
+		        }
+		        
+		        if (el == null) {
+		            try {
+						w.write("Model " + modelName + " was not added or was added with an incorrect name. Stopping test run. \nTest Create Opinion Model failed.\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        	pass = false;
+		            return false;
+		        }
+		        
+		        try {
+					w.write("Attempting to open edit page...\n");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+		        modelsList.selectByIndex(modelsList.getOptions().indexOf(el));
+		        d.findElement(By.id("view_edit")).click();
+		        
+		        return false;
+			}
         	
-        } else {
-        	w.write("Page was not redirected to index.html after creating model. Stopping test run. \nTest Create Opinion Model failed.\n");
-        	pass = false;
-        	return false;
-        }
-        driver.findElement(By.linkText("Edit Opinion Model")).click();
-        Select modelsList = new Select(driver.findElement(By.id("Models")));
-        WebElement el = null;
-        boolean modelExists = false;
-        for (WebElement model : modelsList.getOptions()) {
-        	if (model.getText().equals(modelName)) {
-        		el = model;
-        		break;
-        	}
-        }
-        
-        if (el == null) {
-            w.write("Model " + modelName + " was not added or was added with an incorrect name. Stopping test run. \nTest Create Opinion Model failed.\n");
-        	pass = false;
-            return false;
-        }
-        
-        w.write("Attempting to open edit page...\n");
-        modelsList.selectByIndex(modelsList.getOptions().indexOf(el));
-        driver.findElement(By.id("view_edit")).click();
+        });
         (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
             /* (non-Javadoc)
              * @see com.google.common.base.Function#apply(java.lang.Object)
@@ -445,9 +472,8 @@ public class ChromeTests  {
 						e.printStackTrace();
 					}
             	}
-            	return true;
+            	return pass;
             }});
-        
         
         w.write("Test Create Opinion Model reached the end.\n");
         if (pass) {
