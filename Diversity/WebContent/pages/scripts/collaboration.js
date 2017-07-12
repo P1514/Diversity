@@ -10,6 +10,11 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
+var userCompany;
+var userStorage = [];
+var availableUsers = [];
+var team = [];
+
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -20,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
   $('#overlay').hide();
-
+	userCompany = getParam("company");
+	$('#comp').append(userCompany);
   if (window.location.href.indexOf('https://') != -1) {
 		ws = new WebSocket('wss://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
@@ -44,20 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
-		if (localStorage.tutorial !=undefined && localStorage.tutorial.indexOf("collaboration=done") == -1) { // if the user never opened this page, start the tutorial
-			request_tutorial();
-		}
-		if (localStorage.tutorial == undefined) {
-			localStorage.tutorial += "";
-			request_tutorial();
-		}
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
       draw = true;
-			users = json;
+			users = json[1];
       console.log(users);
 
-      drawTable('');
+      drawTable();
     }
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
@@ -71,28 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-function request_tutorial() {
-  $('#error').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
-  $('#overlay').show();
-  $('#overlay-back').show();
-}
-
-function start_tutorial() {
-  end_tutorial();
-  $('#tutorial_box').toggle();
-}
-
-function end_tutorial() {
-  var pos=$('#submit').offset();
-  var h=$('#submit').height() + 10;
-  var w=$('#submit').width();
-
-  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
-
-  if (localStorage.tutorial.indexOf("collaboration=done") == -1) {
-    localStorage.tutorial += "collaboration=done;";
-  }
-}
 
 /*
 * Finds and returns objects with a specific property inside an array.
@@ -117,10 +94,31 @@ function getObjects(obj, key, val) {
 /*
 * Draws a table with users for collaboration
 */
-function drawTable(filter) {
+function drawTable() {
 	// | USER_NAME | USER_ROLE | USER_COMPANY | COMPANY_TYPE | USER_RATING |
+	$('#users_body').empty();
+	var user;
+	var name;
+	var company;
+	var rating;
+	var role;
+	for (var i = 0; i < users.length; i++) {
+		user = users[i];
+		company = user.Company;
+		if ((company == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1) {
+			name = user.First_name + ' ' + user.Last_name;
+			rating = parseInt(user.Ranking, 10);
+			role = user.Role;
+			$('#users_body').append('<tr id=user_' + i + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + i + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+			userStorage[i] = user;
+		}
+	}
 
+	var options = {
+		valueNames: [ 'name', 'role', 'company', 'rating']
+	};
 
+	var userList = new List('table', options);
 }
 
 function getParam(param) {
@@ -135,10 +133,34 @@ function getParam(param) {
 	}
 }
 
-var lastValue = '';
-$("#filter").on('change keyup paste mouseup', function() {
-    if ($(this).val() != lastValue) {
-        lastValue = $(this).val();
-        console.log(lastValue);
-    }
+$('#all').change(function() {
+    // this will contain a reference to the checkbox
+		drawTable();
 });
+
+$('#unranked').change(function() {
+    // this will contain a reference to the checkbox
+		drawTable();
+});
+
+function addMember(position) {
+	user = userStorage[position];
+	company = user.Company;
+	name = user.First_name + ' ' + user.Last_name;
+	rating = parseInt(user.Ranking, 10);
+	role = user.Role;
+	$('#team_body').append('<tr id="team_' + position + '"><td style="padding:10px;"><input type="button" value="Remove" onClick="removeMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+	$('#user_' + position).remove();
+	team.push(user);
+}
+
+function removeMember(position) {
+	user = userStorage[position];
+	company = user.Company;
+	name = user.First_name + ' ' + user.Last_name;
+	rating = parseInt(user.Ranking, 10);
+	role = user.Role;
+	$('#users_body').append('<tr id=user_' + position + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+	$('#team_' + position).remove();
+	team.splice(team.indexOf(user, 1));
+}

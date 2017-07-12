@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +84,7 @@ public class LeanRules {
 			for (int p : designProjects) {
 				List<Integer> tmp;
 				if (!matrix.containsKey(r)) {
-					tmp = new LinkedList<Integer>();
+					tmp = new ArrayList<Integer>();
 					tmp.add(p);
 					matrix.put(r, (ArrayList<Integer>) tmp);
 				} else {
@@ -242,7 +242,8 @@ public class LeanRules {
 				while (rs.next()) {
 					LeanRule r = new LeanRule(rs.getInt(1), rs.getString(2));
 					JSONObject obj = new JSONObject();
-					obj.put("ID", r.id);
+					obj.put("ID", r.getId());
+					obj.put("Guideline", r.getRule());
 					guidelines.put(obj);
 				}
 			}
@@ -335,8 +336,8 @@ public class LeanRules {
 	private double getDesignProjectSentiment(int dpId) throws JSONException {
 		int pss = -1;
 		int avg = -1;
-		List<Integer> frequencies = new LinkedList<Integer>();
-		List<Double> sentiments = new LinkedList<Double>();
+		List<Integer> frequencies = new ArrayList<Integer>();
+		List<Double> sentiments = new ArrayList<Double>();
 		String select1 = "SELECT DISTINCT produces_pss_id FROM diversity_common_repository.design_project WHERE id = ? ";
 		String select2 = "SELECT (SELECT SUM(polarity*reach) FROM opinions WHERE pss = ?) / (SELECT SUM(reach) FROM opinions WHERE pss= ?);";
 
