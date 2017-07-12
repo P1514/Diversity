@@ -59,6 +59,25 @@ public class Collaboration {
 				userRating.get(userid).add(v);
 			}
 		});
+		
+		for (User user0 : Data.dbuserall()) {
+			if (!userRating.containsKey(user0.getID())){
+				Company company0 = Data.getCompany(user0.getcompany_id());
+				try {
+					JSONObject obj = new JSONObject();
+					obj.put("First_name", user0.getfirst_name());
+					obj.put("Last_name", user0.getlast_name());
+					obj.put("Company", company0.getName());
+					obj.put("Role", user0.getrole());
+					result.put(obj);
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+			}
+				
+		}
 
 		userRating.forEach((k, v) -> {
 			User user1 = Data.getUser(k);

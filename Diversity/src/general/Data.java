@@ -162,6 +162,10 @@ public class Data {
 		return null;
 	}
 	
+	public static Collection<User> dbuserall() {
+		return userdb.values();
+	}
+	
 	public static Company getCompany(long id) {
 		if (companydb.containsKey(id))
 			return companydb.get(id);
