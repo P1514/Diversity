@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
   $('#overlay-back').hide();
   $('#overlay').hide();
 	userCompany = getParam("company");
-	$('#comp').append(userCompany);
+	var str = userCompany;
+
+	$('#comp').append(str[0].toUpperCase() + str.slice(1));
   if (window.location.href.indexOf('https://') != -1) {
 		ws = new WebSocket('wss://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
@@ -105,7 +107,7 @@ function drawTable() {
 	for (var i = 0; i < users.length; i++) {
 		user = users[i];
 		company = user.Company;
-		if ((company == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
+		if ((company.toLowerCase() == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
 			name = user.First_name + ' ' + user.Last_name;
 			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 			role = user.Role;
@@ -145,22 +147,39 @@ $('#unranked').change(function() {
 
 function addMember(position) {
 	user = userStorage[position];
-	company = user.Company;
-	name = user.First_name + ' ' + user.Last_name;
-	rating = parseInt(user.Ranking, 10);
-	role = user.Role;
-	$('#team_body').append('<tr id="team_' + position + '"><td style="padding:10px;"><input type="button" value="Remove" onClick="removeMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
-	$('#user_' + position).remove();
-	team.push(user);
+	if (team.indexOf(user) == -1) {
+		company = user.Company;
+		name = user.First_name + ' ' + user.Last_name;
+		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
+		role = user.Role;
+		$('#team_body').append('<tr id="team_' + position + '"><td style="padding:10px;"><input type="button" value="Remove" onClick="removeMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+		$('#user_' + position).remove();
+		availableUsers.splice(availableUsers.indexOf(user, 1));
+		team.push(user);
+
+		var options = {
+			valueNames: [ 'name', 'role', 'company', 'rating']
+		};
+		var userList = new List('table', options);
+	}
 }
 
 function removeMember(position) {
 	user = userStorage[position];
-	company = user.Company;
-	name = user.First_name + ' ' + user.Last_name;
-	rating = parseInt(user.Ranking, 10);
-	role = user.Role;
-	$('#users_body').append('<tr id=user_' + position + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+	if (availableUsers.indexOf(user) == -1) {
+		company = user.Company;
+		name = user.First_name + ' ' + user.Last_name;
+		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
+		role = user.Role;
+		$('#users_body').append('<tr id=user_' + position + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+		availableUsers.push(user);
+
+		var options = {
+			valueNames: ['name', 'role', 'company', 'rating']
+		};
+		var userList = new List('table', options);
+	}
 	$('#team_' + position).remove();
 	team.splice(team.indexOf(user, 1));
+
 }
