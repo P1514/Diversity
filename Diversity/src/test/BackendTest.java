@@ -470,6 +470,7 @@ public class BackendTest extends Thread {
 		obj.put("Products", "71,74");
 		obj.put("Services", "69,66");
 		obj.put("Key", "10");
+		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
