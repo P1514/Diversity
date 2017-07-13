@@ -39,20 +39,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //Request products and services tree
   ws.onopen = function () {
-    json = {
-      "Op" : "collaboration",
-      'Key' : getCookie("JSESSIONID"),
-			'Products' : getParam('products'),
-			'Services' : getParam('services'),
-			'Company' : getParam('products') == undefined || getParam('services') == undefined ? getParam('company') : undefined
-    }
+		json = {
+			'Op' : 'getrestrictions',
+			'Role' : 'DESIGNER',
+			'Key' : getCookie('JSESSIONID'),
+		}
 
-    ws.send(JSON.stringify(json));
+		ws.send(JSON.stringify(json));
+
   }
 
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
+		if (json[0].Op == "Rights") {
+			json = {
+	      "Op" : "collaboration",
+	      'Key' : getCookie("JSESSIONID"),
+				'Products' : getParam('products'),
+				'Services' : getParam('services'),
+				'Company' : getParam('products') == undefined || getParam('services') == undefined ? getParam('company') : undefined
+	    }
+
+	    ws.send(JSON.stringify(json));
+		}
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
       draw = true;
