@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
   $('#overlay').hide();
-	userCompany = getParam("company");
+	userCompany = getParam("company").toLowerCase();
 	var str = userCompany;
 
 	$('#comp').append(str[0].toUpperCase() + str.slice(1));
@@ -109,20 +109,22 @@ function getObjects(obj, key, val) {
 function drawTable() {
 	// | USER_NAME | USER_ROLE | USER_COMPANY | COMPANY_TYPE | USER_RATING |
 	$('#users_body').empty();
-	var user;
+	availableUsers = [];
 	var name;
 	var company;
 	var rating;
 	var role;
 	for (var i = 0; i < users.length; i++) {
 		user = users[i];
-		company = user.Company;
-		if ((company.toLowerCase() == userCompany || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
+		company = user.Company.toLowerCase();
+		if ((company.toLowerCase() == userCompany.toLowerCase() || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
 			name = user.First_name + ' ' + user.Last_name;
 			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 			role = user.Role;
+			console.log("Adding user " + name + " from " + company);
 			$('#users_body').append('<tr id=user_' + i + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + i + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
 			userStorage[i] = user;
+			availableUsers.push(user);
 		}
 	}
 
