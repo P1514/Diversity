@@ -183,3 +183,12 @@ function removeMember(position) {
 	team.splice(team.indexOf(user, 1));
 
 }
+
+function submit() {
+	var result = [];
+	for (var i = 0; i < team.length; i++) {
+		result.push(team[i]);
+	}
+
+	console.log(JSON.stringify(result));
+}
