@@ -251,10 +251,7 @@ public class Prediction extends Globalsentiment {
 			mean = (totalGsweight) / ((totalWeight == 0 ? 1 : totalWeight));
 			pssSentiment.put(pssid, mean);
 		}
-		 pssSentiment.forEach((k, v) -> {
-		 System.out.println("PSS:(" + k + ") Sentiment-->" + v);
-		
-		 });
+
 		return pssSentiment;
 	}
 }
