@@ -107,7 +107,7 @@ public class LeanRules {
 		guidelineMatrix = new HashMap<LeanRule, ArrayList<Integer>>();
 		// for each rule get the design projects where it is active
 		for (LeanRule g : guidelines) {
-			guidelinesDesignProjects = getDesignProjects(g.getId());
+			guidelinesDesignProjects = getGuidelineDesignProjects(g.getId());
 
 			for (int p : guidelinesDesignProjects) {
 				List<Integer> tmp;
