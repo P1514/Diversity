@@ -16,14 +16,8 @@ public class Collaboration {
 	public Collaboration() {
 
 	}
-	
-	public JSONArray teamRating(String companies) throws JSONException {
-		String productsId="";
-		String servicesId="";
-	return	teamRating(productsId, servicesId);
-	}
 
-	public JSONArray teamRating(String productsId, String servicesId) throws JSONException {
+	public JSONArray teamRating(String productsId, String servicesId, String company) throws JSONException {
 		JSONArray result = new JSONArray();
 
 		productsId = productsId.replace(",", ";");
@@ -33,13 +27,16 @@ public class Collaboration {
 		System.out.println(servicesId);
 
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
+		if (pssSentiment == null) {
+			pssSentiment = pre.predict(company);
+		}
+		if (pssSentiment == null) {
+			return null;
+		}
 		HashMap<Long, Double> dpSentiment = new HashMap<>();
 		HashMap<Long, ArrayList<Double>> userRating = new HashMap<>();
 
 		Collection<DesignProject> designprojects = Data.dbdpall();
-
-		if (pssSentiment == null)
-			return result.put("No Team Members");
 
 		pssSentiment.forEach((k, v) -> { // gives design projects average
 											// sentiment
@@ -59,9 +56,9 @@ public class Collaboration {
 				userRating.get(userid).add(v);
 			}
 		});
-		
+
 		for (User user0 : Data.dbuserall()) {
-			if (!userRating.containsKey(user0.getID())){
+			if (!userRating.containsKey(user0.getID())) {
 				Company company0 = Data.getCompany(user0.getcompany_id());
 				try {
 					JSONObject obj = new JSONObject();
@@ -74,9 +71,9 @@ public class Collaboration {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				
+
 			}
-				
+
 		}
 
 		userRating.forEach((k, v) -> {

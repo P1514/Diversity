@@ -39,7 +39,6 @@ public class Data {
 	protected static final ConcurrentHashMap<Long, User> userdb = new ConcurrentHashMap<>();
 	
 	/** The servicedb. */
-	@SuppressWarnings("unused")
 	protected static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
 
 	/** The companydb. */
@@ -236,9 +235,24 @@ public class Data {
 				return a.getID();
 		}
 		return 0;
-
 	}
 
+	/**
+	 * Identify company by name.
+	 *
+	 * @param name
+	 *            the name of the pss
+	 * @return the long id
+	 */
+	public static Company getcompanybyname(String name) {
+
+		for (Company c : companydb.values()) {
+			if (c.getName().equals(name))
+				return c;
+		}
+		return null;
+	}
+	
 	/**
 	 * Identify product by message.
 	 *
@@ -255,5 +269,7 @@ public class Data {
 
 		return 0;
 	}
+	
+	
 
 }

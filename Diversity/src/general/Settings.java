@@ -303,6 +303,12 @@ public class Settings {
 	public static final String lsstable_type = "type";
 	public static final String lsstable_timespan = "timespan";
 	public static final String lsstable_model_id = "model_id";
+	
+	// Company_is_costumer_of_design_project Table
+	public static final String cictable = "company_is_costumer_of_design_project";
+	public static final String cictable_id = "id";
+	public static final String cictable_company_id = "company_id";
+	public static final String cictable_design_project_id = "design_project_id";
 
 
 	// SQL Common String

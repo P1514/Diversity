@@ -193,7 +193,7 @@ public class Backend {
 				result.put(obj);
 				
 				result.put(col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
-						msg.has("Services") ? msg.getString("Services") : ""));
+						msg.has("Services") ? msg.getString("Services") : "",msg.getString("Company")));
 				
 				
 				
