@@ -237,7 +237,7 @@ public class Data {
 	public static Company getcompanybyname(String name) {
 
 		for (Company c : companydb.values()) {
-			if (c.getName().equals(name))
+			if (c.getName().toLowerCase().equals(name.toLowerCase()))
 				return c;
 		}
 		return null;
