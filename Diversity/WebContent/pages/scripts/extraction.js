@@ -48,7 +48,8 @@ $("#USER_LIST")
 						"Product" : product != undefined && product != "Global" ? product
 								: undefined,
 						'Key' : getCookie("JSESSIONID"),
-						'User' : user
+						'User' : user,
+						'Type' : "All"
 					}
 					ws.send(JSON.stringify(json));
 
@@ -340,7 +341,18 @@ function connect() {
 			$('.table > tbody > tr').click(function(e) {
 				clicker($(this).find('input[name="id"]').val());
 			});
-
+			var type;
+			switch ($("input[name='radioName']:checked").val()) {
+				case 1:
+					type = 'All';
+					break;
+				case 2:
+					type = 'Positive';
+					break;
+				case 3:
+					type = 'Negative';
+					break;
+			}
 			// Request the tagcloud for the current user
 			var json = {
 				"Op" : "tagcloud",
@@ -350,7 +362,8 @@ function connect() {
 				"Product" : product != undefined && product != "Global" ? product
 						: undefined,
 				'Key' : getCookie("JSESSIONID"),
-				'User' : user
+				'User' : user,
+				'Type' : type
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -376,13 +389,14 @@ function connect() {
 	};
 }
 
+
+
 google.charts.load('current', {
 	packages : [ 'corechart', 'bar', 'gauge' ]
 });
-$(document).ready(
-		function() {
-			google.charts.setOnLoadCallback(connect);
-		});
+$(document).ready(function() {
+	google.charts.setOnLoadCallback(connect);
+});
 $(window).load(function() {
 	$('#overlay').hide();
 	$('#overlay-back').hide();
@@ -400,6 +414,7 @@ function goToByScroll(id) { // simple scroll to element
 		scrollTop : $("#" + id).offset().top - 200
 	}, 'ease');
 }
+
 
 // tutorial functions, should be
 // refactored?-------------------------------------
@@ -673,7 +688,7 @@ $(".custom-menu li").click(function(e) {
 });
 
 function ignore_words(word) { // sends a message to start ignoring the word we
-								// clicked on
+	// clicked on
 	var json = {
 		'Op' : 'set_ignore_word',
 		"Id" : sessionStorage.id,
@@ -684,26 +699,15 @@ function ignore_words(word) { // sends a message to start ignoring the word we
 
 	ws.send(JSON.stringify(json));
 }
-/* NEW TAG CLOUD - CLICK NOT WORKING
-function makeCloud(words) {
-	$('#cloud').html('');
-	var cloud = [];
-	for (var i = 0; i < words.length; i++) {
-		var currWord = words[i].word;
-		cloud[i] = {
-			text: currWord,
-			weight: words[i].frequency,
-			handlers: {click: function() {
-					var word = currWord;
-					return tagClick(word);
-				}
-			}
-		};
-	}
-
-	$('#cloud').jQCloud(cloud);
-}
-*/
+/*
+ * NEW TAG CLOUD - CLICK NOT WORKING function makeCloud(words) {
+ * $('#cloud').html(''); var cloud = []; for (var i = 0; i < words.length; i++) {
+ * var currWord = words[i].word; cloud[i] = { text: currWord, weight:
+ * words[i].frequency, handlers: {click: function() { var word = currWord;
+ * return tagClick(word); } } }; }
+ *
+ * $('#cloud').jQCloud(cloud); }
+ */
 function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
@@ -1015,8 +1019,6 @@ function drawChart() {
 
 	}
 
-
-
 	// Bottom Middle
 	var mid_data;
 	if (jsonData[i].Graph == "Bottom_Middle") {
@@ -1040,8 +1042,8 @@ function drawChart() {
 
 					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
 							+ time[2])); // month comes as a number from
-											// server, if it changes use
-											// getMonthFromString
+					// server, if it changes use
+					// getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
 					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
@@ -1123,7 +1125,8 @@ function drawChart() {
 				maxZoomIn : 4.0,
 				maxZoomOut : 1
 			},
-			pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
+			pointsVisible : (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true
+					: false,
 		};
 
 		if (start != 0 && end != 0) {
@@ -1149,35 +1152,35 @@ function drawChart() {
 		bottom_middle.draw(data, mid_options);
 	}
 
+	function getCoordsMid() {
+		var chartLayout = bottom_middle.getChartLayoutInterface();
+		var chartBounds = chartLayout.getChartAreaBoundingBox();
+		return {
+			x : {
+				min : chartLayout.getHAxisValue(chartBounds.left),
+				max : chartLayout.getHAxisValue(chartBounds.width
+						+ chartBounds.left)
+			},
+		/*
+		 * y: { min: chartLayout.getVAxisValue(chartBounds.top), max:
+		 * chartLayout.getVAxisValue(chartBounds.height + chartBounds.top) }
+		 */
+		};
+	}
 
-		function getCoordsMid() {
-			var chartLayout = bottom_middle.getChartLayoutInterface();
-			var chartBounds = chartLayout.getChartAreaBoundingBox();
-			return {
-				x: {
-					min: chartLayout.getHAxisValue(chartBounds.left),
-					max: chartLayout.getHAxisValue(chartBounds.width + chartBounds.left)
-				},
-				/*y: {
-					min: chartLayout.getVAxisValue(chartBounds.top),
-					max: chartLayout.getVAxisValue(chartBounds.height + chartBounds.top)
-				}*/
-			};
+	function setRangeMid(coords) {
+		mid_options.hAxis.viewWindow = {};
+		// options.vAxis.viewWindow = {};
+		if (coords) {
+			mid_options.hAxis.viewWindow.min = coords.x.min;
+			mid_options.hAxis.viewWindow.max = coords.x.max;
+			// options.vAxis.viewWindow.min = coords.y.min;
+			// options.vAxis.viewWindow.max = coords.y.max;
 		}
+		bottom_middle.draw(mid_data, mid_options);
+	}
 
-		function setRangeMid(coords) {
-			mid_options.hAxis.viewWindow = {};
-			//options.vAxis.viewWindow = {};
-			if (coords) {
-				mid_options.hAxis.viewWindow.min = coords.x.min;
-				mid_options.hAxis.viewWindow.max = coords.x.max;
-				//options.vAxis.viewWindow.min = coords.y.min;
-				//options.vAxis.viewWindow.max = coords.y.max;
-			}
-			bottom_middle.draw(mid_data, mid_options);
-		}
-
-		var right_data;
+	var right_data;
 	// Bottom Right
 	if (jsonData[i].Graph == "Bottom_Right"
 			|| jsonData[i].Graph == "Bottom_Right_Ex") {
@@ -1327,7 +1330,8 @@ function drawChart() {
 				maxZoomIn : 4.0,
 				maxZoomOut : 1,
 			},
-			pointsVisible: (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true : false,
+			pointsVisible : (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true
+					: false,
 		};
 
 		for (var v = 0; v < series.length; v++) {
@@ -1363,38 +1367,50 @@ function drawChart() {
 			var chartLayout = bottom_right.getChartLayoutInterface();
 			var chartBounds = chartLayout.getChartAreaBoundingBox();
 			return {
-				x: {
-					min: chartLayout.getHAxisValue(chartBounds.left),
-					max: chartLayout.getHAxisValue(chartBounds.width + chartBounds.left)
+				x : {
+					min : chartLayout.getHAxisValue(chartBounds.left),
+					max : chartLayout.getHAxisValue(chartBounds.width
+							+ chartBounds.left)
 				},
-				/*y: {
-					min: chartLayout.getVAxisValue(chartBounds.top),
-					max: chartLayout.getVAxisValue(chartBounds.height + chartBounds.top)
-				}*/
+			/*
+			 * y: { min: chartLayout.getVAxisValue(chartBounds.top), max:
+			 * chartLayout.getVAxisValue(chartBounds.height + chartBounds.top) }
+			 */
 			};
 		}
 
 		function setRangeRight(coords) {
 			right_options.hAxis.viewWindow = {};
-			//options.vAxis.viewWindow = {};
+			// options.vAxis.viewWindow = {};
 			if (coords) {
 				right_options.hAxis.viewWindow.min = coords.x.min;
 				right_options.hAxis.viewWindow.max = coords.x.max;
-				//options.vAxis.viewWindow.min = coords.y.min;
-			  //options.vAxis.viewWindow.max = coords.y.max;
+				// options.vAxis.viewWindow.min = coords.y.min;
+				// options.vAxis.viewWindow.max = coords.y.max;
 			}
 			bottom_right.draw(right_data, right_options);
 		}
 
-		//google.visualization.events.addListener(bottom_right,'scroll', function(){setRangeMid(getCoordsRight())});
-		//google.visualization.events.addListener(bottom_middle,'scroll', function(){setRangeRight(getCoordsMid())});
+		// google.visualization.events.addListener(bottom_right,'scroll',
+		// function(){setRangeMid(getCoordsRight())});
+		// google.visualization.events.addListener(bottom_middle,'scroll',
+		// function(){setRangeRight(getCoordsMid())});
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);
 
 	if (!loaded) {
 		if (localStorage.tutorial != undefined
-				&& localStorage.tutorial.indexOf("extraction=done") == -1) { // if the user never opened this page, start the tutorial
+				&& localStorage.tutorial.indexOf("extraction=done") == -1) { // if
+																				// the
+																				// user
+																				// never
+																				// opened
+																				// this
+																				// page,
+																				// start
+																				// the
+																				// tutorial
 			request_tutorial();
 		}
 		if (localStorage.tutorial == undefined) {
@@ -1477,7 +1493,7 @@ function chartcolor(data) {
 	}
 }
 
-function changeRequest() {
+function changeRequest(type) {
 	var gender = document.getElementById("genderfilt").value;
 	var location = document.getElementById("locationfilt").value;
 	var age = document.getElementById("agefilt").value;
@@ -1526,7 +1542,7 @@ function changeRequest() {
 
 	} else {
 		json = {
-			"Op" : "oe_refresh",// OE_Filter
+			"Op" : document.getElementById('radio_wiki').checked ? "oe_wiki" : "oe_refresh",// OE_Filter
 			"Param" : "",
 			"Values" : "",
 			"Filter" : "",
@@ -1671,4 +1687,29 @@ function fixbuttons(data) {
 		document.getElementById('agefilt').disabled = false;
 		document.getElementById('finalfilt').disabled = true;
 	}
+}
+
+function socialPosts() {
+	changeRequest("");
+}
+
+function wikiPosts() {
+	changeRequest("wiki");
+}
+
+function requestTagcloud(polarity) {
+	var json = {
+		"Op" : "tagcloud",
+		"Id" : sessionStorage.id,
+		"Param" : month != undefined ? "Month" : undefined,
+		"Values" : month != undefined ? month : undefined,
+		"Product" : product != undefined && product != "Global" ? product
+				: undefined,
+		'Key' : getCookie("JSESSIONID"),
+		'User' : user,
+		'Type' : polarity
+	};
+	console.log('requested ' + polarity + ' tagcloud');
+	console.log(JSON.stringify(json))
+	ws.send(JSON.stringify(json));
 }
