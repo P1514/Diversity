@@ -48,7 +48,8 @@ $("#USER_LIST")
 						"Product" : product != undefined && product != "Global" ? product
 								: undefined,
 						'Key' : getCookie("JSESSIONID"),
-						'User' : user
+						'User' : user,
+						'Type' : "All"
 					}
 					ws.send(JSON.stringify(json));
 
@@ -340,7 +341,18 @@ function connect() {
 			$('.table > tbody > tr').click(function(e) {
 				clicker($(this).find('input[name="id"]').val());
 			});
-
+			var type;
+			switch ($("input[name='radioName']:checked").val()) {
+				case 1:
+					type = 'All';
+					break;
+				case 2:
+					type = 'Positive';
+					break;
+				case 3:
+					type = 'Negative';
+					break;
+			}
 			// Request the tagcloud for the current user
 			var json = {
 				"Op" : "tagcloud",
@@ -350,7 +362,8 @@ function connect() {
 				"Product" : product != undefined && product != "Global" ? product
 						: undefined,
 				'Key' : getCookie("JSESSIONID"),
-				'User' : user
+				'User' : user,
+				'Type' : type
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -376,6 +389,8 @@ function connect() {
 	};
 }
 
+
+
 google.charts.load('current', {
 	packages : [ 'corechart', 'bar', 'gauge' ]
 });
@@ -399,6 +414,7 @@ function goToByScroll(id) { // simple scroll to element
 		scrollTop : $("#" + id).offset().top - 200
 	}, 'ease');
 }
+
 
 // tutorial functions, should be
 // refactored?-------------------------------------
@@ -689,7 +705,7 @@ function ignore_words(word) { // sends a message to start ignoring the word we
  * var currWord = words[i].word; cloud[i] = { text: currWord, weight:
  * words[i].frequency, handlers: {click: function() { var word = currWord;
  * return tagClick(word); } } }; }
- * 
+ *
  * $('#cloud').jQCloud(cloud); }
  */
 function makeCloud(words) {
@@ -1607,7 +1623,7 @@ function changeRequest(type) {
 
 	/*
 	 * if (ageradio == "false") { if (age == "All") {
-	 * 
+	 *
 	 * json.Param += "Age,"; json.Values += "All,"; } else { json.Param +=
 	 * "Age,"; var select = document .getElementById('agefilt');
 	 * console.log(age); json.Values += age + ","; } } else {
@@ -1679,4 +1695,21 @@ function socialPosts() {
 
 function wikiPosts() {
 	changeRequest("wiki");
+}
+
+function requestTagcloud(polarity) {
+	var json = {
+		"Op" : "tagcloud",
+		"Id" : sessionStorage.id,
+		"Param" : month != undefined ? "Month" : undefined,
+		"Values" : month != undefined ? month : undefined,
+		"Product" : product != undefined && product != "Global" ? product
+				: undefined,
+		'Key' : getCookie("JSESSIONID"),
+		'User' : user,
+		'Type' : polarity
+	};
+	console.log('requested ' + polarity + ' tagcloud');
+	console.log(JSON.stringify(json))
+	ws.send(JSON.stringify(json));
 }

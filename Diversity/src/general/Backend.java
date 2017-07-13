@@ -241,8 +241,38 @@ public class Backend {
 			case 27:
 				obj = new JSONObject();
 				result = new JSONArray();
-				Tagcloud tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				Tagcloud tag;
+				if (msg.has("Type")) {
+					System.out.println("type " + msg.getString("Type"));
+					switch (msg.getString("Type")) {
+					case "Positive":
+						System.out.println("POSITIVE");
+						tag = new Tagcloud(
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+
+					case "Negative":
+						System.out.println("NEGATIVE");
+						tag = new Tagcloud(
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+					default:
+						tag = new Tagcloud(
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+					}
+				} else {
+					tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",50,-1), id,
+							msg.has("User") ? msg.getLong("User") : 0);
+				}
+				
 				if (msg.has("Word")) {
 					tag.addIgnoreWord(msg.getString("Word"));
 				}
@@ -254,8 +284,36 @@ public class Backend {
 			case 26:
 				obj = new JSONObject();
 				result = new JSONArray();
-				tag = new Tagcloud(gp.getTop(param, values, id,
-						(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id, msg.has("User") ? msg.getLong("User") : 0);
+				if (msg.has("Type")) {
+					System.out.println("type " + msg.getString("Type"));
+					switch (msg.getString("Type")) {
+					case "Positive":
+						System.out.println("POSITIVE");
+						tag = new Tagcloud(
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+
+					case "Negative":
+						System.out.println("NEGATIVE");
+						tag = new Tagcloud(
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+					default:
+						tag = new Tagcloud(
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								id, msg.has("User") ? msg.getLong("User") : 0);
+						break;
+					}
+				} else {
+					tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",50,-1), id,
+							msg.has("User") ? msg.getLong("User") : 0);
+				}
 				obj.put("Op", "words");
 				obj.put("Words", tag.calculateWeights());
 				result.put(obj);

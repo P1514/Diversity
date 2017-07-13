@@ -180,7 +180,7 @@ ws.onmessage = function(event) {
       'PSS' : localStorage.pss != "" ? localStorage.pss : undefined,
       'Start_date' : localStorage.start_date != "" ? localStorage.start_date : undefined,
       'End_date' : localStorage.end_date != "" ? localStorage.end_date : undefined,
-    		  "Key" : getCookie("JSESSIONID")
+    	"Key" : getCookie("JSESSIONID")
     }
     timespan
     ws.send(JSON.stringify(jsonData));
