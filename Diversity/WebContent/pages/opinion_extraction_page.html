@@ -151,16 +151,20 @@ $(document).ready(function(){
 							<option>User 5</option>
 						</select>
 					</div>
-					<div id="cloud" style="width:700px;margin:0px;">
+					<div class="row">
+						<div class="col-md-3" style="text-align: left;">
+							<label style="margin-bottom: 5px;"><input type="radio" style="margin-left:0; height:15px; padding-bottom:0px;" name="tagRadio" value="1" id="tagAll" onclick="requestTagcloud('All');" checked/> &nbsp Show full tagcloud</label><br>
+							<label><input type="radio" style="margin-left:0" name="tagRadio" value="2" id="tagPositive" onclick="requestTagcloud('Positive');"/> &nbsp Show positive only tagcloud</label><br>
+							<label><input type="radio" style="margin-left:0" name="tagRadio" value="3" id="tagNegative" onclick="requestTagcloud('Negative');"/> &nbsp Show negative only tagcloud</label>
+						</div>
+					<div id="cloud" class="col-md-6" style="width:700px;margin:0px;">
 					</div>
-					<hr>
-					Click a word to see the posts in which it appears. Right click a word for more options.
-				</center>
-					<label><input type="radio" style="margin-left:0" name="tagRadio" value="1" id="tagAll" onclick="requestTagcloud('All');" checked/> &nbsp Show full tagcloud</label><br>
-					<label><input type="radio" style="margin-left:0" name="tagRadio" value="2" id="tagPositive" onclick="requestTagcloud('Positive');"/> &nbsp Show positive only tagcloud</label><br>
-					<label><input type="radio" style="margin-left:0" name="tagRadio" value="3" id="tagNegative" onclick="requestTagcloud('Negative');"/> &nbsp Show negative only tagcloud</label>
 
+				</center>
+				<hr>
+				Click a word to see the posts in which it appears. Right click a word for more options.
 			</div>
+
 	<!-- Tabela Posts-->
 	<div class="container" style = "width: 90%;padding-right:0;padding-top:0;" id="dashboard">
 		<div class="container" id="table_container">
