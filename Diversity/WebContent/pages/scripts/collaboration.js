@@ -53,15 +53,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
 		if (json[0].Op == "Rights") {
-			json = {
+			json2 = {
 	      "Op" : "collaboration",
 	      'Key' : getCookie("JSESSIONID"),
 				'Products' : getParam('products'),
 				'Services' : getParam('services'),
-				'Company' : getParam('products') == undefined || getParam('services') == undefined ? getParam('company') : undefined
+				'Company' : getParam('company')
 	    }
 
-	    ws.send(JSON.stringify(json));
+	    ws.send(JSON.stringify(json2));
 		}
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
@@ -74,11 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
-      if (json[0].hasOwnProperty("Message")) {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
-      }
+        $('#error').html(json[1] + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
+
     }
   }
 });
