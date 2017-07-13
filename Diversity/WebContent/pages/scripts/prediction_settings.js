@@ -365,7 +365,7 @@ function drawChart() {
         variance = chartData[1][i].Variance;
       }
 
-      if (month != "" && (value != -1 || variance != -1)) {
+      if (month != "" && (value != -1 && variance != -1)) {
         sum += value;
         count += 1;
 
