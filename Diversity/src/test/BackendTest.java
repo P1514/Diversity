@@ -469,11 +469,28 @@ public class BackendTest extends Thread {
 		obj.put("Op", "collaboration");
 		obj.put("Products", "71,74");
 		obj.put("Services", "69,66");
+		obj.put("Company", "Desma");
 		obj.put("Key", "10");
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
+		
+	}
+	
+	@Test
+	public void resolveCollaborationJustCompany() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "collaboration");
+		obj.put("Company", "DESMA");
+		obj.put("Key", "10");
+		System.out.println(obj.toString());
+		tester = new Backend(33, obj);
+		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
+
+		
 	}
 	
 

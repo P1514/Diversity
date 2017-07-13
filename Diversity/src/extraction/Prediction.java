@@ -1,21 +1,30 @@
 package extraction;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import org.json.JSONArray;
 
 import extraction.Extrapolation;
 import general.Data;
+import general.DesignProject;
+import general.Logging;
 import general.Model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Prediction extends Globalsentiment {
 
 	double totalSentiment, totalWeight, totalGsweight, variance, numbOfProd, maxValue, mean, tempvalue, stDeviation;
 	int month, i;
+	public static final Logger LOGGER = new Logging().create(Data.class.getName());
+
 
 	public Prediction() {
 
@@ -139,30 +148,29 @@ public class Prediction extends Globalsentiment {
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
 
-//		pssweights.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
-//
-//		});
+		// pssweights.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
+		//
+		// });
 
-//		pssweightss.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
-//
-//		});
+		// pssweightss.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
+		//
+		// });
 
+		pssweightss.forEach((k2, v2) -> {
+			if (pssweights.containsKey(k2))
+				pssweights.put(k2, pssweights.get(k2) + v2);
+			else
+				pssweights.put(k2, v2);
 
-			pssweightss.forEach((k2, v2) -> {
-				if (pssweights.containsKey(k2))
-					pssweights.put(k2,pssweights.get(k2) + v2);
-				else
-					pssweights.put(k2, v2);
+		});
 
-			});
-
-
-//		pssweights.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF SERVICES & PRODUCTS(" + k + ") -->" + v);
-//
-//		});
+		// pssweights.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF SERVICES & PRODUCTS(" + k + ") -->"
+		// + v);
+		//
+		// });
 
 		if (pssweights.isEmpty() && pssweightss.isEmpty()) {
 
@@ -189,12 +197,64 @@ public class Prediction extends Globalsentiment {
 			pssSentiment.put(k, mean);
 		});
 
-//		pssSentiment.forEach((k, v) -> {
-//			System.out.println("PSS:(" + k + ") Sentiment-->" + v);
-//
-//		});
+		// pssSentiment.forEach((k, v) -> {
+		// System.out.println("PSS:(" + k + ") Sentiment-->" + v);
+		//
+		// });
+
+		return pssSentiment;
+	}
+
+	public HashMap<Long, Double> predict(String company) throws JSONException {
+
+		HashMap<Long, Double> pssSentiment = new HashMap<Long, Double>();
+		ArrayList<Long> pss = new ArrayList<Long>();
+		ArrayList<Long> dp;
+
+		try {
+			dp = Data.getcompanybyname(company).get_design_projects();
 
 
+		} catch (Exception e1) {
+			LOGGER.log(Level.SEVERE, "Company does not exist",e1);
+			return null;
+		}
+		
+		try {
+			for (Long dpid : dp) {
+				pss.add(Data.getDp(dpid).getProducesPssId());
+			}
+
+		} catch (Exception e2) {
+			LOGGER.log(Level.SEVERE, "Company does not have design projects",e2);
+			return null;
+		}
+
+		Calendar data = Calendar.getInstance();
+		data.add(Calendar.MONTH, 1);
+		data.add(Calendar.YEAR, -1);
+
+		totalWeight = 0;
+		totalGsweight = 0;
+
+		for (Long pssid : pss) {
+
+			for (month = data.get(Calendar.MONTH); month < 12 + data.get(Calendar.MONTH); month++) {
+				Data.addmodel((long) -1,
+						new Model(-1, 0, 0, "", "", pssid, "0,150", "All", "-1", false, 0, 0, -1, true));
+				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12,
+						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+				totalGsweight += (tempvalue == -1 ? 0 : tempvalue);
+				Data.delmodel((long) -1);
+				totalWeight += (tempvalue == -1 ? 0 : 1);
+			}
+			mean = (totalGsweight) / ((totalWeight == 0 ? 1 : totalWeight));
+			pssSentiment.put(pssid, mean);
+		}
+		 pssSentiment.forEach((k, v) -> {
+		 System.out.println("PSS:(" + k + ") Sentiment-->" + v);
+		
+		 });
 		return pssSentiment;
 	}
 }
