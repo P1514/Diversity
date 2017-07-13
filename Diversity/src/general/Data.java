@@ -2,21 +2,11 @@ package general;
 
 import java.sql.*;
 import security.SessionClean;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The Class Data.
@@ -247,7 +237,7 @@ public class Data {
 	public static Company getcompanybyname(String name) {
 
 		for (Company c : companydb.values()) {
-			if (c.getName().equals(name))
+			if (c.getName().toLowerCase().equals(name.toLowerCase()))
 				return c;
 		}
 		return null;

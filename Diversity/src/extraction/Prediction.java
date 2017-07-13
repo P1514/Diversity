@@ -216,7 +216,7 @@ public class Prediction extends Globalsentiment {
 
 
 		} catch (Exception e1) {
-			LOGGER.log(Level.SEVERE, "Company does not exist",e1);
+			//LOGGER.log(Level.SEVERE, "Company does not exist",e1);
 			return null;
 		}
 		
@@ -226,7 +226,7 @@ public class Prediction extends Globalsentiment {
 			}
 
 		} catch (Exception e2) {
-			LOGGER.log(Level.SEVERE, "Company does not have design projects",e2);
+			//LOGGER.log(Level.SEVERE, "Company does not have design projects",e2);
 			return null;
 		}
 
@@ -251,10 +251,7 @@ public class Prediction extends Globalsentiment {
 			mean = (totalGsweight) / ((totalWeight == 0 ? 1 : totalWeight));
 			pssSentiment.put(pssid, mean);
 		}
-		 pssSentiment.forEach((k, v) -> {
-		 System.out.println("PSS:(" + k + ") Sentiment-->" + v);
-		
-		 });
+
 		return pssSentiment;
 	}
 }
