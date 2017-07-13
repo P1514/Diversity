@@ -655,7 +655,7 @@ function send_config() {
     }
   var jsonData = {
     "Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
-    "URI" : configs != "" ? configs : erro = true,
+    "URI" : configs != "" ? configs : document.getElementById('mediawikibox').checked ? "mediawiki" : erro = true,
     "Update" : document.getElementById('frequency').value != "" ? document
         .getElementById('frequency').value
         : erro = true,
@@ -677,7 +677,7 @@ function send_config() {
 
   };
 
-  
+
   if (erro == true) {
       var code = 'All fields must be filled. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
 		  $('#alert').html(code);

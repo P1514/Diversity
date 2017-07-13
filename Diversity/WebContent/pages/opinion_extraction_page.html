@@ -156,6 +156,10 @@ $(document).ready(function(){
 					<hr>
 					Click a word to see the posts in which it appears. Right click a word for more options.
 				</center>
+					<label><input type="radio" style="margin-left:0" name="tagRadio" value="1" id="tagAll" onclick="requestTagcloud('All');" checked/> &nbsp Show full tagcloud</label><br>
+					<label><input type="radio" style="margin-left:0" name="tagRadio" value="2" id="tagPositive" onclick="requestTagcloud('Positive');"/> &nbsp Show positive only tagcloud</label><br>
+					<label><input type="radio" style="margin-left:0" name="tagRadio" value="3" id="tagNegative" onclick="requestTagcloud('Negative');"/> &nbsp Show negative only tagcloud</label>
+
 			</div>
 	<!-- Tabela Posts-->
 	<div class="container" style = "width: 90%;padding-right:0;padding-top:0;" id="dashboard">

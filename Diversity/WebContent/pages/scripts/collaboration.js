@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
       "Op" : "collaboration",
       'Key' : getCookie("JSESSIONID"),
 			'Products' : getParam('products'),
-			'Services' : getParam('services')
+			'Services' : getParam('services'),
+			'Company' : getParam('products') == undefined || getParam('services') == undefined ? getParam('company') : undefined
     }
 
     ws.send(JSON.stringify(json));
