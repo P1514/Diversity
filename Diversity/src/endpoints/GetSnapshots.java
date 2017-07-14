@@ -69,6 +69,7 @@ public class GetSnapshots {
 					obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="
 						+ obj.getString("Name"));
 				}
+
 				obj.remove("Id");
 			}
 
