@@ -780,7 +780,8 @@ public class Loader {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
-		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+		try (Statement stmt = cnlocal.createStatement(); 
+				ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
 				if (authordb2.containsKey(rs.getString("id")))

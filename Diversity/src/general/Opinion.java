@@ -112,8 +112,7 @@ public class Opinion {
 	 *            the authordb
 	 */
 	public void evalPolarity2(ConcurrentHashMap<String, Author> authordb) {
-		System.out.println(author_id2);
-		
+
 		authordb.forEach((k, v) -> {
 			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
 			

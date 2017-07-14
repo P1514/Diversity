@@ -141,7 +141,7 @@ public class Post {
 	public String getUID(/*boolean a*/) {
 //		if (a)
 //			return userid2;
-		return userid2 + "," + source;
+		return userid2;
 	}
 
 	/**

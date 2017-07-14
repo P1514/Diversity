@@ -146,7 +146,7 @@ public final class Author {
 	 * @return the uid
 	 */
 	public String getID() {
-		return id2+source;
+		return id2;
 	}
 
 	/**
