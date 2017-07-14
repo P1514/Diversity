@@ -7,7 +7,7 @@ package general;
  */
 public final class Author {
 
-	private long id; // Keys
+	// private long id; // Keys
 	private String id2; // Keys String
 	private String source;
 	private String name; //
@@ -16,21 +16,26 @@ public final class Author {
 	private String gender;
 	private String location;
 	private long comments;
-	private long posts;
+	private long posts = 0;
 	private long likes;
 	private long views;
 
 	/**
 	 * Instantiates a new author.
 	 *
-	 * @param _id the id
-	 * @param _name the name
-	 * @param _age the age
-	 * @param _gender the gender
-	 * @param _location the location
+	 * @param _id
+	 *            the id
+	 * @param _name
+	 *            the name
+	 * @param _age
+	 *            the age
+	 * @param _gender
+	 *            the gender
+	 * @param _location
+	 *            the location
 	 */
-	public Author(long _id, String _name, long _age, String _gender, String _location) {
-		this.id = _id;
+	public Author(String _id, String _name, long _age, String _gender, String _location) {
+		this.id2 = _id;
 		this.age = _age;
 		this.name = _name;
 		this.gender = _gender;
@@ -39,18 +44,25 @@ public final class Author {
 		this.comments = 0;
 		this.likes = 0;
 		this.views = 0;
+		this.source = "";
 
 	}
 
 	/**
 	 * Instantiates a new author.
 	 *
-	 * @param _id the id
-	 * @param _source the source
-	 * @param _name the name
-	 * @param _age the age
-	 * @param _gender the gender
-	 * @param _location the location
+	 * @param _id
+	 *            the id
+	 * @param _source
+	 *            the source
+	 * @param _name
+	 *            the name
+	 * @param _age
+	 *            the age
+	 * @param _gender
+	 *            the gender
+	 * @param _location
+	 *            the location
 	 */
 	public Author(String _id, String _source, String _name, long _age, String _gender, String _location) {
 		this.id2 = _id;
@@ -124,17 +136,17 @@ public final class Author {
 	 *
 	 * @return the id
 	 */
-	public long getID() {
-		return id;
-	}
+	// public long getID() {
+	// return id;
+	// }
 
 	/**
 	 * Gets the uid.
 	 *
 	 * @return the uid
 	 */
-	public String getUID() {
-		return id2;
+	public String getID() {
+		return id2+source;
 	}
 
 	/**
@@ -149,7 +161,8 @@ public final class Author {
 	/**
 	 * Adds the ammount of comments.
 	 *
-	 * @param number the number
+	 * @param number
+	 *            the number
 	 */
 	public void addComments(long number) {
 		this.comments += number;
@@ -158,7 +171,8 @@ public final class Author {
 	/**
 	 * Adds the ammount of views.
 	 *
-	 * @param number the number
+	 * @param number
+	 *            the number
 	 */
 	public void addViews(long number) {
 		this.views += number;
@@ -167,7 +181,8 @@ public final class Author {
 	/**
 	 * Adds the likes.
 	 *
-	 * @param number the number
+	 * @param number
+	 *            the number
 	 */
 	public void addLikes(long number) {
 		this.likes += number;
@@ -183,7 +198,8 @@ public final class Author {
 	/**
 	 * Sets the comments.
 	 *
-	 * @param number the new comments
+	 * @param number
+	 *            the new comments
 	 */
 	public void setComments(long number) {
 		this.comments = number;
@@ -192,7 +208,8 @@ public final class Author {
 	/**
 	 * Sets the views.
 	 *
-	 * @param number the new views
+	 * @param number
+	 *            the new views
 	 */
 	public void setViews(long number) {
 		this.views = number;
@@ -201,7 +218,8 @@ public final class Author {
 	/**
 	 * Sets the likes.
 	 *
-	 * @param number the new likes
+	 * @param number
+	 *            the new likes
 	 */
 	public void setLikes(long number) {
 		this.likes = number;
@@ -210,7 +228,8 @@ public final class Author {
 	/**
 	 * Sets the posts.
 	 *
-	 * @param number the new posts
+	 * @param number
+	 *            the new posts
 	 */
 	public void setPosts(long number) {
 		this.posts = number;
@@ -246,16 +265,21 @@ public final class Author {
 	/**
 	 * Calculates influence.
 	 *
-	 * @param avgcom the avgcom
-	 * @param avglike the avglike
-	 * @param avgview the avgview
+	 * @param avgcom
+	 *            the avgcom
+	 * @param avglike
+	 *            the avglike
+	 * @param avgview
+	 *            the avgview
 	 */
 	public void calcInfluence(double avgcom, double avglike, double avgview) {
+		// System.out.println(avgcom + " / " + avglike + " / " +
+		// avgview+"/"+this.posts);
 		this.influence = Settings.aWcomments
- 				* ((this.comments / this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
+				* ((this.comments / this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
 				+ Settings.aWlikes * ((this.likes / this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
 				+ Settings.aWviews * ((this.views / this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
-		// System.out.println(avgcom + " / " + avglike + " / " + avgview);
+		System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 
 }

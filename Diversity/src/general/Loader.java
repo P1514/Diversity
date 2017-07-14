@@ -38,10 +38,11 @@ public class Loader {
 	static long totallikes;
 	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
-	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
+	// protected ConcurrentHashMap<Long, Author> authordb = new
+	// ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
-	public static List<Long> users;
+	public static List<String> users;
 	public static List<Author> users2;
 	public static boolean first_load = true;
 
@@ -68,7 +69,7 @@ public class Loader {
 
 	private String loadp1(JSONArray json) throws JSONException {
 		Server.isloading = true;
-		users = new ArrayList<Long>();
+		users = new ArrayList<String>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
 		totalviews = 0;
@@ -127,7 +128,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(30 * 1000/* waiting_time*10 */);
+					Thread.sleep(1/* 30 * 1000waiting_time*10 */);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -249,9 +250,9 @@ public class Loader {
 		for (Author user : users2) {
 			if (user == null)
 				continue;
-			System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
-			System.out.println(" RESULT STRING " + querycond);
-			querycond += user.getUID() + ",";
+			//System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
+			//System.out.println(" RESULT STRING " + querycond);
+			querycond += user.getID() + ",";
 		}
 		// System.out.println(querycond);
 
@@ -656,14 +657,15 @@ public class Loader {
 		String err;
 
 		String querycond = "(";
-
 		for (Author a : users2) {
-			querycond += a.getUID() + ",";// um autor está a null
+			a.getID();
+			querycond += a.getID() + ",";
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
+		
 		else {
-			for (Long a : users) {
+			for (String a : users) {
 				querycond += a + ",";
 			}
 			querycond = querycond.substring(0, querycond.length() - 1);
@@ -703,7 +705,10 @@ public class Loader {
 				 * auth.setPosts(obj.getLong(Settings.JSON_replies) - 1);
 				 * auth.setViews(obj.getLong(Settings.JSON_views));
 				 */
-				authordb2.put(auth.getUID() + "," + auth.getSource(), auth);
+				if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
+					authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+
+				authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
 
 			}
 
@@ -778,16 +783,16 @@ public class Loader {
 		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getLong("id")))
+				if (authordb2.containsKey(rs.getString("id")))
 					continue;
-				Author auth = new Author(rs.getLong(Settings.latable_id), rs.getString(Settings.latable_name),
+				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_name),
 						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
 						rs.getString(Settings.latable_location));
 				auth.setComments(rs.getLong(Settings.latable_comments));
 				auth.setLikes(rs.getLong(Settings.latable_likes));
 				auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
 				auth.setViews(rs.getLong(Settings.latable_views));
-				authordb.put(rs.getLong(Settings.latable_id), auth);
+				authordb2.put(rs.getString(Settings.latable_id) + "," + rs.getString(Settings.latable_source), auth);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
@@ -807,22 +812,22 @@ public class Loader {
 	private void update(String type) {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
-				List<Long> uniqueauthors = new ArrayList<>();
+				List<String> uniqueauthors = new ArrayList<>();
 				HashMap<Long, Post> temppost = v.getPosts();
 				temppost.forEach((k2, v2) -> {
 					if (!uniqueauthors.contains(v2.getUID()))
 						uniqueauthors.add(v2.getUID());
 				});
 				uniqueauthors.forEach((v3) -> {
-					if (!authordb.containsKey(v3)) {
+					if (!authordb2.containsKey(v3)) {
 						LOGGER.log(Level.SEVERE, "NULL POINTER UNIQUE AUTHORS" + v3);
 					} else {
-						Author tempauthor = authordb.get(v3);
+						Author tempauthor = authordb2.get(v3);
 						tempauthor.addComments(v.newcomments());
 						tempauthor.addLikes(v.newlikes());
 						tempauthor.addViews(v.newviews());
 						tempauthor.addPosts();
-						authordb.put(tempauthor.getID(), tempauthor);
+						authordb2.put(String.valueOf(tempauthor.getID()), tempauthor);
 					}
 				});
 
@@ -845,10 +850,10 @@ public class Loader {
 			try (Statement stmt = cndata.createStatement()) {
 				try (ResultSet rs = stmt.executeQuery(query)) {
 					while (rs.next()) {
-						if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
+						if (authordb2.containsKey(rs.getLong(Settings.rutable_userid))) {
 						} else {
-							authordb.put(rs.getLong(Settings.rutable_userid),
-									new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
+							authordb2.put(rs.getString(Settings.rutable_userid),
+									new Author(rs.getString(Settings.rutable_userid), rs.getString(Settings.rutable_name),
 											rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
 											rs.getString(Settings.rutable_loc)));
 						}
@@ -863,17 +868,14 @@ public class Loader {
 	}
 
 	private void evaluatedata() {
-		authordb.forEach((k, v) -> {
+		authordb2.forEach((k, v) -> {
 			v.calcInfluence((totalcomments / ((double) totalposts)), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
 		});
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			if (Settings.JSON_use)
-				v.evalPolarity2(authordb2);
-			else
-				v.evalPolarity(authordb);
+			v.evalPolarity2(authordb2);
 
 		});
 		LOGGER.log(Level.INFO, " calc eval and reach " + (System.nanoTime() - stime));
@@ -888,13 +890,13 @@ public class Loader {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect);
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
-		for (Author author : authordb.values()) {
+		for (Author author : authordb2.values()) {
 			String insert = "INSERT INTO " + Settings.latable + " "
 					+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setLong(1, author.getID());
+				query1.setString(1, author.getID());
 				query1.setLong(2, author.getAge());
 				query1.setString(3, author.getName());
 				query1.setString(4, author.getGender());

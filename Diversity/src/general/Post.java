@@ -6,8 +6,8 @@ package general;
  */
 public class Post {
 	private long id;
-	private long userid;
-	private String userid2 = null;
+	//private long userid;
+	private String userid2;
 	private long time = 0;
 	private String message;
 	private long likes = 0;
@@ -31,45 +31,47 @@ public class Post {
 	 * @param _message
 	 *            the message
 	 */
-	public Post(long id, long userid, long time, long likes, long views, String message, double polarity){
+	public Post(long id, String userid, long time, long likes, long views, String message, double polarity){
 		this.polarity=polarity;
 		this.id = id;
-		this.userid = userid;
+		this.userid2 = userid;
 		this.time = time;
 		this.views = views;
 		this.likes = likes;
 		this.message = message;
+		this.source = "";
+
 		
 	}
-	public Post(long id, long userid, long time, long likes, long views, String message) {
-		this.id = id;
-		this.userid = userid;
-		this.time = time;
-		this.views = views;
-		this.likes = likes;
-		this.message = message;
-
-		// To replace with API
-		if (Settings.LocalPolarity) {
-			String[] words = message.split("[^\\w'-]+");
-
-			Adjectives adjs = new Adjectives();
-			double sentiment = 50;
-			for (int i = 0; i < words.length; i++) {
-
-				String currentWord = words[i];
-
-				if (adjs.matches(currentWord)) {
-					sentiment = adjs.getSentiment(currentWord);
-				}
-			}
-			// End of To Replace
-
-			this.polarity = sentiment;
-		}else{
-			this.polarity= -1;
-		}
-	}
+//	public Post(long id, long userid, long time, long likes, long views, String message) {
+//		this.id = id;
+//		this.userid = userid;
+//		this.time = time;
+//		this.views = views;
+//		this.likes = likes;
+//		this.message = message;
+//
+//		// To replace with API
+//		if (Settings.LocalPolarity) {
+//			String[] words = message.split("[^\\w'-]+");
+//
+//			Adjectives adjs = new Adjectives();
+//			double sentiment = 50;
+//			for (int i = 0; i < words.length; i++) {
+//
+//				String currentWord = words[i];
+//
+//				if (adjs.matches(currentWord)) {
+//					sentiment = adjs.getSentiment(currentWord);
+//				}
+//			}
+//			// End of To Replace
+//
+//			this.polarity = sentiment;
+//		}else{
+//			this.polarity= -1;
+//		}
+//	}
 
 	/**
 	 * Instantiates a new post.
@@ -120,14 +122,14 @@ public class Post {
 		}
 	}
 
-	/**
-	 * Gets the uid.
-	 *
-	 * @return the uid
-	 */
-	public long getUID() {
-		return userid;
-	}
+//	/**
+//	 * Gets the uid.
+//	 *
+//	 * @return the uid
+//	 */
+//	public long getUID() {
+//		return userid;
+//	}
 
 	/**
 	 * Gets the uid.
@@ -136,9 +138,9 @@ public class Post {
 	 *            the a
 	 * @return the uid
 	 */
-	public String getUID(boolean a) {
-		if (a)
-			return userid2;
+	public String getUID(/*boolean a*/) {
+//		if (a)
+//			return userid2;
 		return userid2 + "," + source;
 	}
 

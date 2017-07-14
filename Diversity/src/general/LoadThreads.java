@@ -53,7 +53,7 @@ public class LoadThreads {
 				query1.setDouble(3, opinion.getPolarity());
 				query1.setDouble(4, opinion.getTotalInf());
 				if (!Settings.JSON_use)
-					query1.setLong(5, opinion.getUID());
+					query1.setString(5, opinion.getUID(false));
 				else
 					query1.setString(5, opinion.getUID(true));
 
@@ -95,10 +95,10 @@ public class LoadThreads {
 						query2.setLong(5, post.getViews());
 						query2.setLong(6, opinion.getID());
 						if (!Settings.JSON_use)
-							query2.setLong(7, post.getUID());
+							query2.setString(7, post.getUID());
 						else
-							query2.setString(7, post.getUID(true));
-						
+							query2.setString(7, post.getUID());
+
 						while (true) {
 							try {
 								query2.executeUpdate();
@@ -173,7 +173,7 @@ public class LoadThreads {
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setLong(1, a.getID());
+				query1.setString(1, a.getID());
 				query1.setLong(2, a.getAge());
 				query1.setString(3, a.getName());
 				query1.setString(4, a.getGender());
@@ -242,7 +242,7 @@ public class LoadThreads {
 			// System.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 			// System.out.println(id);
-			long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
+			String user_id = remote ? rs.getString(Settings.rptable_userid) : rs.getString(Settings.lptable_authorid);
 			long time = 0;
 			double polarity = -1;
 			if (remote) {
@@ -266,8 +266,8 @@ public class LoadThreads {
 			if (product == 0) {
 				return;
 			}
-			Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
-					: new Post(postid, user_id, 0, likes, views, message, polarity);
+			Post _post = remote ? new Post(postid, "", user_id, time, likes, views, message)
+					: new Post(postid, user_id, (long) 0, likes, views, message, polarity);
 			if (!(Loader.users.contains(user_id))) {
 				Loader.users.add(user_id);
 			}
@@ -539,7 +539,7 @@ public class LoadThreads {
 						do {
 							// System.out.println("HELLO2");
 							long postid = rs.getLong(Settings.rptable_postid);
-							long user_id = rs.getLong(Settings.rptable_userid);
+							String user_id = rs.getString(Settings.rptable_userid);
 							long time = 0;
 
 							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -554,7 +554,7 @@ public class LoadThreads {
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
-							Post _post = new Post(postid, user_id, time, likes, views, message);
+							Post _post = new Post(postid, "",user_id, time, likes, views, message);
 							if (!(Loader.users.contains(user_id))) {
 								Loader.users.add(user_id);
 							}
@@ -574,7 +574,7 @@ public class LoadThreads {
 						do {
 							// System.out.println("HELLO3");
 							long postid = rs.getLong(Settings.lptable_id);
-							long user_id = rs.getLong(Settings.lptable_authorid);
+							String user_id = rs.getString(Settings.lptable_authorid);
 							long likes = rs.getLong(Settings.lptable_likes);
 							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
