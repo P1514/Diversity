@@ -35,13 +35,15 @@
 		</span>
 	</div>
   <h1 id="page_title">Create Prediction</h1>
-	<input id="load" class="btn btn-default" onclick="load()" style="margin-top:20px;margin-right:60px;position:absolute;right:60px;margin-bottom:20px;" type="submit" value="Load snapshot" />
-	<input id="back" class="btn btn-default" onclick="window.location.href = 'index.html'" style="margin-top:20px;position:absolute;right:250px;margin-bottom:20px;" type="submit" value="Back" />
+	<div id="snap_label"></div>
 
 	<center>
+		<input id="load" class="btn btn-default" onclick="load()" style="margin-top:20px;margin-right:60px;right:60px;margin-bottom:20px;" type="submit" value="Load snapshot" />
+		<input id="back" class="btn btn-default" onclick="window.location.href = 'index.html'" style="margin-top:20px;right:250px;margin-bottom:20px;" type="submit" value="Back" />
+
     <div class="container" id="lists">
       <br>
-      <p>Select the products and services that you wish to include in the prediction model: </p>
+      <p id="tip">Select the products and services that you wish to include in the prediction model: </p>
       <br>
       <div class="row">
 				<center>
