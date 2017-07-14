@@ -62,8 +62,13 @@ public class GetSnapshots {
 			JSONArray snapshots = response.getJSONArray(1);
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
-				obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="
-						+ obj.getInt("Id"));
+				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
+					obj.put("URL", "http://localhost:8080/Diversity/pages/prediction_settings.html?snapshot="
+							+ obj.getString("Name"));
+				} else {
+					obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="
+						+ obj.getString("Name"));
+				}
 				obj.remove("Id");
 			}
 
