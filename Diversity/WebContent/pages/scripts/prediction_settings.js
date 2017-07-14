@@ -11,7 +11,7 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
-var snap_author;
+var snap_user;
 var snap_date;
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
@@ -19,6 +19,8 @@ function getCookie(name) { //not being used
 	  if (parts.length == 2)
 	    return parts.pop().split(";").shift();
 	}
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawChart);
 document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
@@ -32,15 +34,29 @@ document.addEventListener('DOMContentLoaded', function() {
 				+ window.location.port + '/Diversity/server');
 	}
 
+
   //Request products and services tree
   ws.onopen = function () {
-    json = {
-      "Op" : "gettree",
-      "All" : 1,
-      'Key' : getCookie("JSESSIONID")
-    }
+		if (window.location.href.indexOf('snapshot=') != -1) {
+			var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+			snap_name = snapName;
+			//snap = true;
+			json = {
+				'Op' : 'getrestrictions',
+				'Role' : 'DEVELOPER',
+				'Key' : getCookie('JSESSIONID'),
+			}
+			ws.send(JSON.stringify(json));
+		} else {
+			json = {
+	      "Op" : "gettree",
+	      "All" : 1,
+	      'Key' : getCookie("JSESSIONID")
+	    }
 
-    ws.send(JSON.stringify(json));
+	    ws.send(JSON.stringify(json));
+		}
+
   }
 
   ws.onmessage = function(event) {
@@ -65,12 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				request_tutorial();
 			}
 
-			if (window.location.href.indexOf('snapshot=') != -1) {
-				var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
-				requestSnapshot(snapName);
-			}
+
     }
 
+		if (json[0].Op == "Rights") {
+			requestSnapshot(snap_name);
+		}
     //If the message Op is 'Prediction', draw the predicted global sentiment chart
     if (json[0].Op == "Prediction") {
       draw = true;
@@ -88,10 +104,27 @@ document.addEventListener('DOMContentLoaded', function() {
 						snap_pss = chartData[i].PSS;
 					}
 				}
+				$('#page_title').html('Snapshot: ' + snap_name);
+				$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
+				$('#tip').hide();
+				$('#prod_list').hide();
+				$('#serv_list').hide();
+				$('#lists').hide();
+				$('#submit').hide();
 			}
       drawChart();
     }
+		//If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
+		if (json[0] == "Snapshots") {
+				snapshots = json[1];
+				displaySnapshots();
+		}
+		if (snap) {
 
+		} else {
+			$('#snap_label').empty();
+
+		}
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
       if (json[0].hasOwnProperty("Message")) {
@@ -346,6 +379,7 @@ function requestSnapshot(val) {
   }
   snap = true;
   snap_name = val;
+
   ws.send(JSON.stringify(json));
 }
 
@@ -443,6 +477,3 @@ function drawChart() {
     return;
   }
 }
-
-google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawChart);
