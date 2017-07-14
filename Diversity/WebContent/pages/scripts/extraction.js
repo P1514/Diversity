@@ -25,7 +25,10 @@ var user = 1;
 var finalProductColors = [];
 var loaded = false;
 var mediawiki = false;
-
+var snap_name;
+var snap_user;
+var snap_date;
+var snap_pss;
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
 $(window).on('load', function() {
@@ -295,15 +298,30 @@ function connect() {
 				}
 			} else {
 				// console.log("redone");
+				drawChart();
 				if (snap) {
-					document.getElementById("Cookie").innerHTML = "Snapshot: "
-							+ name;
+					if (jsonData[jsonData.length - 1].hasOwnProperty('Date')) {
+						var d = jsonData[jsonData.length - 1].Date.split(" ");
+						var dateString = d[1] + " " + d[2] + ", " + d[5];
+						snap_date = dateString;
+					}
+
+					if (jsonData[jsonData.length - 1].hasOwnProperty('User')) {
+						snap_user = jsonData[jsonData.length - 1].User;
+					}
+
+
+
+					if (jsonData[jsonData.length - 1].hasOwnProperty('PSS')) {
+						snap_pss = jsonData[jsonData.length - 1].PSS;
+					}
+
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + name + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
 				} else {
 					document.getElementById("Cookie").innerHTML = "Model: "
 							+ window.sessionStorage.model + "; PSS: "
 							+ window.sessionStorage.pss;
 				}
-				drawChart();
 			}
 
 			// Request posts to build the post table

@@ -246,8 +246,9 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT " + Settings.lsstable_result + " FROM " + Settings.lsstable + " where "
+		String insert = new String("SELECT " + Settings.lsstable_result + "," + Settings.lsstable_creation_user + "," + Settings.lsstable_creation_date + "," + Settings.lsstable_model_id + " FROM " + Settings.lsstable + " where "
 				+ Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
+		long model;
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))
@@ -256,7 +257,16 @@ public class Snapshot {
 				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
 				if(!rs.next()) return "";
-				return rs.getString("result");
+				JSONArray json = new JSONArray(rs.getString("result"));
+				JSONObject obj = new JSONObject();
+				obj.put("User", rs.getString("creation_user"));
+				obj.put("Date", new Date(rs.getLong("creation_date")));
+				model = rs.getLong("model_id");
+				if (Data.getmodel(model) != null) {
+					obj.put("PSS", Data.getmodel(model).getPSS());
+				}
+				json.put(obj);
+				return json.toString();
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
@@ -268,6 +278,8 @@ public class Snapshot {
 				LOGGER.log(Level.INFO, error, e);
 			}
 		}
+		
+		
 	}
 
 	// pss = -1 returns all snapshots from all PSS

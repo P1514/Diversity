@@ -11,6 +11,8 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
+var snap_author;
+var snap_date;
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -44,10 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
-    if (snap) {
-      $('#page_title').html('Snapshot: ' + snap_name);
-    }
-
     //If the message Op is 'Tree', build the products and services list as an interactive tree
     if (json[0].Op == "Tree") {
       jsonData = JSON.parse(JSON.stringify(json));
@@ -78,7 +76,19 @@ document.addEventListener('DOMContentLoaded', function() {
       draw = true;
       //console.log(json);
       chartData = JSON.parse(JSON.stringify(json));
-
+			if (snap) {
+				for (var i = 0; i < chartData.length; i++) {
+					if (chartData[i].hasOwnProperty('User')) {
+						snap_user = chartData[i].User;
+					} else if (chartData[2].hasOwnProperty('Date')) {
+						var d = chartData[2].Date.split(" ");
+						var dateString = d[1] + " " + d[2] + ", " + d[5];
+						snap_date = dateString;
+					} else if (chartData[i].hasOwnProperty('PSS')) {
+						snap_pss = chartData[i].PSS;
+					}
+				}
+			}
       drawChart();
     }
 
@@ -96,6 +106,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	      snapshots = json[1];
 	      displaySnapshots();
     }
+		if (snap) {
+			$('#page_title').html('Snapshot: ' + snap_name);
+			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
+		} else {
+			$('#snap_label').empty();
+		}
   }
 });
 
