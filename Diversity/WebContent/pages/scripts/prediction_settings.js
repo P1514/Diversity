@@ -134,7 +134,17 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-
+    //If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
+    if (json[0] == "Snapshots") {
+	      snapshots = json[1];
+	      displaySnapshots();
+    }
+		if (snap) {
+			$('#page_title').html('Snapshot: ' + snap_name);
+			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
+		} else {
+			$('#snap_label').empty();
+		}
   }
 });
 
