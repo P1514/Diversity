@@ -111,6 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#serv_list').hide();
 				$('#lists').hide();
 				$('#submit').hide();
+				$('#radio_label1').hide();
+				$('#radio_label2').hide();
 			}
       drawChart();
     }
