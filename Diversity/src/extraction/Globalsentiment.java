@@ -381,7 +381,7 @@ public class Globalsentiment extends GetReach {
 		 * values, id, frequency);
 		 */
 
-		String query = "SELECT sum(opinions.polarity*1)/count(polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
+		String query = "SELECT sum(opinions.polarity*1)/count(opinions.polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
 
 		/*
 		 * Calendar data1 = Calendar.getInstance();
