@@ -250,8 +250,9 @@ public class Loader {
 		for (Author user : users2) {
 			if (user == null)
 				continue;
-			//System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
-			//System.out.println(" RESULT STRING " + querycond);
+			// System.out.println("\n DEBUG IF HAPPENS USERID=" +
+			// user.getUID());
+			// System.out.println(" RESULT STRING " + querycond);
 			querycond += user.getID() + ",";
 		}
 		// System.out.println(querycond);
@@ -658,6 +659,7 @@ public class Loader {
 
 		String querycond = "(";
 		for (Author a : users2) {
+			if(a==null) continue;
 			a.getID();
 			querycond += a.getID() + ",";
 		}
@@ -683,12 +685,40 @@ public class Loader {
 				return err;
 		} else {
 			// Load users from JSON
-			for (int i = 1; i < json.length(); i++) {
+			Author auth;
+			for (int i = 0; i < json.length(); i++) {
+				
 				JSONObject obj = json.getJSONObject(i);
-				if (authordb2.containsKey(obj.getString(Settings.JSON_userid) + obj.getString(Settings.JSON_source)))
+				JSONArray obj1 = obj.getJSONArray(Settings.JSON_replies);
+				String user1 = obj.getString(Settings.JSON_userid);
+				String source1=obj.getString(Settings.JSON_source);
+				
+				for (int j = 0;j < obj1.length(); j++) {//TO LOAD REPLIES
+					obj=obj1.getJSONObject(j);
+					user1 = obj.getString(Settings.JSON_userid);
+					source1=obj.getString(Settings.JSON_source);
+					if (authordb2.containsKey(user1 +","+ source1))
+						continue;
+					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
+							+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""), 0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
+					
+					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
+						authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+					
+					authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+					
+				}
+				
+				obj = json.getJSONObject(i);
+				user1 = obj.getString(Settings.JSON_userid);
+				source1=obj.getString(Settings.JSON_source);
+				if (authordb2.containsKey(user1 +","+ source1))
 					continue;
+				
 
-				Author auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+				auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
 						(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
 								+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
 						/*
@@ -696,7 +726,7 @@ public class Loader {
 						 * obj.getLong(Settings.JSON_age) : 0)
 						 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 						(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
-
+				
 				/*
 				 * auth.setComments(obj.has(Settings.JSON_fname) ?
 				 * obj.getLong(Settings.JSON_comments) : 0);
@@ -709,6 +739,8 @@ public class Loader {
 					authordb2.put(auth.getID() + "," + auth.getSource(), auth);
 
 				authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+				
+				
 
 			}
 
@@ -780,11 +812,10 @@ public class Loader {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
-		try (Statement stmt = cnlocal.createStatement(); 
-				ResultSet rs = stmt.executeQuery(query)) {
+		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				if (authordb2.containsKey(rs.getString("id")))
+				if (authordb2.containsKey(rs.getString("id")+";"+rs.getString("source")))
 					continue;
 				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_name),
 						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
@@ -816,8 +847,8 @@ public class Loader {
 				List<String> uniqueauthors = new ArrayList<>();
 				HashMap<Long, Post> temppost = v.getPosts();
 				temppost.forEach((k2, v2) -> {
-					if (!uniqueauthors.contains(v2.getUID()))
-						uniqueauthors.add(v2.getUID());
+					if (!uniqueauthors.contains(v2.getUID() + "," + v2.getSource()))
+						uniqueauthors.add(v2.getUID() + "," + v2.getSource());
 				});
 				uniqueauthors.forEach((v3) -> {
 					if (!authordb2.containsKey(v3)) {
@@ -828,7 +859,7 @@ public class Loader {
 						tempauthor.addLikes(v.newlikes());
 						tempauthor.addViews(v.newviews());
 						tempauthor.addPosts();
-						authordb2.put(String.valueOf(tempauthor.getID()), tempauthor);
+						authordb2.put(String.valueOf(tempauthor.getID() + "," + tempauthor.getSource()), tempauthor);
 					}
 				});
 
@@ -853,10 +884,10 @@ public class Loader {
 					while (rs.next()) {
 						if (authordb2.containsKey(rs.getLong(Settings.rutable_userid))) {
 						} else {
-							authordb2.put(rs.getString(Settings.rutable_userid),
-									new Author(rs.getString(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-											rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-											rs.getString(Settings.rutable_loc)));
+							authordb2.put(rs.getString(Settings.rutable_userid) + ", ",
+									new Author(rs.getString(Settings.rutable_userid),
+											rs.getString(Settings.rutable_name), rs.getLong(Settings.rutable_age),
+											rs.getString(Settings.rutable_gender), rs.getString(Settings.rutable_loc)));
 						}
 					}
 				}
@@ -914,6 +945,7 @@ public class Loader {
 				query1.setLong(15, author.getViews());
 				query1.setLong(16, author.getPosts());
 				query1.executeUpdate();
+				System.out.println(query1.toString());
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				try {

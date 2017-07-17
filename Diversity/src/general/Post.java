@@ -31,7 +31,7 @@ public class Post {
 	 * @param _message
 	 *            the message
 	 */
-	public Post(long id, String userid, long time, long likes, long views, String message, double polarity){
+	public Post(long id, String userid, long time, long likes, long views, String message, double polarity, String _source){
 		this.polarity=polarity;
 		this.id = id;
 		this.userid2 = userid;
@@ -39,10 +39,9 @@ public class Post {
 		this.views = views;
 		this.likes = likes;
 		this.message = message;
-		this.source = "";
-
-		
+		this.source = _source;	
 	}
+	
 //	public Post(long id, long userid, long time, long likes, long views, String message) {
 //		this.id = id;
 //		this.userid = userid;

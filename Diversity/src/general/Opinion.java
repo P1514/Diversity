@@ -17,7 +17,7 @@ public class Opinion {
 	// private long author_id; // String
 	private String author_id2;
 	private HashMap<Long, Post> comments = new HashMap<>();
-	private String URI = "";
+	private String source = "";
 	private double reach = 0;
 	private double polarity = 0;
 	private double total_inf = 0;
@@ -35,15 +35,15 @@ public class Opinion {
 	 * @param _product
 	 *            the product id
 	 */
-	public Opinion(Post _main, long _pss, long _product) {
-		this.main = _main;
-		this.author_id2 = main.getUID();
-		timestamp = main.getTime();
-		pss = _pss;
-		product = _product;
-		this.id = this.main.getID();
-
-	}
+//	public Opinion(Post _main, long _pss, long _product) {
+//		this.main = _main;
+//		this.author_id2 = main.getUID();
+//		timestamp = main.getTime();
+//		pss = _pss;
+//		product = _product;
+//		this.id = this.main.getID();
+//
+//	}
 
 	/**
 	 * Instantiates a new opinion.
@@ -58,13 +58,13 @@ public class Opinion {
 	 *            the source and account list
 	 *            Example:"facebook,shoes;twitter,run;"
 	 */
-	public Opinion(Post _main, long _pss, long _product, String _URI) {
+	public Opinion(Post _main, long _pss, long _product, String _source) {
 		this.main = _main;
 		this.author_id2 = main.getUID();
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
-		URI = _URI;
+		source = _source;
 		this.id = this.main.getID();
 
 	}
@@ -115,20 +115,24 @@ public class Opinion {
 
 		authordb.forEach((k, v) -> {
 			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
-			
+
 		});
 		System.out.println(author_id2);
 
-		total_inf = authordb.get(author_id2).getInfluence();
+		total_inf = authordb.get(author_id2 + "," + source).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
-
 		comments.forEach((k, v) -> {
-			System.out.println("COMMENTS: " + v.getID() + " - " + v.getUID());
-
-			total_inf += authordb.get(v.getUID()).getInfluence();
+			System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
+			
+			if(v.getSource()!=null){
+			total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()+ "," + v.getSource()).getInfluence();
+			}
+			else{
+				total_inf += authordb.get(v.getUID()).getInfluence();
 			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
-
+			}
 		});
 
 		polarity = polarity / total_inf;

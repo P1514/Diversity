@@ -260,19 +260,21 @@ public class LoadThreads {
 			}
 			long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
 			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
-			;
+
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
+			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lptable_message);
+
 			long product = Data.identifyProduct(message);
 			if (product == 0) {
 				return;
 			}
-			Post _post = remote ? new Post(postid, "", user_id, time, likes, views, message)
-					: new Post(postid, user_id, (long) 0, likes, views, message, polarity);
+			Post _post = remote ? new Post(postid, source, user_id, time, likes, views, message)
+					: new Post(postid, user_id, (long) 0, likes, views, message, polarity, "");
 			if (!(Loader.users.contains(user_id))) {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, ""));
 
 		}
 
@@ -325,9 +327,10 @@ public class LoadThreads {
 					return;
 				}
 				boolean remote = true;
-				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable_postid + " = "
-						+ id);
-				try (Statement stmt = cndata.createStatement()) {
+				query = (Settings.sqlselectall + Settings.rptable+ Settings.sqlwhere
+						+ Settings.rptable + "." + Settings.rptable_postid + " = " + id);
+				System.out.println(query);
+ 				try (Statement stmt = cndata.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (!rs.next()) {
 							remote = false;
@@ -433,7 +436,7 @@ public class LoadThreads {
 						Loader.users2.add(author);
 					}
 					Loader.opiniondb.put(postid,
-							new Opinion(_post, Data.identifyPSSbyproduct(product), product, "google.pt"));// TODO
+							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 					// find
 					// url
 					// to
@@ -554,7 +557,7 @@ public class LoadThreads {
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
-							Post _post = new Post(postid, "",user_id, time, likes, views, message);
+							Post _post = new Post(postid, "", user_id, time, likes, views, message);
 							if (!(Loader.users.contains(user_id))) {
 								Loader.users.add(user_id);
 							}
@@ -565,11 +568,12 @@ public class LoadThreads {
 					stmt.close();
 					cndata.close();
 					cnlocal = Settings.connlocal();
-					query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_opinion
-							+ " = " + id);
+					query = (Settings.sqlselectall + Settings.lptable
+							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id " + Settings.sqlwhere
+							+ Settings.lptable_opinion + " = " + id);
+					System.out.println(query);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
-					// System.out.println(query);
 					if (rs.next()) {
 						do {
 							// System.out.println("HELLO3");
@@ -579,7 +583,8 @@ public class LoadThreads {
 							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
 							double polarity = rs.getDouble(Settings.lptable_polarity);
-							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity);
+							String source = rs.getString(Settings.latable_source);
+							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity, source);
 							if (!(Loader.users.contains(user_id)))
 								Loader.users.add(user_id);
 							_opin.addcomment(_post);
