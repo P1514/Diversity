@@ -1,4 +1,4 @@
-package general;
+package extraction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,7 +7,11 @@ import java.util.HashMap;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import extraction.Prediction;
+
+import general.Company;
+import general.Data;
+import general.DesignProject;
+import general.User;
 
 public class Collaboration {
 
