@@ -304,7 +304,7 @@ function submit() {
     "Op" : "prediction",
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined,
-		"Type" : document.getElementById('radio_lifecycle').checked ? "lifecycle" : undefined,
+		"type" : document.getElementById('radio_lifecycle').checked ? "lifecycle" : undefined,
     'Key' : getCookie("JSESSIONID")
   }
   snap = false;
