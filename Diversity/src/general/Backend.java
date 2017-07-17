@@ -384,8 +384,11 @@ public class Backend {
 				if (msg.has("Products") || msg.has("Services")) {
 					obj.put("Op", "Prediction");
 					result.put(obj);
-
+					if(!msg.has("type"))
 					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+							msg.has("Services") ? msg.getString("Services") : ""));
+					else
+					result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : ""));
 					// result = convert(result, pre.predict(1,
 					// msg.getString("Products"), msg.getString("Services")),

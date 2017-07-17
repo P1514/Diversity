@@ -310,6 +310,21 @@ public class BackendTest extends Thread {
 		System.out.println("Prediction Test Output: " + tester.resolve().toString());
 
 	}
+	
+	@Test
+	public void resolvePredictionLifeCycle() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "prediction");
+		obj.put("type", "lifeCycle");
+		obj.put("Products", "71;74");
+		obj.put("Services", "69;66");
+		obj.put("Key", "10");
+		tester = new Backend(23, obj);
+		System.out.println("Prediction Test Output: " + tester.resolve().toString());
+
+	}
 
 	@Test
 	public void resolveTopreachglobalsentiment5pss() throws JSONException {
