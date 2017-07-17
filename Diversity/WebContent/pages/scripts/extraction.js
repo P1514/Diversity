@@ -272,8 +272,8 @@ function connect() {
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
-				$('#Cookie').html = 'Snapshot: ' + snapName;
-				name = snapName;
+				$('#Cookie').html = 'Snapshot: ' + snap_name;
+				name = snap_name;
 			} else {
 				json = {
 					"Op" : "opinion_extraction",
