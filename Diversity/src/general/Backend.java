@@ -255,7 +255,6 @@ public class Backend {
 				result = new JSONArray();
 				Tagcloud tag;
 				if (msg.has("Type")) {
-					System.out.println("type " + msg.getString("Type"));
 					switch (msg.getString("Type")) {
 					case "Positive":
 						System.out.println("POSITIVE");
@@ -266,7 +265,6 @@ public class Backend {
 						break;
 
 					case "Negative":
-						System.out.println("NEGATIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
@@ -282,7 +280,7 @@ public class Backend {
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 

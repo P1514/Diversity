@@ -143,7 +143,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 		if (snap) {
 			$('#page_title').html('Snapshot: ' + snap_name);
-			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
+
+			var prods = json[1][json[1].length - 1].Products.split(',');
+			var prodsHTML = '';
+			for (var i = 0; i < prods.length; i++) {
+				prodsHTML += prods[i];
+				if (i != prods.length - 2) {
+					prodsHTML += ', ';
+				}
+			}
+
+			var servs = json[1][json[1].length - 1].Services.split(',');
+			var servsHTML = '';
+			for (var i = 0; i < servs.length; i++) {
+				servsHTML += servs[i];
+				if (i != servs.length - 2) {
+					servsHTML += ', ';
+				}
+			}
+			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p><br><p style="margin-left:50px"><b>Products:</b> ' + prodsHTML + '</p><br><p style="margin-left:50px"><b>Services:</b> ' + servsHTML  + '</p>');
 		} else {
 			$('#snap_label').empty();
 		}
