@@ -136,6 +136,30 @@ public class Prediction extends Globalsentiment {
 				e.printStackTrace();
 			}
 		}
+		String productsName = "";
+		String servicesName = "";
+		
+		String[] products = productsId.split(";");
+		
+		for (String s : products) {
+			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+		}
+		
+		String[] services = servicesId.split(";");
+		
+		for (String s : services) {
+			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		}
+		
+		try {
+			obj = new JSONObject();
+			obj.put("Products", productsName);
+			obj.put("Services", servicesName);
+			result.put(obj);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return result;
 	}
@@ -266,6 +290,31 @@ public class Prediction extends Globalsentiment {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+		String productsName = "";
+		String servicesName = "";
+		
+		String[] products = productsId.split(";");
+		
+		for (String s : products) {
+			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+		}
+		
+		String[] services = servicesId.split(";");
+		
+		for (String s : services) {
+			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		}
+		
+		try {
+			obj = new JSONObject();
+			obj.put("Products", productsName);
+			obj.put("Services", servicesName);
+			result.put(obj);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return result;

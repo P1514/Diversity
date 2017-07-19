@@ -1033,8 +1033,12 @@ function drawChart() {
 			},
 		};
 
-		bottom_left.draw(data, options);
-
+		if (!document.getElementById('radio_wiki').checked) {
+			document.getElementById('reachpie').style.display = 'block';
+				bottom_left.draw(data, options);
+		} else {
+			document.getElementById('reachpie').style.display = 'none';
+		}
 	}
 
 	// Bottom Middle
@@ -1167,7 +1171,12 @@ function drawChart() {
 		// google.visualization.events.addListener(bottom_middle, 'select',
 		// midSelectHandler);
 		mid_data = data;
-		bottom_middle.draw(data, mid_options);
+		if (!document.getElementById('radio_wiki').checked) {
+			document.getElementById('reachline').style.display = 'block';
+			bottom_middle.draw(data, mid_options);
+		} else {
+			document.getElementById('reachline').style.display = 'none';
+		}
 	}
 
 	function getCoordsMid() {
