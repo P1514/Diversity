@@ -29,8 +29,8 @@ public class Collaboration {
 		productsId = productsId.replace(",", ";");
 		servicesId = servicesId.replace(",", ";");
 
-		System.out.println(productsId);
-		System.out.println(servicesId);
+		//System.out.println(productsId);
+		//System.out.println(servicesId);
 
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		HashMap<Long, Double> dpSentiment = new HashMap<>();

@@ -101,12 +101,17 @@ public class Oversight extends TimerTask {
 			try {
 				PreparedStatement query = cnlocal.prepareStatement(getpss);
 				ResultSet rs;
+				System.out.println("QUERY: " + query.toString());
 				rs = query.executeQuery();
+
 				while (rs.next()) {
 					sourcelist.add(
 							rs.getString(Settings.lutable_source) + ";;;" + rs.getString(Settings.lutable_lastupdate));
 				}
 				for (String a : sourcelist) {
+
+					System.out.println("Source: " + a);
+
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();
 
@@ -115,7 +120,10 @@ public class Oversight extends TimerTask {
 					String source = a.split(";;;")[0];
 					String date = a.split(";;;")[1];
 					query.setString(2, "%" + source + ",%");
+
 					rs = query.executeQuery();
+
+					System.out.println("query: " + query.toString());
 
 					Calendar c = Calendar.getInstance();
 					while (rs.next()) {
@@ -141,19 +149,23 @@ public class Oversight extends TimerTask {
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
 								: new url();
-						local.accounts += "&accounts[]=\"" + d.account + "\"";
-						local.epochs += "&epochFrom[]=" + d.date + "&epochTo[]=" + now.getTimeInMillis();
+						local.accounts += "&accounts[]=" + d.account.replace(" ", "%");
+						local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
 						requesturl.put(d.pss.toString(), local);
+						// break;// TO TEST
 					}
+
 					requesturl.forEach((k, v) -> {
-						// String request = uri + a.split(";;;")[0] +
-						// "/getPosts/" + v.epochs.replaceFirst("&", "?") +
-						// v.accounts + "&pssId=\"" + k + "\"";
+						// String request = uri +
+						// a.split(";;;")[0] + "/intelligent-search/getFeedback"
+						// + v.epochs.replaceFirst("&", "?") + v.accounts +
+						// "&pssId=\"" + k + "\"";
+						String request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId="
+								+ k;
 						// request = Settings.JSON_uri;
-						// System.out.println(request+"/n");
+						System.out.println("REQUEST:" + request);
 						try {
-							String request = Settings.JSON_uri;
-							System.out.println("TESTE: " + readUrl(request));
+							// System.out.println("TESTE: " + readUrl(request));
 							(new Loader()).load(new JSONArray(readUrl(request)));
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
@@ -200,6 +212,7 @@ public class Oversight extends TimerTask {
 						}
 
 					});
+					// break;// TO TEST
 				}
 				// TODO missing uodate DB
 			} catch (SQLException e) {

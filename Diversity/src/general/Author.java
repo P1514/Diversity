@@ -214,6 +214,8 @@ public final class Author {
 	public void setViews(long number) {
 		this.views = number;
 	}
+	
+	
 
 	/**
 	 * Sets the likes.
@@ -279,7 +281,7 @@ public final class Author {
 				* ((this.comments / this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
 				+ Settings.aWlikes * ((this.likes / this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
 				+ Settings.aWviews * ((this.views / this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
-		System.out.println(avgcom + " / " + avglike + " / " + avgview);
+		//System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 
 }

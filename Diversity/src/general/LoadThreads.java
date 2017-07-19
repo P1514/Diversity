@@ -239,9 +239,9 @@ public class LoadThreads {
 		 */
 
 		private void load(ResultSet rs, boolean remote) throws SQLException {
-			// System.out.println(id);
+			// //system.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
-			// System.out.println(id);
+			// //system.out.println(id);
 			String user_id = remote ? rs.getString(Settings.rptable_userid) : rs.getString(Settings.lptable_authorid);
 			long time = 0;
 			double polarity = -1;
@@ -251,7 +251,7 @@ public class LoadThreads {
 				try {
 					date = df.parse(rs.getString(Settings.rptable_date));
 				} catch (ParseException e) {
-					System.out.print("Error Parsing Date from Local DB");
+					//system.out.print("Error Parsing Date from Local DB");
 				}
 				time = date.getTime();
 
@@ -329,7 +329,7 @@ public class LoadThreads {
 				boolean remote = true;
 				query = (Settings.sqlselectall + Settings.rptable+ Settings.sqlwhere
 						+ Settings.rptable + "." + Settings.rptable_postid + " = " + id);
-				System.out.println(query);
+				//system.out.println(query);
  				try (Statement stmt = cndata.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (!rs.next()) {
@@ -381,7 +381,7 @@ public class LoadThreads {
 					String formatted = format.format(date);
 					java.util.Date parsed = format.parse(formatted);
 
-					// System.out.println(formatted);
+					// //system.out.println(formatted);
 					long postid;
 					if (obj.has("postId")) {
 						postid = obj.getLong("postId");
@@ -389,7 +389,7 @@ public class LoadThreads {
 						postid = (long) (Math.random() * 200);
 						obj.put("postId", postid);
 					}
-					// System.out.println(id);
+					// //system.out.println(id);
 					String source = obj.getString(Settings.JSON_source);
 					String user_id = obj.getString(Settings.JSON_userid);
 					long time = parsed.getTime();
@@ -399,12 +399,12 @@ public class LoadThreads {
 						try {
 							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
 						} catch (ParseException e) {
-							System.out.print("Error Parsing Date from Local DB");
+							//system.out.print("Error Parsing Date from Local DB");
 						}
 						time = date.getTime();
 
 					}
-					// System.out.println("IM HERE");
+					// //system.out.println("IM HERE");
 					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
@@ -449,7 +449,7 @@ public class LoadThreads {
 					if (cnlocal != null)
 						cnlocal.close();
 				} catch (SQLException | JSONException e) {
-					System.out.println("ERROR loading Opinions");
+					//system.out.println("ERROR loading Opinions");
 					e.printStackTrace();
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -531,16 +531,16 @@ public class LoadThreads {
 			Connection cnlocal = null;
 			if (obj == null) {
 				try {
-					// System.out.println("HELLO1");
+					// //system.out.println("HELLO1");
 					cndata = Settings.conndata();
 					String query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere
 							+ Settings.rptable_rpostid + " = " + id);
 					stmt = cndata.createStatement();
-					// System.out.println(query);
+					// //system.out.println(query);
 					rs = stmt.executeQuery(query);
 					if (rs.next()) {
 						do {
-							// System.out.println("HELLO2");
+							// //system.out.println("HELLO2");
 							long postid = rs.getLong(Settings.rptable_postid);
 							String user_id = rs.getString(Settings.rptable_userid);
 							long time = 0;
@@ -550,7 +550,7 @@ public class LoadThreads {
 							try {
 								date = df.parse(rs.getString(Settings.rptable_date));
 							} catch (ParseException e) {
-								System.out.print("Error Parsing Date from Local DB");
+								//system.out.print("Error Parsing Date from Local DB");
 							}
 							time = date.getTime();
 
@@ -571,12 +571,12 @@ public class LoadThreads {
 					query = (Settings.sqlselectall + Settings.lptable
 							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id " + Settings.sqlwhere
 							+ Settings.lptable_opinion + " = " + id);
-					System.out.println(query);
+					//system.out.println(query);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (rs.next()) {
 						do {
-							// System.out.println("HELLO3");
+							// //system.out.println("HELLO3");
 							long postid = rs.getLong(Settings.lptable_id);
 							String user_id = rs.getString(Settings.lptable_authorid);
 							long likes = rs.getLong(Settings.lptable_likes);
@@ -600,7 +600,7 @@ public class LoadThreads {
 						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					System.out.println("ERROR loading Posts");
+					//system.out.println("ERROR loading Posts");
 					e.printStackTrace();
 				} catch (SQLException e) {
 					//
@@ -640,7 +640,7 @@ public class LoadThreads {
 
 					if (obj.has(Settings.JSON_replies)) {
 
-						// System.out.println("HELLO2");
+						// //system.out.println("HELLO2");
 						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
 						for (int index = 0; index < replies.length(); index++) {
 
@@ -688,7 +688,7 @@ public class LoadThreads {
 
 					}
 
-					// System.out.println("HELLO");
+					// //system.out.println("HELLO");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -737,7 +737,7 @@ public class LoadThreads {
 		 * public Tmodels() { }
 		 */
 		public void Tmodels() {
-			// System.out.println("HELLO1");
+			// //system.out.println("HELLO1");
 			Statement stmt = null;
 			ResultSet rs = null;
 			Connection cnlocal = null;
@@ -751,7 +751,7 @@ public class LoadThreads {
 			try {
 				String query = (Settings.sqlselectall + Settings.lmtable);
 				stmt = cnlocal.createStatement();
-				// System.out.println(query);
+				// //system.out.println(query);
 				rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {

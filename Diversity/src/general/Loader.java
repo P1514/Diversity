@@ -47,8 +47,10 @@ public class Loader {
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
-		System.out.println("json: " + json);
+		//TODO protect for empty json
+		//System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
+		//if(json.length()<1) return "";
 		loadp1(json);
 		first_load = false;
 		String err = updatelocal();
@@ -76,7 +78,7 @@ public class Loader {
 		totalcomments = 0;
 		totallikes = 0;
 		// long stime = System.nanoTime();
-		// System.out.println(" Beginning " + stime);
+		// //system.out.println(" Beginning " + stime);
 		loadPSS();
 		loadDesignProjects();
 		loadUsers();
@@ -250,12 +252,12 @@ public class Loader {
 		for (Author user : users2) {
 			if (user == null)
 				continue;
-			// System.out.println("\n DEBUG IF HAPPENS USERID=" +
+			// //system.out.println("\n DEBUG IF HAPPENS USERID=" +
 			// user.getUID());
-			// System.out.println(" RESULT STRING " + querycond);
+			// //system.out.println(" RESULT STRING " + querycond);
 			querycond += user.getID() + ",";
 		}
-		// System.out.println(querycond);
+		// //system.out.println(querycond);
 
 		// Load users from local DB
 		if (users2.size() != 0) {
@@ -265,13 +267,12 @@ public class Loader {
 				select += "?,";
 			select += "?)";
 
-			// System.out.println(query);
 			try (PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
 				for (int i = 0; i < users2.size(); i++) {
 					stmt2.setString(i + 1, querycond.split(",")[i]);
 				}
 				try (ResultSet rs = stmt2.executeQuery()) {
-					// System.out.println(stmt2);
+					// //system.out.println(stmt2);
 					while (rs.next()) {
 						if (authordb2.containsKey(
 								rs.getString(Settings.latable_id) + rs.getString(Settings.latable_source))) {
@@ -502,7 +503,7 @@ public class Loader {
 				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
 				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_user_id
 				+ ";";
-		System.out.println(select);
+		//system.out.println(select);
 		Connection cncr = null;
 		try {
 			cncr = Settings.conncr();
@@ -596,7 +597,7 @@ public class Loader {
 		}
 		String query = Settings.sqlselectall + Settings.lmtable;
 		try (Statement stmt = cnlocal.createStatement()) {
-			// System.out.println(query);
+			// //system.out.println(query);
 			try (ResultSet rs = stmt.executeQuery(query)) {
 
 				for (; rs.next();) {
@@ -670,10 +671,13 @@ public class Loader {
 			for (String a : users) {
 				querycond += a + ",";
 			}
+			if (querycond.length() > 1)
 			querycond = querycond.substring(0, querycond.length() - 1);
+			else
+				querycond += "-1";
 		}
 		querycond += ");";
-		System.out.println(querycond);
+		//system.out.println(querycond);
 		// From local DB
 		err = loadlocalusers(querycond);
 		if (err != null)
@@ -689,6 +693,7 @@ public class Loader {
 			for (int i = 0; i < json.length(); i++) {
 				
 				JSONObject obj = json.getJSONObject(i);
+				//system.out.println(obj.toString());
 				JSONArray obj1 = obj.getJSONArray(Settings.JSON_replies);
 				String user1 = obj.getString(Settings.JSON_userid);
 				String source1=obj.getString(Settings.JSON_source);
@@ -696,10 +701,9 @@ public class Loader {
 				for (int j = 0;j < obj1.length(); j++) {//TO LOAD REPLIES
 					obj=obj1.getJSONObject(j);
 					user1 = obj.getString(Settings.JSON_userid);
-					source1=obj.getString(Settings.JSON_source);
 					if (authordb2.containsKey(user1 +","+ source1))
 						continue;
-					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+					auth = new Author(obj.getString(Settings.JSON_userid), source1,
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
 							+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""), 0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
@@ -707,7 +711,7 @@ public class Loader {
 					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
 						authordb2.put(auth.getID() + "," + auth.getSource(), auth);
 					
-					authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+					//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
 					
 				}
 				
@@ -738,7 +742,7 @@ public class Loader {
 				if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
 					authordb2.put(auth.getID() + "," + auth.getSource(), auth);
 
-				authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+				//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
 				
 				
 
@@ -805,7 +809,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
-		System.out.println(query);
+		//System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -817,7 +821,7 @@ public class Loader {
 			while (rs.next()) {
 				if (authordb2.containsKey(rs.getString("id")+";"+rs.getString("source")))
 					continue;
-				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_name),
+				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_source),rs.getString(Settings.latable_name),
 						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
 						rs.getString(Settings.latable_location));
 				auth.setComments(rs.getLong(Settings.latable_comments));
@@ -907,6 +911,7 @@ public class Loader {
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
+			if(!authordb2.isEmpty())
 			v.evalPolarity2(authordb2);
 
 		});
@@ -945,7 +950,7 @@ public class Loader {
 				query1.setLong(15, author.getViews());
 				query1.setLong(16, author.getPosts());
 				query1.executeUpdate();
-				System.out.println(query1.toString());
+				//system.out.println(query1.toString());
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				try {
@@ -977,7 +982,7 @@ public class Loader {
 		try {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
-			System.out.println("ERROR THREAD OP");
+			//system.out.println("ERROR THREAD OP");
 			e.printStackTrace();
 		}
 

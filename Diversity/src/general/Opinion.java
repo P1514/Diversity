@@ -113,17 +113,17 @@ public class Opinion {
 	 */
 	public void evalPolarity2(ConcurrentHashMap<String, Author> authordb) {
 
-		authordb.forEach((k, v) -> {
-			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
-
-		});
-		System.out.println(author_id2);
+//		authordb.forEach((k, v) -> {
+//			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
+//
+//		});
+		//System.out.println(author_id2);
 
 		total_inf = authordb.get(author_id2 + "," + source).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((k, v) -> {
-			System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
+			//System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
 			
 			if(v.getSource()!=null){
 			total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
