@@ -21,7 +21,7 @@ var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 		"SEP", "OCT", "NOV", "DEC" ];
 var month;
 var product;
-var user = sessionStorage.user;
+var user = localStorage.user;
 var finalProductColors = [];
 var loaded = false;
 var mediawiki = false;

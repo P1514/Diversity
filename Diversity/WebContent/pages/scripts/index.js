@@ -122,7 +122,7 @@ function getRole(){
     };
       ws.send(JSON.stringify(jsonData));
 
-      sessionStorage.user = url.split("user_id=")[1].split("&")[0];
+      localStorage.user = url.split("user_id=")[1].split("&")[0];
 }
 
 function getCookie(name) {
@@ -207,6 +207,7 @@ ws.onmessage = function(event) {
     var dp = "";
     if (url.indexOf("design_project_id=") != -1) {
       dp = url.split("design_project_id=")[1].split("&")[0];
+      localStorage.dp = dp;
     }
 
     dp = dp.replace(/%20/g," ");
