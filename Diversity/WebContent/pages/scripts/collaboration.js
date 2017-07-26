@@ -122,7 +122,7 @@ function drawTable() {
 			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 			role = user.Role;
 			console.log("Adding user " + name + " from " + company);
-			$('#users_body').append('<tr id=user_' + i + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + i + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+			$('#users_body').append('<tr id=user_' + i + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + i + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + i + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 			userStorage[i] = user;
 			availableUsers.push(user);
 		}
@@ -164,7 +164,7 @@ function addMember(position) {
 		name = user.First_name + ' ' + user.Last_name;
 		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 		role = user.Role;
-		$('#team_body').append('<tr id="team_' + position + '"><td style="padding:10px;"><input type="button" value="Remove" onClick="removeMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+		$('#team_body').append('<tr id="team_' + position + '"><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="removeMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_remove.png" onClick="removeMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		$('#user_' + position).remove();
 		availableUsers.splice(availableUsers.indexOf(user, 1));
 		team.push(user);
@@ -183,7 +183,7 @@ function removeMember(position) {
 		name = user.First_name + ' ' + user.Last_name;
 		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 		role = user.Role;
-		$('#users_body').append('<tr id=user_' + position + '><td style="padding:10px;"><input type="button" value="Add" onClick="addMember(' + position + ')" /><td style="padding:10px;" class="name">' + name + '</td><td style="padding:10px;" class="role">' + role + '</td><td style="padding:10px;" class="company">' + company + '</td><td style="padding:10px;" class="rating">' + rating + '</td></tr>');
+		$('#users_body').append('<tr id=user_' + position + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		availableUsers.push(user);
 
 		var options = {

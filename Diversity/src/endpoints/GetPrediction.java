@@ -79,7 +79,9 @@ public class GetPrediction {
 
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		obj.put("URL", "http://localhost:8080/Diversity/pages/prediction_settings.html?snapshot=" + name);
+		String url = ui.getBaseUri().toString();
+		String urlPred = url.split("Diversity/")[0] + "Diversity/pages/prediction_settings.html?snapshot=";
+		obj.put("URL", urlPred + name);
 		obj.put("Average", avg);
 		result.put(obj);
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
