@@ -603,7 +603,7 @@ public class Backend {
 				if (msg.has("Id")) {
 					tmp = conf.getConf(msg.getLong("Id")).toString();
 				} else {
-					tmp = conf.getConf(845).toString();
+					tmp = conf.getConf().toString();
 				}
 				return tmp;
 			case 13:

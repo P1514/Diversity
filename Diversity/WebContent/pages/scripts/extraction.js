@@ -21,7 +21,7 @@ var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 		"SEP", "OCT", "NOV", "DEC" ];
 var month;
 var product;
-var user = 1;
+var user = localStorage.user;
 var finalProductColors = [];
 var loaded = false;
 var mediawiki = false;
@@ -41,7 +41,7 @@ $("#USER_LIST")
 		.on(
 				"change",
 				function() {
-					user = parseInt(this.value.split(" ")[1]);
+					var user_l = parseInt(this.value.split(" ")[1]);
 
 					var json = {
 						"Op" : "tagcloud",
@@ -804,7 +804,7 @@ function send(val) {
 		"name" : val,
 		"creation_date" : new Date(),
 		"timespan" : 12,
-		"user" : "test",
+		"user" : user,
 		"Id" : sessionStorage.id,
 		'Key' : getCookie("JSESSIONID")
 	}
