@@ -65,6 +65,7 @@ public class ChromeTests  {
 		driver.findElement(By.id("ok")).click();
 //		driver.navigate().refresh();
 		
+		testPrediction(driver);
 		w.write("-----------------------------------------------\n");
 		boolean create = testCreate(driver);
 		Thread.sleep(2000);
@@ -782,6 +783,68 @@ public class ChromeTests  {
 		
 		return pass;
 		
+	}
+	
+	private static boolean testPrediction(WebDriver driver) throws IOException {
+		
+		driver.findElement(By.linkText("Generate Prediction")).click();
+		
+		(new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+
+			public Boolean apply(WebDriver d) {
+				try {
+					d.findElement(By.xpath(".//li[@id='j1_50']/a")).click();
+				} catch (StaleElementReferenceException e) {
+					try {
+						w.write("Unable to find H Line checkbox. Check if the test database is being used.");
+						return false;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						return false;
+					}
+				}
+				
+				try {
+					d.findElement(By.xpath(".//li[@id='j2_59']/a")).click();
+				} catch (StaleElementReferenceException e) {
+					try {
+						w.write("Unable to find Helpdesk checkbox. Check if the test database is being used.");
+						return false;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						return false;
+					}
+				}
+				
+				try {
+					d.findElement(By.id("submit")).click();
+				} catch (StaleElementReferenceException e) {
+					try {
+						w.write("Unable to find the submit button.");
+						return false;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+						return false;
+					}
+				}
+				
+				(new WebDriverWait(d, 10)).until(new ExpectedCondition<Boolean>() {
+
+					public Boolean apply(WebDriver d1) {
+						
+						return null;
+					}
+					
+				});
+				pass = true;
+				return true;
+			}
+			
+		});
+
+		
+		
+		return false;
 	}
 	
 

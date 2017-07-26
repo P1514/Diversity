@@ -66,15 +66,16 @@ public class GetPrediction {
 
 		JSONArray json = p.predict(1, products.replace(',', ';'), services.replace(',', ';'));
 		double sum = 0;
-		int count = 1;
+		int count = 0;
 		for (int i = 0; i < json.length(); i++) {
 			if (json.getJSONObject(i).has("Value")) {
-				sum += json.getJSONObject(i).getDouble("Value");
-				count++;
+				double val = json.getJSONObject(i).getDouble("Value");
+				sum += val != -1 ? val : 0;
+				count += val != -1 ? 1 : 0;
 			}
 		}
 
-		double avg = sum / count;
+		double avg = sum / (count != 0 ? count : 12);
 
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();

@@ -14,6 +14,7 @@ import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
 
 import endpoints.LeanRules;
 import endpoints.LeanRules.LeanRule;
+import extraction.Collaboration;
 import extraction.Extrapolation;
 import extraction.GetComments;
 import extraction.GetPosts;
@@ -25,7 +26,6 @@ import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
-import general.Collaboration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -255,7 +255,6 @@ public class Backend {
 				result = new JSONArray();
 				Tagcloud tag;
 				if (msg.has("Type")) {
-					System.out.println("type " + msg.getString("Type"));
 					switch (msg.getString("Type")) {
 					case "Positive":
 						System.out.println("POSITIVE");
@@ -266,7 +265,6 @@ public class Backend {
 						break;
 
 					case "Negative":
-						System.out.println("NEGATIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
@@ -282,7 +280,7 @@ public class Backend {
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 
@@ -384,8 +382,11 @@ public class Backend {
 				if (msg.has("Products") || msg.has("Services")) {
 					obj.put("Op", "Prediction");
 					result.put(obj);
-
+					if(!msg.has("type"))
 					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+							msg.has("Services") ? msg.getString("Services") : ""));
+					else
+					result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : ""));
 					// result = convert(result, pre.predict(1,
 					// msg.getString("Products"), msg.getString("Services")),
