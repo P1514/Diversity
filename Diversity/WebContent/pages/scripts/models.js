@@ -94,19 +94,28 @@ document.addEventListener('DOMContentLoaded', function() {
     //console.log(json);
     if (json[0].Op == "Error") {
       if(json[0].hasOwnProperty('id')){
-		  var id = json[0].id;
-		  var code = json[0].Message +  '<br> Do you want to create another model? <br><br><button class="btn btn-default" id="yes" onclick="location.href =\'models.html\'">Yes</button> <button class="btn btn-default" id="no" onclick="sessionStorage.Id=\'model=\'+id;location.href =\'index.html\';">No</button>';
-		  $('#alert').html(code);
-		  $('#overlay').show();
-		  $('#overlay-back').show();
-		 /* $('alert').text()
-        alert(json[0].Message);
-        if (confirm("Do you want to create another model?")) {
-          location.href = "models.html"
-        } else {
-          sessionStorage.Id="model="+json[0].id;
-          location.href ='index.html';
-        }*/
+
+        if (document.getElementById("submit").value.toLowerCase() == "create") {
+          $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
+            var post = '//diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=' + 1 + '&design_project_id=' + json[1].dp + '&status=1&lat=' + data.latitude + '&lng=' + data.longitude;
+            $.post(post);
+            console.log(post);
+          });
+        }
+
+  		  var id = json[0].id;
+  		  var code = json[0].Message +  '<br> Do you want to create another model? <br><br><button class="btn btn-default" id="yes" onclick="location.href =\'models.html\'">Yes</button> <button class="btn btn-default" id="no" onclick="sessionStorage.Id=\'model=\'+id;location.href =\'index.html\';">No</button>';
+  		  $('#alert').html(code);
+  		  $('#overlay').show();
+  		  $('#overlay-back').show();
+  		 /* $('alert').text()
+          alert(json[0].Message);
+          if (confirm("Do you want to create another model?")) {
+            location.href = "models.html"
+          } else {
+            sessionStorage.Id="model="+json[0].id;
+            location.href ='index.html';
+          }*/
       } else {
 		  var code = json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>';
 		  $('#alert').html(code);
@@ -677,7 +686,6 @@ function send_config() {
 
   };
 
-
   if (erro == true) {
       var code = 'All fields must be filled. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
 		  $('#alert').html(code);
@@ -731,3 +739,16 @@ $("#frequency").on("change", function() {
     this.value = val > maxSliderValue ? maxSliderValue : val;
     $('#ex1').slider('setValue', val);
 });
+
+function get_ip_address() {
+
+    if ($_SERVER["REMOTE_ADDR"] != "::1") {
+        // remote operation
+        return $_SERVER["REMOTE_ADDR"];
+    } else {
+        // local operation
+        $json_ip = file_get_contents("https://jsonip.com/?callback=");
+        $arr_ip = json_decode($json_ip, true);
+        return $arr_ip["ip"];
+    }
+}
