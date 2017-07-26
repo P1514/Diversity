@@ -64,17 +64,9 @@ public class GetSnapshots {
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
 				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
-<<<<<<< HEAD
 					obj.put("URL", urlPred + obj.getString("Name"));
 				} else {
 					obj.put("URL", urlExt + obj.getString("Name"));
-=======
-					obj.put("URL", "http://localhost:8080/Diversity/pages/prediction_settings.html?snapshot="
-							+ obj.getString("Name"));
-				} else {
-					obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="
-						+ obj.getString("Name"));
->>>>>>> refs/remotes/origin/Last-Stable
 				}
 
 				obj.remove("Id");
