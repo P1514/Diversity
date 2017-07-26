@@ -121,6 +121,8 @@ function getRole(){
       'Key' : getCookie("JSESSIONID")
     };
       ws.send(JSON.stringify(jsonData));
+
+      sessionStorage.user = url.split("user_id=")[1].split("&")[0];
 }
 
 function getCookie(name) {
@@ -631,7 +633,7 @@ function ok(val) {
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
-      "User" : 1,// TODO find this field
+      "User" : url.split("user_id=")[1].split("&")[0],
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")

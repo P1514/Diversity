@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (document.getElementById("submit").value.toLowerCase() == "create") {
           $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
-            var post = '//diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=' + 1 + '&design_project_id=' + json[1].dp + '&status=1&lat=' + data.latitude + '&lng=' + data.longitude;
+            var post = '//diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=' + sessionStorage.user + '&design_project_id=' + json[1].dp + '&status=1&lat=' + data.latitude + '&lng=' + data.longitude;
             $.post(post);
             console.log(post);
           });
