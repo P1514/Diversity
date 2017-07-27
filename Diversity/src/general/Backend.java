@@ -98,8 +98,11 @@ public class Backend {
 				return error_message("You're not allowed to be here. What were you expecting to find?").toString();
 			}
 			if (msg.has("Id")) {
-
-				id = msg.getLong("Id");
+				try {
+					id = msg.getLong("Id");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 
 			param = (msg.has("Param")) ? msg.getString("Param") : null;

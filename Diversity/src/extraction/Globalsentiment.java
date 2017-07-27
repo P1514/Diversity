@@ -723,18 +723,18 @@ public class Globalsentiment extends GetReach {
 		obj = new JSONObject();
 		obj.put("Filter", output);
 		result.put(obj);
-		String query = "select sum(case when (posts.polarity  <=20) then 1 else 0 end) '--', "
-				+ "sum(case when (posts.polarity  > 20 AND posts.polarity <= 40 ) then 1 else 0 end) '-', "
-				+ "sum(case when (posts.polarity   >40 AND posts.polarity <=60) then 1 else 0 end) '0', "
-				+ "sum(case when (posts.polarity >60 AND posts.polarity <=80) then 1 else 0 end) '+', "
-				+ "sum(case when (posts.polarity >80 AND posts.polarity <=100) then 1 else 0 end) '++' "
-				+ "from posts where posts.opinions_id in (Select opinions.id from opinions where opinions.pss = ? AND id in (Select authors_id from authors)"
-				+ " AND " + Settings.lotable_product
-				+ (par.products != null ? "=?"
-						: " in (" + model.getProducts() + ") AND " + Settings.lotable_timestamp + ">? AND "
-								+ Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
-								+ Settings.latable );
-
+		String query = "select sum(case when (" + Settings.lptable_polarity + " <=20) then 1 else 0 end) '--',"
+				+ "	sum(case when (" + Settings.lptable_polarity + " >20 AND " + Settings.lptable_polarity
+				+ "<=40) then 1 else 0 end) '-'," + " sum(case when (" + Settings.lptable_polarity + " >40 AND "
+				+ Settings.lptable_polarity + "<=60) then 1 else 0 end) '0'," + " sum(case when ("
+				+ Settings.lptable_polarity + " >60 AND " + Settings.lptable_polarity + "<=80) then 1 else 0 end) '+',"
+				+ " sum(case when (" + Settings.lptable_polarity + " >80 AND " + Settings.lptable_polarity
+				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
+				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
+				+ "=?" + " AND " + Settings.lotable_product
+				+ (par.products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "
+				+ Settings.lotable_timestamp + ">?) AND " + Settings.lptable_authorid + " in (Select "
+				+ Settings.latable_id + " from " + Settings.latable;
 		if (par.age != null || par.gender != null || par.location != null)
 			query += " where 1=1 ";
 		if (par.age != null)
@@ -745,7 +745,7 @@ public class Globalsentiment extends GetReach {
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
-		query += "and posts.opinions_id in (select post_id from post_source where post_source LIKE 'wiki'))";
+		query += "and posts.opinions_id in (select post_id from post_source where post_source LIKE 'wiki')";
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -768,7 +768,6 @@ public class Globalsentiment extends GetReach {
 				query1.setString(rangeindex++, par.gender);
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
-			
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");

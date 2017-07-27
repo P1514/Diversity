@@ -142,12 +142,14 @@ public class Prediction extends Globalsentiment {
 		String[] products = productsId.split(";");
 		
 		for (String s : products) {
+			if(Data.dbhasproduct(Long.parseLong(s)))
 			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
 		}
 		
 		String[] services = servicesId.split(";");
 		
 		for (String s : services) {
+			if(Data.dbhasservice(Long.parseLong(s)))
 			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
 		}
 		
@@ -298,12 +300,14 @@ public class Prediction extends Globalsentiment {
 		String[] products = productsId.split(";");
 		
 		for (String s : products) {
+			if(Data.dbhasproduct(Long.parseLong(s)))
 			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
 		}
 		
 		String[] services = servicesId.split(";");
 		
 		for (String s : services) {
+			if(Data.dbhasservice(Long.parseLong(s)))
 			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
 		}
 		
