@@ -28,15 +28,15 @@ public class Prediction extends Globalsentiment {
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
 
-		pssweights.forEach((k, v) -> {
-			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
-
-		});
-
-		pssweightss.forEach((k, v) -> {
-			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
-
-		});
+//		pssweights.forEach((k, v) -> {
+//			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
+//
+//		});
+//
+//		pssweightss.forEach((k, v) -> {
+//			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
+//
+//		});
 		if (pssweights.isEmpty() && pssweightss.isEmpty())
 
 		{
