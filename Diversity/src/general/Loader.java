@@ -130,7 +130,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(1/* 30 * 1000waiting_time*10 */);
+					Thread.sleep(1000/* 30 * 1000waiting_time*10 */);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -155,6 +155,7 @@ public class Loader {
 			return err;
 
 		evaluatedata();
+		System.out.println("1");
 
 		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();

@@ -199,7 +199,7 @@ public class Oversight extends TimerTask {
 							for (String acc : account) {
 								query1.setString(i++, acc.split("=")[1]);
 							}
-							// System.out.println(query1);
+							System.out.println(query1);
 							query1.execute();
 
 							/*
@@ -212,6 +212,7 @@ public class Oversight extends TimerTask {
 						}
 
 					});
+					
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -220,14 +221,21 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
-		} else {
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} //else {
 			try {
 				(new Loader()).load(null);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		//}
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {

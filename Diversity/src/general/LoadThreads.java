@@ -65,22 +65,21 @@ public class LoadThreads {
 				query1.setDouble(11, opinion.getPolarity());
 				query1.setDouble(12, opinion.getTotalInf());
 				query1.setLong(13, opinion.ncomments());
-				while (true) {
 					try {
+						//System.out.println(query1.toString());
 						query1.executeUpdate();
 					} catch (Exception e) {
 						LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
 						Thread.sleep((long) (Math.random() * 1000));
-						continue;
-					}
-					break;
-				}
+						}
+					
 				if (!Loader.first_load) {
 					cnlocal.close();
 					return;
 				}
 				for (Post post : opinion.getPosts().values()) {
 					PreparedStatement query2 = null;
+					
 					try {
 						String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 						query2 = cnlocal.prepareStatement(update1);

@@ -60,19 +60,21 @@ public class Monitor {
 		}
 		url = url.substring(0, url.length() - 1);
 		url += pssName + finalProductId + finalProductName;
-		
+
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
-					+ Settings.lutable_account + "," + Settings.lutable_pss + ") VALUES(?,?,?) ON DUPLICATE KEY UPDATE "
-					+ Settings.lutable_source + "=?";
+					+ Settings.lutable_account + "," + Settings.lutable_pss + "," + Settings.lutable_lastupdate
+					+ ") VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lutable_source + "=?";
 			stmt = cnlocal.prepareStatement(query);
 			stmt.setString(1, source);
 			stmt.setString(2, account);
 			stmt.setLong(3, pss);
-			stmt.setString(4, source);
+			stmt.setLong(4,(long) 9466848 * 100000);
+			stmt.setString(5, source);
+			System.out.println(query);
 
 			stmt.execute();
 
