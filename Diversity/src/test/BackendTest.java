@@ -137,7 +137,7 @@ public class BackendTest extends Thread {
 		obj = new JSONObject();
 		obj.put("Key", "10");
 		obj.put("Op", "getposts");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Product", "Morris Ground 1");
 		tester = new Backend(4, obj);
 		System.out.println("Get Posts Test Output: " + tester.resolve().toString());
@@ -163,7 +163,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "getconfig");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Key", "10");
 		tester = new Backend(12, obj);
 		System.out.println("Get Config Test Output: " + tester.resolve().toString());
@@ -177,7 +177,7 @@ public class BackendTest extends Thread {
 		obj = new JSONObject();
 		obj.put("Key", "10");
 		obj.put("Op", "get_model");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		tester = new Backend(15, obj);
 		System.out.println("Get Model Test Output: " + tester.resolve().toString());
 
@@ -201,7 +201,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "opinion_extraction");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Key", "10");
 		tester = new Backend(18, obj);
 		System.out.println("Opinio Extraction Test Output: " + tester.resolve().toString());
@@ -216,7 +216,7 @@ public class BackendTest extends Thread {
 		// obj.put("Param", "Global");
 		// obj.put("Values", "");
 		obj.put("Filter", "");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Key", "10");
 		tester = new Backend(19, obj);
 		System.out.println("Oe Refresh Test Output: " + tester.resolve().toString());
@@ -263,7 +263,7 @@ public class BackendTest extends Thread {
 		obj.put("URI", "Facebook,adidas;");
 		obj.put("Start_date", "1970-01-02");
 		obj.put("Name", "D522-1 PSS");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("mediawiki", "true");
 		obj.put("Key", "10");
 		tester = new Backend(16, obj);
@@ -289,7 +289,7 @@ public class BackendTest extends Thread {
 		obj.put("Param", "Age,Gender,Location,");
 		obj.put("Values", "All,All,All,");
 		obj.put("Filter", "Product");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Extrapolate", 1);
 		obj.put("Key", "10");
 		tester = new Backend(19, obj);
@@ -303,6 +303,21 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "prediction");
+		obj.put("Products", "71;74");
+		obj.put("Services", "69;66");
+		obj.put("Key", "10");
+		tester = new Backend(23, obj);
+		System.out.println("Prediction Test Output: " + tester.resolve().toString());
+
+	}
+	
+	@Test
+	public void resolvePredictionLifeCycle() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "prediction");
+		obj.put("type", "lifeCycle");
 		obj.put("Products", "71;74");
 		obj.put("Services", "69;66");
 		obj.put("Key", "10");
@@ -377,7 +392,7 @@ public class BackendTest extends Thread {
 		obj.put("name", "test101");
 		obj.put("creation_date", "2017-01-28T16:37:01.466Z");
 		obj.put("timespan", "6");
-		obj.put("Id", "839");
+		obj.put("Id", "10");
 		obj.put("type", "Extraction");
 		obj.put("user", "test12345");
 		obj.put("Key", "10");
@@ -405,7 +420,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "getposts");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Product", "Morris Ground 1");
 		obj.put("word", "average");
 		obj.put("Key", "10");
@@ -435,7 +450,7 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "set_ignore_word");
-		obj.put("id", "838");
+		obj.put("id", "10");
 		obj.put("Word", "phenomenal");
 		obj.put("Key", "10");
 		tester = new Backend(27, obj);
@@ -452,7 +467,7 @@ public class BackendTest extends Thread {
 		obj = new JSONObject();
 		obj.put("Op", "tagcloud");
 		obj.put("User", "4");
-		obj.put("Id", "838");
+		obj.put("Id", "10");
 		obj.put("Key", "10");
 
 		tester = new Backend(26, obj);
@@ -469,11 +484,28 @@ public class BackendTest extends Thread {
 		obj.put("Op", "collaboration");
 		obj.put("Products", "71,74");
 		obj.put("Services", "69,66");
+		obj.put("Company", "DESMA");
 		obj.put("Key", "10");
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
+		
+	}
+	
+	@Test
+	public void resolveCollaborationJustCompany() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "collaboration");
+		obj.put("Company", "DESMA");
+		obj.put("Key", "10");
+		System.out.println(obj.toString());
+		tester = new Backend(33, obj);
+		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
+
+		
 	}
 	
 

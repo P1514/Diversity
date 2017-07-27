@@ -16,7 +16,7 @@ import extraction.Snapshot;
 
 public class GetMediawiki {
 	private Connection cnlocal;
-	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
+	private static final Logger LOGGER = new Logging().create(GetMediawiki.class.getName());
 	String error = "error";
 
 	public JSONArray getNames(String pss) throws JSONException {

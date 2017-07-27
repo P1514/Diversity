@@ -309,6 +309,12 @@ public class Settings {
 	public static final String lsstable_type = "type";
 	public static final String lsstable_timespan = "timespan";
 	public static final String lsstable_model_id = "model_id";
+	
+	// Company_is_costumer_of_design_project Table
+	public static final String cictable = "company_is_costumer_of_design_project";
+	public static final String cictable_id = "id";
+	public static final String cictable_company_id = "company_id";
+	public static final String cictable_design_project_id = "design_project_id";
 
 
 	// SQL Common String
@@ -470,6 +476,75 @@ public class Settings {
 
 	}
 
+	
+	/**
+	 * Gets the default conf.
+	 *
+	 *
+	 * @return the conf
+	 * @throws JSONException
+	 *             the JSON exception
+	 */
+	public JSONArray getConf() throws JSONException {
+		JSONArray result = new JSONArray();
+		JSONObject obj = new JSONObject();
+		obj.put("Op", "Configs");
+		result.put(obj);
+		obj = new JSONObject();
+		obj.put("Size", 3);
+		obj.put("Param", "Age");
+		result.put(obj);
+
+		obj.put("Min", 0);
+		obj.put("Max", 30);
+		result.put(obj);
+		obj.put("Min", 31);
+		obj.put("Max", 60);
+		result.put(obj);
+		obj.put("Min", 61);
+		obj.put("Max", 99);
+		result.put(obj);
+		
+		obj = new JSONObject();
+		obj.put("Size", 2);
+		obj.put("Param", "Gender");
+		result.put(obj);
+		obj = new JSONObject();
+		obj.put("Gender", "Male");
+		result.put(obj);
+		obj.put("Gender", "Female");
+		result.put(obj);
+		
+		obj = new JSONObject();
+		obj.put("Size", 3);
+		obj.put("Param", "Location");
+		result.put(obj);
+		obj = new JSONObject();
+		obj.put("Location", "Asia");
+		result.put(obj);
+		obj.put("Location", "Europe");
+		result.put(obj);
+		
+//		obj = new JSONObject();
+//		if (!Data.getmodel(id).getProducts().isEmpty()) {
+//			String[] values4 = Data.getmodel(id).getProducts().split(",");
+//			obj.put("Size", values4.length);
+//			obj.put("Param", "Product");
+//			result.put(obj);
+//			for (int i = 0; i < values4.length; i++) {
+//				if (!Data.dbhasproduct(Long.valueOf(values4[i])))
+//					continue;
+//				obj = new JSONObject();
+//				obj.put("Product", Data.getProduct(Long.valueOf(values4[i])).get_Name());
+//				result.put(obj);
+//			}
+//		}
+
+		LOGGER.log(Level.INFO, result.toString());
+		return result;
+
+	}
+	
 	/**
 	 * Sets the conf.
 	 *

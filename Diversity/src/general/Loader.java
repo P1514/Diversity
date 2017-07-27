@@ -394,6 +394,29 @@ public class Loader {
 			}
 			return;
 		}
+		select = Settings.sqlselectall + Settings.crdbname+"."+Settings.cictable;
+		System.out.println(select);
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
+					
+					Data.companydb.get(rs.getLong(Settings.cictable_company_id))
+							.add_design_project(rs.getLong(Settings.cictable_design_project_id));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+		
 		select = Settings.sqlselectall + Settings.crpssproducttable;
 
 		try (PreparedStatement query = cncr.prepareStatement(select)) {

@@ -42,7 +42,10 @@ public class GetLeanGuidelines {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		
-		JSONArray json = LeanRules.getGuidelines(dpInt);
+		LeanRules lr = new LeanRules(dp);
+
+		JSONArray json = lr.getGuidelineResult();
+		json.remove(0);
 
 		return Response.status(Response.Status.OK).entity(json.toString()).build();
 	}

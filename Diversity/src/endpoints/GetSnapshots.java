@@ -54,7 +54,8 @@ public class GetSnapshots {
 	 */
 	private String getAll(int pss_id, String type) {
 		String url = ui.getBaseUri().toString();
-		url = url.split("Diversity/")[0] + "Diversity/pages/opinion_extraction_page.html?snapshot=";
+		String urlExt = url.split("Diversity/")[0] + "Diversity/pages/opinion_extraction_page.html?snapshot=";
+		String urlPred = url.split("Diversity/")[0] + "Diversity/pages/prediction_settings.html?snapshot=";
 		JSONArray response;
 		try {
 			response = extraction.Snapshot.getAll(pss_id, type);
@@ -62,8 +63,12 @@ public class GetSnapshots {
 			JSONArray snapshots = response.getJSONArray(1);
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
-				obj.put("URL", "http://localhost:8080/Diversity/pages/opinion_extraction_page.html?snapshot="
-						+ obj.getInt("Id"));
+				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
+					obj.put("URL", urlPred + obj.getString("Name"));
+				} else {
+					obj.put("URL", urlExt + obj.getString("Name"));
+				}
+
 				obj.remove("Id");
 			}
 

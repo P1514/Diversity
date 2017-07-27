@@ -10,6 +10,11 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
+var userCompany;
+var userStorage = [];
+var availableUsers = [];
+var team = [];
+
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -20,7 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
   $('#overlay').hide();
+	userCompany = getParam("company").toLowerCase();
+	var str = userCompany;
 
+	$('#comp').append(str[0].toUpperCase() + str.slice(1));
   if (window.location.href.indexOf('https://') != -1) {
 		ws = new WebSocket('wss://' + window.location.hostname + ":"
 				+ window.location.port + '/Diversity/server');
@@ -31,68 +39,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //Request products and services tree
   ws.onopen = function () {
-    json = {
-      "Op" : "collaboration",
-      'Key' : getCookie("JSESSIONID"),
-			'Products' : getParam('products'),
-			'Services' : getParam('services')
-    }
+		json = {
+			'Op' : 'getrestrictions',
+			'Role' : 'DESIGNER',
+			'Key' : getCookie('JSESSIONID'),
+		}
 
-    ws.send(JSON.stringify(json));
+		ws.send(JSON.stringify(json));
+
   }
 
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
-		if (localStorage.tutorial !=undefined && localStorage.tutorial.indexOf("collaboration=done") == -1) { // if the user never opened this page, start the tutorial
-			request_tutorial();
-		}
-		if (localStorage.tutorial == undefined) {
-			localStorage.tutorial += "";
-			request_tutorial();
+		if (json[0].Op == "Rights") {
+			json2 = {
+	      "Op" : "collaboration",
+	      'Key' : getCookie("JSESSIONID"),
+				'Products' : getParam('products'),
+				'Services' : getParam('services'),
+				'Company' : getParam('company')
+	    }
+
+	    ws.send(JSON.stringify(json2));
 		}
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
       draw = true;
-			users = json;
+			users = json[1];
       console.log(users);
 
-      drawTable('');
+      drawTable();
     }
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
-      if (json[0].hasOwnProperty("Message")) {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
-      }
+        $('#error').html(json[1] + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
+
     }
   }
 });
 
-function request_tutorial() {
-  $('#error').html("Would you like to see a tutorial for this page?" + '<br><br><button class="btn btn-default" id="yes" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();start_tutorial();">Yes</button><button class="btn btn-default" id="no" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">No</button>');
-  $('#overlay').show();
-  $('#overlay-back').show();
-}
-
-function start_tutorial() {
-  end_tutorial();
-  $('#tutorial_box').toggle();
-}
-
-function end_tutorial() {
-  var pos=$('#submit').offset();
-  var h=$('#submit').height() + 10;
-  var w=$('#submit').width();
-
-  $('#tutorial').html('You\'ve reached the end of the tutorial. You can access it at any time by clicking the <i class="fa fa-question-circle" aria-hidden="true"></i> button at the top right corner of the page.<br><br><center><button class="btn btn-default" style="margin-left:5px;" id="end" onclick="$(\'#tutorial_box\').toggle();">Finish</button></center>');
-
-  if (localStorage.tutorial.indexOf("collaboration=done") == -1) {
-    localStorage.tutorial += "collaboration=done;";
-  }
-}
 
 /*
 * Finds and returns objects with a specific property inside an array.
@@ -117,10 +106,33 @@ function getObjects(obj, key, val) {
 /*
 * Draws a table with users for collaboration
 */
-function drawTable(filter) {
+function drawTable() {
 	// | USER_NAME | USER_ROLE | USER_COMPANY | COMPANY_TYPE | USER_RATING |
+	$('#users_body').empty();
+	availableUsers = [];
+	var name;
+	var company;
+	var rating;
+	var role;
+	for (var i = 0; i < users.length; i++) {
+		user = users[i];
+		company = user.Company.toLowerCase();
+		if ((company.toLowerCase() == userCompany.toLowerCase() || document.getElementById('all').checked) && team.indexOf(user) == -1 && (user.hasOwnProperty('Ranking') || document.getElementById('unranked').checked)) {
+			name = user.First_name + ' ' + user.Last_name;
+			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
+			role = user.Role;
+			console.log("Adding user " + name + " from " + company);
+			$('#users_body').append('<tr id=user_' + i + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + i + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + i + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
+			userStorage[i] = user;
+			availableUsers.push(user);
+		}
+	}
 
+	var options = {
+		valueNames: [ 'name', 'role', 'company', 'rating']
+	};
 
+	var userList = new List('table', options);
 }
 
 function getParam(param) {
@@ -135,10 +147,60 @@ function getParam(param) {
 	}
 }
 
-var lastValue = '';
-$("#filter").on('change keyup paste mouseup', function() {
-    if ($(this).val() != lastValue) {
-        lastValue = $(this).val();
-        console.log(lastValue);
-    }
+$('#all').change(function() {
+    // this will contain a reference to the checkbox
+		drawTable();
 });
+
+$('#unranked').change(function() {
+    // this will contain a reference to the checkbox
+		drawTable();
+});
+
+function addMember(position) {
+	user = userStorage[position];
+	if (team.indexOf(user) == -1) {
+		company = user.Company;
+		name = user.First_name + ' ' + user.Last_name;
+		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
+		role = user.Role;
+		$('#team_body').append('<tr id="team_' + position + '"><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="removeMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_remove.png" onClick="removeMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
+		$('#user_' + position).remove();
+		availableUsers.splice(availableUsers.indexOf(user, 1));
+		team.push(user);
+
+		var options = {
+			valueNames: [ 'name', 'role', 'company', 'rating']
+		};
+		var userList = new List('table', options);
+	}
+}
+
+function removeMember(position) {
+	user = userStorage[position];
+	if (availableUsers.indexOf(user) == -1) {
+		company = user.Company;
+		name = user.First_name + ' ' + user.Last_name;
+		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
+		role = user.Role;
+		$('#users_body').append('<tr id=user_' + position + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
+		availableUsers.push(user);
+
+		var options = {
+			valueNames: ['name', 'role', 'company', 'rating']
+		};
+		var userList = new List('table', options);
+	}
+	$('#team_' + position).remove();
+	team.splice(team.indexOf(user, 1));
+
+}
+
+function submit() {
+	var result = [];
+	for (var i = 0; i < team.length; i++) {
+		result.push(team[i]);
+	}
+
+	console.log(JSON.stringify(result));
+}

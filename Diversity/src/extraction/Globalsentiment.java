@@ -381,7 +381,7 @@ public class Globalsentiment extends GetReach {
 		 * values, id, frequency);
 		 */
 
-		String query = "SELECT sum(opinions.polarity*1)/count(polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
+		String query = "SELECT sum(opinions.polarity*1)/count(opinions.polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
 
 		/*
 		 * Calendar data1 = Calendar.getInstance();
@@ -404,7 +404,6 @@ public class Globalsentiment extends GetReach {
 			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
 			query1.setLong(2, model.getUpdate() - frequency * 86400000);
 			query1.setLong(3, model.getPSS());
-			System.out.println("Query:" + query1.toString());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
@@ -734,8 +733,7 @@ public class Globalsentiment extends GetReach {
 				+ (par.products != null ? "=?"
 						: " in (" + model.getProducts() + ") AND " + Settings.lotable_timestamp + ">? AND "
 								+ Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
-								+ Settings.latable + ")")
-				+ "and posts.id in (select post_id from post_source where post_source LIKE 'wiki')";
+								+ Settings.latable );
 
 		if (par.age != null || par.gender != null || par.location != null)
 			query += " where 1=1 ";
@@ -747,6 +745,7 @@ public class Globalsentiment extends GetReach {
 			query += " AND " + Settings.latable_location + "=?";
 
 		query += ")";
+		query += "and posts.opinions_id in (select post_id from post_source where post_source LIKE 'wiki'))";
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -769,6 +768,7 @@ public class Globalsentiment extends GetReach {
 				query1.setString(rangeindex++, par.gender);
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
+			
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");

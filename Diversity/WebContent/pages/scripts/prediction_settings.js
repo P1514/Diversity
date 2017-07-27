@@ -11,12 +11,16 @@ var count; // for timespan
 var snapshots;
 var snap = false;
 var snap_name;
+var snap_user;
+var snap_date;
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
 	  if (parts.length == 2)
 	    return parts.pop().split(";").shift();
 	}
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawChart);
 document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
@@ -30,23 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
 				+ window.location.port + '/Diversity/server');
 	}
 
+
   //Request products and services tree
   ws.onopen = function () {
-    json = {
-      "Op" : "gettree",
-      "All" : 1,
-      'Key' : getCookie("JSESSIONID")
-    }
+		if (window.location.href.indexOf('snapshot=') != -1) {
+			var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+			snap_name = snapName;
+			//snap = true;
+			json = {
+				'Op' : 'getrestrictions',
+				'Role' : 'DEVELOPER',
+				'Key' : getCookie('JSESSIONID'),
+			}
+			ws.send(JSON.stringify(json));
+		} else {
+			json = {
+	      "Op" : "gettree",
+	      "All" : 1,
+	      'Key' : getCookie("JSESSIONID")
+	    }
 
-    ws.send(JSON.stringify(json));
+	    ws.send(JSON.stringify(json));
+		}
+
   }
 
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
-
-    if (snap) {
-      $('#page_title').html('Snapshot: ' + snap_name);
-    }
 
     //If the message Op is 'Tree', build the products and services list as an interactive tree
     if (json[0].Op == "Tree") {
@@ -67,21 +81,52 @@ document.addEventListener('DOMContentLoaded', function() {
 				request_tutorial();
 			}
 
-			if (window.location.href.indexOf('snapshot=') != -1) {
-				var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
-				requestSnapshot(snapName);
-			}
+
     }
 
+		if (json[0].Op == "Rights") {
+			requestSnapshot(snap_name);
+		}
     //If the message Op is 'Prediction', draw the predicted global sentiment chart
     if (json[0].Op == "Prediction") {
       draw = true;
       //console.log(json);
       chartData = JSON.parse(JSON.stringify(json));
-
+			if (snap) {
+				for (var i = 0; i < chartData.length; i++) {
+					if (chartData[i].hasOwnProperty('User')) {
+						snap_user = chartData[i].User;
+					} else if (chartData[2].hasOwnProperty('Date')) {
+						var d = chartData[2].Date.split(" ");
+						var dateString = d[1] + " " + d[2] + ", " + d[5];
+						snap_date = dateString;
+					} else if (chartData[i].hasOwnProperty('PSS')) {
+						snap_pss = chartData[i].PSS;
+					}
+				}
+				$('#page_title').html('Snapshot: ' + snap_name);
+				$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
+				$('#tip').hide();
+				$('#prod_list').hide();
+				$('#serv_list').hide();
+				$('#lists').hide();
+				$('#submit').hide();
+				$('#radio_label1').hide();
+				$('#radio_label2').hide();
+			}
       drawChart();
     }
+		//If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
+		if (json[0] == "Snapshots") {
+				snapshots = json[1];
+				displaySnapshots();
+		}
+		if (snap) {
 
+		} else {
+			$('#snap_label').empty();
+
+		}
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
       if (json[0].hasOwnProperty("Message")) {
@@ -96,6 +141,30 @@ document.addEventListener('DOMContentLoaded', function() {
 	      snapshots = json[1];
 	      displaySnapshots();
     }
+		if (snap) {
+			$('#page_title').html('Snapshot: ' + snap_name);
+
+			var prods = json[1][json[1].length - 1].Products.split(',');
+			var prodsHTML = '';
+			for (var i = 0; i < prods.length; i++) {
+				prodsHTML += prods[i];
+				if (i != prods.length - 2) {
+					prodsHTML += ', ';
+				}
+			}
+
+			var servs = json[1][json[1].length - 1].Services.split(',');
+			var servsHTML = '';
+			for (var i = 0; i < servs.length; i++) {
+				servsHTML += servs[i];
+				if (i != servs.length - 2) {
+					servsHTML += ', ';
+				}
+			}
+			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p><br><p style="margin-left:50px"><b>Products:</b> ' + prodsHTML + '</p><br><p style="margin-left:50px"><b>Services:</b> ' + servsHTML  + '</p>');
+		} else {
+			$('#snap_label').empty();
+		}
   }
 });
 
@@ -255,6 +324,7 @@ function submit() {
     "Op" : "prediction",
     "Products" : products != "" ? products : undefined,
     "Services" : services != "" ? services : undefined,
+		"type" : document.getElementById('radio_lifecycle').checked ? "lifecycle" : undefined,
     'Key' : getCookie("JSESSIONID")
   }
   snap = false;
@@ -330,6 +400,7 @@ function requestSnapshot(val) {
   }
   snap = true;
   snap_name = val;
+
   ws.send(JSON.stringify(json));
 }
 
@@ -365,7 +436,7 @@ function drawChart() {
         variance = chartData[1][i].Variance;
       }
 
-      if (month != "" && (value != -1 || variance != -1)) {
+      if (month != "" && (value != -1 && variance != -1)) {
         sum += value;
         count += 1;
 
@@ -427,6 +498,3 @@ function drawChart() {
     return;
   }
 }
-
-google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawChart);

@@ -1,5 +1,7 @@
 package general;
 
+import java.util.ArrayList;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Company.
@@ -18,6 +20,8 @@ public final class Company {
 	/** The company id. */
 	private long company_id;
 	
+	private ArrayList<Long> design_projects;
+	
 	/**
 	 * Instantiates a new company.
 	 *
@@ -31,6 +35,7 @@ public final class Company {
 		this.name=_name;
 		this.type=_type;
 		this.company_id=_company_id;
+		this.design_projects= new ArrayList<Long>();
 	}
 	
 	/**
@@ -67,5 +72,14 @@ public final class Company {
 	 */
 	public long getCompany(){
 		return company_id;
+	}
+	
+
+	public void add_design_project(Long id){
+		this.design_projects.add(id);
+	}
+	
+	public ArrayList<Long> get_design_projects(){
+		return this.design_projects;
 	}
 }
