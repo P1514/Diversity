@@ -121,6 +121,8 @@ function getRole(){
       'Key' : getCookie("JSESSIONID")
     };
       ws.send(JSON.stringify(jsonData));
+
+      localStorage.user = url.split("user_id=")[1].split("&")[0];
 }
 
 function getCookie(name) {
@@ -205,6 +207,7 @@ ws.onmessage = function(event) {
     var dp = "";
     if (url.indexOf("design_project_id=") != -1) {
       dp = url.split("design_project_id=")[1].split("&")[0];
+      localStorage.dp = dp;
     }
 
     dp = dp.replace(/%20/g," ");
@@ -631,7 +634,7 @@ function ok(val) {
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
-      "User" : 1,// TODO find this field
+      "User" : url.split("user_id=")[1].split("&")[0],
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")

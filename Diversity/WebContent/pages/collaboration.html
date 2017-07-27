@@ -28,7 +28,6 @@
     <div class="container" id="table">
 			<br>
 			<div id="comp"><b>User company:</b> </div>
-			<input id="filter" class="search" type="text" placeholder="Type to filter table (eg. specific company, user role, etc)" style="width: 400px; margin-top: 20px;"/><br>
 			<label style="font-weight: 100"><input type = "checkbox" id = "all" />&nbsp Show users from all companies</label><br>
 			<label style="font-weight: 100"><input type = "checkbox" id = "unranked" />&nbsp Show users with no rating</label>
 
@@ -36,35 +35,36 @@
 				<div class="row">
 					<div class="col-md-6">
 						<h3 style="color: #604460;">Available members</h3>
-						<table id="users" class="sortable">
+						<input id="filter" class="search" type="text" placeholder="Type to filter table (eg. specific company, user role, etc)" style="width: 400px; margin-top: 10px;margin-bottom: 10px;"/><br>
+						<table id="users" class="sortable" style="background: #DDDDD; box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;">
 							<tbody id="users_body" class="list">
-								<tr>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;"></th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Name</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Role</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Company</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">User Rating</th>
+								<tr style="margin-top:10px;background: #604460;color: white;">
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;"></th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Name</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Role</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Company</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">User Rating</th>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<div class="col-md-6">
 						<h3 style="color: #604460;">My team</h3>
-						<table id="team" class="sortable">
+						<table id="team" class="sortable" style="background: #DDDDD; box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);padding-bottom:10px;margin-top:55px;">
 							<tbody id="team_body">
-								<tr>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;"></th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Name</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Role</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">Company</th>
-									<th style = "text-align: center;padding-right: 20px;padding-top:20px;">User Rating</th>
+								<tr style="margin-top:10px; background: #604460;color: white;">
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;"></th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Name</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Role</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">Company</th>
+									<th style = "text-align: center;padding-right: 20px;padding-top:5px;">User Rating</th>
 								</tr>
 							</tbody>
 						</table>
+						<input id="back" class="btn btn-default" onclick="submit();" type="submit" value="Submit" style="margin-top:20px;"/>
 					</div>
 				</div>
 				<br>
-				<input id="back" class="btn btn-default" onclick="submit();" type="submit" value="Submit" />
 		  </center>
     </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
