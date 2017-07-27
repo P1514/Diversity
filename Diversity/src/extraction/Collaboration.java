@@ -27,11 +27,9 @@ public class Collaboration {
 		productsId = productsId.replace(",", ";");
 		servicesId = servicesId.replace(",", ";");
 
-<<<<<<< HEAD:Diversity/src/general/Collaboration.java
+
 		//System.out.println(productsId);
 		//System.out.println(servicesId);
-=======
->>>>>>> master:Diversity/src/extraction/Collaboration.java
 
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		if (pssSentiment == null) {
