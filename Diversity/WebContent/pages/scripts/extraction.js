@@ -194,12 +194,14 @@ function connect() {
 
 		// If Op is 'Error', display the server message in an overlay window
 		if (json[0].Op == "Error") {
-			$('#loading')
-					.html(
-							json[0].Message
-									+ '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
-			$('#overlay').show();
-			$('#overlay-back').show();
+			if (snap && json[0].Message != 'Requested Model Not Found') {
+				$('#loading')
+						.html(
+								json[0].Message
+										+ '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
+				$('#overlay').show();
+				$('#overlay-back').show();
+			}
 			return;
 		}
 
@@ -235,24 +237,26 @@ function connect() {
 				i++;
 				for (var ii = 0; ii < tsize; ii++, i++) {
 					var option = document.createElement('option');
-					if (jsonData1[i].hasOwnProperty("Min")) {
-						option.text = jsonData1[i].Min + "-" + jsonData1[i].Max;
-					} else {
-						if (!(jsonData1[i].hasOwnProperty("Gender"))
-								&& !(jsonData1[i].hasOwnProperty("Product"))) {
-							option.text = jsonData1[i].Location;
-						} else if (!(jsonData1[i].hasOwnProperty("Gender"))
-								&& !(jsonData1[i].hasOwnProperty("Location"))) {
-							option.text = jsonData1[i].Product;
-						} else if (!(jsonData1[i].hasOwnProperty("Product"))
-								&& !(jsonData1[i].hasOwnProperty("Location"))) {
-							option.text = jsonData1[i].Gender;
+					if (jsonData1[i] !== undefined) {
+						if (jsonData1[i].hasOwnProperty("Min")) {
+							option.text = jsonData1[i].Min + "-" + jsonData1[i].Max;
+						} else {
+							if (!(jsonData1[i].hasOwnProperty("Gender"))
+									&& !(jsonData1[i].hasOwnProperty("Product"))) {
+								option.text = jsonData1[i].Location;
+							} else if (!(jsonData1[i].hasOwnProperty("Gender"))
+									&& !(jsonData1[i].hasOwnProperty("Location"))) {
+								option.text = jsonData1[i].Product;
+							} else if (!(jsonData1[i].hasOwnProperty("Product"))
+									&& !(jsonData1[i].hasOwnProperty("Location"))) {
+								option.text = jsonData1[i].Gender;
+							}
+							/*
+							 * option.text = (!(jsonData1[i]
+							 * .hasOwnProperty("Gender"))) ? jsonData1[i].Location :
+							 * jsonData1[i].Gender;
+							 */
 						}
-						/*
-						 * option.text = (!(jsonData1[i]
-						 * .hasOwnProperty("Gender"))) ? jsonData1[i].Location :
-						 * jsonData1[i].Gender;
-						 */
 					}
 					x.add(option);
 				}
@@ -268,7 +272,7 @@ function connect() {
 				snap = true;
 				json = {
 					"Op" : "load_snapshot",
-					"Id" : snapID,
+					"Name" : snapID,
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
