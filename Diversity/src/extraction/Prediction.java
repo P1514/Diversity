@@ -165,6 +165,8 @@ public class Prediction extends Globalsentiment {
 
 		return result;
 	}
+	Calendar firstdate=Calendar.getInstance();
+	Calendar firstdateaux=Calendar.getInstance();
 
 	public JSONArray predictLifeCycle(int timespan /* years */, String productsId, String servicesId)
 			throws JSONException {
@@ -206,28 +208,47 @@ public class Prediction extends Globalsentiment {
 		time[11] = "DEC";
 		obj = new JSONObject();
 
-		Calendar data = Calendar.getInstance();
-		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -1);
 
-		for (month = -1; month < 12 + data.get(Calendar.MONTH); month++) {
+		pssweights.forEach((k, v) -> {
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+			firstdateaux.setTimeInMillis(firstDate(-1));
+			if(firstdateaux.before(firstdate)){
+				firstdate=firstdateaux;
+			}
+			Data.delmodel((long) -1);
+		});
+		
+		pssweightss.forEach((k, v) -> {
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+			firstdateaux.setTimeInMillis(firstDate(-1));
+			if(firstdateaux.before(firstdate)){
+				firstdate=firstdateaux;
+			}
+			Data.delmodel((long) -1);
+		});
+
+
+		Calendar data = firstdate;
+		Calendar today = Calendar.getInstance();
+		for (month = 0; today.after(data); data.add(Calendar.MONTH, 1)) {
 			totalWeight = 0;
 			totalGsweight = 0;
 			variance = 0;
 			numbOfProd = 0;
+//			System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/"
+//					+ (data.get(Calendar.MONTH) + 1) + "/" + data.get(Calendar.YEAR));
+//			System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
+//					+ (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.YEAR));
 			pssweights.forEach((k, v) -> {
 
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				Calendar dateToShift = Calendar.getInstance();
 				dateToShift.setTimeInMillis(firstDate(-1));
-				//System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-					//	+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
-				
-				if (month == -1)// first time it goes iun the for loop it shifts
-								// the date
-					month = dateToShift.get(Calendar.MONTH) + 1;
+//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				dateToShift.add(Calendar.MONTH, month);
 
-				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), month % 12,
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
 						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
@@ -235,18 +256,16 @@ public class Prediction extends Globalsentiment {
 				numbOfProd++;
 			});
 			pssweightss.forEach((k, v) -> {
+
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				Calendar dateToShift = Calendar.getInstance();
 				dateToShift.setTimeInMillis(firstDate(-1));
-				//System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-				//		+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
-				
-				if (month == -1)// first time it goes iun the for loop it shifts
-								// the date
-					month = dateToShift.get(Calendar.MONTH) + 1;
-				
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12,
-						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				dateToShift.add(Calendar.MONTH, month);
+
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
+						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
 				totalWeight += (tempvalue == -1 ? 0 : v);
@@ -281,7 +300,7 @@ public class Prediction extends Globalsentiment {
 			}
 			try {
 				obj = new JSONObject();
-				obj.put("Month", time[month % 12]);
+				obj.put("Month", time[(month+1) % 12]);
 				obj.put("Value", mean);
 				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
 																								// confidence
@@ -292,6 +311,7 @@ public class Prediction extends Globalsentiment {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			month++;
 		}
 		
 		String productsName = "";
