@@ -1039,9 +1039,11 @@ function drawChart() {
 
 		if (!document.getElementById('radio_wiki').checked) {
 			document.getElementById('reachpie').style.display = 'block';
+			$('#reachpie').show();
 				bottom_left.draw(data, options);
 		} else {
 			document.getElementById('reachpie').style.display = 'none';
+			$('#reachpie').hide();
 		}
 	}
 
@@ -1177,9 +1179,11 @@ function drawChart() {
 		mid_data = data;
 		if (!document.getElementById('radio_wiki').checked) {
 			document.getElementById('reachline').style.display = 'block';
+			$('#reachline').show();
 			bottom_middle.draw(data, mid_options);
 		} else {
 			document.getElementById('reachline').style.display = 'none';
+			$('#reachline').hide();
 		}
 	}
 
@@ -1449,6 +1453,11 @@ function drawChart() {
 			request_tutorial();
 		}
 		loaded = !loaded;
+	}
+
+	if (document.getElementById('radio_wiki').checked) {
+		$('#reachline').hide();
+		$('#reachpie').hide();
 	}
 }
 
