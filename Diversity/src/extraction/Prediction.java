@@ -459,10 +459,10 @@ public class Prediction extends Globalsentiment {
 				totalWeight += (tempvalue == -1 ? 0 : v);
 				numbOfProd++;
 			});
+			}
 			
-			
-
-			
+			mean = (totalGsweight) / (totalWeight == 0 ? 1 : totalWeight);
+			for (; today.after(data); data.add(Calendar.YEAR, 1)) {
 			pssweights.forEach((k, v) -> {
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
@@ -479,7 +479,7 @@ public class Prediction extends Globalsentiment {
 				Data.delmodel((long) -1);
 			});
 			}
-			mean = (totalGsweight) / (totalWeight == 0 ? 1 : totalWeight);
+			
 
 			variance += Math.pow(200 - mean, 2);
 
@@ -493,7 +493,7 @@ public class Prediction extends Globalsentiment {
 			}
 			try {
 				obj = new JSONObject();
-				obj.put("Month", time[(month+1) % 12]);
+				obj.put("Month", time[(month) % 12]);
 				obj.put("Value", mean);
 				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
 																								// confidence
