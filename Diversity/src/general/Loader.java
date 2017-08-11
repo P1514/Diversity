@@ -681,7 +681,7 @@ public class Loader {
 		String querycond = "(";
 
 		for (Author a : users2) {
-			querycond += a.getUID() + ",";// um autor está a null
+			querycond += a.getUID() + ",";// um autor estï¿½ a null
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
@@ -1017,7 +1017,7 @@ public class Loader {
 		String err = null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
-				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
+				+ Settings.rptable_rpostid + " end as 'ID' from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
 				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
 				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
 		Connection cndata = null;
