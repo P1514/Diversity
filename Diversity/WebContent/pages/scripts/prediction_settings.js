@@ -13,6 +13,8 @@ var snap = false;
 var snap_name;
 var snap_user;
 var snap_date;
+var snapProds;
+var snapServs;
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -93,6 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
       //console.log(json);
       chartData = JSON.parse(JSON.stringify(json));
 			if (snap) {
+				snapProds = json[1][json[1].length - 1].Products.split(',');
+				snapServs = json[1][json[1].length - 1].Services.split(',');
 				for (var i = 0; i < chartData.length; i++) {
 					if (chartData[i].hasOwnProperty('User')) {
 						snap_user = chartData[i].User;
@@ -113,6 +117,19 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#submit').hide();
 				$('#radio_label1').hide();
 				$('#radio_label2').hide();
+
+					//var prods = json[1][json[1].length - 1].Products.split(',');
+					var prodsHTML = '';
+					for (var i = 0; i < snapProds.length; i++) {
+						prodsHTML += snapProds[i] + ', ';
+					}
+
+					//var servs = json[1][json[1].length - 1].Services.split(',');
+					var servsHTML = '';
+					for (var i = 0; i < snapServs.length; i++) {
+						servsHTML += snapServs[i] + ', ';
+					}
+					$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p><br><p style="margin-left:50px"><b>Products:</b> ' + prodsHTML.substring(0, prodsHTML.length - 4) + '</p><br><p style="margin-left:50px"><b>Services:</b> ' + servsHTML.substring(0, servsHTML.length - 4)  + '</p>');
 			}
       drawChart();
     }
@@ -141,30 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	      snapshots = json[1];
 	      displaySnapshots();
     }
-		if (snap) {
-			$('#page_title').html('Snapshot: ' + snap_name);
 
-			var prods = json[1][json[1].length - 1].Products.split(',');
-			var prodsHTML = '';
-			for (var i = 0; i < prods.length; i++) {
-				prodsHTML += prods[i];
-				if (i != prods.length - 2) {
-					prodsHTML += ', ';
-				}
-			}
-
-			var servs = json[1][json[1].length - 1].Services.split(',');
-			var servsHTML = '';
-			for (var i = 0; i < servs.length; i++) {
-				servsHTML += servs[i];
-				if (i != servs.length - 2) {
-					servsHTML += ', ';
-				}
-			}
-			$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p><br><p style="margin-left:50px"><b>Products:</b> ' + prodsHTML + '</p><br><p style="margin-left:50px"><b>Services:</b> ' + servsHTML  + '</p>');
-		} else {
-			$('#snap_label').empty();
-		}
   }
 });
 
