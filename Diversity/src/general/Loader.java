@@ -69,6 +69,31 @@ public class Loader {
 
 	}
 
+	public String loadinit() throws JSONException{
+		Server.isloading = true;
+		users = new ArrayList<String>();
+		users2 = new ArrayList<Author>();
+		totalposts = 0;
+		totalviews = 0;
+		totalcomments = 0;
+		totallikes = 0;
+		// long stime = System.nanoTime();
+		// //system.out.println(" Beginning " + stime);
+		loadPSS();
+		loadDesignProjects();
+		loadUsers();
+		String err = loadroles();
+		if (err != null)
+			return err;
+		err = loadGeneral();
+		if (err != null)
+			return err;
+		err = loadmodels();
+		if (err != null)
+			return err;
+		Server.isloading=false;
+		return null;
+	}
 	private String loadp1(JSONArray json) throws JSONException {
 		Server.isloading = true;
 		users = new ArrayList<String>();

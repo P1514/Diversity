@@ -47,6 +47,7 @@ public class LoadThreads {
 					+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?," + Settings.lotable_comments
 					+ "=?";
+
 			try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 				query1.setLong(1, opinion.getID());
 				query1.setDouble(2, opinion.getReach());
@@ -65,21 +66,22 @@ public class LoadThreads {
 				query1.setDouble(11, opinion.getPolarity());
 				query1.setDouble(12, opinion.getTotalInf());
 				query1.setLong(13, opinion.ncomments());
-					try {
-						//System.out.println(query1.toString());
-						query1.executeUpdate();
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
-						Thread.sleep((long) (Math.random() * 1000));
-						}
-					
+				try {
+//					if (opinion.getID() == 8480)
+//						System.out.println("INSERT OPINION: " + query1.toString());
+					query1.executeUpdate();
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
+					Thread.sleep((long) (Math.random() * 1000));
+				}
+
 				if (!Loader.first_load) {
 					cnlocal.close();
 					return;
 				}
 				for (Post post : opinion.getPosts().values()) {
 					PreparedStatement query2 = null;
-					
+
 					try {
 						String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 						query2 = cnlocal.prepareStatement(update1);
@@ -250,7 +252,7 @@ public class LoadThreads {
 				try {
 					date = df.parse(rs.getString(Settings.rptable_date));
 				} catch (ParseException e) {
-					//system.out.print("Error Parsing Date from Local DB");
+					// system.out.print("Error Parsing Date from Local DB");
 				}
 				time = date.getTime();
 
@@ -263,7 +265,7 @@ public class LoadThreads {
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
 			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lptable_message);
 
-			long product = Data.identifyProduct(message);
+			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
 				return;
 			}
@@ -278,7 +280,7 @@ public class LoadThreads {
 		}
 
 		public void run() {
-			Connection cndata;
+			Connection cndata = null;
 			Connection cnlocal;
 			if (obj == null) {
 
@@ -326,10 +328,10 @@ public class LoadThreads {
 					return;
 				}
 				boolean remote = true;
-				query = (Settings.sqlselectall + Settings.rptable+ Settings.sqlwhere
-						+ Settings.rptable + "." + Settings.rptable_postid + " = " + id);
-				//system.out.println(query);
- 				try (Statement stmt = cndata.createStatement()) {
+				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable + "."
+						+ Settings.rptable_postid + " = " + id);
+				// system.out.println(query);
+				try (Statement stmt = cndata.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (!rs.next()) {
 							remote = false;
@@ -372,9 +374,8 @@ public class LoadThreads {
 					} else {
 						Loader.totalposts--;
 					}
-					// Date date = new
-					// Date(Long.valueOf(obj.getString("postEpoch")) * 1000L);
-					Date date = new Date(0);
+					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
+					// Date date = new Date(0);
 					DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					format.setTimeZone(TimeZone.getTimeZone("GMT"));
 					String formatted = format.format(date);
@@ -398,7 +399,8 @@ public class LoadThreads {
 						try {
 							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
 						} catch (ParseException e) {
-							//system.out.print("Error Parsing Date from Local DB");
+							// system.out.print("Error Parsing Date from Local
+							// DB");
 						}
 						time = date.getTime();
 
@@ -413,7 +415,7 @@ public class LoadThreads {
 					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
-					long product = Data.identifyProduct(message);
+					long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 					/*
 					 * if (product == 0) { rs.close(); stmt.close();
 					 * conlocal.close(); condata.close(); return; }
@@ -448,7 +450,7 @@ public class LoadThreads {
 					if (cnlocal != null)
 						cnlocal.close();
 				} catch (SQLException | JSONException e) {
-					//system.out.println("ERROR loading Opinions");
+					// system.out.println("ERROR loading Opinions");
 					e.printStackTrace();
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -477,6 +479,14 @@ public class LoadThreads {
 
 				}
 
+			}
+			try {
+				if (cndata != null)
+					cndata.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -549,7 +559,8 @@ public class LoadThreads {
 							try {
 								date = df.parse(rs.getString(Settings.rptable_date));
 							} catch (ParseException e) {
-								//system.out.print("Error Parsing Date from Local DB");
+								// system.out.print("Error Parsing Date from
+								// Local DB");
 							}
 							time = date.getTime();
 
@@ -568,9 +579,9 @@ public class LoadThreads {
 					cndata.close();
 					cnlocal = Settings.connlocal();
 					query = (Settings.sqlselectall + Settings.lptable
-							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id " + Settings.sqlwhere
-							+ Settings.lptable_opinion + " = " + id);
-					//system.out.println(query);
+							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id "
+							+ Settings.sqlwhere + Settings.lptable_opinion + " = " + id);
+					// system.out.println(query);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (rs.next()) {
@@ -599,7 +610,7 @@ public class LoadThreads {
 						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					//system.out.println("ERROR loading Posts");
+					// system.out.println("ERROR loading Posts");
 					e.printStackTrace();
 				} catch (SQLException e) {
 					//

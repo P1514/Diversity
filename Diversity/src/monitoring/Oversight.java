@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.Connection;
 
@@ -52,10 +53,11 @@ public class Oversight extends TimerTask {
 		// 24*60*60*1000);//h/d*m/d*s/m*ms/s = ms/d (runs once a day)
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 0/* 1 */);
-		c.set(Calendar.HOUR, 0);
-		c.set(Calendar.MINUTE, 1/* 0 */);
+		/*c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 1);
 		c.set(Calendar.SECOND, 0);
-		c.set(Calendar.AM_PM, Calendar.AM);
+		c.set(Calendar.AM_PM, Calendar.AM);*/
+		c.add(Calendar.SECOND, 15);
 
 		timer.scheduleAtFixedRate(this, c.getTime(), 24 * 60 * 60 * 1000);
 	}
@@ -67,7 +69,7 @@ public class Oversight extends TimerTask {
 	 *            the a
 	 */
 	public Oversight(boolean a) {
-		local = Settings.JSON_use;
+		local = false;
 		Calendar date = Calendar.getInstance();
 		date.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
 		// timer.scheduleAtFixedRate(this, date.getTime(),
@@ -149,13 +151,16 @@ public class Oversight extends TimerTask {
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
 								: new url();
-						local.accounts += "&accounts[]=" + d.account.replace(" ", "%");
+						local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
 						local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
 						requesturl.put(d.pss.toString(), local);
 						// break;// TO TEST
 					}
 
 					requesturl.forEach((k, v) -> {
+						Settings.currentPss = Long.parseLong(k);
+						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();					
+						for(Long prodid : products){
 						// String request = uri +
 						// a.split(";;;")[0] + "/intelligent-search/getFeedback"
 						// + v.epochs.replaceFirst("&", "?") + v.accounts +
@@ -166,7 +171,8 @@ public class Oversight extends TimerTask {
 						System.out.println("REQUEST:" + request);
 						try {
 							// System.out.println("TESTE: " + readUrl(request));
-							(new Loader()).load(new JSONArray(readUrl(request)));
+							Settings.currentProduct = prodid;
+									(new Loader()).load(new JSONArray(readUrl(request)));
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -210,9 +216,9 @@ public class Oversight extends TimerTask {
 
 							e.printStackTrace();
 						}
-
+					}
 					});
-					
+
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -227,15 +233,21 @@ public class Oversight extends TimerTask {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-		} //else {
+
 			try {
 				(new Loader()).load(null);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		//}
+		}  else {
+		try {
+			(new Loader()).loadinit();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 }
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
@@ -271,7 +283,7 @@ public class Oversight extends TimerTask {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
-			// System.out.println("URL:"+url.toString());
+			System.out.println("URL:" + url.toString());
 			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			StringBuffer buffer = new StringBuffer();
 			int read;

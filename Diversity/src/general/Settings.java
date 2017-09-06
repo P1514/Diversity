@@ -147,6 +147,9 @@ public class Settings {
 	public static String locations = "Asia,,Europe";
 	public static Boolean JSON_use = true;
 	public static int session_timeout = 30; // in minutes
+	public static long currentProduct = 0;
+	public static long currentPss = 0;
+
 	
 	//testing epochs:
 	//http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200123&epochsTo[]=1500476864598&pssId=31&accounts[]=AirForce1&accounts[]=AirForcse1
@@ -155,7 +158,8 @@ public class Settings {
 	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
 	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
 	//public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200000&epochsTo[]=1498054243000&pssId=31&accounts[]=AirForce1";
-	public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback";
+	//public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback";
+	public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/";
 	public static final boolean LocalPolarity = true;
 	public static Boolean include_services = true;
 

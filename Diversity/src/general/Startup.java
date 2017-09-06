@@ -43,7 +43,7 @@ public class Startup implements ServletContextListener {
 		
 		Oversight o = new Oversight(true);
 		o.run();
-		//new Oversight();
+		new Oversight();
 		Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;
