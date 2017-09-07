@@ -166,7 +166,7 @@ public class Oversight extends TimerTask {
 						// + v.epochs.replaceFirst("&", "?") + v.accounts +
 						// "&pssId=\"" + k + "\"";
 						String request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId="
-								+ k;
+								+ k+ "&pssName="+Data.getpss(Long.parseLong(k)).getName()+(Data.getProduct(prodid).getFinal()?"&finalProductId="+prodid+"&finalProductName="+Data.getProduct(prodid).get_Name():"");
 						// request = Settings.JSON_uri;
 						System.out.println("REQUEST:" + request);
 						try {
