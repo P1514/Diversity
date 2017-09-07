@@ -121,6 +121,7 @@ public class Prediction extends Globalsentiment {
 
 				variance = variance / totalGsweight;
 				stDeviation = Math.sqrt(variance);
+				variance=Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd));
 			} else {
 				mean = -1;
 				variance = -1;
@@ -129,7 +130,7 @@ public class Prediction extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value", mean);
-				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
+				obj.put("Variance", variance);// 95%
 																								// confidence
 																								// interval
 				result.put(obj);
@@ -144,16 +145,19 @@ public class Prediction extends Globalsentiment {
 		
 		String[] products = productsId.split(";");
 		
+		if(!products.equals(null))
 		for (String s : products) {
 			if(Data.dbhasproduct(Long.parseLong(s)))
 			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
 		}
 		
+		if(!servicesId.equals(null)){
 		String[] services = servicesId.split(";");
-		
+
 		for (String s : services) {
 			if(Data.dbhasservice(Long.parseLong(s)))
 			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		}
 		}
 		
 		try {
