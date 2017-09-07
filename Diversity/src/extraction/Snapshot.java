@@ -331,7 +331,7 @@ public class Snapshot {
 				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}
-			result.put("Snapshots");
+			result.put(new JSONObject().put("Op", "Snapshots"));
 			result.put(aux);
 
 		} catch (Exception e) {

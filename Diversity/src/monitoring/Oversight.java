@@ -103,7 +103,7 @@ public class Oversight extends TimerTask {
 			try {
 				PreparedStatement query = cnlocal.prepareStatement(getpss);
 				ResultSet rs;
-				System.out.println("QUERY: " + query.toString());
+				//System.out.println("QUERY: " + query.toString());
 				rs = query.executeQuery();
 
 				while (rs.next()) {
@@ -112,7 +112,7 @@ public class Oversight extends TimerTask {
 				}
 				for (String a : sourcelist) {
 
-					System.out.println("Source: " + a);
+					//System.out.println("Source: " + a);
 
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();
@@ -125,7 +125,7 @@ public class Oversight extends TimerTask {
 
 					rs = query.executeQuery();
 
-					System.out.println("query: " + query.toString());
+					//System.out.println("query: " + query.toString());
 
 					Calendar c = Calendar.getInstance();
 					while (rs.next()) {
@@ -166,9 +166,9 @@ public class Oversight extends TimerTask {
 						// + v.epochs.replaceFirst("&", "?") + v.accounts +
 						// "&pssId=\"" + k + "\"";
 						String request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts + "&pssId="
-								+ k;
+								+ k+ "&pssName="+Data.getpss(Long.parseLong(k)).getName()+(Data.getProduct(prodid).getFinal()?"&finalProductId="+prodid+"&finalProductName="+Data.getProduct(prodid).get_Name():"");
 						// request = Settings.JSON_uri;
-						System.out.println("REQUEST:" + request);
+						//System.out.println("REQUEST:" + request);
 						try {
 							// System.out.println("TESTE: " + readUrl(request));
 							Settings.currentProduct = prodid;
@@ -205,7 +205,7 @@ public class Oversight extends TimerTask {
 							for (String acc : account) {
 								query1.setString(i++, acc.split("=")[1]);
 							}
-							System.out.println(query1);
+							//System.out.println(query1);
 							query1.execute();
 
 							/*
@@ -283,7 +283,7 @@ public class Oversight extends TimerTask {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
-			System.out.println("URL:" + url.toString());
+			//System.out.println("URL:" + url.toString());
 			reader = new BufferedReader(new InputStreamReader(url.openStream()));
 			StringBuffer buffer = new StringBuffer();
 			int read;
