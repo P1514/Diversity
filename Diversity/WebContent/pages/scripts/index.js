@@ -634,7 +634,7 @@ function ok(val) {
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
-      "User" : url.split("user_id=")[1].split("&")[0],
+      "User" : location.href.indexOf("user_id") != -1 ? location.href.split("user_id=")[1].split("&")[0] : "",
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")
