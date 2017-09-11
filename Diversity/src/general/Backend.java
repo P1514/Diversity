@@ -386,7 +386,7 @@ public class Backend {
 					obj.put("Op", "Prediction");
 					result.put(obj);
 					if(!msg.has("type"))
-					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+					result.put(pre.predictSeassonal(1, msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : ""));
 					else
 					result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
