@@ -52,15 +52,22 @@ public class Monitor {
 
 			}
 		}
-		url = "http://diversity.euprojects.net/socialfeedbackextraction/registerSFE?accounts[]=\"";
+		url = Settings.register_uri + "?accounts[]=";
 		for (int i = 0; i < urilists.length; i++) {
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "\"&type[]=\"" + source + "\"&";
+			url += account + "&type[]=" + source  ;
 		}
-		url = url.substring(0, url.length() - 1);
-		url += pssName + finalProductId + finalProductName;
-
+		//url = url.substring(0, url.length() - 1);
+		//url += pssName + finalProductId + finalProductName;
+		//System.out.println(url);
+		try {
+			System.out.println(url);
+			Oversight.readUrl(url);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
 		try {
@@ -72,9 +79,9 @@ public class Monitor {
 			stmt.setString(1, source);
 			stmt.setString(2, account);
 			stmt.setLong(3, pss);
-			stmt.setLong(4,(long) 9466848 * 100000);
+			stmt.setLong(4, (long) 9466848 * 100000);
 			stmt.setString(5, source);
-			//System.out.println(query);
+			// System.out.println(query);
 
 			stmt.execute();
 
