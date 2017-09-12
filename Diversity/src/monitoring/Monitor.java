@@ -62,7 +62,7 @@ public class Monitor {
 		//url += pssName + finalProductId + finalProductName;
 		//System.out.println(url);
 		try {
-			System.out.println(url);
+			//System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
