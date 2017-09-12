@@ -286,7 +286,7 @@ public class Oversight extends TimerTask {
 
 	}
 
-	private static String readUrl(String urlString) throws Exception {
+	public static String readUrl(String urlString) throws Exception {
 		BufferedReader reader = null;
 		try {
 			URL url = new URL(urlString);
