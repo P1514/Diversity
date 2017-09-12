@@ -147,7 +147,7 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = false;
+	public static Boolean JSON_use = true;
 	public static int session_timeout = 30; // in minutes
 	public static long currentProduct = 0;
 	public static long currentPss = 0;
@@ -162,7 +162,7 @@ public class Settings {
 	//public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200000&epochsTo[]=1498054243000&pssId=31&accounts[]=AirForce1";
 	public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback";
 	//public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/";
-	public static final boolean LocalPolarity = true;
+	public static final boolean LocalPolarity = false;
 	public static Boolean include_services = true;
 
 	// Received JSON Parameters

@@ -553,9 +553,9 @@ public class Backend {
 			 * System.out.println("YELLO"); return result.toString();
 			 */
 			case 2:
-				Data dat = new Data();
-				return (new Loader()).load(null);
-			/*
+				Startup.running.run();
+				return error_message("Update Ran Successfully").toString();
+				/*
 			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1,
 			 * param, values, id).toString(); return tmp;
 			 */
