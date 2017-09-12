@@ -20,6 +20,8 @@ import java.sql.Connection;
  */
 public class Settings {
 	
+	public static final String version = "2.0";
+	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
 	private static DataSource concr;
@@ -145,7 +147,7 @@ public class Settings {
 	public static String ages = "0-30,,31-60,,61-90";
 	public static String genders = "Female,,Male";
 	public static String locations = "Asia,,Europe";
-	public static Boolean JSON_use = true;
+	public static Boolean JSON_use = false;
 	public static int session_timeout = 30; // in minutes
 	public static long currentProduct = 0;
 	public static long currentPss = 0;

@@ -74,7 +74,7 @@ public class Monitor {
 			stmt.setLong(3, pss);
 			stmt.setLong(4,(long) 9466848 * 100000);
 			stmt.setString(5, source);
-			System.out.println(query);
+			//System.out.println(query);
 
 			stmt.execute();
 

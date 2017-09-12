@@ -112,7 +112,7 @@ public class Oversight extends TimerTask {
 				}
 				for (String a : sourcelist) {
 
-					//System.out.println("Source: " + a);
+				//System.out.println("Source: " + a);
 
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();
@@ -171,6 +171,7 @@ public class Oversight extends TimerTask {
 						//System.out.println("REQUEST:" + request);
 						try {
 							// System.out.println("TESTE: " + readUrl(request));
+							request.replaceAll(" ", "%20");
 							Settings.currentProduct = prodid;
 									(new Loader()).load(new JSONArray(readUrl(request)));
 						} catch (Exception e) {

@@ -120,7 +120,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		System.out.println("TEST" + result);
+		//System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}

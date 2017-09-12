@@ -24,7 +24,7 @@ public class Prediction extends Globalsentiment {
 	double totalSentiment, totalWeight, totalGsweight, variance, numbOfProd, maxValue, mean, tempvalue, stDeviation;
 	int month, i;
 	public static final Logger LOGGER = new Logging().create(Data.class.getName());
-	Calendar data;
+	Calendar data = Calendar.getInstance();
 
 	public Prediction() {
 
@@ -37,15 +37,15 @@ public class Prediction extends Globalsentiment {
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
 
-//		pssweights.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
-//
-//		});
-//
-//		pssweightss.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
-//
-//		});
+		// pssweights.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
+		//
+		// });
+		//
+		// pssweightss.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
+		//
+		// });
 		if (pssweights.isEmpty() && pssweightss.isEmpty())
 
 		{
@@ -121,6 +121,7 @@ public class Prediction extends Globalsentiment {
 
 				variance = variance / totalGsweight;
 				stDeviation = Math.sqrt(variance);
+				variance = Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd));
 			} else {
 				mean = -1;
 				variance = -1;
@@ -129,9 +130,9 @@ public class Prediction extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[month % 12]);
 				obj.put("Value", mean);
-				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
-																								// confidence
-																								// interval
+				obj.put("Variance", variance);// 95%
+												// confidence
+												// interval
 				result.put(obj);
 
 			} catch (JSONException e) {
@@ -141,21 +142,24 @@ public class Prediction extends Globalsentiment {
 		}
 		String productsName = "";
 		String servicesName = "";
-		
-		String[] products = productsId.split(";");
-		
-		for (String s : products) {
-			if(Data.dbhasproduct(Long.parseLong(s)))
-			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+
+		if (!productsId.equals("")) {
+			String[] products = productsId.split(";");
+
+			for (String s : products) {
+				if (Data.dbhasproduct(Long.parseLong(s)))
+					productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
-		String[] services = servicesId.split(";");
-		
-		for (String s : services) {
-			if(Data.dbhasservice(Long.parseLong(s)))
-			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		if (!servicesId.equals("")) {
+			String[] services = servicesId.split(";");
+
+			for (String s : services) {
+				if (Data.dbhasservice(Long.parseLong(s)))
+					servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
+
 		try {
 			obj = new JSONObject();
 			obj.put("Products", productsName);
@@ -168,8 +172,9 @@ public class Prediction extends Globalsentiment {
 
 		return result;
 	}
-	Calendar firstdate=Calendar.getInstance();
-	Calendar firstdateaux=Calendar.getInstance();
+
+	Calendar firstdate = Calendar.getInstance();
+	Calendar firstdateaux = Calendar.getInstance();
 
 	public JSONArray predictLifeCycle(int timespan /* years */, String productsId, String servicesId)
 			throws JSONException {
@@ -179,15 +184,15 @@ public class Prediction extends Globalsentiment {
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
 
-//		pssweights.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
-//
-//		});
-//
-//		pssweightss.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
-//
-//		});
+		// pssweights.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
+		//
+		// });
+		//
+		// pssweightss.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
+		//
+		// });
 		if (pssweights.isEmpty() && pssweightss.isEmpty())
 
 		{
@@ -211,25 +216,23 @@ public class Prediction extends Globalsentiment {
 		time[11] = "DEC";
 		obj = new JSONObject();
 
-
 		pssweights.forEach((k, v) -> {
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 			firstdateaux.setTimeInMillis(firstDate(-1));
-			if(firstdateaux.before(firstdate)){
-				firstdate=firstdateaux;
-			}
-			Data.delmodel((long) -1);
-		});
-		
-		pssweightss.forEach((k, v) -> {
-			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-			firstdateaux.setTimeInMillis(firstDate(-1));
-			if(firstdateaux.before(firstdate)){
-				firstdate=firstdateaux;
+			if (firstdateaux.before(firstdate)) {
+				firstdate = firstdateaux;
 			}
 			Data.delmodel((long) -1);
 		});
 
+		pssweightss.forEach((k, v) -> {
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+			firstdateaux.setTimeInMillis(firstDate(-1));
+			if (firstdateaux.before(firstdate)) {
+				firstdate = firstdateaux;
+			}
+			Data.delmodel((long) -1);
+		});
 
 		Calendar data = firstdate;
 		Calendar today = Calendar.getInstance();
@@ -238,20 +241,24 @@ public class Prediction extends Globalsentiment {
 			totalGsweight = 0;
 			variance = 0;
 			numbOfProd = 0;
-//			System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/"
-//					+ (data.get(Calendar.MONTH) + 1) + "/" + data.get(Calendar.YEAR));
-//			System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
-//					+ (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.YEAR));
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/"
+			// + (data.get(Calendar.MONTH) + 1) + "/" +
+			// data.get(Calendar.YEAR));
+			// System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
+			// + (today.get(Calendar.MONTH) + 1) + "/" +
+			// today.get(Calendar.YEAR));
 			pssweights.forEach((k, v) -> {
 
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				Calendar dateToShift = Calendar.getInstance();
 				dateToShift.setTimeInMillis(firstDate(-1));
-//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				// System.out.println(firstDate(-1) + " " +
+				// (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+				// + (dateToShift.get(Calendar.MONTH) + 1) + "/" +
+				// dateToShift.get(Calendar.YEAR));
 				dateToShift.add(Calendar.MONTH, month);
 
-				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
 						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
@@ -263,11 +270,13 @@ public class Prediction extends Globalsentiment {
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				Calendar dateToShift = Calendar.getInstance();
 				dateToShift.setTimeInMillis(firstDate(-1));
-//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				// System.out.println(firstDate(-1) + " " +
+				// (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+				// + (dateToShift.get(Calendar.MONTH) + 1) + "/" +
+				// dateToShift.get(Calendar.YEAR));
 				dateToShift.add(Calendar.MONTH, month);
 
-				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
 						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
@@ -282,11 +291,13 @@ public class Prediction extends Globalsentiment {
 
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				dateToShift.setTimeInMillis(firstDate(-1));
-//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				// System.out.println(firstDate(-1) + " " +
+				// (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+				// + (dateToShift.get(Calendar.MONTH) + 1) + "/" +
+				// dateToShift.get(Calendar.YEAR));
 				dateToShift.add(Calendar.MONTH, month);
-				
-				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
+
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
 						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				variance += Math.pow(tempvalue - mean, 2);
 				Data.delmodel((long) -1);
@@ -296,10 +307,12 @@ public class Prediction extends Globalsentiment {
 				Calendar dateToShift = Calendar.getInstance();
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 				dateToShift.setTimeInMillis(firstDate(-1));
-//				System.out.println(firstDate(-1) + " " + (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
-//						+ (dateToShift.get(Calendar.MONTH) + 1) + "/" + dateToShift.get(Calendar.YEAR));
+				// System.out.println(firstDate(-1) + " " +
+				// (dateToShift.get(Calendar.DAY_OF_MONTH)) + "/"
+				// + (dateToShift.get(Calendar.MONTH) + 1) + "/" +
+				// dateToShift.get(Calendar.YEAR));
 				dateToShift.add(Calendar.MONTH, month);
-				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH),dateToShift.get(Calendar.MONTH),
+				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
 						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				variance += Math.pow(tempvalue - mean, 2);
 				Data.delmodel((long) -1);
@@ -331,24 +344,25 @@ public class Prediction extends Globalsentiment {
 			}
 			month++;
 		}
-		
+
 		String productsName = "";
 		String servicesName = "";
-		
-		String[] products = productsId.split(";");
-		
-		for (String s : products) {
-			if(Data.dbhasproduct(Long.parseLong(s)))
-			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+		if (!productsId.equals("")) {
+			String[] products = productsId.split(";");
+
+			for (String s : products) {
+				if (Data.dbhasproduct(Long.parseLong(s)))
+					productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
-		String[] services = servicesId.split(";");
-		
-		for (String s : services) {
-			if(Data.dbhasservice(Long.parseLong(s)))
-			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		if (!servicesId.equals("")) {
+			String[] services = servicesId.split(";");
+
+			for (String s : services) {
+				if (Data.dbhasservice(Long.parseLong(s)))
+					servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
 		try {
 			obj = new JSONObject();
 			obj.put("Products", productsName);
@@ -361,7 +375,7 @@ public class Prediction extends Globalsentiment {
 
 		return result;
 	}
-	
+
 	public JSONArray predictSeassonal(int timespan /* years */, String productsId, String servicesId)
 			throws JSONException {
 		JSONArray result = new JSONArray();
@@ -370,15 +384,15 @@ public class Prediction extends Globalsentiment {
 		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
 
-//		pssweights.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
-//
-//		});
-//
-//		pssweightss.forEach((k, v) -> {
-//			System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
-//
-//		});
+		// pssweights.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
+		//
+		// });
+		//
+		// pssweightss.forEach((k, v) -> {
+		// System.out.println("SIMILARITY OF SERVICES(" + k + ") -->" + v);
+		//
+		// });
 		if (pssweights.isEmpty() && pssweightss.isEmpty())
 
 		{
@@ -402,84 +416,93 @@ public class Prediction extends Globalsentiment {
 		time[11] = "DEC";
 		obj = new JSONObject();
 
-
 		pssweights.forEach((k, v) -> {
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 			firstdateaux.setTimeInMillis(firstDate(-1));
-			if(firstdateaux.before(firstdate)){
-				firstdate=firstdateaux;
+			if (firstdateaux.before(firstdate)) {
+				firstdate = firstdateaux;
 			}
 			Data.delmodel((long) -1);
 		});
-		
+
 		pssweightss.forEach((k, v) -> {
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 			firstdateaux.setTimeInMillis(firstDate(-1));
-			if(firstdateaux.before(firstdate)){
-				firstdate=firstdateaux;
+			if (firstdateaux.before(firstdate)) {
+				firstdate = firstdateaux;
 			}
 			Data.delmodel((long) -1);
 		});
 
-
-		
 		Calendar today = Calendar.getInstance();
-		for (month = 0; month<12;month++) {
+		for (month = 0; month < 12; month++) {
 			totalWeight = 0;
 			totalGsweight = 0;
 			variance = 0;
 			numbOfProd = 0;
-//			System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/"
-//					+ (data.get(Calendar.MONTH) + 1) + "/" + data.get(Calendar.YEAR));
-//			System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
-//					+ (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.YEAR));
-			data = firstdate;			
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
+			// System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
+			// + (today.get(Calendar.MONTH) + 1) + "/" +
+			// today.get(Calendar.YEAR));
+			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
+
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
 			variance = 0;
 			for (; today.after(data); data.add(Calendar.YEAR, 1)) {
-			pssweights.forEach((k, v) -> {
+				pssweights.forEach((k, v) -> {
 
-				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+					Data.addmodel((long) -1,
+							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+					totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
+					Data.delmodel((long) -1);
+					totalWeight += (tempvalue == -1 ? 0 : v);
+					numbOfProd++;
+				});
+				pssweightss.forEach((k, v) -> {
 
-				tempvalue = globalsentimentby(firstdate.get(Calendar.DAY_OF_MONTH),month,
-						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
-				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
-				Data.delmodel((long) -1);
-				totalWeight += (tempvalue == -1 ? 0 : v);
-				numbOfProd++;
-			});
-			pssweightss.forEach((k, v) -> {
+					Data.addmodel((long) -1,
+							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
-				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-
-				tempvalue = globalsentimentby(firstdate.get(Calendar.DAY_OF_MONTH),month,
-						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
-				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
-				Data.delmodel((long) -1);
-				totalWeight += (tempvalue == -1 ? 0 : v);
-				numbOfProd++;
-			});
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+					totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
+					Data.delmodel((long) -1);
+					totalWeight += (tempvalue == -1 ? 0 : v);
+					numbOfProd++;
+				});
 			}
-			
+
 			mean = (totalGsweight) / (totalWeight == 0 ? 1 : totalWeight);
+			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
 			for (; today.after(data); data.add(Calendar.YEAR, 1)) {
-			pssweights.forEach((k, v) -> {
-				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
-						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
-				variance += Math.pow(tempvalue - mean, 2);
-				Data.delmodel((long) -1);
-			});
+				pssweights.forEach((k, v) -> {
+					Data.addmodel((long) -1,
+							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+					variance += Math.pow(tempvalue - mean, 2);
+					Data.delmodel((long) -1);
+				});
 
-			pssweightss.forEach((k, v) -> {
-				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
-						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
-				variance += Math.pow(tempvalue - mean, 2);
-				Data.delmodel((long) -1);
-			});
+				pssweightss.forEach((k, v) -> {
+					Data.addmodel((long) -1,
+							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+					variance += Math.pow(tempvalue - mean, 2);
+					Data.delmodel((long) -1);
+				});
 			}
-			
 
 			variance += Math.pow(200 - mean, 2);
 
@@ -487,6 +510,7 @@ public class Prediction extends Globalsentiment {
 
 				variance = variance / totalGsweight;
 				stDeviation = Math.sqrt(variance);
+				variance = Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd));
 			} else {
 				mean = -1;
 				variance = -1;
@@ -495,35 +519,36 @@ public class Prediction extends Globalsentiment {
 				obj = new JSONObject();
 				obj.put("Month", time[(month) % 12]);
 				obj.put("Value", mean);
-				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
-																								// confidence
-																								// interval
+				obj.put("Variance", variance);// 95%
+												// confidence
+												// interval
 				result.put(obj);
-
+				firstdate.add(Calendar.MONTH, 1);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 		String productsName = "";
 		String servicesName = "";
-		
-		String[] products = productsId.split(";");
-		
-		for (String s : products) {
-			if(Data.dbhasproduct(Long.parseLong(s)))
-			productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+		if (!productsId.equals("")) {
+			String[] products = productsId.split(";");
+
+			for (String s : products) {
+				if (Data.dbhasproduct(Long.parseLong(s)))
+					productsName += Data.getProduct(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
-		String[] services = servicesId.split(";");
-		
-		for (String s : services) {
-			if(Data.dbhasservice(Long.parseLong(s)))
-			servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+		if (!servicesId.equals("")) {
+			String[] services = servicesId.split(";");
+
+			for (String s : services) {
+				if (Data.dbhasservice(Long.parseLong(s)))
+					servicesName += Data.getService(Long.parseLong(s)).get_Name() + ",";
+			}
 		}
-		
 		try {
 			obj = new JSONObject();
 			obj.put("Products", productsName);
@@ -536,7 +561,6 @@ public class Prediction extends Globalsentiment {
 
 		return result;
 	}
-
 
 	public HashMap<Long, Double> predict(String productsId, String servicesId) throws JSONException {
 
