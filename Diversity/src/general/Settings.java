@@ -20,6 +20,8 @@ import java.sql.Connection;
  */
 public class Settings {
 	
+	public static final String version = "2.0";
+	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
 	private static DataSource concr;

@@ -632,6 +632,7 @@ public class Loader {
 			}
 		}
 		LOGGER.log(Level.INFO, " Variable Init " + (System.nanoTime() - stime));
+		LOGGER.log(Level.INFO, " Version: " + Settings.version);
 		stime = System.nanoTime();
 		return null;
 	}
