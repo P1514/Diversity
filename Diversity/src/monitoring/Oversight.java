@@ -112,7 +112,7 @@ public class Oversight extends TimerTask {
 				}
 				for (String a : sourcelist) {
 
-					//System.out.println("Source: " + a);
+				//System.out.println("Source: " + a);
 
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();

@@ -324,7 +324,7 @@ public class Globalsentiment extends GetReach {
 			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
 			query1.setLong(2, model.getUpdate() - frequency * 86400000);
 			query1.setLong(3, model.getPSS());
-			System.out.println("Query:" + query1.toString());
+			//System.out.println("Query:" + query1.toString());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {

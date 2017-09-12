@@ -440,15 +440,17 @@ public class Prediction extends Globalsentiment {
 			totalGsweight = 0;
 			variance = 0;
 			numbOfProd = 0;
-			//System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" + (data.get(Calendar.MONTH) + 1) + "/"
-				//	+ data.get(Calendar.YEAR));
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
 			// System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
 			// + (today.get(Calendar.MONTH) + 1) + "/" +
 			// today.get(Calendar.YEAR));
 			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
-			
-			System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" + (data.get(Calendar.MONTH) + 1) + "/"
-					+ data.get(Calendar.YEAR));
+
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
 			variance = 0;
 			for (; today.after(data); data.add(Calendar.YEAR, 1)) {
 				pssweights.forEach((k, v) -> {
@@ -479,8 +481,9 @@ public class Prediction extends Globalsentiment {
 
 			mean = (totalGsweight) / (totalWeight == 0 ? 1 : totalWeight);
 			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
-			System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" + (data.get(Calendar.MONTH) + 1) + "/"
-					+ data.get(Calendar.YEAR));
+			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
+			// (data.get(Calendar.MONTH) + 1) + "/"
+			// + data.get(Calendar.YEAR));
 			for (; today.after(data); data.add(Calendar.YEAR, 1)) {
 				pssweights.forEach((k, v) -> {
 					Data.addmodel((long) -1,

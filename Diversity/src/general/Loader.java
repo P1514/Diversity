@@ -180,7 +180,7 @@ public class Loader {
 			return err;
 
 		evaluatedata();
-		System.out.println("1");
+		//System.out.println("1");
 
 		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();
@@ -421,13 +421,13 @@ public class Loader {
 			return;
 		}
 		select = Settings.sqlselectall + Settings.crdbname+"."+Settings.cictable;
-		System.out.println(select);
+		//System.out.println(select);
 
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
 			try (ResultSet rs = query.executeQuery()) {
 
 				while (rs.next()) {
-					System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
+					//System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
 					
 					Data.companydb.get(rs.getLong(Settings.cictable_company_id))
 							.add_design_project(rs.getLong(Settings.cictable_design_project_id));

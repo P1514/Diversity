@@ -494,7 +494,7 @@ public class LeanRules {
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
 					avg = rs.getInt(1);
-					System.out.println(query1.toString());
+					//System.out.println(query1.toString());
 				}
 			}
 		} catch (Exception e) {
