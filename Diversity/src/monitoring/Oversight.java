@@ -182,6 +182,7 @@ public class Oversight extends TimerTask {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
+								continue;
 							}
 							String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate
 									+ "=? where (" + Settings.lutable_pss + "=? AND " + Settings.lutable_source

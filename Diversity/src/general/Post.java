@@ -117,7 +117,7 @@ public class Post {
 
 			this.polarity = sentiment;
 		}else{
-			this.polarity= 0;
+			this.polarity= -1;
 		}
 	}
 
