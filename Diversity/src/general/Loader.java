@@ -550,7 +550,7 @@ public class Loader {
 
 		String select = Settings.sqlselectall + Settings.crdbname + "." + Settings.crusertable + " INNER JOIN  "
 				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
-				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_user_id
+				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_id
 				+ ";";
 		//system.out.println(select);
 		Connection cncr = null;

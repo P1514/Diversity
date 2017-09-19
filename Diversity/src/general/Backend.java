@@ -275,15 +275,15 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					}
 				} else {
 					tag = new Tagcloud(
-							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
+							gp.getTop(param, values, id,
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 
