@@ -28,6 +28,9 @@ public class Collaboration {
 		servicesId = servicesId.replace(",", ";");
 
 
+		//System.out.println(productsId);
+		//System.out.println(servicesId);
+
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		if (pssSentiment == null) {
 			pssSentiment = pre.predict(company);

@@ -61,7 +61,7 @@ public class DBHandler extends Handler {
 			insert = cnlocal.prepareStatement(sql);
 			insert.setInt(1, user_id);
 			insert.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-			insert.setString(3, record.getMessage());
+			insert.setString(3, record.getLevel() + " " + record.getMessage());
 			insert.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();

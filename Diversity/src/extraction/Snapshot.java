@@ -120,7 +120,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		System.out.println("TEST" + result);
+		//System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}
@@ -331,7 +331,7 @@ public class Snapshot {
 				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}
-			result.put("Snapshots");
+			result.put(new JSONObject().put("Op", "Snapshots"));
 			result.put(aux);
 
 		} catch (Exception e) {

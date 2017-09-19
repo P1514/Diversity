@@ -25,7 +25,7 @@ import monitoring.Oversight;
 public class Startup implements ServletContextListener {
 	
 	private static final Logger LOGGER = new Logging().create(Startup.class.getName());
-
+	public static Oversight running ;
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
@@ -43,7 +43,7 @@ public class Startup implements ServletContextListener {
 		
 		Oversight o = new Oversight(true);
 		o.run();
-		//new Oversight();
+		running = new Oversight();
 		Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;

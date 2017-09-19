@@ -107,7 +107,7 @@ public class GetPosts {
 
 		if (word != null) {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
-					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%' and views>0)"; // More
+					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and views>0)"; // More
 																													// comment
 		}
 
@@ -309,7 +309,7 @@ public class GetPosts {
 
 		if (word != null) {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
-					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%' and views>0)"; // More
+					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and views>0)"; // More
 																													// comment
 		}
 

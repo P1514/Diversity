@@ -193,7 +193,7 @@ public class Backend {
 				}
 
 				LOGGER.log(Level.INFO, result.toString());
-				System.out.println(result.toString());
+				//System.out.println(result.toString());
 				return result.toString();
 			case 33:
 				obj = new JSONObject();
@@ -260,7 +260,7 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						System.out.println("POSITIVE");
+						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
 								gp.getTop(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
@@ -275,15 +275,15 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					}
 				} else {
 					tag = new Tagcloud(
-							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
+							gp.getTop(param, values, id,
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 
@@ -299,10 +299,10 @@ public class Backend {
 				obj = new JSONObject();
 				result = new JSONArray();
 				if (msg.has("Type")) {
-					System.out.println("type " + msg.getString("Type"));
+					//System.out.println("type " + msg.getString("Type"));
 					switch (msg.getString("Type")) {
 					case "Positive":
-						System.out.println("POSITIVE");
+						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
 								gp.getTop(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
@@ -310,7 +310,7 @@ public class Backend {
 						break;
 
 					case "Negative":
-						System.out.println("NEGATIVE");
+						//System.out.println("NEGATIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
@@ -386,7 +386,7 @@ public class Backend {
 					obj.put("Op", "Prediction");
 					result.put(obj);
 					if(!msg.has("type"))
-					result.put(pre.predict(1, msg.has("Products") ? msg.getString("Products") : "",
+					result.put(pre.predictSeassonal(1, msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : ""));
 					else
 					result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
@@ -553,9 +553,9 @@ public class Backend {
 			 * System.out.println("YELLO"); return result.toString();
 			 */
 			case 2:
-				Data dat = new Data();
-				return (new Loader()).load(null);
-			/*
+				Startup.running.run();
+				return error_message("Update Ran Successfully").toString();
+				/*
 			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1,
 			 * param, values, id).toString(); return tmp;
 			 */

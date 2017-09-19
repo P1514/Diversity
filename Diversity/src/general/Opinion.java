@@ -9,15 +9,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The Class Opinion.
  */
-//Opinion Individual Object
+// Opinion Individual Object
 public class Opinion {
 
 	private Post main;
 	private long id;
-	private long author_id; // String
+	// private long author_id; // String
 	private String author_id2;
-	private HashMap<Long,Post> comments = new HashMap<>();
-	private String URI = "";
+	private HashMap<Long, Post> comments = new HashMap<>();
+	private String source = "";
 	private double reach = 0;
 	private double polarity = 0;
 	private double total_inf = 0;
@@ -28,83 +28,111 @@ public class Opinion {
 	/**
 	 * Instantiates a new opinion.
 	 *
-	 * @param _main the main post
-	 * @param _pss the pss id
-	 * @param _product the product id
+	 * @param _main
+	 *            the main post
+	 * @param _pss
+	 *            the pss id
+	 * @param _product
+	 *            the product id
 	 */
-	public Opinion(Post _main, long _pss, long _product) {
-		this.main = _main;
-		this.author_id = main.getUID();
-		timestamp = main.getTime();
-		pss = _pss;
-		product = _product;
-		this.id=this.main.getID();
+//	public Opinion(Post _main, long _pss, long _product) {
+//		this.main = _main;
+//		this.author_id2 = main.getUID();
+//		timestamp = main.getTime();
+//		pss = _pss;
+//		product = _product;
+//		this.id = this.main.getID();
+//
+//	}
 
-	}
-	
 	/**
 	 * Instantiates a new opinion.
 	 *
-	 * @param _main the main post
-	 * @param _pss the pss id
-	 * @param _product the product id
-	 * @param _URI the source and account list Example:"facebook,shoes;twitter,run;"
+	 * @param _main
+	 *            the main post
+	 * @param _pss
+	 *            the pss id
+	 * @param _product
+	 *            the product id
+	 * @param _URI
+	 *            the source and account list
+	 *            Example:"facebook,shoes;twitter,run;"
 	 */
-	public Opinion(Post _main, long _pss, long _product, String _URI) {
+	public Opinion(Post _main, long _pss, long _product, String _source) {
 		this.main = _main;
-		this.author_id2 = main.getUID(false);
+		this.author_id2 = main.getUID();
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
-		URI=_URI;
-		this.id=this.main.getID();
+		source = _source;
+		this.id = this.main.getID();
 
 	}
 
 	/**
 	 * Calculate reach.
 	 *
-	 * @param avgPost the avg post
-	 * @param avgLikes the avg likes
-	 * @param avgViews the avg views
+	 * @param avgPost
+	 *            the avg post
+	 * @param avgLikes
+	 *            the avg likes
+	 * @param avgViews
+	 *            the avg views
 	 */
 	public void evalReach(double avgPost, double avgLikes, double avgViews) {
-		this.reach = Settings.pWcomments * (ncomments() / avgPost) + Settings.pWlikes * (nlikes() / (avgLikes != 0 ? avgLikes : 1))
+		this.reach = Settings.pWcomments * (ncomments() / avgPost)
+				+ Settings.pWlikes * (nlikes() / (avgLikes != 0 ? avgLikes : 1))
 				+ Settings.pWviews * (nviews() / (avgViews != 0 ? avgViews : 1));
 	}
 
 	/**
 	 * Calculate polarity.
 	 *
-	 * @param authordb the authordb
+	 * @param authordb
+	 *            the authordb
 	 */
-	public void evalPolarity(ConcurrentHashMap<Long, Author> authordb) {
-		total_inf = authordb.get(author_id).getInfluence();
-		polarity = total_inf * main.getPolarity();
+	// public void evalPolarity(ConcurrentHashMap<Long, Author> authordb) {
+	// total_inf = authordb.get(author_id).getInfluence();
+	// polarity = total_inf * main.getPolarity();
+	//
+	// comments.forEach((k,v) -> {
+	// total_inf += authordb.get(v.getUID()).getInfluence();
+	// polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
+	//
+	// });
+	//
+	// polarity = polarity / total_inf;
+	// }
+	//
 
-		comments.forEach((k,v) -> {
-			total_inf += authordb.get(v.getUID()).getInfluence();
-			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
-
-		});
-
-		polarity = polarity / total_inf;
-	}
-	
-	
 	/**
 	 * Calculate polarity 2.
 	 *
-	 * @param authordb the authordb
+	 * @param authordb
+	 *            the authordb
 	 */
 	public void evalPolarity2(ConcurrentHashMap<String, Author> authordb) {
-		total_inf = authordb.get(author_id2).getInfluence();
+
+//		authordb.forEach((k, v) -> {
+//			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
+//
+//		});
+		//System.out.println(author_id2);
+
+		total_inf = authordb.get(author_id2 + "," + source).getInfluence();
 		polarity = total_inf * main.getPolarity();
 
-		comments.forEach((k,v) -> {
-			total_inf += authordb.get(v.getUID(false)).getInfluence();
-			polarity += v.getPolarity() * authordb.get(v.getUID(false)).getInfluence();
-
+		comments.forEach((k, v) -> {
+			//System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
+			
+			if(v.getSource()!=null){
+			total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()+ "," + v.getSource()).getInfluence();
+			}
+			else{
+				total_inf += authordb.get(v.getUID()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
+			}
 		});
 
 		polarity = polarity / total_inf;
@@ -113,10 +141,11 @@ public class Opinion {
 	/**
 	 * Add comment.
 	 *
-	 * @param _comment the comment
+	 * @param _comment
+	 *            the comment
 	 */
 	public void addcomment(Post _comment) {
-		comments.put(_comment.getID(),_comment);
+		comments.put(_comment.getID(), _comment);
 	}
 
 	/**
@@ -142,14 +171,15 @@ public class Opinion {
 	 *
 	 * @return the uid long
 	 */
-	public long getUID() {
-		return author_id;
-	}
-	
+	// public long getUID() {
+	// return author_id;
+	// }
+
 	/**
 	 * Gets the uid.
 	 *
-	 * @param a the a
+	 * @param a
+	 *            the a
 	 * @return the uid string
 	 */
 	public String getUID(boolean a) {
@@ -182,17 +212,17 @@ public class Opinion {
 	public long getPSS() {
 		return pss;
 	}
-	
+
 	/**
 	 * Gets the product id.
 	 *
 	 * @return the product id
 	 */
-	public long getProduct(){
+	public long getProduct() {
 		return product;
 	}
-	
-	public long getID(){
+
+	public long getID() {
 		return this.id;
 	}
 
@@ -247,7 +277,7 @@ public class Opinion {
 
 		for (Post i : comments.values()) {
 			if (i.getTime() != 0)
-				newlike+=i.getLikes();
+				newlike += i.getLikes();
 		}
 
 		return newlike;
@@ -278,7 +308,7 @@ public class Opinion {
 
 		for (Post i : comments.values()) {
 			if (i.getTime() != 0)
-				newview+=i.getViews();
+				newview += i.getViews();
 		}
 
 		return newview;
@@ -289,9 +319,9 @@ public class Opinion {
 	 *
 	 * @return the posts
 	 */
-	public HashMap<Long,Post> getPosts() {
+	public HashMap<Long, Post> getPosts() {
 		if (!comments.containsKey(this.id))
-			comments.put(this.id,this.main);
+			comments.put(this.id, this.main);
 		return comments;
 	}
 }

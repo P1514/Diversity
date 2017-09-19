@@ -97,7 +97,7 @@ public class Server {
 	 *            the msg
 	 */
 	public void send_message(String msg) {
-		LOGGER.log(Level.INFO, "\r\nOUT: " + msg);
+		LOGGER.log(Level.INFO, "OUT: " + msg);
 		as.sendText(msg);
 		return;
 	}
@@ -138,7 +138,7 @@ public class Server {
 	public void runn(JSONObject msg) {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		LOGGER.log(Level.INFO, "\r\nIN:" + msg);
+		LOGGER.log(Level.INFO, "IN:" + msg);
 		Backend be;
 
 		try {
