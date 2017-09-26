@@ -37,9 +37,9 @@ public class GetPosts {
 	private static final Logger LOGGER = new Logging().create(GetPosts.class.getName());
 
 	/**
-	 * Method that uses the input to get Top 5 parent posts information, uses
-	 * month for the month requested, param defines if any filtering is
-	 * expected, the id is the model ID requested.
+	 * Method that uses the input to get Top 5 parent posts information, uses month
+	 * for the month requested, param defines if any filtering is expected, the id
+	 * is the model ID requested.
 	 * 
 	 * @param param
 	 *            String any value
@@ -107,8 +107,10 @@ public class GetPosts {
 
 		if (word != null) {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
-					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and views>0)"; // More
-																													// comment
+					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and
+																											// views>0)";
+																											// // More
+																											// comment
 		}
 
 		insert += ")";
@@ -247,7 +249,8 @@ public class GetPosts {
 
 	}
 
-	public JSONArray getTopWithPolarity(String param, String month, long id, String product, String word, int min, int max) throws JSONException {
+	public JSONArray getTopWithPolarity(String param, String month, long id, String product, String word, int min,
+			int max) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -258,16 +261,13 @@ public class GetPosts {
 		String insert = new String();
 		int[] topid = new int[MAXTOP];
 		int n_tops = 0;
-		// System.out.print("TEST:"+product);
-		
-		if (min != -1) {
-			insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-					+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + ">" + min;
-		} else if (max != -1) {
-			insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-					+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<" + max;
-		}
-		
+		// System.out.print("TEST:"+product);´
+		if (min == -1) min = 0;
+		if (max == -1) max = 100;
+
+		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
+				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">=" + min;
+
 		if (!"Global".equals(product))
 			insert += " AND " + Settings.lotable_product;
 
@@ -309,8 +309,10 @@ public class GetPosts {
 
 		if (word != null) {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
-					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and views>0)"; // More
-																													// comment
+					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and
+																											// views>0)";
+																											// // More
+																											// comment
 		}
 
 		insert += ")";
@@ -323,6 +325,7 @@ public class GetPosts {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return Backend.error_message("Cannot connect to Database Please Try Again Later");
 		}
+		LOGGER.log(Level.INFO, "TagCloud Query: "+ insert);
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			int rangeindex = 3;
@@ -380,23 +383,18 @@ public class GetPosts {
 
 			}
 		}
-
-		if (min != -1) {
-			insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
-					+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
-					+ " = ? AND " + Settings.lotable_polarity + ">" + min;
-		} else if (max != -1) {
-			insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
-					+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
-					+ " = ? AND " + Settings.lotable_polarity + "<" + max;
-		}
+	
+			insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + ","
+					+ Settings.lotable_reach + "," + Settings.lotable_comments + " from " + Settings.lotable + " where "
+					+ Settings.lotable_id + " = ? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">=" + min;
 		
+
 		for (int i = 0; i < n_tops; i++) {
 
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
-					rs.next();
+					if(rs.next()==false)continue;
 					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
 							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
 							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
@@ -410,7 +408,7 @@ public class GetPosts {
 				+ " = ?";
 
 		for (int i = 0; i < n_tops; i++) {
-
+			if(topid[i]==0 )continue;
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 
@@ -434,6 +432,7 @@ public class GetPosts {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < n_tops; i++) {
+			if("".equals(pre_result[i])) continue;
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
 			obj.put("Id", pre_results[0]);
@@ -455,13 +454,13 @@ public class GetPosts {
 		return result;
 
 	}
+
 	/**
 	 * Method that returns the amount of parent post that exist to the specific
-	 * model, with the filtering specified. The Value param expects a String
-	 * with parameters to filter separated by ',', same with value but regarding
-	 * values to that specific parameters. Filter specifies what are you
-	 * filtering by, for the output JSON. Id is reference to the model that we
-	 * want the results for.
+	 * model, with the filtering specified. The Value param expects a String with
+	 * parameters to filter separated by ',', same with value but regarding values
+	 * to that specific parameters. Filter specifies what are you filtering by, for
+	 * the output JSON. Id is reference to the model that we want the results for.
 	 * <p>
 	 * Filtering
 	 * 
@@ -529,9 +528,10 @@ public class GetPosts {
 			inputdate.add(Calendar.MONTH, 1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
 			rangeindex++;
-			/*inputdate.add(Calendar.YEAR, -1);
-			query1.setLong(rangeindex, inputdate.getTimeInMillis());
-			rangeindex++;*/
+			/*
+			 * inputdate.add(Calendar.YEAR, -1); query1.setLong(rangeindex,
+			 * inputdate.getTimeInMillis()); rangeindex++;
+			 */
 			query1.setLong(rangeindex, model.getDate());
 
 			try (ResultSet rs = query1.executeQuery()) {
