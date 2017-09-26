@@ -30,6 +30,10 @@ public class Collaboration {
 
 		//System.out.println(productsId);
 		//System.out.println(servicesId);
+		if("null".equals(productsId)) productsId="";
+		if("null".equals(company)) company="";
+		if("null".equals(servicesId)) servicesId="";
+		if("-%20Select%20-".equals(company)) company="";
 
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		if (pssSentiment == null) {

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onopen = function () {
 		json = {
 			'Op' : 'getrestrictions',
-			'Role' : 'DESIGNER',
+			'Role' : 'Designer',
 			'Key' : getCookie('JSESSIONID'),
 		}
 
