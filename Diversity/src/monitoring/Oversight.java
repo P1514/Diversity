@@ -125,7 +125,7 @@ public class Oversight extends TimerTask {
 
 					rs = query.executeQuery();
 
-					// System.out.println("query: " + query.toString());
+					//System.out.println("query: " + query.toString());
 
 					Calendar c = Calendar.getInstance();
 					while (rs.next()) {
@@ -177,6 +177,7 @@ public class Oversight extends TimerTask {
 								// readUrl(request));
 								//request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
+								LOGGER.log(Level.INFO, "Getting Post From: " + request);
 								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
 							} catch (Exception e) {
 								// TODO Auto-generated catch block

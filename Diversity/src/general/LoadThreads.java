@@ -64,15 +64,15 @@ public class LoadThreads {
 				query1.setLong(7, opinion.getPSS());
 				query1.setLong(8, opinion.ncomments());
 				query1.setLong(9, opinion.getProduct());
-				query1.setDouble(10, opinion.getReach());
-				query1.setDouble(11, opinion.getPolarity());
-				query1.setDouble(12, opinion.getTotalInf());
-				query1.setLong(13, opinion.ncomments());
-				query1.setString(14, opinion.getSource());
+				query1.setString(10, opinion.getSource());
+				query1.setDouble(11, opinion.getReach());
+				query1.setDouble(12, opinion.getPolarity());
+				query1.setDouble(13, opinion.getTotalInf());
+				query1.setLong(14, opinion.ncomments());
 
 				try {
-//					if (opinion.getID() == 8480)
-//						System.out.println("INSERT OPINION: " + query1.toString());
+					// if (opinion.getID() == 8480)
+					// System.out.println("INSERT OPINION: " + query1.toString());
 					query1.executeUpdate();
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
@@ -88,7 +88,8 @@ public class LoadThreads {
 
 					try {
 						String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
-					+"ON DUPLICATE KEY UPDATE "+Settings.lptable_views+"=?,"+Settings.lptable_likes+"=?";
+								+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?," + Settings.lptable_likes
+								+ "=?";
 						query2 = cnlocal.prepareStatement(update1);
 						query2.setLong(1, post.getID());
 						if (post.getPolarity() != -1) {
@@ -417,14 +418,15 @@ public class LoadThreads {
 					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
 					long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
-							? obj.getLong(Settings.JSON_age) : 0;
+							? obj.getLong(Settings.JSON_age)
+							: 0;
 					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
 					long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 					/*
-					 * if (product == 0) { rs.close(); stmt.close();
-					 * conlocal.close(); condata.close(); return; }
+					 * if (product == 0) { rs.close(); stmt.close(); conlocal.close();
+					 * condata.close(); return; }
 					 */
 					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
 																								// create
@@ -529,7 +531,8 @@ public class LoadThreads {
 		public Tposts(JSONObject _obj) throws JSONException {
 			obj = _obj;
 			_opin = Loader.opiniondb.containsKey(_obj.getLong(Settings.JSON_postid))
-					? Loader.opiniondb.get(_obj.getLong(Settings.JSON_postid)) : null;
+					? Loader.opiniondb.get(_obj.getLong(Settings.JSON_postid))
+					: null;
 		}
 
 		/*
@@ -573,8 +576,9 @@ public class LoadThreads {
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
-							message=message.trim();
-							if(message.length()<=1)continue;
+							message = message.trim();
+							if (message.length() <= 1)
+								continue;
 							Post _post = new Post(postid, "", user_id, time, likes, views, message);
 							if (!(Loader.users.contains(user_id))) {
 								Loader.users.add(user_id);
@@ -681,17 +685,20 @@ public class LoadThreads {
 							String user_id = reply.getString(Settings.JSON_userid);
 							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
-									? reply.has("likes") ? reply.getLong("likes") : 0 : 0;
+									? reply.has("likes") ? reply.getLong("likes") : 0
+									: 0;
 							long views = reply.has("mediaSpecificInfo")
-									? reply.has("views") ? reply.getLong("views") : 0 : 0;
+									? reply.has("views") ? reply.getLong("views") : 0
+									: 0;
 							String message = reply.getString(Settings.JSON_message);
-							
+
 							String source = obj.getString(Settings.JSON_source);
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
 							long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
-									? obj.getLong(Settings.JSON_age) : 0;
+									? obj.getLong(Settings.JSON_age)
+									: 0;
 							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
@@ -750,8 +757,8 @@ public class LoadThreads {
 		 * Tmodels Multithreading for model
 		 */
 		/*
-		 * class Tmodels implements Runnable { private Model model; private
-		 * Connection conlocal;
+		 * class Tmodels implements Runnable { private Model model; private Connection
+		 * conlocal;
 		 * 
 		 * public Tmodels() { }
 		 */
