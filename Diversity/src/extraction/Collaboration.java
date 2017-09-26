@@ -35,11 +35,11 @@ public class Collaboration {
 		if (pssSentiment == null) {
 			pssSentiment = pre.predict(company);
 		}
-		if (pssSentiment == null) {
-			return null;
-		}
-		HashMap<Long, Double> dpSentiment = new HashMap<>();
 		HashMap<Long, ArrayList<Double>> userRating = new HashMap<>();
+
+		if (pssSentiment != null) {
+
+		HashMap<Long, Double> dpSentiment = new HashMap<>();
 
 		Collection<DesignProject> designprojects = Data.dbdpall();
 
@@ -61,6 +61,8 @@ public class Collaboration {
 				userRating.get(userid).add(v);
 			}
 		});
+		//return null;
+	}
 
 		for (User user0 : Data.dbuserall()) {
 			if (!userRating.containsKey(user0.getID())) {
