@@ -171,7 +171,7 @@ ws.onmessage = function(event) {
   json = JSON.parse(event.data);
   if (json[0].Op == 'Error') {
     // alert(json[0].Message);
-	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 	$('#overlay').show();
 	$('#overlay-back').show();
   }

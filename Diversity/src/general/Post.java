@@ -119,6 +119,10 @@ public class Post {
 		}else{
 			this.polarity= -1;
 		}
+		message=message.trim();
+		if(message.length()<=1) {
+			this.polarity=50.0;
+		}
 	}
 
 //	/**
@@ -195,6 +199,15 @@ public class Post {
 	 */
 	public double getPolarity() {
 		return polarity;
+	}
+	
+	/**
+	 * Sets the polarity.
+	 *
+	 * @return the polarity
+	 */
+	public void setPolarity(double pol) {
+		this.polarity=pol;
 	}
 
 	/**

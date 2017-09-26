@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	public static final String version = "2.2";
+	public static final String version = "2.3";
 	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
