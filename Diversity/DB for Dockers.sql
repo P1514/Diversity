@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `sentimentanalysis` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `sentimentanalysis`;
--- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
--- Host: localhost    Database: sentimentanalysis
+-- Host: 127.0.0.1    Database: sentimentanalysis
 -- ------------------------------------------------------
--- Server version	5.7.17-log
+-- Server version	5.7.17
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -43,7 +43,7 @@ CREATE TABLE `access_rights` (
 
 LOCK TABLES `access_rights` WRITE;
 /*!40000 ALTER TABLE `access_rights` DISABLE KEYS */;
-INSERT INTO `access_rights` VALUES ('Business%20Costumer',NULL,0,0,0,0,0,0),('Business%20Partner',NULL,1,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1,0),('DEVELOPER',NULL,1,1,1,1,1,1),('Knowledge%20Engineer',NULL,1,1,1,0,0,0),('PLM%20Configuration%20Manager',NULL,1,1,1,1,1,0),('PLM%20System%20Engineer',NULL,1,1,1,1,1,0),('Product%20Manufacturer',NULL,0,0,1,0,0,0),('SYS_ENG',NULL,1,0,1,0,0,0);
+INSERT INTO `access_rights` VALUES ('BUS_PART',NULL,0,0,0,0,0,0),('DESIGNER',NULL,1,1,1,1,1,0),('DEVELOPER',NULL,1,1,1,1,1,1),('PLM%20Configuration%20Manager',NULL,1,1,1,1,1,NULL),('PROD_MAN',NULL,0,0,1,0,0,0),('SYS_ENG',NULL,1,0,1,0,0,0);
 /*!40000 ALTER TABLE `access_rights` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,7 +105,7 @@ CREATE TABLE `general` (
 
 LOCK TABLES `general` WRITE;
 /*!40000 ALTER TABLE `general` DISABLE KEYS */;
-INSERT INTO `general` VALUES (0,0,0,0,'2017-09-20',1,11);
+INSERT INTO `general` VALUES (0,0,0,0,'2017-09-25',1,11);
 /*!40000 ALTER TABLE `general` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -207,7 +207,7 @@ CREATE TABLE `models` (
   PRIMARY KEY (`id`,`name`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=864 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=861 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -344,7 +344,7 @@ CREATE TABLE `snapshots` (
   `timespan` int(11) DEFAULT NULL,
   `model_id` bigint(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -402,7 +402,7 @@ CREATE TABLE `tagcloud` (
 
 LOCK TABLES `tagcloud` WRITE;
 /*!40000 ALTER TABLE `tagcloud` DISABLE KEYS */;
-INSERT INTO `tagcloud` VALUES (1,1,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,2,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,3,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,4,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,5,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,6,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,7,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,8,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,9,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,10,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,11,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,831,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,841,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,858,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,859,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,860,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,861,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,862,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,');
+INSERT INTO `tagcloud` VALUES (0,858,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(0,859,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(0,860,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,inspired,'),(1,1,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,2,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,3,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,4,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,5,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,6,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,7,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,8,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,9,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,10,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,11,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,831,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(1,841,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,858,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,859,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,'),(10,860,'and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,');
 /*!40000 ALTER TABLE `tagcloud` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -423,4 +423,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-21 18:11:47
+-- Dump completed on 2017-09-26 14:57:34

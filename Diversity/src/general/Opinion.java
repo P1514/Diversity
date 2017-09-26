@@ -64,7 +64,7 @@ public class Opinion {
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
-		source = _source;
+		source = this.main.getSource();
 		this.id = this.main.getID();
 
 	}

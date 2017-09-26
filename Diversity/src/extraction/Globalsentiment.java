@@ -321,8 +321,8 @@ public class Globalsentiment extends GetReach {
 			return Backend.error_message(Settings.err_dbconnect);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
-			query1.setLong(2, model.getUpdate() - frequency * 86400000);
+			query1.setLong(1, model.getLastUpdate());
+			query1.setLong(2, model.getUpdate());
 			query1.setLong(3, model.getPSS());
 			//System.out.println("Query:" + query1.toString());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
