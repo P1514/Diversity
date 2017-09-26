@@ -18,6 +18,7 @@ public class PSS {
 	private String name;
 	private long user_id;
 	private String type;
+	private ArrayList<Long> list_services;
 	private ArrayList<Long> list_products;
 	
 	/**
@@ -36,6 +37,8 @@ public class PSS {
 		this.user_id=_user_id;
 		this.type=_type;
 		this.list_products = new ArrayList<Long>();
+		this.list_services = new ArrayList<Long>();
+
 		/*
 		tags.put("Morris Ground 1", "D522-1 PSS");// TODO Change this so that it all comes from DB
 		tags.put("Austin Basket", "D522-2 PSS");
@@ -98,5 +101,13 @@ public class PSS {
 	
 	public ArrayList<Long> get_products(){
 		return new ArrayList<>(this.list_products);
+	}
+	
+	public void add_service(Long id){
+		this.list_services.add(id);
+	}
+	
+	public ArrayList<Long> get_services(){
+		return new ArrayList<>(this.list_services);
 	}
 }

@@ -38,15 +38,19 @@ public class Loader {
 	static long totallikes;
 	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
-	protected ConcurrentHashMap<Long, Author> authordb = new ConcurrentHashMap<>();
+	// protected ConcurrentHashMap<Long, Author> authordb = new
+	// ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
-	public static List<Long> users;
+	public static List<String> users;
 	public static List<Author> users2;
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
+		//TODO protect for empty json
+		//System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
+		//if(json.length()<1) return "";
 		loadp1(json);
 		first_load = false;
 		String err = updatelocal();
@@ -65,17 +69,44 @@ public class Loader {
 
 	}
 
-	private String loadp1(JSONArray json) throws JSONException {
+	public String loadinit() throws JSONException{
 		Server.isloading = true;
-		users = new ArrayList<Long>();
+		users = new ArrayList<String>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
 		totalviews = 0;
 		totalcomments = 0;
 		totallikes = 0;
-		long stime = System.nanoTime();
-		System.out.println(" Beginning " + stime);
+		// long stime = System.nanoTime();
+		// //system.out.println(" Beginning " + stime);
 		loadPSS();
+		loadDesignProjects();
+		loadUsers();
+		String err = loadroles();
+		if (err != null)
+			return err;
+		err = loadGeneral();
+		if (err != null)
+			return err;
+		err = loadmodels();
+		if (err != null)
+			return err;
+		Server.isloading=false;
+		return null;
+	}
+	private String loadp1(JSONArray json) throws JSONException {
+		Server.isloading = true;
+		users = new ArrayList<String>();
+		users2 = new ArrayList<Author>();
+		totalposts = 0;
+		totalviews = 0;
+		totalcomments = 0;
+		totallikes = 0;
+		// long stime = System.nanoTime();
+		// //system.out.println(" Beginning " + stime);
+		loadPSS();
+		loadDesignProjects();
+		loadUsers();
 		String err = loadroles();
 		if (err != null)
 			return err;
@@ -94,7 +125,7 @@ public class Loader {
 		err = loadUsers(json);
 		if (err != null)
 			return err;
-		
+
 		update("opinions");
 
 		err = insertauthors();
@@ -124,7 +155,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(30 * 1000/* waiting_time*10 */);
+					Thread.sleep(1000/* 30 * 1000waiting_time*10 */);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -147,8 +178,9 @@ public class Loader {
 		err = awaittermination(es, "posts");
 		if (err != null)
 			return err;
-		
+
 		evaluatedata();
+		//System.out.println("1");
 
 		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();
@@ -246,11 +278,12 @@ public class Loader {
 		for (Author user : users2) {
 			if (user == null)
 				continue;
-			System.out.println("\n DEBUG IF HAPPENS USERID=" + user.getUID());
-			System.out.println(" RESULT STRING " + querycond);
-			querycond += user.getUID() + ",";
+			// //system.out.println("\n DEBUG IF HAPPENS USERID=" +
+			// user.getUID());
+			// //system.out.println(" RESULT STRING " + querycond);
+			querycond += user.getID() + ",";
 		}
-		// System.out.println(querycond);
+		// //system.out.println(querycond);
 
 		// Load users from local DB
 		if (users2.size() != 0) {
@@ -260,13 +293,12 @@ public class Loader {
 				select += "?,";
 			select += "?)";
 
-			// System.out.println(query);
 			try (PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
 				for (int i = 0; i < users2.size(); i++) {
 					stmt2.setString(i + 1, querycond.split(",")[i]);
 				}
 				try (ResultSet rs = stmt2.executeQuery()) {
-					// System.out.println(stmt2);
+					// //system.out.println(stmt2);
 					while (rs.next()) {
 						if (authordb2.containsKey(
 								rs.getString(Settings.latable_id) + rs.getString(Settings.latable_source))) {
@@ -346,6 +378,27 @@ public class Loader {
 			return;
 		}
 
+		if (Settings.include_services) {
+			select = Settings.sqlselectall + Settings.crservicetable + " ORDER BY " + Settings.crservicetable_id
+					+ " ASC";
+			try (PreparedStatement query = cncr.prepareStatement(select)) {
+				try (ResultSet rs = query.executeQuery()) {
+
+					while (rs.next()) {
+						Data.addservice(rs);
+					}
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+				try {
+					cncr.close();
+				} catch (Exception e1) {
+					LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+				}
+				return;
+			}
+		}
+
 		select = Settings.sqlselectall + Settings.crcompanytable;
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
 			try (ResultSet rs = query.executeQuery()) {
@@ -367,15 +420,17 @@ public class Loader {
 			}
 			return;
 		}
-		select = Settings.sqlselectall + Settings.crpssproducttable;
+		select = Settings.sqlselectall + Settings.crdbname+"."+Settings.cictable;
+		//System.out.println(select);
 
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
 			try (ResultSet rs = query.executeQuery()) {
 
 				while (rs.next()) {
-					Data.pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
-							.add_product(rs.getLong(Settings.crrpssproducttable_product));
-
+					//System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
+					
+					Data.companydb.get(rs.getLong(Settings.cictable_company_id))
+							.add_design_project(rs.getLong(Settings.cictable_design_project_id));
 				}
 			}
 		} catch (Exception e) {
@@ -384,6 +439,144 @@ public class Loader {
 				cncr.close();
 			} catch (Exception e1) {
 				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+		
+		select = Settings.sqlselectall + Settings.crpssproducttable;
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.pssdb.get(rs.getLong(Settings.crrpssproducttable_pss))
+							.add_product(rs.getLong(Settings.crrpssproducttable_product));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+		select = Settings.sqlselectall + Settings.crpssservicetable;
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.pssdb.get(rs.getLong(Settings.crrpssservicetable_pss))
+							.add_service(rs.getLong(Settings.crrpssservicetable_service));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+
+		try {
+			cncr.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+		}
+	}
+
+	private void loadDesignProjects() {
+
+		String select = Settings.sqlselectall + Settings.crdptable;
+		Connection cncr = null;
+		try {
+			cncr = Settings.conncr();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_cr, e);
+			return;
+		}
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+				while (rs.next()) {
+					Data.designProjectdb.put(rs.getLong(Settings.crdptable_id), new DesignProject(
+							rs.getLong(Settings.crdptable_id), rs.getLong(Settings.crdptable_produces_pss_id),
+							rs.getString(Settings.crdptable_name), rs.getLong(Settings.crdptable_author),
+							rs.getLong(Settings.crdptable_time_created), rs.getLong(Settings.crdptable_wiki_id)));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, Settings.err_unknown, e1);
+			}
+			return;
+		}
+
+		select = Settings.sqlselectall + Settings.crdpuserstable;
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+
+				while (rs.next()) {
+					Data.designProjectdb.get(rs.getLong(Settings.crdpuserstable_design_project_id))
+							.add_team_member_user(rs.getLong(Settings.crdpuserstable_user_id));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, "Nothing can be done here", e1);
+			}
+			return;
+		}
+
+		try {
+			cncr.close();
+		} catch (Exception e) {
+			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
+		}
+	}
+
+	private void loadUsers() {
+
+		String select = Settings.sqlselectall + Settings.crdbname + "." + Settings.crusertable + " INNER JOIN  "
+				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
+				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_id
+				+ ";";
+		//system.out.println(select);
+		Connection cncr = null;
+		try {
+			cncr = Settings.conncr();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_cr, e);
+			return;
+		}
+
+		try (PreparedStatement query = cncr.prepareStatement(select)) {
+			try (ResultSet rs = query.executeQuery()) {
+				while (rs.next()) {
+					Data.userdb.put(rs.getLong(Settings.crusertable_id), new User(rs.getLong(Settings.crusertable_id),
+							rs.getString(Settings.crusertable_username), rs.getString(Settings.crusertable_password),
+							rs.getString(Settings.crusertable_email), rs.getString(Settings.crusertable_first_name),
+							rs.getString(Settings.crusertable_last_name), rs.getString(Settings.cruserrtable_name),
+							rs.getLong(Settings.crusertable_company_id)));
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			try {
+				cncr.close();
+			} catch (Exception e1) {
+				LOGGER.log(Level.FINEST, Settings.err_unknown, e1);
 			}
 			return;
 		}
@@ -439,6 +632,7 @@ public class Loader {
 			}
 		}
 		LOGGER.log(Level.INFO, " Variable Init " + (System.nanoTime() - stime));
+		LOGGER.log(Level.INFO, " Version: " + Settings.version);
 		stime = System.nanoTime();
 		return null;
 	}
@@ -453,7 +647,7 @@ public class Loader {
 		}
 		String query = Settings.sqlselectall + Settings.lmtable;
 		try (Statement stmt = cnlocal.createStatement()) {
-			// System.out.println(query);
+			// //system.out.println(query);
 			try (ResultSet rs = stmt.executeQuery(query)) {
 
 				for (; rs.next();) {
@@ -514,8 +708,26 @@ public class Loader {
 	private String loadUsers(JSONArray json) throws JSONException {
 		String err;
 
-		String querycond = users.toString();
-		querycond = querycond.replaceAll("\\[", "(").replaceAll("\\]", "\\)");
+		String querycond = "(";
+		for (Author a : users2) {
+			if(a==null) continue;
+			a.getID();
+			querycond += a.getID() + ",";
+		}
+		if (querycond.length() > 2)
+			querycond = querycond.substring(0, querycond.length() - 2);
+		
+		else {
+			for (String a : users) {
+				querycond += a + ",";
+			}
+			if (querycond.length() > 1)
+			querycond = querycond.substring(0, querycond.length() - 1);
+			else
+				querycond += "-1";
+		}
+		querycond += ");";
+		//system.out.println(querycond);
 		// From local DB
 		err = loadlocalusers(querycond);
 		if (err != null)
@@ -527,28 +739,75 @@ public class Loader {
 				return err;
 		} else {
 			// Load users from JSON
-			for (int i = 1; i < json.length(); i++) {
-				JSONObject obj = json.getJSONObject(i);
-				if (authordb2.containsKey(obj.getString(Settings.JSON_source) + obj.getString(Settings.latable_source)))
-					continue;
-				Author auth = new Author(obj.getString(Settings.JSON_source), obj.getString(Settings.latable_source),
-						obj.getString(Settings.latable_name), obj.getLong(Settings.latable_age),
-						obj.getString(Settings.latable_gender), obj.getString(Settings.latable_location));
-				auth.setComments(obj.getLong(Settings.latable_comments));
-				auth.setLikes(obj.getLong(Settings.latable_likes));
-				auth.setPosts(obj.getLong(Settings.latable_posts) - 1);
-				auth.setViews(obj.getLong(Settings.latable_views));
-				authordb2.put(obj.getString(Settings.latable_id) + "," + obj.getString(Settings.latable_source), auth);
-			}
-
+			Author auth;
 			for (int i = 0; i < json.length(); i++) {
+				
 				JSONObject obj = json.getJSONObject(i);
-				if (authordb.containsKey(obj.getLong("id")))
+				//system.out.println(obj.toString());
+				JSONArray obj1 = obj.getJSONArray(Settings.JSON_replies);
+				String user1 = obj.getString(Settings.JSON_userid);
+				String source1=obj.getString(Settings.JSON_source);
+				
+				for (int j = 0;j < obj1.length(); j++) {//TO LOAD REPLIES
+					obj=obj1.getJSONObject(j);
+					user1 = obj.getString(Settings.JSON_userid);
+					if (authordb2.containsKey(user1 +","+ source1))
+						continue;
+					auth = new Author(obj.getString(Settings.JSON_userid), source1,
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
+							+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""), 0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
+					
+					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
+						authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+					
+					//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+					
+				}
+				
+				obj = json.getJSONObject(i);
+				user1 = obj.getString(Settings.JSON_userid);
+				source1=obj.getString(Settings.JSON_source);
+				if (authordb2.containsKey(user1 +","+ source1))
 					continue;
-				authordb.put(obj.getLong("id"), new Author(obj.getLong("id"), obj.getString("name"), obj.getLong("age"),
-						obj.getString("gender"), obj.getString("location")));
+				
+
+				auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+						(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
+								+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+						/*
+						 * (obj.has(Settings.JSON_age) ?
+						 * obj.getLong(Settings.JSON_age) : 0)
+						 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+						(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
+				
+				/*
+				 * auth.setComments(obj.has(Settings.JSON_fname) ?
+				 * obj.getLong(Settings.JSON_comments) : 0);
+				 * auth.setLikes(obj.has(Settings.JSON_likes) ?
+				 * obj.getLong(Settings.JSON_likes) : 0);
+				 * auth.setPosts(obj.getLong(Settings.JSON_replies) - 1);
+				 * auth.setViews(obj.getLong(Settings.JSON_views));
+				 */
+				if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
+					authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+
+				//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+				
+				
 
 			}
+
+			/*
+			 * for (int i = 0; i < json.length(); i++) { JSONObject obj =
+			 * json.getJSONObject(i); if
+			 * (authordb.containsKey(obj.getLong("id"))) continue;
+			 * authordb.put(obj.getLong("id"), new Author(obj.getLong("id"),
+			 * obj.getString("name"), obj.getLong("age"),
+			 * obj.getString("gender"), obj.getString("location")));
+			 * 
+			 * }
+			 */
 
 		}
 
@@ -600,6 +859,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
+		//System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -609,16 +869,16 @@ public class Loader {
 		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				if (authordb.containsKey(rs.getLong("id")))
+				if (authordb2.containsKey(rs.getString("id")+";"+rs.getString("source")))
 					continue;
-				Author auth = new Author(rs.getLong(Settings.latable_id), rs.getString(Settings.latable_name),
+				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_source),rs.getString(Settings.latable_name),
 						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
 						rs.getString(Settings.latable_location));
 				auth.setComments(rs.getLong(Settings.latable_comments));
 				auth.setLikes(rs.getLong(Settings.latable_likes));
 				auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
 				auth.setViews(rs.getLong(Settings.latable_views));
-				authordb.put(rs.getLong(Settings.latable_id), auth);
+				authordb2.put(rs.getString(Settings.latable_id) + "," + rs.getString(Settings.latable_source), auth);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
@@ -638,22 +898,22 @@ public class Loader {
 	private void update(String type) {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
-				List<Long> uniqueauthors = new ArrayList<>();
+				List<String> uniqueauthors = new ArrayList<>();
 				HashMap<Long, Post> temppost = v.getPosts();
 				temppost.forEach((k2, v2) -> {
-					if (!uniqueauthors.contains(v2.getUID()))
-						uniqueauthors.add(v2.getUID());
+					if (!uniqueauthors.contains(v2.getUID() + "," + v2.getSource()))
+						uniqueauthors.add(v2.getUID() + "," + v2.getSource());
 				});
 				uniqueauthors.forEach((v3) -> {
-					if (!authordb.containsKey(v3)) {
+					if (!authordb2.containsKey(v3)) {
 						LOGGER.log(Level.SEVERE, "NULL POINTER UNIQUE AUTHORS" + v3);
 					} else {
-						Author tempauthor = authordb.get(v3);
+						Author tempauthor = authordb2.get(v3);
 						tempauthor.addComments(v.newcomments());
 						tempauthor.addLikes(v.newlikes());
 						tempauthor.addViews(v.newviews());
 						tempauthor.addPosts();
-						authordb.put(tempauthor.getID(), tempauthor);
+						authordb2.put(String.valueOf(tempauthor.getID() + "," + tempauthor.getSource()), tempauthor);
 					}
 				});
 
@@ -668,49 +928,42 @@ public class Loader {
 	}
 
 	private String loadsimauthors(String querycond) throws JSONException {
+
 		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
 				+ querycond);
-		Connection cndata = null;
-		try {
-			cndata = Settings.conndata();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
-		try (Statement stmt = cndata.createStatement()) {
-			try (ResultSet rs = stmt.executeQuery(query)) {
-				while (rs.next()) {
-					if (authordb.containsKey(rs.getLong(Settings.rutable_userid))) {
-					} else {
-						authordb.put(rs.getLong(Settings.rutable_userid),
-								new Author(rs.getLong(Settings.rutable_userid), rs.getString(Settings.rutable_name),
-										rs.getLong(Settings.rutable_age), rs.getString(Settings.rutable_gender),
-										rs.getString(Settings.rutable_loc)));
+		/// Connection cndata = null;
+		try (Connection cndata = Settings.conndata()) {
+			try (Statement stmt = cndata.createStatement()) {
+				try (ResultSet rs = stmt.executeQuery(query)) {
+					while (rs.next()) {
+						if (authordb2.containsKey(rs.getLong(Settings.rutable_userid))) {
+						} else {
+							authordb2.put(rs.getString(Settings.rutable_userid) + ", ",
+									new Author(rs.getString(Settings.rutable_userid),
+											rs.getString(Settings.rutable_name), rs.getLong(Settings.rutable_age),
+											rs.getString(Settings.rutable_gender), rs.getString(Settings.rutable_loc)));
+						}
 					}
 				}
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
 			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
-		} finally {
-			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.FINE, "Nothing can be done here, error closing");
-			}
 		}
 		return null;
 	}
 
 	private void evaluatedata() {
-		authordb.forEach((k, v) -> {
+		authordb2.forEach((k, v) -> {
 			v.calcInfluence((totalcomments / ((double) totalposts)), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
 		});
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			v.evalPolarity(authordb);
+			if(!authordb2.isEmpty())
+			v.evalPolarity2(authordb2);
+
 		});
 		LOGGER.log(Level.INFO, " calc eval and reach " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
@@ -724,13 +977,13 @@ public class Loader {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect);
 			return Backend.error_message(Settings.err_dbconnect).toString();
 		}
-		for (Author author : authordb.values()) {
+		for (Author author : authordb2.values()) {
 			String insert = "INSERT INTO " + Settings.latable + " "
 					+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.latable_influence + "=?,"
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setLong(1, author.getID());
+				query1.setString(1, author.getID());
 				query1.setLong(2, author.getAge());
 				query1.setString(3, author.getName());
 				query1.setString(4, author.getGender());
@@ -747,6 +1000,7 @@ public class Loader {
 				query1.setLong(15, author.getViews());
 				query1.setLong(16, author.getPosts());
 				query1.executeUpdate();
+				//system.out.println(query1.toString());
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				try {
@@ -778,7 +1032,7 @@ public class Loader {
 		try {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
-			System.out.println("ERROR THREAD OP");
+			//system.out.println("ERROR THREAD OP");
 			e.printStackTrace();
 		}
 
@@ -827,7 +1081,7 @@ public class Loader {
 	}
 
 	private String loaduopid() throws JSONException {
-		String err=null;
+		String err = null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
@@ -844,9 +1098,9 @@ public class Loader {
 		}
 
 		boolean error = false;
-		
-			try (Statement stmt = cndata.createStatement()) {
-				while (true) {
+
+		try (Statement stmt = cndata.createStatement()) {
+			while (true) {
 				try (ResultSet rs = stmt.executeQuery(query)) {
 					if (!rs.next()) {
 						cndata.close();
@@ -871,7 +1125,7 @@ public class Loader {
 					if (err != null)
 						break;
 					break;
-				}catch (Exception e) {
+				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
 					query = query.replace("ORDER BY ID ASC", ") order by id asc");
@@ -881,29 +1135,29 @@ public class Loader {
 					continue;
 				}
 
-			} 
-
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				return null;
 			}
 
-			finally
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return null;
+		}
 
-			{
-				try {
-					cndata.close();
-				} catch (SQLException e) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e);
-				}
-				try {
-					cnlocal.close();
-				} catch (SQLException e) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e);
-				}
+		finally
+
+		{
+			try {
+				cndata.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
-			return err;
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+			}
+		}
+		return err;
 	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {

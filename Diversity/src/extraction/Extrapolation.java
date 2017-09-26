@@ -35,7 +35,6 @@ public final class Extrapolation extends Globalsentiment {
 		double globalSentiment;
 		boolean extraTest = true;
 
-
 		String[] time = new String[12];
 		time[0] = "JAN";
 		time[1] = "FEB";
@@ -182,30 +181,82 @@ public final class Extrapolation extends Globalsentiment {
 		return result;
 	}
 
-	public static HashMap<Long, Long> get_Similarity_Threshold(String productsId, double threshold) {
-		if (productsId.isEmpty())
-			return new HashMap<Long, Long>();
+	private static double get_Similarity_Services(long service_id1, long service_id2) {
+		ArrayList<Long> commonid = new ArrayList<Long>();
+		if (service_id1 == service_id2)
+			return 1;
+		if (!(Data.dbhasservice(service_id1) && Data.dbhasservice(service_id2)))
+			return 0;
 
-		HashMap<Long, Long> pssweights = new HashMap<Long, Long>();
+		Product ser1 = Data.getService(service_id1);
+		commonid.add(service_id1);
+		int depth1 = 2;
+		int founddepth = -1;
+		if (ser1.getParent() != 0) {
+			do {
+				commonid.add(ser1.getParent());
+				ser1 = Data.getService(ser1.getParent());
+				depth1++;
+
+			} while (ser1.getParent() != 0);
+		}
+		Product ser2 = Data.getService(service_id2);
+		int depth2 = 2;
+		if (commonid.contains(service_id2))
+			founddepth = 0;
+		if (ser2.getParent() != 0) {
+			do {
+				if (founddepth == -1) {
+					if (commonid.contains(ser2.getParent()))
+						founddepth = depth2 - 1;
+				}
+				ser2 = Data.getService(ser2.getParent());
+				depth2++;
+			} while (ser2.getParent() != 0);
+		}
+		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
+		return result;
+	}
+
+	public static HashMap<Long, Double> get_Similarity_Threshold(String productsId, double threshold,
+			boolean is_product) {
+		if (productsId.isEmpty())
+			return new HashMap<Long, Double>();
+
+		HashMap<Long, Double> pssweights = new HashMap<Long, Double>();
 		String[] products = productsId.split(";");
-		ArrayList<Long> simproducts = new ArrayList<Long>();
+		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
 		for (String p : products) {
 			try {
-				simproducts.addAll(get_Similarity_Threshold(Long.parseLong(p), threshold));
+				id_similarity = get_Similarity_Threshold(Long.parseLong(p), threshold, is_product);
+				id_similarity.forEach((k, v) -> {
+					for (PSS pss : Data.dbpssall()) {
+						if (is_product) {
+							if (pss.get_products().contains(k)) {
+								if (pssweights.containsKey(pss.getID())) {
+									pssweights.put(pss.getID(), pssweights.get(pss.getID()) + v);
+
+								} else {
+
+									pssweights.put(pss.getID(), v);
+								}
+							}
+						} else {
+							if (pss.get_services().contains(k)) {
+								if (pssweights.containsKey(pss.getID())) {
+									pssweights.put(pss.getID(), pssweights.get(pss.getID()) + v);
+
+								} else {
+
+									pssweights.put(pss.getID(), v);
+								}
+							}
+						}
+					}
+				});
 			} catch (NumberFormatException e1) {
 				LOGGER.log(Level.SEVERE, "Parsing String to Long error String = " + p);
 				return null;
-			}
-		}
-		for (Long id : simproducts) {
-			for (PSS pss : Data.dbpssall()) {
-				if (pss.get_products().contains(id)) {
-					if (pssweights.containsKey(pss.getID())) {
-						pssweights.put(pss.getID(), pssweights.get(pss.getID()) + 1);
-					} else {
-						pssweights.put(pss.getID(), (long) 1);
-					}
-				}
 			}
 		}
 
@@ -213,20 +264,38 @@ public final class Extrapolation extends Globalsentiment {
 
 	}
 
-	private static ArrayList<Long> get_Similarity_Threshold(long product_id, double threshold) {
-		ArrayList<Long> id_list = new ArrayList<Long>();
+	private static HashMap<Long, Double> get_Similarity_Threshold(long product_id, double threshold,
+			boolean is_product) {
+		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
 		while (threshold > 1)
 			threshold = threshold / ((double) 100);
+		if (is_product) {
+			for (Product pro : Data.dbproductall()) {
+				// if (pro.get_Id() == product_id)
+				// continue;
 
-		for (Product pro : Data.dbproductall()) {
-			if (pro.get_Id() == product_id)
-				continue;
+				if (get_Similarity(product_id, pro.get_Id()) >= threshold) {
+					id_similarity.put(pro.get_Id(), get_Similarity(product_id, pro.get_Id()));
+					// System.out.println("SIMILARITY OF PRODUCTS(" +
+					// pro.get_Id() + "," + product_id + ") -->"
+					// + get_Similarity(product_id, pro.get_Id()));
+				}
+			}
+		} else {
+			for (Product ser : Data.dbserviceall()) {
+				// if (ser.get_Id() == product_id)
+				// continue;
 
-			if (get_Similarity(product_id, pro.get_Id()) >= threshold)
-				id_list.add(pro.get_Id());
+				if (get_Similarity_Services(product_id, ser.get_Id()) >= threshold) {
+					id_similarity.put(ser.get_Id(), get_Similarity_Services(product_id, ser.get_Id()));
+					// System.out.println("SIMILARITY OF SERVICES(" +
+					// ser.get_Id() + "," + product_id + ") -->"
+					// + get_Similarity_Services(product_id, ser.get_Id()));
+				}
+			}
 		}
 
-		return id_list;
+		return id_similarity;
 
 	}
 

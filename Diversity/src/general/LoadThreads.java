@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 public class LoadThreads {
 	private static final Logger LOGGER = new Logging().create(LoadThreads.class.getName());
-	
+
 	class Tinsert implements Runnable {
 		private Author a;
 		private Opinion opinion;
@@ -33,9 +33,9 @@ public class LoadThreads {
 		 *            the a
 		 */
 		public Tinsert(Opinion _op) {
-			this.opinion=_op;
+			this.opinion = _op;
 		}
-		
+
 		public void run() {
 			Connection cnlocal = null;
 			try {
@@ -45,14 +45,19 @@ public class LoadThreads {
 			}
 			String update = "INSERT INTO " + Settings.lotable + " "
 					+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
-					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?,"
-					+ Settings.lotable_comments + "=?";
+					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?," + Settings.lotable_comments
+					+ "=?";
+
 			try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 				query1.setLong(1, opinion.getID());
 				query1.setDouble(2, opinion.getReach());
 				query1.setDouble(3, opinion.getPolarity());
 				query1.setDouble(4, opinion.getTotalInf());
-				query1.setLong(5, opinion.getUID());
+				if (!Settings.JSON_use)
+					query1.setString(5, opinion.getUID(false));
+				else
+					query1.setString(5, opinion.getUID(true));
+
 				query1.setLong(6, opinion.getTime());
 				query1.setLong(7, opinion.getPSS());
 				query1.setLong(8, opinion.ncomments());
@@ -61,22 +66,22 @@ public class LoadThreads {
 				query1.setDouble(11, opinion.getPolarity());
 				query1.setDouble(12, opinion.getTotalInf());
 				query1.setLong(13, opinion.ncomments());
-				while (true) {
-					try {
-						query1.executeUpdate();
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
-						Thread.sleep((long)(Math.random()*1000));
-						continue;
-					}
-					break;
+				try {
+//					if (opinion.getID() == 8480)
+//						System.out.println("INSERT OPINION: " + query1.toString());
+					query1.executeUpdate();
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
+					Thread.sleep((long) (Math.random() * 1000));
 				}
+
 				if (!Loader.first_load) {
 					cnlocal.close();
 					return;
 				}
 				for (Post post : opinion.getPosts().values()) {
 					PreparedStatement query2 = null;
+
 					try {
 						String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
 						query2 = cnlocal.prepareStatement(update1);
@@ -90,13 +95,17 @@ public class LoadThreads {
 						query2.setLong(4, post.getLikes());
 						query2.setLong(5, post.getViews());
 						query2.setLong(6, opinion.getID());
-						query2.setLong(7, post.getUID());
+						if (!Settings.JSON_use)
+							query2.setString(7, post.getUID());
+						else
+							query2.setString(7, post.getUID());
+
 						while (true) {
 							try {
 								query2.executeUpdate();
 							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, Settings.err_unknown +"Retried", e);
-								Thread.sleep((long)(Math.random()*1000));
+								LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
+								Thread.sleep((long) (Math.random() * 1000));
 								continue;
 							}
 							break;
@@ -113,7 +122,7 @@ public class LoadThreads {
 					} catch (Exception e) {
 					}
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -126,19 +135,13 @@ public class LoadThreads {
 
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
+
 	/**
 	 * The Class Tauthors.
 	 */
 	class Tauthors implements Runnable {
 		private Author a;
-		private int counter=0;
+		private int counter = 0;
 
 		/**
 		 * Instantiates a new tauthors.
@@ -155,10 +158,10 @@ public class LoadThreads {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		
+
 		public void run() {
-			Connection cnlocal=null;
-			LOGGER.log(Level.SEVERE, "started thread nº"+counter);
+			Connection cnlocal = null;
+			LOGGER.log(Level.SEVERE, "started thread nº" + counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -171,7 +174,7 @@ public class LoadThreads {
 					+ Settings.latable_comments + "=?," + Settings.latable_likes + "=?," + Settings.latable_views
 					+ "=?," + Settings.latable_posts + "=?";
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setLong(1, a.getID());
+				query1.setString(1, a.getID());
 				query1.setLong(2, a.getAge());
 				query1.setString(3, a.getName());
 				query1.setString(4, a.getGender());
@@ -237,95 +240,87 @@ public class LoadThreads {
 		 */
 
 		private void load(ResultSet rs, boolean remote) throws SQLException {
-			// System.out.println(id);
+			// //system.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
-			// System.out.println(id);
-			long user_id = remote ? rs.getLong(Settings.rptable_userid) : rs.getLong(Settings.lptable_authorid);
+			// //system.out.println(id);
+			String user_id = remote ? rs.getString(Settings.rptable_userid) : rs.getString(Settings.lptable_authorid);
 			long time = 0;
-			double polarity=-1;
+			double polarity = -1;
 			if (remote) {
 				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				java.util.Date date = null;
 				try {
 					date = df.parse(rs.getString(Settings.rptable_date));
 				} catch (ParseException e) {
-					System.out.print("Error Parsing Date from Local DB");
+					// system.out.print("Error Parsing Date from Local DB");
 				}
 				time = date.getTime();
 
-			}else{
-				polarity=rs.getDouble(Settings.lptable_polarity);
-				}
+			} else {
+				polarity = rs.getDouble(Settings.lptable_polarity);
+			}
 			long likes = remote ? rs.getLong(Settings.rptable_likes) : rs.getLong(Settings.lptable_likes);
 			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
-			;
+
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
-			long product = Data.identifyProduct(message);
+			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lptable_message);
+
+			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
 				return;
 			}
-			Post _post = remote ? new Post(postid, user_id, time, likes, views, message)
-					: new Post(postid, user_id, 0, likes, views, message,polarity);
+			Post _post = remote ? new Post(postid, source, user_id, time, likes, views, message)
+					: new Post(postid, user_id, (long) 0, likes, views, message, polarity, "");
 			if (!(Loader.users.contains(user_id))) {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, ""));
+
 		}
 
 		public void run() {
-			Connection cndata;
+			Connection cndata = null;
 			Connection cnlocal;
 			if (obj == null) {
-				
-				
-				///Change load order
-				
-				try{
-					cnlocal= Settings.connlocal();
-					}catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-						return;
-					}
-					String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id + " = "
-							+ id);
-					try (Statement stmt = cnlocal.createStatement()) {
-						try (ResultSet rs = stmt.executeQuery(query)) {
-							if (rs.next()) {
-								if(Loader.first_load)Loader.totalposts--;
-								load(rs, false);
-							}
 
+				/// Change load order
+
+				try {
+					cnlocal = Settings.connlocal();
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+					return;
+				}
+				String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id
+						+ " = " + id);
+				try (Statement stmt = cnlocal.createStatement()) {
+					try (ResultSet rs = stmt.executeQuery(query)) {
+						if (rs.next()) {
+							if (Loader.first_load)
+								Loader.totalposts--;
+							load(rs, false);
 						}
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-						try {
-							cnlocal.close();
-						} catch (Exception e1) {
-							LOGGER.log(Level.SEVERE, Settings.err_unknown, e1);
-						}
-						return;
+
 					}
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 					try {
 						cnlocal.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-						return;
+					} catch (Exception e1) {
+						LOGGER.log(Level.SEVERE, Settings.err_unknown, e1);
 					}
-					
-					// FInished load order
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
+					return;
+				}
+				try {
+					cnlocal.close();
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+					return;
+				}
+
+				// FInished load order
+
 				try {
 					cndata = Settings.conndata();
 				} catch (Exception e) {
@@ -333,8 +328,9 @@ public class LoadThreads {
 					return;
 				}
 				boolean remote = true;
-				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable_postid
-						+ " = " + id);
+				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable + "."
+						+ Settings.rptable_postid + " = " + id);
+				// system.out.println(query);
 				try (Statement stmt = cndata.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (!rs.next()) {
@@ -357,7 +353,7 @@ public class LoadThreads {
 
 			{
 				try {
-					cnlocal= Settings.connlocal();
+					cnlocal = Settings.connlocal();
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
@@ -378,15 +374,14 @@ public class LoadThreads {
 					} else {
 						Loader.totalposts--;
 					}
-					// Date date = new
-					// Date(Long.valueOf(obj.getString("postEpoch")) * 1000L);
-					Date date = new Date(0);
+					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
+					// Date date = new Date(0);
 					DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					format.setTimeZone(TimeZone.getTimeZone("GMT"));
 					String formatted = format.format(date);
 					java.util.Date parsed = format.parse(formatted);
 
-					System.out.println(formatted);
+					// //system.out.println(formatted);
 					long postid;
 					if (obj.has("postId")) {
 						postid = obj.getLong("postId");
@@ -394,9 +389,9 @@ public class LoadThreads {
 						postid = (long) (Math.random() * 200);
 						obj.put("postId", postid);
 					}
-					// System.out.println(id);
-					String source = obj.getString("source");
-					String user_id = obj.getString("account");
+					// //system.out.println(id);
+					String source = obj.getString(Settings.JSON_source);
+					String user_id = obj.getString(Settings.JSON_userid);
 					long time = parsed.getTime();
 					if (!remote) {
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -404,21 +399,23 @@ public class LoadThreads {
 						try {
 							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
 						} catch (ParseException e) {
-							System.out.print("Error Parsing Date from Local DB");
+							// system.out.print("Error Parsing Date from Local
+							// DB");
 						}
 						time = date.getTime();
 
 					}
-					System.out.println("IM HERE");
+					// //system.out.println("IM HERE");
 					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
-					long age = obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0;
+					long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
+							? obj.getLong(Settings.JSON_age) : 0;
 					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
 					String message = obj.getString("post");
-					long product = Data.identifyProduct(message);
+					long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 					/*
 					 * if (product == 0) { rs.close(); stmt.close();
 					 * conlocal.close(); condata.close(); return; }
@@ -439,7 +436,8 @@ public class LoadThreads {
 					if (!(Loader.users2.contains(author))) {
 						Loader.users2.add(author);
 					}
-					Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, "google.pt"));// TODO
+					Loader.opiniondb.put(postid,
+							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 					// find
 					// url
 					// to
@@ -452,7 +450,7 @@ public class LoadThreads {
 					if (cnlocal != null)
 						cnlocal.close();
 				} catch (SQLException | JSONException e) {
-					System.out.println("ERROR loading Opinions");
+					// system.out.println("ERROR loading Opinions");
 					e.printStackTrace();
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -481,6 +479,14 @@ public class LoadThreads {
 
 				}
 
+			}
+			try {
+				if (cndata != null)
+					cndata.close();
+
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -530,22 +536,22 @@ public class LoadThreads {
 				return;
 			Statement stmt = null;
 			ResultSet rs = null;
-			Connection cndata=null;
-			Connection cnlocal=null;
+			Connection cndata = null;
+			Connection cnlocal = null;
 			if (obj == null) {
 				try {
-					// System.out.println("HELLO1");
+					// //system.out.println("HELLO1");
 					cndata = Settings.conndata();
 					String query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere
 							+ Settings.rptable_rpostid + " = " + id);
 					stmt = cndata.createStatement();
-					// System.out.println(query);
+					// //system.out.println(query);
 					rs = stmt.executeQuery(query);
 					if (rs.next()) {
 						do {
-							// System.out.println("HELLO2");
+							// //system.out.println("HELLO2");
 							long postid = rs.getLong(Settings.rptable_postid);
-							long user_id = rs.getLong(Settings.rptable_userid);
+							String user_id = rs.getString(Settings.rptable_userid);
 							long time = 0;
 
 							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -553,14 +559,15 @@ public class LoadThreads {
 							try {
 								date = df.parse(rs.getString(Settings.rptable_date));
 							} catch (ParseException e) {
-								System.out.print("Error Parsing Date from Local DB");
+								// system.out.print("Error Parsing Date from
+								// Local DB");
 							}
 							time = date.getTime();
 
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
-							Post _post = new Post(postid, user_id, time, likes, views, message);
+							Post _post = new Post(postid, "", user_id, time, likes, views, message);
 							if (!(Loader.users.contains(user_id))) {
 								Loader.users.add(user_id);
 							}
@@ -571,21 +578,23 @@ public class LoadThreads {
 					stmt.close();
 					cndata.close();
 					cnlocal = Settings.connlocal();
-					query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_opinion
-							+ " = " + id);
+					query = (Settings.sqlselectall + Settings.lptable
+							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id "
+							+ Settings.sqlwhere + Settings.lptable_opinion + " = " + id);
+					// system.out.println(query);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
-					// System.out.println(query);
 					if (rs.next()) {
 						do {
-							// System.out.println("HELLO3");
+							// //system.out.println("HELLO3");
 							long postid = rs.getLong(Settings.lptable_id);
-							long user_id = rs.getLong(Settings.lptable_authorid);
+							String user_id = rs.getString(Settings.lptable_authorid);
 							long likes = rs.getLong(Settings.lptable_likes);
 							long views = rs.getLong(Settings.lptable_views);
 							String message = rs.getString(Settings.lptable_message);
 							double polarity = rs.getDouble(Settings.lptable_polarity);
-							Post _post = new Post(postid, user_id, 0, likes, views, message,polarity);
+							String source = rs.getString(Settings.latable_source);
+							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity, source);
 							if (!(Loader.users.contains(user_id)))
 								Loader.users.add(user_id);
 							_opin.addcomment(_post);
@@ -601,7 +610,7 @@ public class LoadThreads {
 						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					System.out.println("ERROR loading Posts");
+					// system.out.println("ERROR loading Posts");
 					e.printStackTrace();
 				} catch (SQLException e) {
 					//
@@ -641,7 +650,7 @@ public class LoadThreads {
 
 					if (obj.has(Settings.JSON_replies)) {
 
-						// System.out.println("HELLO2");
+						// //system.out.println("HELLO2");
 						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
 						for (int index = 0; index < replies.length(); index++) {
 
@@ -672,20 +681,24 @@ public class LoadThreads {
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
-							long age = obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0;
+							long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
+									? obj.getLong(Settings.JSON_age) : 0;
 							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
 							Author author = new Author(user_id, source, name, age, gender, location);
+							// if(Loader.) //se não existir na authors db2 tem
+							// de ser criado
 							if (!(Loader.users2.contains(author))) {
 								Loader.users2.add(author);
+
 							}
 							_opin.addcomment(_post);
 						}
 
 					}
 
-					System.out.println("HELLO");
+					// //system.out.println("HELLO");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (ParseException e) {
@@ -734,10 +747,10 @@ public class LoadThreads {
 		 * public Tmodels() { }
 		 */
 		public void Tmodels() {
-			// System.out.println("HELLO1");
+			// //system.out.println("HELLO1");
 			Statement stmt = null;
 			ResultSet rs = null;
-			Connection cnlocal=null;
+			Connection cnlocal = null;
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e1) {
@@ -748,7 +761,7 @@ public class LoadThreads {
 			try {
 				String query = (Settings.sqlselectall + Settings.lmtable);
 				stmt = cnlocal.createStatement();
-				// System.out.println(query);
+				// //system.out.println(query);
 				rs = stmt.executeQuery(query);
 				if (rs.next()) {
 					do {
@@ -758,7 +771,8 @@ public class LoadThreads {
 								rs.getString(Settings.lmtable_age), rs.getString(Settings.lmtable_gender),
 								rs.getString(Settings.lmtable_monitorfinal), rs.getBoolean(Settings.lmtable_archived),
 								rs.getLong(Settings.lmtable_cdate), rs.getLong(Settings.lmtable_udate),
-								rs.getLong(Settings.lmtable_designproject),rs.getBoolean(Settings.lmtable_add_mediawiki));
+								rs.getLong(Settings.lmtable_designproject),
+								rs.getBoolean(Settings.lmtable_add_mediawiki));
 						Data.modeldb.put(model.getId(), model);
 					} while (rs.next());
 				}

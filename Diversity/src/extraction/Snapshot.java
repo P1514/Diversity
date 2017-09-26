@@ -20,6 +20,11 @@ import general.Logging;
 import general.Settings;
 
 public class Snapshot {
+	
+	private static final String ALL_SNAPSHOTS = "all";
+	private static final String EXTRACTION_SNAPSHOTS = "extraction";
+	private static final String PREDICTION_SNAPSHOTS = "prediction";
+	
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 	private final Backend b;
 
@@ -115,7 +120,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		System.out.println("TEST" + result);
+		//System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}
@@ -241,8 +246,9 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT " + Settings.lsstable_result + " FROM " + Settings.lsstable + " where "
+		String insert = new String("SELECT " + Settings.lsstable_result + "," + Settings.lsstable_creation_user + "," + Settings.lsstable_creation_date + "," + Settings.lsstable_model_id + " FROM " + Settings.lsstable + " where "
 				+ Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
+		long model;
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))
@@ -251,7 +257,16 @@ public class Snapshot {
 				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
 				if(!rs.next()) return "";
-				return rs.getString("result");
+				JSONArray json = new JSONArray(rs.getString("result"));
+				JSONObject obj = new JSONObject();
+				obj.put("User", rs.getString("creation_user"));
+				obj.put("Date", new Date(rs.getLong("creation_date")));
+				model = rs.getLong("model_id");
+				if (Data.getmodel(model) != null) {
+					obj.put("PSS", Data.getmodel(model).getPSS());
+				}
+				json.put(obj);
+				return json.toString();
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
@@ -263,10 +278,12 @@ public class Snapshot {
 				LOGGER.log(Level.INFO, error, e);
 			}
 		}
+		
+		
 	}
 
-
-	public static JSONArray getAll(int pss) throws JSONException {
+	// pss = -1 returns all snapshots from all PSS
+	public static JSONArray getAll(int pss, String type) throws JSONException {
 
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
@@ -279,12 +296,29 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "Error", e);
 			return null;
 		}
-		String insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
-				+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
-				+ "=?) AND "+Settings.lsstable_type+"='all'");
+		String insert;
+		
+		if (pss == -1) {
+			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_type + " like ?");
+		} else {
+			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
+					+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
+					+ "=?) AND "+Settings.lsstable_type+" like '%all%'");
+		}
+		
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-
-				query1.setInt(1, pss);
+			int i = 1;
+			if (pss != -1) {
+				query1.setInt(i++, pss);
+			} else {
+				if (type.equals(ALL_SNAPSHOTS)) {
+					query1.setString(i++, "%%");
+				} else if (type.equals(EXTRACTION_SNAPSHOTS)) {
+					query1.setString(i++, "%all%");
+				} else if (type.endsWith(PREDICTION_SNAPSHOTS)) {
+					query1.setString(i++, PREDICTION_SNAPSHOTS);
+				}
+			}
 
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
@@ -294,9 +328,10 @@ public class Snapshot {
 				obj.put("Name", rs.getString("name"));
 				obj.put("Id", rs.getString("id"));
 				obj.put("User", rs.getString("creation_user"));
+				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}
-			result.put("Snapshots");
+			result.put(new JSONObject().put("Op", "Snapshots"));
 			result.put(aux);
 
 		} catch (Exception e) {

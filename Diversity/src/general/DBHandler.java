@@ -46,8 +46,6 @@ public class DBHandler extends Handler {
 		try {
 			msg = getFormatter().format(record);
 		} catch (Exception ex) {
-			// We don't want to throw an exception here, but we
-			// report the exception to any registered ErrorManager.
 			reportError(null, ex, ErrorManager.FORMAT_FAILURE);
 			return;
 		}
@@ -62,8 +60,8 @@ public class DBHandler extends Handler {
 		try {
 			insert = cnlocal.prepareStatement(sql);
 			insert.setInt(1, user_id);
-			insert.setTimestamp(2, timestamp);
-			insert.setString(3, msg);
+			insert.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+			insert.setString(3, record.getLevel() + " " + record.getMessage());
 			insert.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();

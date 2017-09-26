@@ -2,21 +2,11 @@ package general;
 
 import java.sql.*;
 import security.SessionClean;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * The Class Data.
@@ -32,8 +22,13 @@ public class Data {
 	/** The productdb. */
 	protected static final ConcurrentHashMap<Long, Product> productdb = new ConcurrentHashMap<>();
 
+	/** The designProjectdb. */
+	protected static final ConcurrentHashMap<Long, DesignProject> designProjectdb = new ConcurrentHashMap<>();
+	
+	/** The userdb. */
+	protected static final ConcurrentHashMap<Long, User> userdb = new ConcurrentHashMap<>();
+	
 	/** The servicedb. */
-	@SuppressWarnings("unused")
 	protected static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
 
 	/** The companydb. */
@@ -43,21 +38,31 @@ public class Data {
 	private static final ConcurrentHashMap<String, Timer> security = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<String, String> security_users = new ConcurrentHashMap<>();
 
-	
-	protected static void addproduct(ResultSet rs) throws SQLException{
-		
+	protected static void addproduct(ResultSet rs) throws SQLException {
+
 		productdb.put(rs.getLong(Settings.crproducttable_id),
-				new Product(rs.getLong(Settings.crproducttable_id),
-						rs.getString(Settings.crproducttable_name),
-						rs.getBoolean(Settings.crproducttable_isfinal),
-						rs.getLong(Settings.crproducttable_supplied_by),
+				new Product(rs.getLong(Settings.crproducttable_id), rs.getString(Settings.crproducttable_name),
+						rs.getBoolean(Settings.crproducttable_isfinal), rs.getLong(Settings.crproducttable_supplied_by),
 						rs.getLong(Settings.crproducttable_parent)));
 		if (rs.getLong(Settings.crproducttable_parent) != 0) {
 			Product parent = productdb.get(rs.getLong(Settings.crproducttable_parent));
 			parent.setParent(rs.getLong(Settings.crproducttable_id));
 		}
-		
+
 	}
+
+	protected static void addservice(ResultSet rs) throws SQLException {
+
+		servicedb.put(rs.getLong(Settings.crservicetable_id),
+				new Product(rs.getLong(Settings.crservicetable_id), rs.getString(Settings.crservicetable_name), false,
+						rs.getLong(Settings.crservicetable_supplied_by), rs.getLong(Settings.crservicetable_parent)));
+		if (rs.getLong(Settings.crservicetable_parent) != 0) {
+			Product parent = servicedb.get(rs.getLong(Settings.crservicetable_parent));
+			parent.setParent(rs.getLong(Settings.crservicetable_id));
+		}
+
+	}
+	
 
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
@@ -72,7 +77,7 @@ public class Data {
 
 	public static void newuser(String id, String role) {
 		Timer tmp;
-		//System.out.println(id + role);
+		// System.out.println(id + role);
 		if (security_users.containsKey(id)) {
 			if (getRole(role).permissionAmount() < getRole(security_users.get(id)).permissionAmount())
 				security_users.put(id, role);
@@ -120,12 +125,56 @@ public class Data {
 	public static Collection<PSS> dbpssall() {
 		return pssdb.values();
 	}
+	
+	public static Collection<DesignProject> dbdpall() {
+		return designProjectdb.values();
+	}
 
 	public static PSS getpss(long id) {
 		if (pssdb.containsKey(id))
 			return pssdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
 		return null;
+	}
+	
+	public static DesignProject getDp(long id) {
+		if (designProjectdb.containsKey(id))
+			return designProjectdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Designproject");
+		return null;
+	}
+	
+	public static User getUser(long id) {
+		if (userdb.containsKey(id))
+			return userdb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get user");
+		return null;
+	}
+	
+	public static Collection<User> dbuserall() {
+		return userdb.values();
+	}
+	
+	public static Company getCompany(long id) {
+		if (companydb.containsKey(id))
+			return companydb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Company");
+		return null;
+	}
+
+	public static boolean dbhasservice(long id) {
+		return servicedb.containsKey(id);
+	}
+
+	public static Product getService(long id) {
+		if (dbhasservice(id))
+			return servicedb.get(id);
+		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get service");
+		return null;
+	}
+
+	public static Collection<Product> dbserviceall() {
+		return servicedb.values();
 	}
 
 	public static boolean dbhasproduct(long id) {
@@ -176,9 +225,24 @@ public class Data {
 				return a.getID();
 		}
 		return 0;
-
 	}
 
+	/**
+	 * Identify company by name.
+	 *
+	 * @param name
+	 *            the name of the pss
+	 * @return the long id
+	 */
+	public static Company getcompanybyname(String name) {
+
+		for (Company c : companydb.values()) {
+			if (c.getName().toLowerCase().equals(name.toLowerCase()))
+				return c;
+		}
+		return null;
+	}
+	
 	/**
 	 * Identify product by message.
 	 *
@@ -195,5 +259,7 @@ public class Data {
 
 		return 0;
 	}
+	
+	
 
 }

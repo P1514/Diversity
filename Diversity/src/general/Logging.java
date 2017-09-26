@@ -184,11 +184,11 @@ public class Logging {
 		String text = "";
 		for(String s : logs) {
 			text += s;
-			System.out.println("working...");
+			//System.out.println("working...");
 		}
 		
 		logsJSON.put(classname, text);
-		System.out.println(classname);
+		//System.out.println(classname);
 		return logsJSON;
 	}
 	

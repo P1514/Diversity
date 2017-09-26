@@ -8,6 +8,7 @@ import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +18,9 @@ import extraction.Globalsentiment;
 
 import java.sql.Connection;
 
+import general.Data;
+import general.Product;
+import general.PSS;
 import general.Logging;
 import general.Settings;
 
@@ -35,26 +39,49 @@ public class Monitor {
 	 */
 	public static void update(String uri, long pss) {
 		String[] urilists = uri.split(";");
-		String account = "", source = "", url;
-		url = "http://diversity.euprojects.net/socialfeedbackextraction/registerSFE?accounts[]=\"";
+		String account = "", source = "", url, finalProductId = "", finalProductName = "";
+		PSS pssInstance = Data.getpss(pss);
+		String pssName = "&pssName=" + pssInstance.getName();
+		ArrayList<Long> products = pssInstance.get_products();
+		Product productInstance = null;
+		for (int i = 0; i < products.size(); i++) {
+			productInstance = Data.getProduct((long) products.get(i));
+			if (productInstance.getFinal()) {
+				finalProductId = "&finalProductId=" + String.valueOf(productInstance.get_Id());
+				finalProductName = "&finalProductName=" + productInstance.get_Name();
+
+			}
+		}
+		url = Settings.register_uri + "?accounts[]=";
 		for (int i = 0; i < urilists.length; i++) {
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "\"&type[]=\"" + source + "\"&";
+			url += account + "&type[]=" + source  ;
 		}
-		url = url.substring(0, url.length() - 1);
+		//url = url.substring(0, url.length() - 1);
+		//url += pssName + finalProductId + finalProductName;
+		//System.out.println(url);
+		try {
+			//System.out.println(url);
+			Oversight.readUrl(url);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
-					+ Settings.lutable_account + "," + Settings.lutable_pss + ") VALUES(?,?,?) ON DUPLICATE KEY UPDATE "
-					+ Settings.lutable_source + "=?";
+					+ Settings.lutable_account + "," + Settings.lutable_pss + "," + Settings.lutable_lastupdate
+					+ ") VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lutable_source + "=?";
 			stmt = cnlocal.prepareStatement(query);
 			stmt.setString(1, source);
 			stmt.setString(2, account);
 			stmt.setLong(3, pss);
-			stmt.setString(4, source);
+			stmt.setLong(4, (long) 9466848 * 100000);
+			stmt.setString(5, source);
+			// System.out.println(query);
 
 			stmt.execute();
 
@@ -97,7 +124,11 @@ public class Monitor {
 
 	}
 
-	public static void load(String uri, long pss) {// TODO
+	public static void load(String uri, long pss) {
+
+		// Objetos co info sources
+
+		// String uri = Settings.JSON_uri;
 
 	}
 
@@ -109,7 +140,7 @@ public class Monitor {
 	 */
 	public static void delete(String uri) {
 		String[] urilist = uri.split("(?<=;)");
-		int count=1;
+		int count = 1;
 
 		for (int i = 0; i < urilist.length; i++) {
 			Connection cnlocal = null;
@@ -119,23 +150,22 @@ public class Monitor {
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "error", e);
 			}
-			//System.out.println(urilist[i]);
+			// System.out.println(urilist[i]);
 			String insert = new String("SELECT COUNT(id) FROM models WHERE archived=0 and uri=?;");
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setString(1, urilist[i]);
-				//System.out.println(query1.toString());
+				// System.out.println(query1.toString());
 				rs = query1.executeQuery();
 				count = rs.getInt(1);
 
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "error", e);
 			}
-			
-			//System.out.println(count);
-			if(count>0){
-				LOGGER.log(Level.INFO, "Source not deleted");			
-			}
-			else
+
+			// System.out.println(count);
+			if (count > 0) {
+				LOGGER.log(Level.INFO, "Source not deleted");
+			} else
 				LOGGER.log(Level.INFO, "Source deleted");
 		}
 

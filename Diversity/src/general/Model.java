@@ -101,7 +101,10 @@ public final class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
-		design_project = msg.getLong("design_project");
+		if (msg.has("design_project"))
+			design_project = msg.getLong("design_project");
+		else
+			design_project = 0;
 		if (msg.has("Start_date")) {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			Date date = null;
@@ -354,9 +357,9 @@ public final class Model {
 	public Long getDate() {
 		return this.cdate;
 	}
-	
-	public Long getLastUpdate(){
-		return this.nextupdate-(this.frequency*86400000);
+
+	public Long getLastUpdate() {
+		return this.nextupdate - (this.frequency * 86400000);
 	}
 
 	public Long getUpdate() {
