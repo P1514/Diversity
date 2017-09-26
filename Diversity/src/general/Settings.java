@@ -112,6 +112,7 @@ public class Settings {
 	public static final String lotable_pss = "pss";
 	public static final String lotable_product = "product";
 	public static final String lotable_comments = "comments";
+	public static final String lotable_source = "source";
 
 	// Models table
 	public static final String lmtable = "models";

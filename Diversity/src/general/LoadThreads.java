@@ -44,8 +44,10 @@ public class LoadThreads {
 				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 			}
 			String update = "INSERT INTO " + Settings.lotable + " "
-					+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?," + Settings.lotable_comments
+
 					+ "=?";
 
 			try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
@@ -66,6 +68,8 @@ public class LoadThreads {
 				query1.setDouble(11, opinion.getPolarity());
 				query1.setDouble(12, opinion.getTotalInf());
 				query1.setLong(13, opinion.ncomments());
+				query1.setString(14, opinion.getSource());
+
 				try {
 //					if (opinion.getID() == 8480)
 //						System.out.println("INSERT OPINION: " + query1.toString());
@@ -83,7 +87,8 @@ public class LoadThreads {
 					PreparedStatement query2 = null;
 
 					try {
-						String update1 = "REPLACE INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?)";
+						String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
+					+"ON DUPLICATE KEY UPDATE "+Settings.lptable_views+"=?,"+Settings.lptable_likes+"=?";
 						query2 = cnlocal.prepareStatement(update1);
 						query2.setLong(1, post.getID());
 						if (post.getPolarity() != -1) {
@@ -99,7 +104,8 @@ public class LoadThreads {
 							query2.setString(7, post.getUID());
 						else
 							query2.setString(7, post.getUID());
-
+						query2.setLong(8, post.getLikes());
+						query2.setLong(9, post.getViews());
 						while (true) {
 							try {
 								query2.executeUpdate();
@@ -161,7 +167,7 @@ public class LoadThreads {
 
 		public void run() {
 			Connection cnlocal = null;
-			LOGGER.log(Level.SEVERE, "started thread nº" + counter);
+			LOGGER.log(Level.SEVERE, "started thread nï¿½" + counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -567,6 +573,8 @@ public class LoadThreads {
 							long likes = rs.getLong(Settings.rptable_likes);
 							long views = rs.getLong(Settings.rptable_views);
 							String message = rs.getString(Settings.rptable_message);
+							message=message.trim();
+							if(message.length()<=1)continue;
 							Post _post = new Post(postid, "", user_id, time, likes, views, message);
 							if (!(Loader.users.contains(user_id))) {
 								Loader.users.add(user_id);
@@ -677,6 +685,7 @@ public class LoadThreads {
 							long views = reply.has("mediaSpecificInfo")
 									? reply.has("views") ? reply.getLong("views") : 0 : 0;
 							String message = reply.getString(Settings.JSON_message);
+							
 							String source = obj.getString(Settings.JSON_source);
 							Post _post = new Post(postid, source, user_id, time, likes, views, message);
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
@@ -687,7 +696,7 @@ public class LoadThreads {
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
 							Author author = new Author(user_id, source, name, age, gender, location);
-							// if(Loader.) //se não existir na authors db2 tem
+							// if(Loader.) //se nï¿½o existir na authors db2 tem
 							// de ser criado
 							if (!(Loader.users2.contains(author))) {
 								Loader.users2.add(author);

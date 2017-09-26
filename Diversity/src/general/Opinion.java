@@ -165,6 +165,15 @@ public class Opinion {
 	public double getReach() {
 		return reach;
 	}
+	
+	/**
+	 * Gets the source.
+	 *
+	 * @return the reach
+	 */
+	public String getSource() {
+		return source;
+	}
 
 	/**
 	 * Gets the uid.
