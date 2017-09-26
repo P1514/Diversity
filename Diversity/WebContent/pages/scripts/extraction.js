@@ -374,6 +374,8 @@ function connect() {
 				case 3:
 					type = 'Negative';
 					break;
+				default:
+					type = 'All';
 			}
 			// Request the tagcloud for the current user
 			var json = {

@@ -277,8 +277,8 @@ public class Backend {
 					case "Positive":
 						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
