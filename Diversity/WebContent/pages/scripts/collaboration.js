@@ -12,8 +12,10 @@ var snap = false;
 var snap_name;
 var userCompany;
 var userStorage = [];
+var teamRoles = [];
 var availableUsers = [];
 var team = [];
+var roles = [];
 
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
@@ -25,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#overlay-back').hide();
   $('#overlay').hide();
-	userCompany = getParam("company").toLowerCase();
+	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
 	var str = userCompany;
 
 	$('#comp').append(str[0].toUpperCase() + str.slice(1));
@@ -53,21 +55,36 @@ document.addEventListener('DOMContentLoaded', function() {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 
 		if (json[0].Op == "Rights") {
+			json = {
+				'Op' : 'get_roles',
+				'Key' : getCookie('JSESSIONID'),
+			}
+
+			ws.send(JSON.stringify(json));
+		}
+
+		if (json[0].Op == "Roles") {
+			roles = json[1].Roles.substring(0, json[1].Roles.length - 1).split(',');
+			//console.log(roles);
 			json2 = {
-	      "Op" : "collaboration",
-	      'Key' : getCookie("JSESSIONID"),
+				"Op" : "collaboration",
+				'Key' : getCookie("JSESSIONID"),
 				'Products' : getParam('products'),
 				'Services' : getParam('services'),
 				'Company' : getParam('company')
-	    }
+			}
 
-	    ws.send(JSON.stringify(json2));
+			ws.send(JSON.stringify(json2));
 		}
+
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
       draw = true;
 			users = json[1];
-      console.log(users);
+			for (var i = 0; i < users.length; i++) {
+					teamRoles[i] = users[i].Role;
+			}
+      //console.log(users);
 
       drawTable();
     }
@@ -121,7 +138,7 @@ function drawTable() {
 			name = user.First_name + ' ' + user.Last_name;
 			rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 			role = user.Role;
-			console.log("Adding user " + name + " from " + company);
+			//console.log("Adding user " + name + " from " + company);
 			$('#users_body').append('<tr id=user_' + i + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + i + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + i + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 			userStorage[i] = user;
 			availableUsers.push(user);
@@ -158,13 +175,24 @@ $('#unranked').change(function() {
 });
 
 function addMember(position) {
+	var rolesOptions = '';
 	user = userStorage[position];
 	if (team.indexOf(user) == -1) {
+		user.Position = position;
 		company = user.Company;
 		name = user.First_name + ' ' + user.Last_name;
 		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
 		role = user.Role;
-		$('#team_body').append('<tr id="team_' + position + '"><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="removeMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_remove.png" onClick="removeMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
+		for (var i = 0; i < roles.length; i++) {
+			if (roles[i] == role) {
+				rolesOptions += '<option value="' + roles[i] + '" selected>' + roles[i] + '</option>';
+			} else {
+				rolesOptions += '<option value="' + roles[i] + '">' + roles[i] + '</option>';
+			}
+		}
+		$('#team_body').append('<tr id="team_' + position + '"><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="removeMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_remove.png" onClick="removeMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' +
+		'<select id="role' + position +'">' + rolesOptions + '</select>' +
+		'</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		$('#user_' + position).remove();
 		availableUsers.splice(availableUsers.indexOf(user, 1));
 		team.push(user);
@@ -176,13 +204,27 @@ function addMember(position) {
 	}
 }
 
+function setRole(position, role) {
+	userStorage[position].Role = role;
+}
+
+function addToTeam(user, position) {
+	var newRole = $('#role' + position).val();
+
+	user.Role = newRole;
+	if (team.indexOf(user) == -1) {
+		team.push(user);
+	}
+}
+
 function removeMember(position) {
 	user = userStorage[position];
 	if (availableUsers.indexOf(user) == -1) {
+		user.Position = position;
 		company = user.Company;
 		name = user.First_name + ' ' + user.Last_name;
 		rating = user.hasOwnProperty('Ranking') ? parseInt(user.Ranking, 10) : '--';
-		role = user.Role;
+		role = teamRoles[position];
 		$('#users_body').append('<tr id=user_' + position + '><td style="padding-left:10px;padding-top:2px;padding-bottom:2px;padding-right:2px;"><a onClick="addMember(' + position + ');" ><img style="height: 20px;width: 20px;" src="..\\images\\icons\\team_add.png" onClick="addMember(' + position + ');"></a><td style="padding:2px;" class="name">' + name + '</td><td style="padding:2px;" class="role">' + role + '</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		availableUsers.push(user);
 
@@ -198,9 +240,22 @@ function removeMember(position) {
 
 function submit() {
 	var result = [];
-	for (var i = 0; i < team.length; i++) {
-		result.push(team[i]);
+	var transaction = {
+		'transactionId' : getParam('transactionId')
 	}
-
-	console.log(JSON.stringify(result));
+	result.push(transaction);
+	for (var i = 0; i < team.length; i++) {
+		team[i].Role = $('#role' + team[i].Position).val();
+		result.push(team[i]);
+		//console.log(team[i].Role);
+	}
+	$(function () {
+		$.ajax({
+	  	type: "POST",
+	    data :JSON.stringify(result),
+	    url: "https://diversity.euprojects.net/collaborationTool/suggestions",
+	    contentType: "application/json"
+	  });
+	});
+	//console.log(JSON.stringify(result));
 }

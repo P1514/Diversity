@@ -3,6 +3,7 @@ package general;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import security.*;
 import java.util.logging.Logger;
@@ -130,6 +131,20 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 35:
+				result = new JSONArray();
+				obj = new JSONObject();
+				obj.put("Op", "Roles");
+				result.put(obj);
+				Set<String> roles = Data.roledb.keySet();
+				String rolesList = "";
+				for (String r : roles) {
+					rolesList += r + ",";
+				}
+				obj = new JSONObject();
+				obj.put("Roles", rolesList);
+				result.put(obj);
+				return result.toString();
 			case 34:
 				// SELECT * FROM sentimentanalysis.posts where id in (select
 				// post_id from post_source where post_source = 'wiki');
