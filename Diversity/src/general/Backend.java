@@ -275,10 +275,9 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -319,8 +318,8 @@ public class Backend {
 					case "Positive":
 						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -333,15 +332,14 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
-						break;
 					}
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 				obj.put("Op", "words");

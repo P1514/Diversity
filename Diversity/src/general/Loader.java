@@ -155,7 +155,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(1000/* 30 * 1000waiting_time*10 */);
+					Thread.sleep(10*1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -1126,7 +1126,7 @@ public class Loader {
 						break;
 					break;
 				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+					LOGGER.log(Level.INFO, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
 					query = query.replace("ORDER BY ID ASC", ") order by id asc");
 					if (error)

@@ -20,6 +20,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.json.*;
 
 import extraction.Globalsentiment;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Server.
@@ -127,8 +128,8 @@ public class Server {
 	 *            the msg
 	 */
 	/*
-	 * public void Assistantimplements Runnable { private Session session;
-	 * private JSONObject msg; private Operations op; private Backend be;
+	 * public void Assistantimplements Runnable { private Session session; private
+	 * JSONObject msg; private Operations op; private Backend be;
 	 * 
 	 * public void Assistant(Session _session, JSONObject _msg) { session =
 	 * _session; msg = _msg; op = new Operations(); }
@@ -140,45 +141,39 @@ public class Server {
 		JSONObject obj = new JSONObject();
 		LOGGER.log(Level.INFO, "IN:" + msg);
 		Backend be;
-
-		try {
-			if (session.isOpen()) {
-				try {
-					while (true) {
-						if (Server.isloading == true) {
-
-							obj.put("Op", "Error");
-							obj.put("Message", "Loading in Progress please wait a few minutes and try again");
-							result.put(obj);
-							session.getBasicRemote().sendText(result.toString());
-							return;
-
-						} else {
-							break;
-						}
-					}
-					if (op.getOP(msg.getString("Op")) == 2) {
-						Server.isloading = true;
-						obj.put("Op", "Error");
-						obj.put("Message", "Close this Message and wait for the next one to confirm Database loading");
-						result.put(obj);
-						session.getAsyncRemote().sendText(result.toString());
-					}
-					be = new Backend(op.getOP(msg.getString("Op")), msg);
-					if (op.getOP(msg.getString("Op")) == 2)
-						Server.isloading = false;
-					String answer = be.resolve().toString();
-					send_message(answer);
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		} catch (IOException e) {
+		if (session.isOpen()) {
 			try {
-				session.close();
-			} catch (IOException e1) {
-				// Ignore
+				if(Server.isloading == true) {
+					obj.put("Op", "Error");
+					obj.put("Message", "Database is Loading, data may be incoherent");
+					result.put(obj);
+					as.sendText(result.toString());
+				}
+				/*
+				 * while (true) { if (Server.isloading == true) {
+				 * 
+				 * obj.put("Op", "Error"); obj.put("Message",
+				 * "Loading in Progress please wait a few minutes and try again");
+				 * result.put(obj); session.getBasicRemote().sendText(result.toString());
+				 * return;
+				 * 
+				 * } else { break; } }
+				 */
+				if (op.getOP(msg.getString("Op")) == 2) {
+					Server.isloading = true;
+					obj.put("Op", "Error");
+					obj.put("Message", "Close this Message and wait for the next one to confirm Database loading");
+					result.put(obj);
+					session.getAsyncRemote().sendText(result.toString());
+				}
+				be = new Backend(op.getOP(msg.getString("Op")), msg);
+				if (op.getOP(msg.getString("Op")) == 2)
+					Server.isloading = false;
+				String answer = be.resolve().toString();
+				send_message(answer);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		// System.out.println(result.toString());
