@@ -156,6 +156,15 @@ public class Opinion {
 	public double getPolarity() {
 		return polarity;
 	}
+	/**
+	 * Gets the polarity.
+	 *
+	 * @return the polarity
+	 */
+	public String getSource() {
+		return source;
+	}
+
 
 	/**
 	 * Gets the reach.
