@@ -294,7 +294,7 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id" + Settings.sqlwhere + Settings.lptable_id
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id" + Settings.sqlwhere + "posts."+Settings.lptable_id
 						+ " = " + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
