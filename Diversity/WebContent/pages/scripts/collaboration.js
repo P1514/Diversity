@@ -87,13 +87,18 @@ document.addEventListener('DOMContentLoaded', function() {
       //console.log(users);
 
       drawTable();
+
+			if (getParam('products') === undefined && getParam('services') === undefined && getParam('company') === undefined) {
+				$('#all').click();
+				$('#unranked').click();
+			}
     }
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[1] + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
+        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
 
     }
   }

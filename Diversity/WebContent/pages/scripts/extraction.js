@@ -376,7 +376,6 @@ function connect() {
 					break;
 				default:
 					type = 'All';
-					break;
 			}
 			// Request the tagcloud for the current user
 			var json = {
@@ -390,8 +389,6 @@ function connect() {
 				'User' : user,
 				'Type' : type
 			}
-			$('#overlay').fadeOut(2000);
-			$('#overlay-back').fadeOut(2000);
 			ws.send(JSON.stringify(json));
 			return;
 		}
@@ -424,10 +421,10 @@ google.charts.load('current', {
 $(document).ready(function() {
 	google.charts.setOnLoadCallback(connect);
 });
-/*$(window).load(function() {
+$(window).load(function() {
 	$('#overlay').hide();
 	$('#overlay-back').hide();
-});*/
+});
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
@@ -767,30 +764,13 @@ function makeCloud(words) {
 }
 
 function tagClick(word) {
-	var type;
-	switch ($("input[name='radioName']:checked").val()) {
-		case 1:
-			type = 'All';
-			break;
-		case 2:
-			type = 'Positive';
-			break;
-		case 3:
-			type = 'Negative';
-			break;
-		default:
-			type = 'All';
-			break;
-	}
-	
 	var json = {
 		"Op" : "getposts",
 		"Id" : sessionStorage.id,
 		"word" : word,
 		"Month" : month != undefined ? month : undefined,
 		"Product" : product != undefined ? product : undefined,
-		'Key' : getCookie("JSESSIONID"),
-		'Type' : type
+		'Key' : getCookie("JSESSIONID")
 	}
 
 	ws.send(JSON.stringify(json));
