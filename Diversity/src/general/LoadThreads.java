@@ -44,7 +44,7 @@ public class LoadThreads {
 				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 			}
 			String update = "INSERT INTO " + Settings.lotable + " "
-					+ "Values (?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 					+ Settings.lotable_influence + "=?," + Settings.lotable_comments
 					+ "=?";
 
@@ -61,10 +61,11 @@ public class LoadThreads {
 				query1.setLong(6, opinion.getTime());
 				query1.setLong(7, opinion.getPSS());
 				query1.setLong(8, opinion.ncomments());
-				query1.setLong(9, opinion.getProduct());
-				query1.setDouble(10, opinion.getReach());
-				query1.setDouble(11, opinion.getTotalInf());
-				query1.setLong(12, opinion.ncomments());
+				query1.setLong(9, opinion.getProduct());				
+				query1.setString(10, opinion.getSource());
+				query1.setDouble(11, opinion.getReach());
+				query1.setDouble(12, opinion.getTotalInf());
+				query1.setLong(13, opinion.ncomments());
 				try {
 //					if (opinion.getID() == 8480)
 //						System.out.println("INSERT OPINION: " + query1.toString());
@@ -240,7 +241,7 @@ public class LoadThreads {
 		 * @see java.lang.Runnable#run()
 		 */
 
-		private void load(ResultSet rs, boolean remote) throws SQLException {
+		private void load(ResultSet rs, boolean remote) throws SQLException {//fazer join com post table
 			// //system.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 			// //system.out.println(id);
@@ -293,7 +294,7 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id" + Settings.sqlwhere + Settings.lptable_id
 						+ " = " + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
@@ -302,7 +303,6 @@ public class LoadThreads {
 								Loader.totalposts--;
 							load(rs, false);
 						}
-
 					}
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
