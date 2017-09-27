@@ -608,7 +608,7 @@ public class Loader {
 				totalposts = rs.getLong("totalposts");
 				lastUpdated.setTime(rs.getDate("lastupdated"));
 				if (rs.getLong("Version") != Settings.dbversion)
-					rs.getLong("asdasasd");
+					throw new Exception();
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE,
