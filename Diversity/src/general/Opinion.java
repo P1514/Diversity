@@ -64,7 +64,7 @@ public class Opinion {
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
-		source = this.main.getSource();
+		source = _source;
 		this.id = this.main.getID();
 
 	}
@@ -118,8 +118,8 @@ public class Opinion {
 //
 //		});
 		//System.out.println(author_id2);
-
-		total_inf = authordb.get(author_id2 + "," + source).getInfluence();
+		Author auth = authordb.get(author_id2 + "," + source);
+		total_inf = auth.getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((k, v) -> {

@@ -264,7 +264,7 @@ public class LoadThreads {
 			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
 
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
-			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lptable_message);
+			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_source);
 
 			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
@@ -276,7 +276,7 @@ public class LoadThreads {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, ""));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 
 		}
 
