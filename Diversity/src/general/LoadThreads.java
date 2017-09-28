@@ -321,35 +321,36 @@ public class LoadThreads {
 				}
 
 				// FInished load order
-
+				
 				try {
 					cndata = Settings.conndata();
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				boolean remote = true;
-				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable + "."
-						+ Settings.rptable_postid + " = " + id);
-				// system.out.println(query);
-				try (Statement stmt = cndata.createStatement()) {
-					try (ResultSet rs = stmt.executeQuery(query)) {
-						if (!rs.next()) {
-							remote = false;
-						} else {
-							load(rs, remote);
-							cndata.close();
-						}
-					}
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-					try {
-						cndata.close();
-					} catch (SQLException e1) {
-						LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-					}
-					return;
-				}
+				return;
+//				boolean remote = true;
+//				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable + "."
+//						+ Settings.rptable_postid + " = " + id);
+//				// system.out.println(query);
+//				try (Statement stmt = cndata.createStatement()) {
+//					try (ResultSet rs = stmt.executeQuery(query)) {
+//						if (!rs.next()) {
+//							remote = false;
+//						} else {
+//							load(rs, remote);
+//							cndata.close();
+//						}
+//					}
+//				} catch (Exception e) {
+//					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+//					try {
+//						cndata.close();
+//					} catch (SQLException e1) {
+//						LOGGER.log(Level.INFO, Settings.err_unknown, e1);
+//					}
+//					return;
+//				}
 			} else
 
 			{

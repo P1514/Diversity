@@ -164,6 +164,8 @@ public class Loader {
 		}
 		pausetime = System.nanoTime() - pausetime;
 		ExecutorService es = Executors.newFixedThreadPool(10);
+		
+		
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();

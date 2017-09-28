@@ -1,5 +1,7 @@
 package extraction;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -239,6 +241,12 @@ public class Snapshot {
 	}
 
 	public String load(String name, String type) throws JSONException {
+		try {
+			name = URLDecoder.decode(name, "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			LOGGER.log(Level.SEVERE, "Error Decoding Snapshot Name => " + name);
+			return null;
+		}
 		Connection cnlocal;
 		try {
 			cnlocal=Settings.connlocal();

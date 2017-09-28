@@ -1,6 +1,8 @@
 package general;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -91,6 +93,12 @@ public class Backend {
 			}
 
 			if (msg.has("Role")) {
+				String role = msg.getString("Role");
+				try {
+					msg.put("Role", URLDecoder.decode(role, "UTF-8"));
+				} catch (UnsupportedEncodingException e1) {
+					LOGGER.log(Level.SEVERE, "Error Decoding User Role URL => " + msg.getString("Role"));
+				}
 				Data.newuser(msg.getString("Key"), msg.getString("Role"));
 			}
 
