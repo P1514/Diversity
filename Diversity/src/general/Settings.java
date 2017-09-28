@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	public static final String version = "2.2";
+	public static final String version = "2.4";
 	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
@@ -72,7 +72,7 @@ public class Settings {
 			+ "?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
-	public static final Integer dbversion = 11;
+	public static final Integer dbversion = 12;
 
 	// Author Table
 	public static final String latable = "authors";

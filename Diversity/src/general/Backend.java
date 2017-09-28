@@ -1,6 +1,8 @@
 package general;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -91,6 +93,12 @@ public class Backend {
 			}
 
 			if (msg.has("Role")) {
+				String role = msg.getString("Role");
+				try {
+					msg.put("Role", URLDecoder.decode(role, "UTF-8"));
+				} catch (UnsupportedEncodingException e1) {
+					LOGGER.log(Level.SEVERE, "Error Decoding User Role URL => " + msg.getString("Role"));
+				}
 				Data.newuser(msg.getString("Key"), msg.getString("Role"));
 			}
 
@@ -275,10 +283,9 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -319,8 +326,8 @@ public class Backend {
 					case "Positive":
 						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -333,15 +340,14 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
-						break;
 					}
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 				obj.put("Op", "words");

@@ -37,109 +37,112 @@ public class LoadThreads {
 		}
 
 		public void run() {
-			Connection cnlocal = null;
-			try {
-				cnlocal = Settings.connlocal();
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-			}
-			String update = "INSERT INTO " + Settings.lotable + " "
+			try (Connection cnlocal = Settings.connlocal()) {
+				String update = "INSERT INTO " + Settings.lotable + " "
+						+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+						+ Settings.lotable_influence + "=?," + Settings.lotable_comments + "=?,"
+						+ Settings.lotable_polarity + "=?";
 
-					+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
-					+ Settings.lotable_polarity + "=?," + Settings.lotable_influence + "=?," + Settings.lotable_comments
+				try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
+					query1.setLong(1, opinion.getID());
+					query1.setDouble(2, opinion.getReach());
+					query1.setDouble(3, opinion.getPolarity());
+					query1.setDouble(4, opinion.getTotalInf());
+					if (!Settings.JSON_use)
+						query1.setString(5, opinion.getUID(false));
+					else
+						query1.setString(5, opinion.getUID(true));
 
-					+ "=?";
-
-			try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
-				query1.setLong(1, opinion.getID());
-				query1.setDouble(2, opinion.getReach());
-				query1.setDouble(3, opinion.getPolarity());
-				query1.setDouble(4, opinion.getTotalInf());
-				if (!Settings.JSON_use)
-					query1.setString(5, opinion.getUID(false));
-				else
-					query1.setString(5, opinion.getUID(true));
-
-				query1.setLong(6, opinion.getTime());
-				query1.setLong(7, opinion.getPSS());
-				query1.setLong(8, opinion.ncomments());
-				query1.setLong(9, opinion.getProduct());
-				query1.setString(10, opinion.getSource());
-				query1.setDouble(11, opinion.getReach());
-				query1.setDouble(12, opinion.getPolarity());
-				query1.setDouble(13, opinion.getTotalInf());
-				query1.setLong(14, opinion.ncomments());
-
-				try {
-					// if (opinion.getID() == 8480)
-					// System.out.println("INSERT OPINION: " + query1.toString());
-					query1.executeUpdate();
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
-					Thread.sleep((long) (Math.random() * 1000));
-				}
-
-				if (!Loader.first_load) {
-					cnlocal.close();
-					return;
-				}
-				for (Post post : opinion.getPosts().values()) {
-					PreparedStatement query2 = null;
-
-					try {
-						String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
-								+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?," + Settings.lptable_likes
-								+ "=?";
-						query2 = cnlocal.prepareStatement(update1);
-						query2.setLong(1, post.getID());
-						if (post.getPolarity() != -1) {
-							query2.setDouble(2, post.getPolarity());
-						} else {
-							query2.setNull(2, java.sql.Types.DOUBLE);
+					query1.setLong(6, opinion.getTime());
+					query1.setLong(7, opinion.getPSS());
+					query1.setLong(8, opinion.ncomments());
+					query1.setLong(9, opinion.getProduct());
+					query1.setString(10, opinion.getSource());
+					query1.setDouble(11, opinion.getReach());
+					query1.setDouble(12, opinion.getTotalInf());
+					query1.setLong(13, opinion.ncomments());
+					query1.setDouble(14, opinion.getPolarity());
+					while (true) {
+						try {
+							query1.executeUpdate();
+						} catch (Exception e) {
+							LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
+							LOGGER.log(Level.INFO, query1.toString());
+							Thread.sleep((long) (Math.random() * 1000));
+							continue;
 						}
-						query2.setString(3, post.getComment());
-						query2.setLong(4, post.getLikes());
-						query2.setLong(5, post.getViews());
-						query2.setLong(6, opinion.getID());
-						if (!Settings.JSON_use)
-							query2.setString(7, post.getUID());
-						else
-							query2.setString(7, post.getUID());
-						query2.setLong(8, post.getLikes());
-						query2.setLong(9, post.getViews());
-						while (true) {
-							try {
-								query2.executeUpdate();
-							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
-								Thread.sleep((long) (Math.random() * 1000));
-								continue;
+						break;
+					}
+
+					if (!Loader.first_load) {
+						cnlocal.close();
+						return;
+					}
+					for (Post post : opinion.getPosts().values()) {
+						PreparedStatement query2 = null;
+
+						try {
+							String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
+									+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?,"
+									+ Settings.lptable_likes + "=?";
+							query2 = cnlocal.prepareStatement(update1);
+							query2.setLong(1, post.getID());
+							if (post.getPolarity() != -1) {
+								query2.setDouble(2, post.getPolarity());
+							} else {
+								query2.setNull(2, java.sql.Types.DOUBLE);
 							}
-							break;
+							query2.setString(3, post.getComment());
+							query2.setLong(4, post.getLikes());
+							query2.setLong(5, post.getViews());
+							query2.setLong(6, opinion.getID());
+							if (!Settings.JSON_use)
+								query2.setString(7, post.getUID());
+							else
+								query2.setString(7, post.getUID());
+							query2.setLong(8, post.getLikes());
+							query2.setLong(9, post.getViews());
+							while (true) {
+								try {
+									query2.executeUpdate();
+								} catch (Exception e) {
+									LOGGER.log(Level.SEVERE, Settings.err_unknown + "Retried", e);
+									LOGGER.log(Level.INFO, query2.toString());
+									Thread.sleep((long) (Math.random() * 1000));
+									continue;
+								}
+								break;
+							}
+							if (query2 != null)
+								query2.close();
+						} catch (Exception e) {
+							LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+							continue;
 						}
-						if (query2 != null)
-							query2.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-						continue;
+						try {
+							if (query2 != null)
+								query2.close();
+						} catch (Exception e) {
+						}
 					}
-					try {
-						if (query2 != null)
-							query2.close();
-					} catch (Exception e) {
-					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				try {
+					cnlocal.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				cnlocal.close();
-			} catch (SQLException e) {
+			} catch (ClassNotFoundException e1) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e1.printStackTrace();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-
 		}
 	}
 
@@ -246,7 +249,7 @@ public class LoadThreads {
 		 * @see java.lang.Runnable#run()
 		 */
 
-		private void load(ResultSet rs, boolean remote) throws SQLException {
+		private void load(ResultSet rs, boolean remote) throws SQLException {// fazer join com post table
 			// //system.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 			// //system.out.println(id);
@@ -270,7 +273,7 @@ public class LoadThreads {
 			long views = remote ? rs.getLong(Settings.rptable_views) : rs.getLong(Settings.lptable_views);
 
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
-			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lptable_message);
+			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_source);
 
 			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
@@ -282,7 +285,7 @@ public class LoadThreads {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, ""));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 
 		}
 
@@ -299,8 +302,8 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id
-						+ " = " + id);
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
+						+ Settings.sqlwhere + "posts." + Settings.lptable_id + " = " + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (rs.next()) {
@@ -308,7 +311,6 @@ public class LoadThreads {
 								Loader.totalposts--;
 							load(rs, false);
 						}
-
 					}
 				} catch (Exception e) {
 					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
@@ -328,34 +330,30 @@ public class LoadThreads {
 
 				// FInished load order
 
-				try {
-					cndata = Settings.conndata();
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
-					return;
-				}
-				boolean remote = true;
-				query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere + Settings.rptable + "."
-						+ Settings.rptable_postid + " = " + id);
-				// system.out.println(query);
-				try (Statement stmt = cndata.createStatement()) {
-					try (ResultSet rs = stmt.executeQuery(query)) {
-						if (!rs.next()) {
-							remote = false;
-						} else {
-							load(rs, remote);
-							cndata.close();
-						}
-					}
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-					try {
-						cndata.close();
-					} catch (SQLException e1) {
-						LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-					}
-					return;
-				}
+				return;
+				// boolean remote = true;
+				// query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere +
+				// Settings.rptable + "."
+				// + Settings.rptable_postid + " = " + id);
+				// // system.out.println(query);
+				// try (Statement stmt = cndata.createStatement()) {
+				// try (ResultSet rs = stmt.executeQuery(query)) {
+				// if (!rs.next()) {
+				// remote = false;
+				// } else {
+				// load(rs, remote);
+				// cndata.close();
+				// }
+				// }
+				// } catch (Exception e) {
+				// LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+				// try {
+				// cndata.close();
+				// } catch (SQLException e1) {
+				// LOGGER.log(Level.INFO, Settings.err_unknown, e1);
+				// }
+				// return;
+				// }
 			} else
 
 			{

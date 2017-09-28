@@ -1,4 +1,11 @@
 package endpoints;
+import general.Logging;
+
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.logging.Level;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -11,11 +18,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.*;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import extraction.Snapshot;
+import general.Loader;
+import general.Logging;
 
 @Path("/getSnapshots") // Path of the Endpoint
 public class GetSnapshots {
+	private static final Logger LOGGER = new Logging().create(GetSnapshots.class.getName());
 	@DefaultValue("") // Sets pss default value as ""
 	@QueryParam("pss") // Sets pss value as the pss form get if it exists
 	String pss;
@@ -61,14 +72,22 @@ public class GetSnapshots {
 			response = extraction.Snapshot.getAll(pss_id, type);
 			JSONObject obj;
 			JSONArray snapshots = response.getJSONArray(1);
+			String output="";
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
 				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
-					obj.put("URL", urlPred + obj.getString("Name"));
+					output=urlPred;
 				} else {
-					obj.put("URL", urlExt + obj.getString("Name"));
+					output=urlExt;
 				}
-
+				
+					try {
+						output += URLEncoder.encode(obj.getString("Name"), "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+						LOGGER.log(Level.SEVERE, "Error While creating URL for snapshots => " + output);
+					}
+				
+				obj.put("URL", output);
 				obj.remove("Id");
 			}
 

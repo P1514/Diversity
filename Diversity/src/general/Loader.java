@@ -47,6 +47,9 @@ public class Loader {
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
+		if(json==null) return null;
+		authordb2 = new ConcurrentHashMap<>();
+		opiniondb = new ConcurrentHashMap<>();
 		//TODO protect for empty json
 		//System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
@@ -155,7 +158,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(1000/* 30 * 1000waiting_time*10 */);
+					Thread.sleep(10*1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -164,6 +167,8 @@ public class Loader {
 		}
 		pausetime = System.nanoTime() - pausetime;
 		ExecutorService es = Executors.newFixedThreadPool(10);
+		
+		
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
@@ -608,7 +613,7 @@ public class Loader {
 				totalposts = rs.getLong("totalposts");
 				lastUpdated.setTime(rs.getDate("lastupdated"));
 				if (rs.getLong("Version") != Settings.dbversion)
-					rs.getLong("asdasasd");
+					throw new Exception();
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE,
@@ -740,19 +745,22 @@ public class Loader {
 		} else {
 			// Load users from JSON
 			Author auth;
+			String source1="";
 			for (int i = 0; i < json.length(); i++) {
 				
 				JSONObject obj = json.getJSONObject(i);
-				//system.out.println(obj.toString());
+				source1 = obj.has(Settings.JSON_source) ? obj.getString(Settings.JSON_source): source1;
+				//System.out.println("SOURCE: " + source1 + "\n");
 				JSONArray obj1 = obj.getJSONArray(Settings.JSON_replies);
 				String user1 = obj.getString(Settings.JSON_userid);
-				String source1=obj.getString(Settings.JSON_source);
+				
 				
 				for (int j = 0;j < obj1.length(); j++) {//TO LOAD REPLIES
 					obj=obj1.getJSONObject(j);
 					user1 = obj.getString(Settings.JSON_userid);
 					if (authordb2.containsKey(user1 +","+ source1))
 						continue;
+					System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
 							+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""), 0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
@@ -767,10 +775,9 @@ public class Loader {
 				
 				obj = json.getJSONObject(i);
 				user1 = obj.getString(Settings.JSON_userid);
-				source1=obj.getString(Settings.JSON_source);
 				if (authordb2.containsKey(user1 +","+ source1))
 					continue;
-				
+				System.out.println("SOURCE: " + source1 + "\n");
 
 				auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
 						(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
@@ -869,7 +876,7 @@ public class Loader {
 		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				if (authordb2.containsKey(rs.getString("id")+";"+rs.getString("source")))
+				if (authordb2.containsKey(rs.getString("id")+","+rs.getString("source")))
 					continue;
 				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_source),rs.getString(Settings.latable_name),
 						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
@@ -1028,17 +1035,13 @@ public class Loader {
 		for (Opinion opinion : opiniondb.values()) {
 			es.execute(multiThread.new Tinsert(opinion));
 		}
+		String err=null;
 		es.shutdown();
-		try {
-			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			//system.out.println("ERROR THREAD OP");
-			e.printStackTrace();
-		}
+		err = awaittermination(es,"insert calculated opinions");
 
 		LOGGER.log(Level.INFO, " insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
-		return null;
+		return err;
 	}
 
 	private String updatelocal() throws JSONException {
@@ -1126,7 +1129,7 @@ public class Loader {
 						break;
 					break;
 				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+					LOGGER.log(Level.INFO, Settings.err_unknown, e);
 					query = "Select id from sentimentposts.post where id in (" + query;
 					query = query.replace("ORDER BY ID ASC", ") order by id asc");
 					if (error)

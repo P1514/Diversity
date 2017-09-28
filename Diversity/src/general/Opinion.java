@@ -118,8 +118,8 @@ public class Opinion {
 //
 //		});
 		//System.out.println(author_id2);
-
-		total_inf = authordb.get(author_id2 + "," + source).getInfluence();
+		Author auth = authordb.get(author_id2 + "," + source);
+		total_inf = auth.getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((k, v) -> {
@@ -156,6 +156,15 @@ public class Opinion {
 	public double getPolarity() {
 		return polarity;
 	}
+	/**
+	 * Gets the polarity.
+	 *
+	 * @return the polarity
+	 */
+	public String getSource() {
+		return source;
+	}
+
 
 	/**
 	 * Gets the reach.
@@ -164,15 +173,6 @@ public class Opinion {
 	 */
 	public double getReach() {
 		return reach;
-	}
-	
-	/**
-	 * Gets the source.
-	 *
-	 * @return the reach
-	 */
-	public String getSource() {
-		return source;
 	}
 
 	/**
