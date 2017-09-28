@@ -20,6 +20,7 @@ import general.Backend;
 import general.Data;
 import general.Logging;
 import general.Settings;
+import general.User;
 
 public class Snapshot {
 	
@@ -334,8 +335,10 @@ public class Snapshot {
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
-				obj.put("Id", rs.getString("id"));
-				obj.put("User", rs.getString("creation_user"));
+				User _user = Data.getUser(Long.parseLong(rs.getString("creation_user")));
+				String user_name = _user != null ? _user.getUserName() : rs.getString("creation_user");
+				obj.put("Id", rs.getString("id") );
+				obj.put("User", user_name);
 				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}
