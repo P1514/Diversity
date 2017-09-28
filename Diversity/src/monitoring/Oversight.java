@@ -147,6 +147,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					}
+					cnlocal.close();
 
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
@@ -205,6 +206,7 @@ public class Oversight extends TimerTask {
 								update += ")";
 								Calendar cc = (Calendar) now.clone();
 								cc.add(Calendar.DAY_OF_MONTH, 1);
+								dbconnect();
 								PreparedStatement query1 = cnlocal.prepareStatement(update);
 								query1.setLong(1, now.getTimeInMillis());
 								query1.setString(2, k);
@@ -216,6 +218,7 @@ public class Oversight extends TimerTask {
 								// System.out.println(query1);
 								query1.execute();
 
+								cnlocal.close();
 								/*
 								 * } }
 								 */
@@ -238,13 +241,6 @@ public class Oversight extends TimerTask {
 			try {
 				cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			try {
-				(new Loader()).load(null);
-			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

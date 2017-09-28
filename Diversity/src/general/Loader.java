@@ -47,6 +47,9 @@ public class Loader {
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
+		if(json==null) return null;
+		authordb2 = new ConcurrentHashMap<>();
+		opiniondb = new ConcurrentHashMap<>();
 		//TODO protect for empty json
 		//System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
@@ -1032,17 +1035,13 @@ public class Loader {
 		for (Opinion opinion : opiniondb.values()) {
 			es.execute(multiThread.new Tinsert(opinion));
 		}
+		String err=null;
 		es.shutdown();
-		try {
-			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			//system.out.println("ERROR THREAD OP");
-			e.printStackTrace();
-		}
+		err = awaittermination(es,"insert calculated opinions");
 
 		LOGGER.log(Level.INFO, " insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
-		return null;
+		return err;
 	}
 
 	private String updatelocal() throws JSONException {
