@@ -92,6 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#all').click();
 				$('#unranked').click();
 			}
+	    
+	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
+				$('#all').click();
+				$('#unranked').click();
+			}
     }
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
