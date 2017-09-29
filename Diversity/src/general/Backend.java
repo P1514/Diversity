@@ -8,9 +8,16 @@ import java.util.Collection;
 import java.util.Set;
 
 import security.*;
+import sun.net.www.http.HttpClient;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.*;
 
 import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
@@ -139,18 +146,37 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 36:
+				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+				try {
+				    HttpPost request = new HttpPost(Settings.collaboration_uri);
+				    StringEntity params = new StringEntity(msg.getString("Message"));
+				    request.addHeader("content-type", "application/json");
+				    request.setEntity(params);
+				    CloseableHttpResponse r = httpClient.execute(request);
+				    LOGGER.log(Level.INFO, r.toString());
+				// handle response here...
+				} catch (Exception ex) {
+				    // handle exception here
+				} finally {
+				    try {
+						httpClient.close();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				break;
 			case 35:
 				result = new JSONArray();
 				obj = new JSONObject();
 				obj.put("Op", "Roles");
 				result.put(obj);
-				Set<String> roles = Data.roledb.keySet();
-				String rolesList = "";
-				for (String r : roles) {
-					rolesList += r + ",";
-				}
+				String roles = Data.getRolesFromCR();
+				LOGGER.log(Level.INFO, roles);
 				obj = new JSONObject();
-				obj.put("Roles", rolesList);
+				obj.put("Roles", roles);
 				result.put(obj);
 				return result.toString();
 			case 34:
