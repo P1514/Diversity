@@ -335,8 +335,14 @@ public class Snapshot {
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
-				User _user = Data.getUser(Long.parseLong(rs.getString("creation_user")));
-				String user_name = _user != null ? _user.getUserName() : rs.getString("creation_user");
+				String _userS = rs.getString("creation_user");
+				User _user;
+				try{
+				_user = Data.getUser(Long.parseLong(_userS));
+				}catch(NumberFormatException e) {
+					_user=null;
+				}
+				String user_name = _user != null ? _user.getUserName() : _userS;
 				obj.put("Id", rs.getString("id") );
 				obj.put("User", user_name);
 				obj.put("Type", rs.getString("type"));
