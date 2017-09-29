@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#all').click();
 				$('#unranked').click();
 			}
-	    
+
 	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
@@ -205,7 +205,7 @@ function addMember(position) {
 		'</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		$('#user_' + position).remove();
 		team.push(user);
-		console.log(availableUsers.splice(availableUsers.indexOf(user)));
+		availableUsers.splice(availableUsers.indexOf(user));
 
 
 		var options = {
@@ -245,7 +245,7 @@ function removeMember(position) {
 		var userList = new List('table', options);
 	}
 	$('#team_' + position).remove();
-	console.log(team.splice(team.indexOf(user)));
+	team.splice(team.indexOf(user));
 
 }
 
@@ -260,6 +260,13 @@ function submit() {
 		result.push(team[i]);
 		//console.log(team[i].Role);
 	}
+
+	var json = {
+		'Op' : 'send_collab',
+		'Message' : result
+	};
+
+	/*
 	$(function () {
 		$.ajax({
 	  	type: "POST",
@@ -269,4 +276,5 @@ function submit() {
 	  });
 	});
 	//console.log(JSON.stringify(result));
+	*/
 }
