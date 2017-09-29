@@ -136,13 +136,10 @@ public class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "Roles");
 				result.put(obj);
-				Set<String> roles = Data.roledb.keySet();
-				String rolesList = "";
-				for (String r : roles) {
-					rolesList += r + ",";
-				}
+				String roles = Data.getRolesFromCR();
+				LOGGER.log(Level.INFO, roles);
 				obj = new JSONObject();
-				obj.put("Roles", rolesList);
+				obj.put("Roles", roles);
 				result.put(obj);
 				return result.toString();
 			case 34:

@@ -102,7 +102,36 @@ public class Data {
 		}
 		return new Role();
 	}
+	
+	public static String getRolesFromCR() {
+		String roles = "";
+		
+		Connection cncr = null;
+		PreparedStatement query1 = null;
 
+		try {
+			cncr = Settings.conncr();
+			try {
+				String query = "SELECT name FROM diversity_common_repository.user_role;";
+				query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+				
+				try (ResultSet rs = query1.executeQuery(query)) {
+					while (rs.next()) {
+						roles += "," + rs.getString(1);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
+		return roles;
+	}
+	
 	public static Model getmodel(long id) {
 		if (modeldb.containsKey(id))
 			return modeldb.get(id);
