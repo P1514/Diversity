@@ -1,41 +1,39 @@
 package general;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-
-import security.*;
-import sun.net.www.http.HttpClient;
-
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.*;
-
-import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import endpoints.LeanRules;
-import endpoints.LeanRules.LeanRule;
 import extraction.Collaboration;
 import extraction.Extrapolation;
 import extraction.GetComments;
+import extraction.GetMediawiki;
 import extraction.GetPosts;
 import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
-import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
+import security.Roles;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -147,25 +145,16 @@ public class Backend {
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
 			case 36:
-				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead 
 
 				try {
 				    HttpPost request = new HttpPost(Settings.collaboration_uri);
-				    StringEntity params = new StringEntity(msg.getString("Message"));
+				    StringEntity params =new StringEntity(msg.getString("Message"));
 				    request.addHeader("content-type", "application/json");
 				    request.setEntity(params);
-				    CloseableHttpResponse r = httpClient.execute(request);
-				    LOGGER.log(Level.INFO, r.toString());
-				// handle response here...
-				} catch (Exception ex) {
-				    // handle exception here
-				} finally {
-				    try {
-						httpClient.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				    HttpResponse response = httpClient.execute(request);
+				}catch (Exception ex) {
+					ex.printStackTrace();
 				}
 				break;
 			case 35:
@@ -662,8 +651,63 @@ public class Backend {
 				return tmp;
 			case 14:
 				model = new GetModels();
-				tmp = model.create_model(msg).toString();
-				return tmp;
+				JSONArray tmp2 = model.create_model(msg);
+				boolean update = false;
+				for (int i = 0; i < tmp2.length(); i++) {
+					if (tmp2.getJSONObject(i).has("Update")) {
+						update = true;
+					}
+				}
+				
+				if (update) {
+				
+					URL url = new URL(Settings.geoip_uri);
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("GET");
+					
+					BufferedReader in = null;
+					try {
+						in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String output;
+					StringBuffer response = new StringBuffer();
+					
+					try {
+						while ((output = in.readLine()) != null) {
+							response.append(output);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					in.close();
+					obj = new JSONObject(response.toString());
+					
+					int user = msg.getInt("User");
+					int dp = msg.getInt("design_project");
+					String lat = obj.getString("latitude");
+					String lon = obj.getString("longitude");
+					
+					String link = Settings.has_steps_uri;
+					
+					link = link.replace("REPLACE_USER", user + "");
+					link = link.replace("REPLACE_DP", dp + "");
+					link = link.replace("REPLACE_LATITUDE", lat);
+					link = link.replace("REPLACE_LONGITUDE", lon);
+
+					httpClient = HttpClientBuilder.create().build(); 
+					
+					try {
+					    HttpPost request = new HttpPost(link);
+					    request.addHeader("content-type", "application/json");
+					    HttpResponse response2 = httpClient.execute(request);
+					}catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				
+				return tmp2.toString();
 			case 15:
 				model = new GetModels();
 				tmp = model.get_model(msg).toString();
@@ -692,8 +736,10 @@ public class Backend {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 		return result.toString();
 	}
 

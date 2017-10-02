@@ -81,6 +81,9 @@ public class GetModels {
 		result = add.add_model(msg);
 		if (!(result.getJSONObject(0).getString("Op").equals("Error"))) {
 			Data.addmodel(add.getId(), add);
+			JSONObject upd = new JSONObject();
+			upd.put("Update", true);
+			result.put(upd);
 			// long id = add.getId();
 			// System.out.println(id);
 		}
