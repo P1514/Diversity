@@ -685,8 +685,8 @@ public class Loader {
 	private String loaduniqueopinionid(JSONArray json) throws JSONException {
 		String err;
 		// Load Opinions id first
-		if (json == null)
-			return loaduopid();
+		//if (json == null)
+			//return loaduopid();
 
 		ExecutorService es = Executors.newFixedThreadPool(10);
 		for (int i = 0; i < json.length(); i++)
@@ -739,7 +739,7 @@ public class Loader {
 			return err;
 		if (json == null) {
 			// Load users from simulation DB
-			err = loadsimauthors(querycond);
+			//err = loadsimauthors(querycond);
 			if (err != null)
 				return err;
 		} else {
@@ -934,31 +934,31 @@ public class Loader {
 		}
 	}
 
-	private String loadsimauthors(String querycond) throws JSONException {
-
-		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
-				+ querycond);
-		/// Connection cndata = null;
-		try (Connection cndata = Settings.conndata()) {
-			try (Statement stmt = cndata.createStatement()) {
-				try (ResultSet rs = stmt.executeQuery(query)) {
-					while (rs.next()) {
-						if (authordb2.containsKey(rs.getLong(Settings.rutable_userid))) {
-						} else {
-							authordb2.put(rs.getString(Settings.rutable_userid) + ", ",
-									new Author(rs.getString(Settings.rutable_userid),
-											rs.getString(Settings.rutable_name), rs.getLong(Settings.rutable_age),
-											rs.getString(Settings.rutable_gender), rs.getString(Settings.rutable_loc)));
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
-			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
-		}
-		return null;
-	}
+//	private String loadsimauthors(String querycond) throws JSONException {
+//
+//		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
+//				+ querycond);
+//		/// Connection cndata = null;
+//		try (Connection cndata = Settings.conndata()) {
+//			try (Statement stmt = cndata.createStatement()) {
+//				try (ResultSet rs = stmt.executeQuery(query)) {
+//					while (rs.next()) {
+//						if (authordb2.containsKey(rs.getLong(Settings.rutable_userid))) {
+//						} else {
+//							authordb2.put(rs.getString(Settings.rutable_userid) + ", ",
+//									new Author(rs.getString(Settings.rutable_userid),
+//											rs.getString(Settings.rutable_name), rs.getLong(Settings.rutable_age),
+//											rs.getString(Settings.rutable_gender), rs.getString(Settings.rutable_loc)));
+//						}
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			LOGGER.log(Level.SEVERE, "Error Accessing Remote Databse Please Check If Populated");
+//			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
+//		}
+//		return null;
+//	}
 
 	private void evaluatedata() {
 		authordb2.forEach((k, v) -> {
@@ -1083,85 +1083,85 @@ public class Loader {
 		return null;
 	}
 
-	private String loaduopid() throws JSONException {
-		String err = null;
-		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
-				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
-				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
-				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
-				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
-		Connection cndata = null;
-		Connection cnlocal = null;
-		try {
-			cnlocal = Settings.connlocal();
-			cndata = Settings.conndata();
-		} catch (Exception e1) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
-			return Backend.error_message(Settings.err_dbconnect).toString();
-		}
-
-		boolean error = false;
-
-		try (Statement stmt = cndata.createStatement()) {
-			while (true) {
-				try (ResultSet rs = stmt.executeQuery(query)) {
-					if (!rs.next()) {
-						cndata.close();
-						cnlocal.close();
-						return Backend.error_message("Loaded Successfully").toString();
-					}
-					rs.beforeFirst();
-					ExecutorService es = Executors.newFixedThreadPool(10);
-					while (rs.next())
-						es.execute(multiThread.new Topinions(rs.getLong(1)));
-					es.shutdown();
-					err = awaittermination(es, "Opinions");
-					if (err != null)
-						break;
-					rs.beforeFirst();
-					es = Executors.newFixedThreadPool(10);
-					while (rs.next())
-						es.execute(multiThread.new Tposts(rs.getLong(1)));
-					es.shutdown();
-
-					err = awaittermination(es, "posts");
-					if (err != null)
-						break;
-					break;
-				} catch (Exception e) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e);
-					query = "Select id from sentimentposts.post where id in (" + query;
-					query = query.replace("ORDER BY ID ASC", ") order by id asc");
-					if (error)
-						return Backend.error_message("Error Loading opinions ids").toString();
-					error = true;
-					continue;
-				}
-
-			}
-
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return null;
-		}
-
-		finally
-
-		{
-			try {
-				cndata.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e);
-			}
-			try {
-				cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e);
-			}
-		}
-		return err;
-	}
+//	private String loaduopid() throws JSONException {
+//		String err = null;
+//		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
+//				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
+//				+ Settings.rptable_rpostid + " end from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
+//				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
+//				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+//		Connection cndata = null;
+//		Connection cnlocal = null;
+//		try {
+//			cnlocal = Settings.connlocal();
+//			cndata = Settings.conndata();
+//		} catch (Exception e1) {
+//			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
+//			return Backend.error_message(Settings.err_dbconnect).toString();
+//		}
+//
+//		boolean error = false;
+//
+//		try (Statement stmt = cndata.createStatement()) {
+//			while (true) {
+//				try (ResultSet rs = stmt.executeQuery(query)) {
+//					if (!rs.next()) {
+//						cndata.close();
+//						cnlocal.close();
+//						return Backend.error_message("Loaded Successfully").toString();
+//					}
+//					rs.beforeFirst();
+//					ExecutorService es = Executors.newFixedThreadPool(10);
+//					while (rs.next())
+//						es.execute(multiThread.new Topinions(rs.getLong(1)));
+//					es.shutdown();
+//					err = awaittermination(es, "Opinions");
+//					if (err != null)
+//						break;
+//					rs.beforeFirst();
+//					es = Executors.newFixedThreadPool(10);
+//					while (rs.next())
+//						es.execute(multiThread.new Tposts(rs.getLong(1)));
+//					es.shutdown();
+//
+//					err = awaittermination(es, "posts");
+//					if (err != null)
+//						break;
+//					break;
+//				} catch (Exception e) {
+//					LOGGER.log(Level.INFO, Settings.err_unknown, e);
+//					query = "Select id from sentimentposts.post where id in (" + query;
+//					query = query.replace("ORDER BY ID ASC", ") order by id asc");
+//					if (error)
+//						return Backend.error_message("Error Loading opinions ids").toString();
+//					error = true;
+//					continue;
+//				}
+//
+//			}
+//
+//		} catch (SQLException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//			return null;
+//		}
+//
+//		finally
+//
+//		{
+//			try {
+//				cndata.close();
+//			} catch (SQLException e) {
+//				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+//			}
+//			try {
+//				cnlocal.close();
+//			} catch (SQLException e) {
+//				LOGGER.log(Level.INFO, Settings.err_unknown, e);
+//			}
+//		}
+//		return err;
+//	}
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {
 		try {

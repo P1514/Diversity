@@ -249,7 +249,7 @@ public class LoadThreads {
 		 * @see java.lang.Runnable#run()
 		 */
 
-		private void load(ResultSet rs, boolean remote) throws SQLException {// fazer join com post table
+		private void load(ResultSet rs, boolean remote) throws SQLException {
 			// //system.out.println(id);
 			long postid = remote ? rs.getLong(Settings.rptable_postid) : rs.getLong(Settings.lptable_opinion);
 			// //system.out.println(id);
