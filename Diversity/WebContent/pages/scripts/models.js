@@ -498,16 +498,21 @@ function addline() {
 
     if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
       name = "Facebook";
+      var tmp = value.split("/");
+      value = tmp[tmp.length - 1];
     }
 
     if (value.toLowerCase().indexOf("twitter") != -1) {
       name = "Twitter";
+      var tmp = value.split("/");
+      value = tmp[tmp.length - 1];
     }
 
-    var tmp = value.split("/");
-    value = tmp[tmp.length - 1];
-
-
+    if (value.toLowerCase().indexOf("amazon") != -1) {
+      name = "Amazon"
+      var tmp = value.split("/dp/");
+      value = tmp[tmp.length - 1];
+    }
   }
 
   $('#table_div2').append(
