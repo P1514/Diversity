@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		if (json[0].Op == "Roles") {
-			roles = json[1].Roles.substring(0, json[1].Roles.length - 1).split(',');
+			roles = json[1].Roles.substring(1, json[1].Roles.length).split(',');
 			//console.log(roles);
 			json2 = {
 				"Op" : "collaboration",
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#all').click();
 				$('#unranked').click();
 			}
-	    
+
 	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
@@ -204,8 +204,9 @@ function addMember(position) {
 		'<select id="role' + position +'">' + rolesOptions + '</select>' +
 		'</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		$('#user_' + position).remove();
-		availableUsers.splice(availableUsers.indexOf(user, 1));
 		team.push(user);
+		availableUsers.splice(availableUsers.indexOf(user));
+
 
 		var options = {
 			valueNames: [ 'name', 'role', 'company', 'rating']
@@ -244,7 +245,7 @@ function removeMember(position) {
 		var userList = new List('table', options);
 	}
 	$('#team_' + position).remove();
-	team.splice(team.indexOf(user, 1));
+	team.splice(team.indexOf(user));
 
 }
 
@@ -259,6 +260,16 @@ function submit() {
 		result.push(team[i]);
 		//console.log(team[i].Role);
 	}
+	/*
+	var json = {
+		'Op' : 'send_collab',
+		'Message' : result,
+		'Key' : getCookie('JSESSIONID'),
+	};
+
+	ws.send(JSON.stringify(json));
+	*/
+
 	$(function () {
 		$.ajax({
 	  	type: "POST",
@@ -268,4 +279,5 @@ function submit() {
 	  });
 	});
 	//console.log(JSON.stringify(result));
+	
 }
