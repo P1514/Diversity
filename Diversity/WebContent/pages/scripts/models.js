@@ -95,15 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "Error") {
       if(json[0].hasOwnProperty('id')){
 
-        if (document.getElementById("submit").value.toLowerCase() == "create") {
-          $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
-            var post = '//diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=' +localStorage.user + '&design_project_id=' + json[1].dp + '&status=1&lat=' + data.latitude + '&lng=' + data.longitude;
-            $.post(post);
-            console.log(post);
-          });
-        }
-
-  		  var id = json[0].id;
+        var id = json[0].id;
   		  var code = json[0].Message +  '<br> Do you want to create another model? <br><br><button class="btn btn-default" id="yes" onclick="location.href =\'models.html\'">Yes</button> <button class="btn btn-default" id="no" onclick="sessionStorage.Id=\'model=\'+id;location.href =\'index.html\';">No</button>';
   		  $('#alert').html(code);
   		  $('#overlay').show();
@@ -678,7 +670,7 @@ function send_config() {
     "Products" : final_products,
     "Archive" : false,
     "Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
-    "User" : 1,//TODO find this field
+    "User" : localStorage.user,
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),

@@ -260,7 +260,7 @@ function submit() {
 		result.push(team[i]);
 		//console.log(team[i].Role);
 	}
-	/*
+
 	var json = {
 		'Op' : 'send_collab',
 		'Message' : result,
@@ -268,8 +268,8 @@ function submit() {
 	};
 
 	ws.send(JSON.stringify(json));
-	*/
 
+/*
 	$(function () {
 		$.ajax({
 	  	type: "POST",
@@ -279,5 +279,5 @@ function submit() {
 	  });
 	});
 	//console.log(JSON.stringify(result));
-	
+*/
 }
