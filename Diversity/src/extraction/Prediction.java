@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.json.JSONArray;
@@ -633,7 +634,12 @@ public class Prediction extends Globalsentiment {
 		ArrayList<Long> dp;
 
 		try {
-			dp = Data.getcompanybyname(company).get_design_projects();
+
+			if (company.equals("")) {
+				Set<Long> keySet = Data.getallDp().keySet();
+				dp = new ArrayList<Long>(keySet);
+			} else
+				dp = Data.getcompanybyname(company).get_design_projects();
 
 		} catch (Exception e1) {
 			// LOGGER.log(Level.SEVERE, "Company does not exist",e1);
