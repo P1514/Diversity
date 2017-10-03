@@ -634,7 +634,9 @@ function ok(val) {
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
+
       "User" : localStorage.user,
+
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")
