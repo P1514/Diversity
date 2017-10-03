@@ -483,9 +483,9 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "collaboration");
-		obj.put("Products", "71,74");
-		obj.put("Services", "69,66");
-		obj.put("Company", "DESMA");
+		//obj.put("Products", "71,74");
+		//obj.put("Services", "69,66");
+		//obj.put("Company", "DESMA");
 		obj.put("Key", "10");
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
