@@ -81,7 +81,7 @@ public class Operations {
 		op.put("oe_wiki", 34);
 		op.put("get_roles", 35); // get all user roles
 		op.put("send_collab", 36); // send collaboration data to endpoint
-		op.put("send_has_steps", 37); // send completion data to has_steps
+		op.put("get_user_roles", 37); // send completion data to has_steps
 		op.put("testing", 99); // Admin only
 	}
 
