@@ -152,7 +152,9 @@ function setCookie2(name, id, pss) {
 
 // dev only feature - removes the need to set the user type every time
 ws.onopen = function() {
-
+  if (document.cookie.indexOf('JSESSIONID') == -1) {
+    document.cookie = (Math.random().toString(36)+'00000000000000000').slice(2, 15+2);
+  }
   if (sessionStorage.userKey == undefined) {
     sessionStorage.userKey = Math.floor(Math.random() * 100000000);
   }

@@ -54,8 +54,8 @@ $(document).ready(function(){
 		</product>
 		<button onclick="location.href = 'index.html';" id="home"
 			class="btn btn-default">Home</button>
-			<input type="radio" name="source_radio" value="social" id="radio_social" onclick="changeRequest('')"> Use social network data<br>
-			<input type="radio" name="source_radio" value="wiki" id="radio_wiki" onclick="changeRequest('wiki')"> Use media wiki<br>
+			<label id="radio_social_label" style="width:300px;"><input type="radio" name="source_radio" value="social" id="radio_social" onclick="changeRequest('')"> Use social network data</label><br>
+			<label id="radio_wiki_label" style="width:300px;"><input type="radio" name="source_radio" value="wiki" id="radio_wiki" onclick="changeRequest('wiki')"> Use media wiki</label><br>
 			<center>
 				<button onclick="save();" id="save"
 					class="btn btn-default">Save snapshot</button>

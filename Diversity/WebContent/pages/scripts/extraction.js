@@ -302,12 +302,13 @@ function connect() {
 				}
 			} else {
 				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
-					if (!jsonData[jsonData.length-1].has_wiki) {
-						$('#radio_wiki').hide();
+					if (jsonData[jsonData.length-1].has_wiki == false) {
+						$('#radio_wiki_label').hide();
 					} else {
-						$('#radio_wiki').show();
+						$('#radio_wiki_label').show();
 					}
-					$('#radio_wiki').show();
+				} else {
+					$('#radio_wiki_label').show();
 				}
 				// console.log("redone");
 				drawChart();
