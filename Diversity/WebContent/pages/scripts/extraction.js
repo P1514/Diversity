@@ -56,7 +56,7 @@ $("#USER_LIST")
 					}
 					ws.send(JSON.stringify(json));
 
-					console.log("Selected user: " + user);
+					//console.log("Selected user: " + user);
 				});
 
 // -----------------------------------------------------------------------------
@@ -289,7 +289,7 @@ function connect() {
 			return;
 		}
 
-		// If Op is 'OE_Redone' and data is availiable, draw the charts
+		// If Op is 'OE_Redone' and data is available, draw the charts
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if (json[1].hasOwnProperty("Error")) {
@@ -301,6 +301,14 @@ function connect() {
 					$('#overlay-back').show();
 				}
 			} else {
+				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
+					if (!jsonData[jsonData.length-1].has_wiki) {
+						$('#radio_wiki').hide();
+					} else {
+						$('#radio_wiki').show();
+					}
+					$('#radio_wiki').show();
+				}
 				// console.log("redone");
 				drawChart();
 				if (snap) {
@@ -319,8 +327,8 @@ function connect() {
 					if (jsonData[jsonData.length - 1].hasOwnProperty('PSS')) {
 						snap_pss = jsonData[jsonData.length - 1].PSS;
 					}
-
-					document.getElementById("Cookie").innerHTML = "Snapshot: " + name + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
+					if (document)
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + (getParam('snapshot') !== undefined ? getParam('snapshot') : name) + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
 				} else {
 					document.getElementById("Cookie").innerHTML = "Model: "
 							+ window.sessionStorage.model + "; PSS: "
@@ -439,6 +447,17 @@ function goToByScroll(id) { // simple scroll to element
 	}, 'ease');
 }
 
+function getParam(param) {
+	var url = window.location.search.substring(1);
+	var params = url.split('&');
+	for (var i = 0; i < params.length; i++) {
+		var name = params[i].split('=');
+
+		if (name[0] == param) {
+			return name[1];
+		}
+	}
+}
 
 // tutorial functions, should be
 // refactored?-------------------------------------
@@ -859,7 +878,7 @@ function clicker(hidden) {
 			+ hidden + ' frameborder="0" allowfullscreen="no"></iframe>';
 	if (thediv.style.display == "none") {
 		thediv.style.display = "";
-		thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+		thediv.innerHTML = "<script>$(document).keyup(function(e) {if (e.keyCode == 27) { return clicker(); }})</script><table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 				+ "<param name='bgcolor' value='#000000'>"
 				+ embedCode
 				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></center></td></tr></table>";
@@ -1356,7 +1375,6 @@ function drawChart() {
 			backgroundColor : {
 				fill : 'transparent'
 			},
-			series : {},
 			legend : {
 				maxLines : 5,
 				position : 'bottom'
@@ -1393,8 +1411,8 @@ function drawChart() {
 				}
 			}
 		}
-		google.visualization.events.addListener(bottom_right, 'select',
-				rightSelectHandler);
+		//google.visualization.events.addListener(bottom_right, 'select',
+		//		rightSelectHandler);
 
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, right_options);
@@ -1750,7 +1768,7 @@ function requestTagcloud(polarity) {
 		'User' : user,
 		'Type' : polarity
 	};
-	console.log('requested ' + polarity + ' tagcloud');
-	console.log(JSON.stringify(json))
+	//console.log('requested ' + polarity + ' tagcloud');
+	//console.log(JSON.stringify(json))
 	ws.send(JSON.stringify(json));
 }

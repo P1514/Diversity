@@ -62,7 +62,7 @@ public class GetPrediction {
 		Snapshot s = new Snapshot(b);
 		String name = "prediction" + System.currentTimeMillis();
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		s.savePrediction(name, df.format(new Date()).split(" ")[0], 1, "Endpoint", products.replace(',', ';'), services.replace(',', ';'));
+		s.savePrediction("Self-generated snapshot", df.format(new Date()).split(" ")[0], 1, "-1", products.replace(',', ';'), services.replace(',', ';'));
 
 		JSONArray json = p.predict(1, products.replace(',', ';'), services.replace(',', ';'));
 		double sum = 0;

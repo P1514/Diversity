@@ -1,41 +1,39 @@
 package general;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-
-import security.*;
-import sun.net.www.http.HttpClient;
-
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.*;
-
-import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import endpoints.LeanRules;
-import endpoints.LeanRules.LeanRule;
 import extraction.Collaboration;
 import extraction.Extrapolation;
 import extraction.GetComments;
+import extraction.GetMediawiki;
 import extraction.GetPosts;
 import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
-import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
+import security.Roles;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -146,26 +144,55 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 37:
+				obj = new JSONObject();
+				result = new JSONArray();
+				JSONArray ids = new JSONArray();
+				obj.put("Op", "names");
+				result.put(obj);
+				User user1;
+				Company company1;
+				ids = msg.getJSONArray("IDs");
+				for (int i = 0; i < ids.length(); i++) {
+					obj = new JSONObject();
+					JSONObject	obj1 = ids.getJSONObject(i);
+				if (!obj1.has("User_ID") || !obj1.has("Role_ID")) {
+					if (!obj1.has("User_ID")) {
+						obj.put("Op", "Error");
+						result = new JSONArray();
+						result.put(obj);
+						result.put("User_ID was not sent");
+						return result.toString();
+					}
+					if (!obj1.has("Role_ID")) {
+						obj.put("Op", "Error");
+						result = new JSONArray();
+						result.put(obj);
+						result.put("Role_ID was not sent");
+						return result.toString();
+					}
+				} else {
+					user1 = Data.getUser(obj1.getLong("User_ID"));
+					company1 = Data.getCompany(Data.getUser(obj1.getLong("User_ID")).getcompany_id());
+					obj.put("First_name", user1.getfirst_name());
+					obj.put("Last_name", user1.getlast_name());
+					obj.put("Company", company1.getName());
+					obj.put("Role", Data.getRolenameFromCR(obj1.getLong("Role_ID")));
+				}
+				result.put(obj);
+				}
+				return result.toString();
 			case 36:
-				CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+				HttpClient httpClient = HttpClientBuilder.create().build(); // Use this instead
 
 				try {
-				    HttpPost request = new HttpPost(Settings.collaboration_uri);
-				    StringEntity params = new StringEntity(msg.getString("Message"));
-				    request.addHeader("content-type", "application/json");
-				    request.setEntity(params);
-				    CloseableHttpResponse r = httpClient.execute(request);
-				    LOGGER.log(Level.INFO, r.toString());
-				// handle response here...
+					HttpPost request = new HttpPost(Settings.collaboration_uri);
+					StringEntity params = new StringEntity(msg.getString("Message"));
+					request.addHeader("content-type", "application/json");
+					request.setEntity(params);
+					HttpResponse response = httpClient.execute(request);
 				} catch (Exception ex) {
-				    // handle exception here
-				} finally {
-				    try {
-						httpClient.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					ex.printStackTrace();
 				}
 				break;
 			case 35:
@@ -190,10 +217,9 @@ public class Backend {
 				for (int i = 0; i < filter.length; i++) {
 
 					result = convert(result,
-							gs.getWikiPolarityDistribution(id, param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+							gs.getWikiPolarityDistribution(id, param + "," + filtering, values + ","
+									+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i])),
 							"Graph", "Top_Middle");
@@ -219,10 +245,9 @@ public class Backend {
 
 				for (int i = 0; i < filter.length; i++) {
 					result = convert(result,
-							gs.wikiGlobalSentiment(param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+							gs.wikiGlobalSentiment(param + "," + filtering, values + ","
+									+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i]),
 									id, Data.getmodel(id).getFrequency()),
@@ -231,18 +256,16 @@ public class Backend {
 				if (msg.has("Extrapolate")) {
 					LOGGER.log(Level.INFO, "EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
-						result = convert(result,
-								extra.extrapolate(param + "," + filtering,
-										values + "," + (filtering.equals("Product")
-												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										(filtering.equals("Product")
-												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										id, Data.getmodel(id).getFrequency()),
-								"Graph", "Bottom_Right_Ex");
+						result = convert(result, extra.extrapolate(param + "," + filtering, values + ","
+								+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+										: filter[i]),
+								(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+										: filter[i]),
+								id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right_Ex");
 				}
 
 				LOGGER.log(Level.INFO, result.toString());
-				//System.out.println(result.toString());
+				// System.out.println(result.toString());
 				return result.toString();
 			case 33:
 				obj = new JSONObject();
@@ -259,7 +282,6 @@ public class Backend {
 					obj.put("Op", "Error");
 					result.put(obj);
 					result.put("Company does not exist");
-
 
 				}
 				return result.toString();
@@ -329,10 +351,9 @@ public class Backend {
 						break;
 					}
 				} else {
-					tag = new Tagcloud(
-							gp.getTop(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
-							id, msg.has("User") ? msg.getLong("User") : 0);
+					tag = new Tagcloud(gp.getTop(param, values, id,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id,
+							msg.has("User") ? msg.getLong("User") : 0);
 				}
 
 				if (msg.has("Word")) {
@@ -347,10 +368,10 @@ public class Backend {
 				obj = new JSONObject();
 				result = new JSONArray();
 				if (msg.has("Type")) {
-					//System.out.println("type " + msg.getString("Type"));
+					// System.out.println("type " + msg.getString("Type"));
 					switch (msg.getString("Type")) {
 					case "Positive":
-						//System.out.println("POSITIVE");
+						// System.out.println("POSITIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
@@ -358,7 +379,7 @@ public class Backend {
 						break;
 
 					case "Negative":
-						//System.out.println("NEGATIVE");
+						// System.out.println("NEGATIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
 										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
@@ -417,8 +438,8 @@ public class Backend {
 				}
 				if (res.equals("success")) {
 					/*
-					 * obj = new JSONObject(); obj.put("Message",
-					 * "Snapshot Saved Successfully"); obj.put("Op", "Error");
+					 * obj = new JSONObject(); obj.put("Message", "Snapshot Saved Successfully");
+					 * obj.put("Op", "Error");
 					 */
 					return error_message("Snapshot Saved Successfully").toString();
 
@@ -432,12 +453,12 @@ public class Backend {
 				if (msg.has("Products") || msg.has("Services")) {
 					obj.put("Op", "Prediction");
 					result.put(obj);
-					if(!msg.has("type"))
-					result.put(pre.predictSeassonal(1, msg.has("Products") ? msg.getString("Products") : "",
-							msg.has("Services") ? msg.getString("Services") : ""));
+					if (!msg.has("type"))
+						result.put(pre.predictSeassonal(1, msg.has("Products") ? msg.getString("Products") : "",
+								msg.has("Services") ? msg.getString("Services") : ""));
 					else
-					result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
-							msg.has("Services") ? msg.getString("Services") : ""));
+						result.put(pre.predictLifeCycle(1, msg.has("Products") ? msg.getString("Products") : "",
+								msg.has("Services") ? msg.getString("Services") : ""));
 					// result = convert(result, pre.predict(1,
 					// msg.getString("Products"), msg.getString("Services")),
 					// "Graph", "1");
@@ -518,10 +539,9 @@ public class Backend {
 				result.put(obj);
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.getPolarityDistribution(id, param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+							gs.getPolarityDistribution(id, param + "," + filtering, values + ","
+									+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i])),
 							"Graph", "Top_Middle");
@@ -531,20 +551,18 @@ public class Backend {
 				result = convert(result, gr.getReach(param, values, id), "Graph", "Bottom_Left");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gr.globalreach(param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+							gr.globalreach(param + "," + filtering, values + ","
+									+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i]),
 									id, Data.getmodel(id).getFrequency()),
 							"Graph", "Bottom_Middle");
 				for (int i = 0; i < filter.length; i++)
 					result = convert(result,
-							gs.globalsentiment(param + "," + filtering,
-									values + ","
-											+ (filtering.equals("Product")
-													? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
+							gs.globalsentiment(param + "," + filtering, values + ","
+									+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+											: filter[i]),
 									(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
 											: filter[i]),
 									id, Data.getmodel(id).getFrequency()),
@@ -552,18 +570,18 @@ public class Backend {
 				if (msg.has("Extrapolate")) {
 					LOGGER.log(Level.INFO, "EXTRAPOLATING...");
 					for (int i = 0; i < filter.length; i++)
-						result = convert(result,
-								extra.extrapolate(param + "," + filtering,
-										values + "," + (filtering.equals("Product")
-												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										(filtering.equals("Product")
-												? Data.getProduct(Long.valueOf(filter[i])).get_Name() : filter[i]),
-										id, Data.getmodel(id).getFrequency()),
-								"Graph", "Bottom_Right_Ex");
+						result = convert(result, extra.extrapolate(param + "," + filtering, values + ","
+								+ (filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+										: filter[i]),
+								(filtering.equals("Product") ? Data.getProduct(Long.valueOf(filter[i])).get_Name()
+										: filter[i]),
+								id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right_Ex");
 				}
-
+				JSONObject mw = new JSONObject();
+				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
+				result.put(mw);
 				LOGGER.log(Level.INFO, result.toString());
-
+				
 				return result.toString();
 
 			case 18:
@@ -592,19 +610,21 @@ public class Backend {
 					result.put(obj);
 
 				}
+				mw = new JSONObject();
+				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
+				result.put(mw);
 				return result.toString();
 			/*
-			 * case 1: SentimentChart sc = new SentimentChart(); result = new
-			 * JSONArray(); result = convert(result, sc.chartrequest(param,
-			 * values, id), "Graph", "Bottom_Right");
-			 * System.out.println("YELLO"); return result.toString();
+			 * case 1: SentimentChart sc = new SentimentChart(); result = new JSONArray();
+			 * result = convert(result, sc.chartrequest(param, values, id), "Graph",
+			 * "Bottom_Right"); System.out.println("YELLO"); return result.toString();
 			 */
 			case 2:
 				Startup.running.run();
 				return error_message("Update Ran Successfully").toString();
-				/*
-			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1,
-			 * param, values, id).toString(); return tmp;
+			/*
+			 * case 3: gs = new Globalsentiment(); tmp = gs.globalsentiment(1, param,
+			 * values, id).toString(); return tmp;
 			 */
 			case 4:
 				if (msg.has("Product")) {
@@ -634,8 +654,8 @@ public class Backend {
 				tmp = cdb.clean();
 				return tmp;
 			/*
-			 * case 8: GetAuthors ga = new GetAuthors(); tmp =
-			 * ga.getAll().toString(); return tmp;
+			 * case 8: GetAuthors ga = new GetAuthors(); tmp = ga.getAll().toString();
+			 * return tmp;
 			 */
 			/*
 			 * case 9: GetLastPost glp = new GetLastPost(); tmp =
@@ -643,9 +663,9 @@ public class Backend {
 			 */
 			/*
 			 * case 10: GetInfGraph gig = new GetInfGraph(); tmp =
-			 * gig.getAll(msg.getString("Author")).toString(); return tmp; case
-			 * 11: GetPopulation gpo = new GetPopulation(); tmp =
-			 * gpo.getAll(param, id).toString(); return tmp;
+			 * gig.getAll(msg.getString("Author")).toString(); return tmp; case 11:
+			 * GetPopulation gpo = new GetPopulation(); tmp = gpo.getAll(param,
+			 * id).toString(); return tmp;
 			 */
 			case 12:
 				conf = new Settings();
@@ -662,8 +682,63 @@ public class Backend {
 				return tmp;
 			case 14:
 				model = new GetModels();
-				tmp = model.create_model(msg).toString();
-				return tmp;
+				JSONArray tmp2 = model.create_model(msg);
+				boolean update = false;
+				for (int i = 0; i < tmp2.length(); i++) {
+					if (tmp2.getJSONObject(i).has("Update")) {
+						update = true;
+					}
+				}
+
+				if (update) {
+
+					URL url = new URL(Settings.geoip_uri);
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("GET");
+
+					BufferedReader in = null;
+					try {
+						in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String output;
+					StringBuffer response = new StringBuffer();
+
+					try {
+						while ((output = in.readLine()) != null) {
+							response.append(output);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					in.close();
+					obj = new JSONObject(response.toString());
+
+					int user = msg.getInt("User");
+					int dp = msg.getInt("design_project");
+					String lat = obj.getString("latitude");
+					String lon = obj.getString("longitude");
+
+					String link = Settings.has_steps_uri;
+
+					link = link.replace("REPLACE_USER", user + "");
+					link = link.replace("REPLACE_DP", dp + "");
+					link = link.replace("REPLACE_LATITUDE", lat);
+					link = link.replace("REPLACE_LONGITUDE", lon);
+
+					httpClient = HttpClientBuilder.create().build();
+
+					try {
+						HttpPost request = new HttpPost(link);
+						request.addHeader("content-type", "application/json");
+						HttpResponse response2 = httpClient.execute(request);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+
+				return tmp2.toString();
 			case 15:
 				model = new GetModels();
 				tmp = model.get_model(msg).toString();
@@ -692,8 +767,10 @@ public class Backend {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 		return result.toString();
 	}
 
