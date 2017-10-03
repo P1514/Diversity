@@ -289,7 +289,7 @@ function connect() {
 			return;
 		}
 
-		// If Op is 'OE_Redone' and data is availiable, draw the charts
+		// If Op is 'OE_Redone' and data is available, draw the charts
 		if (json[0].Op == "OE_Redone") {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if (json[1].hasOwnProperty("Error")) {
@@ -301,6 +301,14 @@ function connect() {
 					$('#overlay-back').show();
 				}
 			} else {
+				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
+					if (!jsonData[jsonData.length-1].has_wiki) {
+						$('#radio_wiki').hide();
+					} else {
+						$('#radio_wiki').show();
+					}
+					$('#radio_wiki').show();
+				}
 				// console.log("redone");
 				drawChart();
 				if (snap) {

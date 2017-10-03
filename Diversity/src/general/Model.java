@@ -97,7 +97,7 @@ public final class Model {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		name = msg.getString("Name");
-		uri = msg.getString("URI");
+		uri = msg.has("URI") ? msg.getString("URI") : "";
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
