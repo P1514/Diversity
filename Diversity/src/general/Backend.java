@@ -577,9 +577,11 @@ public class Backend {
 										: filter[i]),
 								id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right_Ex");
 				}
-
+				JSONObject mw = new JSONObject();
+				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
+				result.put(mw);
 				LOGGER.log(Level.INFO, result.toString());
-
+				
 				return result.toString();
 
 			case 18:
@@ -608,6 +610,9 @@ public class Backend {
 					result.put(obj);
 
 				}
+				mw = new JSONObject();
+				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
+				result.put(mw);
 				return result.toString();
 			/*
 			 * case 1: SentimentChart sc = new SentimentChart(); result = new JSONArray();
