@@ -159,13 +159,17 @@ public class Backend {
 				if (!obj1.has("User_ID") || !obj1.has("Role_ID")) {
 					if (!obj1.has("User_ID")) {
 						obj.put("Op", "Error");
+						result = new JSONArray();
 						result.put(obj);
 						result.put("User_ID was not sent");
+						return result.toString();
 					}
 					if (!obj1.has("Role_ID")) {
 						obj.put("Op", "Error");
+						result = new JSONArray();
 						result.put(obj);
 						result.put("Role_ID was not sent");
+						return result.toString();
 					}
 				} else {
 					user1 = Data.getUser(obj1.getLong("User_ID"));
