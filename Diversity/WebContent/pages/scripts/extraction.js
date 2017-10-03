@@ -56,7 +56,7 @@ $("#USER_LIST")
 					}
 					ws.send(JSON.stringify(json));
 
-					console.log("Selected user: " + user);
+					//console.log("Selected user: " + user);
 				});
 
 // -----------------------------------------------------------------------------
@@ -859,7 +859,7 @@ function clicker(hidden) {
 			+ hidden + ' frameborder="0" allowfullscreen="no"></iframe>';
 	if (thediv.style.display == "none") {
 		thediv.style.display = "";
-		thediv.innerHTML = "<table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
+		thediv.innerHTML = "<script>$(document).keyup(function(e) {if (e.keyCode == 27) { return clicker(); }})</script><table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 				+ "<param name='bgcolor' value='#000000'>"
 				+ embedCode
 				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></center></td></tr></table>";
@@ -1356,7 +1356,6 @@ function drawChart() {
 			backgroundColor : {
 				fill : 'transparent'
 			},
-			series : {},
 			legend : {
 				maxLines : 5,
 				position : 'bottom'
@@ -1393,8 +1392,8 @@ function drawChart() {
 				}
 			}
 		}
-		google.visualization.events.addListener(bottom_right, 'select',
-				rightSelectHandler);
+		//google.visualization.events.addListener(bottom_right, 'select',
+		//		rightSelectHandler);
 
 		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, right_options);
@@ -1750,7 +1749,7 @@ function requestTagcloud(polarity) {
 		'User' : user,
 		'Type' : polarity
 	};
-	console.log('requested ' + polarity + ' tagcloud');
-	console.log(JSON.stringify(json))
+	//console.log('requested ' + polarity + ' tagcloud');
+	//console.log(JSON.stringify(json))
 	ws.send(JSON.stringify(json));
 }
