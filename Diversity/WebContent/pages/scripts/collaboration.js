@@ -66,16 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (json[0].Op == "Roles") {
 			roles = json[1].Roles.substring(1, json[1].Roles.length).split(',');
 			//console.log(roles);
-
-			var tmp = getMultipleParams("user");
-			console.log(tmp);
-			var users = [];
-			for (var i = 0; i < tmp.length; i++) {
-				users.push({
-					'User_ID' : tmp[i].split(',')[0],
-					'Role_ID' : tmp[i].split(',')[1]
-				});
-			}
 			var json2 = {
 				"Op" : "collaboration",
 				'Key' : getCookie("JSESSIONID"),
@@ -97,9 +87,17 @@ document.addEventListener('DOMContentLoaded', function() {
 					teamRoles[i] = users[i].Role;
 			}
       //console.log(users);
+			var tmp = getMultipleParams("user");
+			var users2 = [];
+			for (var i = 0; i < tmp.length; i++) {
+				users2.push({
+					'User_ID' : tmp[i].split(',')[0],
+					'Role_ID' : tmp[i].split(',')[1]
+				});
+			}
 			var json3 = {
 				'Op': 'get_user_roles',
-				'IDs' : users,
+				'IDs' : users2,
 				'Key' : getCookie("JSESSIONID"),
 			}
 
@@ -121,10 +119,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		if (json[0].Op == "names") {
 			for (var i = 1; i < json.length; i++) {
-				for (var j = 0; j < userStorage.length; j++) {
-					var name = json[i].First_name + ' ' + json[i].Last_name;
-					if (name == userStorage[j].name && json[i].Company == userStorage.Company) {
+				for (var j = 0; j < availableUsers.length; j++) {
+					var name1 = json[i].First_name + ' ' + json[i].Last_name;
+					var name2 = availableUsers[j].First_name + ' ' + availableUsers[j].Last_name;
+					//console.log(name);
+					//console.log(availableUsers[j].First_name + ' ' + availableUsers[j].Last_name);
+					if (name1 == name2 && json[i].Company == availableUsers[i].Company) {
+						userStorage[j].Role = json[i].Role;
+						console.log(userStorage[j].Role);
+						console.log(json[i].Role);
 						addMember(j);
+
 					}
 				}
 			}
