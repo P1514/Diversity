@@ -177,7 +177,7 @@ public class Backend {
 					obj.put("First_name", user1.getfirst_name());
 					obj.put("Last_name", user1.getlast_name());
 					obj.put("Company", company1.getName());
-					obj.put("Role", user1.getrole());
+					obj.put("Role", Data.getRolenameFromCR(obj1.getLong("Role_ID")));
 				}
 				result.put(obj);
 				}
