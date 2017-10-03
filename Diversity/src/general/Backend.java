@@ -159,13 +159,17 @@ public class Backend {
 				if (!obj1.has("User_ID") || !obj1.has("Role_ID")) {
 					if (!obj1.has("User_ID")) {
 						obj.put("Op", "Error");
+						result = new JSONArray();
 						result.put(obj);
 						result.put("User_ID was not sent");
+						return result.toString();
 					}
 					if (!obj1.has("Role_ID")) {
 						obj.put("Op", "Error");
+						result = new JSONArray();
 						result.put(obj);
 						result.put("Role_ID was not sent");
+						return result.toString();
 					}
 				} else {
 					user1 = Data.getUser(obj1.getLong("User_ID"));
@@ -173,7 +177,7 @@ public class Backend {
 					obj.put("First_name", user1.getfirst_name());
 					obj.put("Last_name", user1.getlast_name());
 					obj.put("Company", company1.getName());
-					obj.put("Role", user1.getrole());
+					obj.put("Role", Data.getRolenameFromCR(obj1.getLong("Role_ID")));
 				}
 				result.put(obj);
 				}
