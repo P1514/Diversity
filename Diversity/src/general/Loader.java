@@ -73,7 +73,6 @@ public class Loader {
 	}
 
 	public String loadinit() throws JSONException{
-		Server.isloading = true;
 		users = new ArrayList<String>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
@@ -94,7 +93,7 @@ public class Loader {
 		err = loadmodels();
 		if (err != null)
 			return err;
-		Server.isloading=false;
+		
 		return null;
 	}
 	private String loadp1(JSONArray json) throws JSONException {
