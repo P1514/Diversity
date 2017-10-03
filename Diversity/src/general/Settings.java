@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	public static final String version = "2.2";
+	public static final String version = "2.4";
 	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
@@ -72,7 +72,7 @@ public class Settings {
 			+ "?autoReconnect=true&useSSL=false";
 	private static final String user2 = "diversity";
 	private static final String pass2 = "!diversity!";
-	public static final Integer dbversion = 11;
+	public static final Integer dbversion = 12;
 
 	// Author Table
 	public static final String latable = "authors";
@@ -112,6 +112,7 @@ public class Settings {
 	public static final String lotable_pss = "pss";
 	public static final String lotable_product = "product";
 	public static final String lotable_comments = "comments";
+	public static final String lotable_source = "source";
 
 	// Models table
 	public static final String lmtable = "models";
@@ -162,7 +163,10 @@ public class Settings {
 	//public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200000&epochsTo[]=1498054243000&pssId=31&accounts[]=AirForce1";
 	public static final String JSON_uri = "http://opennebula.euprojects.net/intelligent-search/getFeedback";
 	public static final String register_uri = "https://diversity.euprojects.net/socialfeedbackextraction/registerSFE";
-
+	public static final String collaboration_uri = "https://diversity.euprojects.net/collaborationTool/suggestions";
+	public static final String has_steps_uri = "https://diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=REPLACE_USER&design_project_id=REPLACE_DP&status=1&lat=REPLACE_LATITUDE&lng=REPLACE_LONGITUDE";
+	public static final String geoip_uri = "https://freegeoip.net/json/";
+	
 	//public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/";
 	public static final boolean LocalPolarity = false;
 	public static Boolean include_services = true;

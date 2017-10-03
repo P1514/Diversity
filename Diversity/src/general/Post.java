@@ -102,7 +102,8 @@ public class Post {
 		// To replace with API
 		if (Settings.LocalPolarity) {
 			String[] words = message.split("[^\\w'-]+");
-
+			int count = 0;
+			int sum = 0;
 			Adjectives adjs = new Adjectives();
 			double sentiment = 50;
 			for (int i = 0; i < words.length; i++) {
@@ -110,14 +111,21 @@ public class Post {
 				String currentWord = words[i];
 
 				if (adjs.matches(currentWord)) {
-					sentiment = adjs.getSentiment(currentWord);
+//					sentiment = adjs.getSentiment(currentWord);
+					sum += adjs.getSentiment(currentWord);
+					count++;
 				}
 			}
+			sentiment = count > 0 ? sum/count : 50;
 			// End of To Replace
 
 			this.polarity = sentiment;
 		}else{
-			this.polarity= 0;
+			this.polarity= -1;
+		}
+		message=message.trim();
+		if(message.length()<=1) {
+			this.polarity=50.0;
 		}
 	}
 
@@ -195,6 +203,15 @@ public class Post {
 	 */
 	public double getPolarity() {
 		return polarity;
+	}
+	
+	/**
+	 * Sets the polarity.
+	 *
+	 * @return the polarity
+	 */
+	public void setPolarity(double pol) {
+		this.polarity=pol;
 	}
 
 	/**

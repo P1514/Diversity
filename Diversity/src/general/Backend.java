@@ -1,31 +1,39 @@
 package general;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collection;
-
-import security.*;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.json.*;
-
-import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import endpoints.LeanRules;
-import endpoints.LeanRules.LeanRule;
 import extraction.Collaboration;
 import extraction.Extrapolation;
 import extraction.GetComments;
+import extraction.GetMediawiki;
 import extraction.GetPosts;
 import extraction.GetProducts;
 import extraction.GetReach;
 import extraction.Globalsentiment;
 import extraction.Prediction;
-import extraction.GetMediawiki;
 import extraction.Snapshot;
 import extraction.Tagcloud;
 import modeling.GetModels;
+import security.Roles;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -90,6 +98,12 @@ public class Backend {
 			}
 
 			if (msg.has("Role")) {
+				String role = msg.getString("Role");
+				try {
+					msg.put("Role", URLDecoder.decode(role, "UTF-8"));
+				} catch (UnsupportedEncodingException e1) {
+					LOGGER.log(Level.SEVERE, "Error Decoding User Role URL => " + msg.getString("Role"));
+				}
 				Data.newuser(msg.getString("Key"), msg.getString("Role"));
 			}
 
@@ -130,6 +144,30 @@ public class Backend {
 				Prediction ps = new Prediction();
 				LOGGER.log(Level.INFO, "Hashmapp" + ps.predict(1, "14;15", "14;15").toString());
 				break;
+			case 36:
+				HttpClient httpClient = HttpClientBuilder.create().build(); //Use this instead 
+
+				try {
+				    HttpPost request = new HttpPost(Settings.collaboration_uri);
+				    StringEntity params =new StringEntity(msg.getString("Message"));
+				    request.addHeader("content-type", "application/json");
+				    request.setEntity(params);
+				    HttpResponse response = httpClient.execute(request);
+				}catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				break;
+			case 35:
+				result = new JSONArray();
+				obj = new JSONObject();
+				obj.put("Op", "Roles");
+				result.put(obj);
+				String roles = Data.getRolesFromCR();
+				LOGGER.log(Level.INFO, roles);
+				obj = new JSONObject();
+				obj.put("Roles", roles);
+				result.put(obj);
+				return result.toString();
 			case 34:
 				// SELECT * FROM sentimentanalysis.posts where id in (select
 				// post_id from post_source where post_source = 'wiki');
@@ -260,10 +298,9 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -275,15 +312,15 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+								gp.getTop(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					}
 				} else {
 					tag = new Tagcloud(
-							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
+							gp.getTop(param, values, id,
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 
@@ -304,8 +341,8 @@ public class Backend {
 					case "Positive":
 						//System.out.println("POSITIVE");
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -318,15 +355,14 @@ public class Backend {
 						break;
 					default:
 						tag = new Tagcloud(
-								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+								gp.getTopWithPolarity(param, values, id,
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 								id, msg.has("User") ? msg.getLong("User") : 0);
-						break;
 					}
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 				obj.put("Op", "words");
@@ -615,8 +651,63 @@ public class Backend {
 				return tmp;
 			case 14:
 				model = new GetModels();
-				tmp = model.create_model(msg).toString();
-				return tmp;
+				JSONArray tmp2 = model.create_model(msg);
+				boolean update = false;
+				for (int i = 0; i < tmp2.length(); i++) {
+					if (tmp2.getJSONObject(i).has("Update")) {
+						update = true;
+					}
+				}
+				
+				if (update) {
+				
+					URL url = new URL(Settings.geoip_uri);
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+					con.setRequestMethod("GET");
+					
+					BufferedReader in = null;
+					try {
+						in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					String output;
+					StringBuffer response = new StringBuffer();
+					
+					try {
+						while ((output = in.readLine()) != null) {
+							response.append(output);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					in.close();
+					obj = new JSONObject(response.toString());
+					
+					int user = msg.getInt("User");
+					int dp = msg.getInt("design_project");
+					String lat = obj.getString("latitude");
+					String lon = obj.getString("longitude");
+					
+					String link = Settings.has_steps_uri;
+					
+					link = link.replace("REPLACE_USER", user + "");
+					link = link.replace("REPLACE_DP", dp + "");
+					link = link.replace("REPLACE_LATITUDE", lat);
+					link = link.replace("REPLACE_LONGITUDE", lon);
+
+					httpClient = HttpClientBuilder.create().build(); 
+					
+					try {
+					    HttpPost request = new HttpPost(link);
+					    request.addHeader("content-type", "application/json");
+					    HttpResponse response2 = httpClient.execute(request);
+					}catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				
+				return tmp2.toString();
 			case 15:
 				model = new GetModels();
 				tmp = model.get_model(msg).toString();
@@ -645,8 +736,10 @@ public class Backend {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 		return result.toString();
 	}
 

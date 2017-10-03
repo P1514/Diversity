@@ -20,7 +20,7 @@ public class DBHandler extends Handler {
 	private Connection cnlocal;
 	private int user_id;
 	private Timestamp timestamp;
-	
+
 	public DBHandler(int user_id, long timestamp) {
 		this.user_id = user_id;
 		this.timestamp = new Timestamp(timestamp);
@@ -49,39 +49,31 @@ public class DBHandler extends Handler {
 			reportError(null, ex, ErrorManager.FORMAT_FAILURE);
 			return;
 		}
-		
-		dbconnect();
 
-		String sql = "INSERT INTO " + Settings.ltable + "(" + Settings.ltable_user + "," + Settings.ltable_timestamp
-				+ "," + Settings.ltable_log + ") VALUES (?,?,?)";
-		
-		PreparedStatement insert = null; 
-		
-		try {
-			insert = cnlocal.prepareStatement(sql);
-			insert.setInt(1, user_id);
-			insert.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-			insert.setString(3, record.getMessage());
-			insert.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
+		try (Connection cnlocal = Settings.connlocal()) {
+
+			String sql = "INSERT INTO " + Settings.ltable + "(" + Settings.ltable_user + "," + Settings.ltable_timestamp
+					+ "," + Settings.ltable_log + ") VALUES (?,?,?)";
+
+			PreparedStatement insert = null;
+
 			try {
-				if (insert != null) {
-					insert.close();
-				}
-			} catch (Exception e) {
+				insert = cnlocal.prepareStatement(sql);
+				insert.setInt(1, user_id);
+				insert.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+				insert.setString(3, record.getLevel() + " " + record.getMessage());
+				insert.executeUpdate();
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			try {
-				if (cnlocal != null) {
-					close();
-				}
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			}
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-	
+
 	}
 
 	@Override

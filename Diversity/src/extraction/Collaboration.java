@@ -30,16 +30,20 @@ public class Collaboration {
 
 		//System.out.println(productsId);
 		//System.out.println(servicesId);
+		if("null".equals(productsId)) productsId="";
+		if("null".equals(company)) company="";
+		if("null".equals(servicesId)) servicesId="";
+		if("-%20Select%20-".equals(company)) company="";
 
 		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
 		if (pssSentiment == null) {
 			pssSentiment = pre.predict(company);
 		}
-		if (pssSentiment == null) {
-			return null;
-		}
-		HashMap<Long, Double> dpSentiment = new HashMap<>();
 		HashMap<Long, ArrayList<Double>> userRating = new HashMap<>();
+
+		if (pssSentiment != null) {
+
+		HashMap<Long, Double> dpSentiment = new HashMap<>();
 
 		Collection<DesignProject> designprojects = Data.dbdpall();
 
@@ -61,6 +65,8 @@ public class Collaboration {
 				userRating.get(userid).add(v);
 			}
 		});
+		//return null;
+	}
 
 		for (User user0 : Data.dbuserall()) {
 			if (!userRating.containsKey(user0.getID())) {

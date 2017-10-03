@@ -25,6 +25,7 @@ import extraction.Globalsentiment;
 import general.Data;
 import general.Loader;
 import general.Logging;
+import general.Server;
 import general.Settings;
 
 /**
@@ -83,7 +84,7 @@ public class Oversight extends TimerTask {
 	 */
 	@Override
 	public void run() {
-
+		Server.isloading = true;
 		// TODO Introduce here loading PSS's and Products and save them on
 		// static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
@@ -147,6 +148,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					}
+					cnlocal.close();
 
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
@@ -182,6 +184,7 @@ public class Oversight extends TimerTask {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
+								continue;
 							}
 							String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate
 									+ "=? where (" + Settings.lutable_pss + "=? AND " + Settings.lutable_source
@@ -204,6 +207,7 @@ public class Oversight extends TimerTask {
 								update += ")";
 								Calendar cc = (Calendar) now.clone();
 								cc.add(Calendar.DAY_OF_MONTH, 1);
+								dbconnect();
 								PreparedStatement query1 = cnlocal.prepareStatement(update);
 								query1.setLong(1, now.getTimeInMillis());
 								query1.setString(2, k);
@@ -215,6 +219,7 @@ public class Oversight extends TimerTask {
 								// System.out.println(query1);
 								query1.execute();
 
+								cnlocal.close();
 								/*
 								 * } }
 								 */
@@ -225,7 +230,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					});
-
+					Server.isloading=false;
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -237,13 +242,6 @@ public class Oversight extends TimerTask {
 			try {
 				cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			try {
-				(new Loader()).load(null);
-			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

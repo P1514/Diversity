@@ -374,6 +374,8 @@ function connect() {
 				case 3:
 					type = 'Negative';
 					break;
+				default:
+					type = 'All';
 			}
 			// Request the tagcloud for the current user
 			var json = {
@@ -1394,8 +1396,7 @@ function drawChart() {
 		google.visualization.events.addListener(bottom_right, 'select',
 				rightSelectHandler);
 
-		// google.visualization.events.addListener(bottom_right, 'select',
-		// rightSelectHandler);
+		google.visualization.events.addListener(bottom_right, 'select', rightSelectHandler);
 		bottom_right.draw(sentimentdata, right_options);
 		right_data = sentimentdata;
 		function getCoordsRight() {

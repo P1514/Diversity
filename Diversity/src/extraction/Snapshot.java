@@ -1,5 +1,7 @@
 package extraction;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +20,7 @@ import general.Backend;
 import general.Data;
 import general.Logging;
 import general.Settings;
+import general.User;
 
 public class Snapshot {
 	
@@ -239,6 +242,12 @@ public class Snapshot {
 	}
 
 	public String load(String name, String type) throws JSONException {
+		try {
+			name = URLDecoder.decode(name, "UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			LOGGER.log(Level.SEVERE, "Error Decoding Snapshot Name => " + name);
+			return null;
+		}
 		Connection cnlocal;
 		try {
 			cnlocal=Settings.connlocal();
@@ -326,8 +335,16 @@ public class Snapshot {
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
-				obj.put("Id", rs.getString("id"));
-				obj.put("User", rs.getString("creation_user"));
+				String _userS = rs.getString("creation_user");
+				User _user;
+				try{
+				_user = Data.getUser(Long.parseLong(_userS));
+				}catch(NumberFormatException e) {
+					_user=null;
+				}
+				String user_name = _user != null ? _user.getUserName() : _userS;
+				obj.put("Id", rs.getString("id") );
+				obj.put("User", user_name);
 				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
 			}

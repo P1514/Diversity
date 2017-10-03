@@ -171,7 +171,7 @@ ws.onmessage = function(event) {
   json = JSON.parse(event.data);
   if (json[0].Op == 'Error') {
     // alert(json[0].Message);
-	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	$('#alert').html(json[0].Message + '<br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide()">OK</button>');
 	$('#overlay').show();
 	$('#overlay-back').show();
   }
@@ -634,18 +634,20 @@ function ok(val) {
       "Final_Product" : true,
       "Archive" : true,
       "Name" : name,
-      "User" : location.href.indexOf("user_id") != -1 ? location.href.split("user_id=")[1].split("&")[0] : "",
+
+      "User" : localStorage.user,
+
       "Id": model_data[0],
       "Start_date": 0,
       'Key' : getCookie("JSESSIONID")
     };
     ws.send(JSON.stringify(jsonData));
-	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+	  $('#alert').html('Model ' + name + ' deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.reload()// = \'index.html\'">OK</button>');
     $('#overlay').show();
 	  $('#overlay-back').show();
 	  // window.alert("Model " + name + " deleted.");
   } else {
-    $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
+    $('#alert').html('No models were deleted.<br><br><button class="btn btn-default" id="ok" onclick="location.reload()//href = \'index.html\'">OK</button>');
   	$('#overlay').show();
   	$('#overlay-back').show();
    }
