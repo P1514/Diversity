@@ -6,6 +6,7 @@ import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -54,8 +55,8 @@ public class Oversight extends TimerTask {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 0/* 1 */);
 		/*
-		 * c.set(Calendar.HOUR, 0); c.set(Calendar.MINUTE, 1);
-		 * c.set(Calendar.SECOND, 0); c.set(Calendar.AM_PM, Calendar.AM);
+		 * c.set(Calendar.HOUR, 0); c.set(Calendar.MINUTE, 1); c.set(Calendar.SECOND,
+		 * 0); c.set(Calendar.AM_PM, Calendar.AM);
 		 */
 		c.add(Calendar.SECOND, 15);
 
@@ -176,9 +177,23 @@ public class Oversight extends TimerTask {
 							try {
 								// System.out.println("TESTE: " +
 								// readUrl(request));
-								//request = request.replaceAll(" ", "%20");
+								// request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
-								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
+								if (!Settings.simulatedData)
+									(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
+								else {
+									Statement stmt=null;
+									String deleteOpinions = "delete from " + Settings.lotable;
+									String deletePosts = "delete from " + Settings.lptable;
+									stmt = cnlocal.createStatement();
+									stmt.execute(deleteOpinions);
+									stmt.close();
+									stmt = cnlocal.createStatement();
+									stmt.execute(deletePosts);
+									stmt.close();
+									(new Loader()).load(new JSONArray(
+											readUrl("http://localhost:8080/SimInterface/endpoints/getSimulatedData")));
+								}
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -190,13 +205,9 @@ public class Oversight extends TimerTask {
 									+ "=?) AND (";
 							try {
 								/*
-								 * TODO Missing check standard update time
-								 * update time, currently doing update each day
-								 * Calendar cal=now; for (Model m :
-								 * Data.modeldb.values()) { if
-								 * (m.getPSS().equals(k)) {
-								 * cal.add(Calendar.DAY_OF_MONTH,
-								 * m.getFrequency());
+								 * TODO Missing check standard update time update time, currently doing update
+								 * each day Calendar cal=now; for (Model m : Data.modeldb.values()) { if
+								 * (m.getPSS().equals(k)) { cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());
 								 */
 								String[] account = v.accounts.replaceAll("\"", "").replaceFirst("&", "").split("&");
 								for (int i = 0; i < account.length; i++) {
