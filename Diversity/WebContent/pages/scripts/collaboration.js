@@ -118,18 +118,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 		if (json[0].Op == "names") {
-			for (var i = 1; i < json.length; i++) {
-				for (var j = 0; j < availableUsers.length; j++) {
-					var name1 = json[i].First_name + ' ' + json[i].Last_name;
-					var name2 = availableUsers[j].First_name + ' ' + availableUsers[j].Last_name;
-					//console.log(name);
-					//console.log(availableUsers[j].First_name + ' ' + availableUsers[j].Last_name);
-					if (name1 == name2 && json[i].Company == availableUsers[i].Company) {
-						userStorage[j].Role = json[i].Role;
-						console.log(userStorage[j].Role);
-						console.log(json[i].Role);
-						addMember(j);
+			for (var i = 0; i < json.length; i++) {
+				if (!json[i].hasOwnProperty('Op')) {
+					console.log(i);
+					for (var j = 0; j < userStorage.length; j++) {
+						console.log(userStorage[j]);
+						var name1 = json[i].First_name + ' ' + json[i].Last_name;
+						var name2 = userStorage[j].First_name + ' ' + userStorage[j].Last_name;
+						if (name1 == name2 /*&& json[i].Company == availableUsers[i].Company*/) {
+							userStorage[j].Role = json[i].Role;
+							addMember(j);
 
+						}
 					}
 				}
 			}
@@ -218,6 +218,7 @@ function getMultipleParams(param) {
     var item = params[i].split("=");
 		if (item[0] == param) {
 		  result.push(item[1]);
+			console.log(item[1]);
 		}
   }
   return result;

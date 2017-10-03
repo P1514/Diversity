@@ -319,8 +319,8 @@ function connect() {
 					if (jsonData[jsonData.length - 1].hasOwnProperty('PSS')) {
 						snap_pss = jsonData[jsonData.length - 1].PSS;
 					}
-
-					document.getElementById("Cookie").innerHTML = "Snapshot: " + name + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
+					if (document)
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + (getParam('snapshot') !== undefined ? getParam('snapshot') : name) + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
 				} else {
 					document.getElementById("Cookie").innerHTML = "Model: "
 							+ window.sessionStorage.model + "; PSS: "
@@ -439,6 +439,17 @@ function goToByScroll(id) { // simple scroll to element
 	}, 'ease');
 }
 
+function getParam(param) {
+	var url = window.location.search.substring(1);
+	var params = url.split('&');
+	for (var i = 0; i < params.length; i++) {
+		var name = params[i].split('=');
+
+		if (name[0] == param) {
+			return name[1];
+		}
+	}
+}
 
 // tutorial functions, should be
 // refactored?-------------------------------------
