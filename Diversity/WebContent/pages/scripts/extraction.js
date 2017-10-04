@@ -20,6 +20,8 @@ var snapshots;
 var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 		"SEP", "OCT", "NOV", "DEC" ];
 var month;
+var year;
+var day;
 var product;
 var user = localStorage.user;
 var finalProductColors = [];
@@ -120,14 +122,19 @@ function connect() {
 			var row = selection.row;
 			var col = selection.column;
 			month = monthNames[sentimentdata.getValue(row, 0).getMonth()];
+			year = sentimentdata.getValue(row, 0).getYear();
+			day = sentimentdata.getValue(row, 0).getDay();
 			product = sentimentdata.getColumnLabel(selection.column);
 
 			if (product != "Global" && filteredByProduct) {
 				json = {
 					"Op" : "getposts",
 					"Id" : sessionStorage.id,
-					"Param" : "Month",
-					"Values" : month,
+					//"Param" : "Month",
+					//"Values" : month,
+					"Day" : day,
+					"Month" : month,
+					"Year" : year,
 					"Product" : product,
 					'Key' : getCookie("JSESSIONID")
 				}
@@ -135,8 +142,11 @@ function connect() {
 				json = {
 					"Op" : "getposts",
 					"Id" : sessionStorage.id,
-					"Param" : "Month",
-					"Values" : month,
+					//"Param" : "Month",
+					//"Values" : month,
+					"Day" : day,
+					"Month" : month,
+					"Year" : year,
 					'Key' : getCookie("JSESSIONID")
 				}
 			}
@@ -788,7 +798,11 @@ function tagClick(word) {
 		"Op" : "getposts",
 		"Id" : sessionStorage.id,
 		"word" : word,
-		"Month" : month != undefined ? month : undefined,
+		//"Param" : "Month",
+		//"Values" : month,
+		"Day" : day,
+		"Month" : month,
+		"Year" : year,
 		"Product" : product != undefined ? product : undefined,
 		'Key' : getCookie("JSESSIONID")
 	}

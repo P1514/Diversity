@@ -111,9 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
-	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
+	    if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
+			}
+
+			if (getParam('company') == 'null' || getParam('company') === undefined) {
+				$(#)
 			}
     }
 
