@@ -99,8 +99,11 @@ function getPosts() {
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id,
-				"Param" : "Month",
-				"Values" : month,
+				//"Param" : "Month",
+				//"Values" : month,
+				"Day" : day,
+				"Month" : month,
+				"Year" : year,
 				"Product" : product,
 				'Key' : getCookie("JSESSIONID")
 			}
@@ -108,8 +111,11 @@ function getPosts() {
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id,
-				"Param" : "Month",
-				"Values" : month,
+				//"Param" : "Month",
+				//"Values" : month,
+				"Day" : day,
+				"Month" : month,
+				"Year" : year,
 				'Key' : getCookie("JSESSIONID")
 			}
 		}
@@ -1042,7 +1048,9 @@ function drawChart() {
 		for (ii = 0; i < jsonData.length && jsonData[i].Graph == "Bottom_Left"; ii++, i++) {
 			data.addRow();
 			data.setCell(ii, 0, jsonData[i].Param);
-			data.setCell(ii, 1, jsonData[i].Value)
+			if (jsonData[i].Value != -1) {
+				data.setCell(ii, 1, jsonData[i].Value)
+			}
 		}
 		filt = 2;
 		colors = new Array();
@@ -1099,7 +1107,7 @@ function drawChart() {
 					data.addRow();
 				}
 				var time = jsonData[i].Date.split(" ");
-				if (jsonData[i].Value != 0) {
+				if (jsonData[i].Value != -1 ) {
 
 					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
 							+ time[0])); // month comes as a number from
@@ -1327,7 +1335,9 @@ function drawChart() {
 					sentimentdata.addRow();
 					sentimentdata.setCell(iii, 0, new Date(time2[2],
 							time2[1] - 1, time2[0]));
-					sentimentdata.setCell(iii, filt, jsonData[i].Value);
+					if (jsonData[i].Value != -1) {
+						sentimentdata.setCell(iii, filt, jsonData[i].Value);
+					}
 				}
 			}
 		}
