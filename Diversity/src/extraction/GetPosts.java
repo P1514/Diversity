@@ -504,9 +504,9 @@ public class GetPosts {
 			insert += " AND gender=?";
 		if (par.location != null)
 			insert += " AND location=?";
-		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=?)";
+		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=? ";
+		insert += " AND source in (?))";
 		// ResultSet rs = null;
-
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -532,8 +532,9 @@ public class GetPosts {
 			 * inputdate.add(Calendar.YEAR, -1); query1.setLong(rangeindex,
 			 * inputdate.getTimeInMillis()); rangeindex++;
 			 */
-			query1.setLong(rangeindex, model.getDate());
-
+			query1.setLong(rangeindex++, model.getDate());
+			query1.setString(rangeindex++, model.getSources());
+			LOGGER.log(Level.INFO,query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");
