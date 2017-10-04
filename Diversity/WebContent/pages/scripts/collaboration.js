@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
 					teamRoles[i] = users[i].Role;
+					userStorage[i] = users[i];
 			}
       //console.log(users);
 			var tmp = getMultipleParams("user");
@@ -126,11 +127,17 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
-	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
+	    if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
 			}
+
+			if (getParam('company') == 'null' || getParam('company') === undefined) {
+				$('#all').click();
+			}
+
 	    		return;
+
     }
 
 		if (json[0].Op == "names") {

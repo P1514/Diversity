@@ -20,6 +20,8 @@ var snapshots;
 var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 		"SEP", "OCT", "NOV", "DEC" ];
 var month;
+var year;
+var day;
 var product;
 var user = localStorage.user;
 var finalProductColors = [];
@@ -29,6 +31,7 @@ var snap_name;
 var snap_user;
 var snap_date;
 var snap_pss;
+var refreshTag = true;
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
 $(window).on('load', function() {
@@ -59,8 +62,11 @@ $("#USER_LIST")
 					var json = {
 						"Op" : "tagcloud",
 						"Id" : sessionStorage.id,
-						"Param" : month != undefined ? "Month" : undefined,
-						"Values" : month != undefined ? month : undefined,
+						//"Param" : "Month",
+						//"Values" : month,
+						"Day" : day,
+						"Month" : month,
+						"Year" : year !== undefined ? 1900 + year : undefined,
 						"Product" : product != undefined && product != "Global" ? product
 								: undefined,
 						'Key' : getCookie("JSESSIONID"),
@@ -100,15 +106,20 @@ function getPosts() {
 			&& (selection.hasOwnProperty('row') && selection.row != null)) {
 		var row = selection.row;
 		var col = selection.column;
-		month = monthNames[sentimentdata.getValue(row, 0).getMonth()];
+		month = sentimentdata.getValue(row, 0) != null ? monthNames[sentimentdata.getValue(row, 0).getMonth()] : 'JAN';
+		day = sentimentdata.getValue(row, 0) != null ? sentimentdata.getValue(row, 0).getDay() : 1;
+		year = sentimentdata.getValue(row, 0) != null? sentimentdata.getValue(row, 0).getYear() : 1970;
 		product = sentimentdata.getColumnLabel(selection.column);
 
 		if (product != "Global" && filteredByProduct) {
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id,
-				"Param" : "Month",
-				"Values" : month,
+				//"Param" : "Month",
+				//"Values" : month,
+				"Day" : day,
+				"Month" : month,
+				"Year" : year !== undefined ? 1900 + year : undefined,
 				"Product" : product,
 				'Key' : getCookie("JSESSIONID")
 			}
@@ -116,12 +127,15 @@ function getPosts() {
 			json = {
 				"Op" : "getposts",
 				"Id" : sessionStorage.id,
-				"Param" : "Month",
-				"Values" : month,
+				//"Param" : "Month",
+				//"Values" : month,
+				"Day" : day,
+				"Month" : month,
+				"Year" : year !== undefined ? 1900 + year : undefined,
 				'Key' : getCookie("JSESSIONID")
 			}
 		}
-
+		refreshTag = true;
 		ws.send(JSON.stringify(json));
 
 	} else {
@@ -314,12 +328,13 @@ function connect() {
 				}
 			} else {
 				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
-					if (!jsonData[jsonData.length-1].has_wiki) {
-						$('#radio_wiki').hide();
+					if (jsonData[jsonData.length-1].has_wiki == false) {
+						$('#radio_wiki_label').hide();
 					} else {
-						$('#radio_wiki').show();
+						$('#radio_wiki_label').show();
 					}
-					$('#radio_wiki').show();
+				} else {
+					$('#radio_wiki_label').show();
 				}
 				// console.log("redone");
 				drawChart();
@@ -398,18 +413,23 @@ function connect() {
 					type = 'All';
 			}
 			// Request the tagcloud for the current user
-			var json = {
-				"Op" : "tagcloud",
-				"Id" : sessionStorage.id,
-				"Param" : month != undefined ? "Month" : undefined,
-				"Values" : month != undefined ? month : undefined,
-				"Product" : product != undefined && product != "Global" ? product
-						: undefined,
-				'Key' : getCookie("JSESSIONID"),
-				'User' : user,
-				'Type' : type
+			if (refreshTag) {
+				var json = {
+					"Op" : "tagcloud",
+					"Id" : sessionStorage.id,
+					//"Param" : "Month",
+					//"Values" : month,
+					"Day" : day,
+					"Month" : month,
+					"Year" : year !== undefined ? 1900 + year : undefined,
+					"Product" : product != undefined && product != "Global" ? product
+							: undefined,
+					'Key' : getCookie("JSESSIONID"),
+					'User' : user,
+					'Type' : type
+				}
+				ws.send(JSON.stringify(json));
 			}
-			ws.send(JSON.stringify(json));
 			return;
 		}
 
@@ -799,11 +819,15 @@ function tagClick(word) {
 		"Op" : "getposts",
 		"Id" : sessionStorage.id,
 		"word" : word,
-		"Month" : month != undefined ? month : undefined,
+		//"Param" : "Month",
+		//"Values" : month,
+		"Day" : day,
+		"Month" : month,
+		"Year" : year !== undefined ? 1900 + year : undefined,
 		"Product" : product != undefined ? product : undefined,
 		'Key' : getCookie("JSESSIONID")
 	}
-
+	refreshTag = false;
 	ws.send(JSON.stringify(json));
 }
 
@@ -1042,7 +1066,9 @@ function drawChart() {
 		for (ii = 0; i < jsonData.length && jsonData[i].Graph == "Bottom_Left"; ii++, i++) {
 			data.addRow();
 			data.setCell(ii, 0, jsonData[i].Param);
-			data.setCell(ii, 1, jsonData[i].Value)
+			if (jsonData[i].Value != -1) {
+				data.setCell(ii, 1, jsonData[i].Value)
+			}
 		}
 		filt = 2;
 		colors = new Array();
@@ -1099,25 +1125,30 @@ function drawChart() {
 					data.addRow();
 				}
 				var time = jsonData[i].Date.split(" ");
-				if (jsonData[i].Value != 0) {
+				if (jsonData[i].Value != -1 ) {
 
-					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
-							+ time[2])); // month comes as a number from
+					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
+							+ time[0])); // month comes as a number from
 					// server, if it changes use
 					// getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
-							+ time[2]));
+					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
+							+ time[0]));
 				}
 			}
 		}
+
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(data.getColumnLabel(color)));
 		}
 		finalProductColors = colors;
 		function midSelectHandler() {
+			var selection = bottom_middle.getSelection()[0];
+			var row = selection.row;
+			var col = selection.column;
+			console.log(sentimentdata.getValue(row, 0));
 			var selectedItem = bottom_middle.getSelection()[0] != undefined ? bottom_middle
 					.getSelection()[0]
 					: false;
@@ -1130,6 +1161,7 @@ function drawChart() {
 						row : selectedItem.row
 					} ]);
 					//google.visualization.events.trigger(bottom_right, 'select');
+					sentimentdata = data;
 					getPosts();
 				}
 			} else {
@@ -1205,6 +1237,7 @@ function drawChart() {
 				max : start
 			}
 		}
+
 		google.visualization.events.addListener(bottom_middle, 'select',
 				midSelectHandler);
 
@@ -1246,7 +1279,7 @@ function drawChart() {
 			// options.vAxis.viewWindow.min = coords.y.min;
 			// options.vAxis.viewWindow.max = coords.y.max;
 		}
-		bottom_middle.draw(mid_data, mid_options);
+		bottom_middle.draw(data, mid_options);
 	}
 
 	var right_data;
@@ -1300,10 +1333,11 @@ function drawChart() {
 
 					}
 				} else {
-					sentimentdata.setCell(ii, 0, new Date(time[2], time[1] - 1,
+					sentimentdata.setCell(ii--, 0, new Date(time[2] +"/"+ time[1] - 1+"/"+
 							time[0]));
 
 				}
+
 			}
 			var time2;
 			for (var iii = count; i < jsonData.length
@@ -1319,10 +1353,13 @@ function drawChart() {
 						columns.push('Extrapolation for ' + name);
 						series.push(sentimentdata.getNumberOfColumns() - 2);
 					}
-					sentimentdata.addRow();
-					sentimentdata.setCell(iii, 0, new Date(time2[2],
+					if (jsonData[i].Value != -1) {
+						sentimentdata.addRow();
+						sentimentdata.setCell(iii, 0, new Date(time2[2],
 							time2[1] - 1, time2[0]));
-					sentimentdata.setCell(iii, filt, jsonData[i].Value);
+
+						sentimentdata.setCell(iii, filt, jsonData[i].Value);
+					}
 				}
 			}
 		}
@@ -1344,7 +1381,7 @@ function drawChart() {
 						column : selectedItem.column,
 						row : selectedItem.row
 					} ]);
-					
+
 				}
 			} else {
 				bottom_middle.setSelection([]);
@@ -1770,11 +1807,15 @@ function wikiPosts() {
 }
 
 function requestTagcloud(polarity) {
+	requestTag = true;
 	var json = {
 		"Op" : "tagcloud",
 		"Id" : sessionStorage.id,
-		"Param" : month != undefined ? "Month" : undefined,
-		"Values" : month != undefined ? month : undefined,
+		//"Param" : "Month",
+		//"Values" : month,
+		"Day" : day,
+		"Month" : month,
+		"Year" : year !== undefined ? 1900 + year : undefined,
 		"Product" : product != undefined && product != "Global" ? product
 				: undefined,
 		'Key' : getCookie("JSESSIONID"),

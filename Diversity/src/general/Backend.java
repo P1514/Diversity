@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -155,31 +156,31 @@ public class Backend {
 				ids = msg.getJSONArray("IDs");
 				for (int i = 0; i < ids.length(); i++) {
 					obj = new JSONObject();
-					JSONObject	obj1 = ids.getJSONObject(i);
-				if (!obj1.has("User_ID") || !obj1.has("Role_ID")) {
-					if (!obj1.has("User_ID")) {
-						obj.put("Op", "Error");
-						result = new JSONArray();
-						result.put(obj);
-						result.put("User_ID was not sent");
-						return result.toString();
+					JSONObject obj1 = ids.getJSONObject(i);
+					if (!obj1.has("User_ID") || !obj1.has("Role_ID")) {
+						if (!obj1.has("User_ID")) {
+							obj.put("Op", "Error");
+							result = new JSONArray();
+							result.put(obj);
+							result.put("User_ID was not sent");
+							return result.toString();
+						}
+						if (!obj1.has("Role_ID")) {
+							obj.put("Op", "Error");
+							result = new JSONArray();
+							result.put(obj);
+							result.put("Role_ID was not sent");
+							return result.toString();
+						}
+					} else {
+						user1 = Data.getUser(obj1.getLong("User_ID"));
+						company1 = Data.getCompany(Data.getUser(obj1.getLong("User_ID")).getcompany_id());
+						obj.put("First_name", user1.getfirst_name());
+						obj.put("Last_name", user1.getlast_name());
+						obj.put("Company", company1.getName());
+						obj.put("Role", Data.getRolenameFromCR(obj1.getLong("Role_ID")));
 					}
-					if (!obj1.has("Role_ID")) {
-						obj.put("Op", "Error");
-						result = new JSONArray();
-						result.put(obj);
-						result.put("Role_ID was not sent");
-						return result.toString();
-					}
-				} else {
-					user1 = Data.getUser(obj1.getLong("User_ID"));
-					company1 = Data.getCompany(Data.getUser(obj1.getLong("User_ID")).getcompany_id());
-					obj.put("First_name", user1.getfirst_name());
-					obj.put("Last_name", user1.getlast_name());
-					obj.put("Company", company1.getName());
-					obj.put("Role", Data.getRolenameFromCR(obj1.getLong("Role_ID")));
-				}
-				result.put(obj);
+					result.put(obj);
 				}
 				return result.toString();
 			case 36:
@@ -331,28 +332,31 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						tag = new Tagcloud(
-								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
+								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
 					case "Negative":
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
+										msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
 						tag = new Tagcloud(
 								gp.getTop(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""),
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",
+										msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					}
 				} else {
 					tag = new Tagcloud(gp.getTop(param, values, id,
-							(msg.has("Product") ? msg.getString("Product") : "noproduct"), ""), id,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",
+							msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017), id,
 							msg.has("User") ? msg.getLong("User") : 0);
 				}
 
@@ -374,7 +378,8 @@ public class Backend {
 						// System.out.println("POSITIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1),
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
+										msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
@@ -382,19 +387,22 @@ public class Backend {
 						// System.out.println("NEGATIVE");
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50),
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
+										msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
 						tag = new Tagcloud(
 								gp.getTopWithPolarity(param, values, id,
-										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
+										(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+										msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 					}
 				} else {
 					tag = new Tagcloud(
 							gp.getTopWithPolarity(param, values, id,
-									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1),
+									(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+									msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 							id, msg.has("User") ? msg.getLong("User") : 0);
 				}
 				obj.put("Op", "words");
@@ -581,7 +589,7 @@ public class Backend {
 				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
 				result.put(mw);
 				LOGGER.log(Level.INFO, result.toString());
-				
+
 				return result.toString();
 
 			case 18:
@@ -629,14 +637,18 @@ public class Backend {
 			case 4:
 				if (msg.has("Product")) {
 					if (msg.has("word"))
-						tmp = gp.getTop(param, values, id, msg.getString("Product"), msg.getString("word")).toString();
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, msg.getString("Product"), msg.getString("word"),
+								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 					else
-						tmp = gp.getTop(param, values, id, msg.getString("Product"), null).toString();
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, msg.getString("Product"), null,
+								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				} else {
 					if (msg.has("word"))
-						tmp = gp.getTop(param, values, id, "noproduct", msg.getString("word")).toString();
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, "noproduct", msg.getString("word"),
+								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 					else
-						tmp = gp.getTop(param, values, id, "noproduct", null).toString();
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, "noproduct", null,
+								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				}
 				return tmp;
 			case 5:
@@ -730,9 +742,11 @@ public class Backend {
 					httpClient = HttpClientBuilder.create().build();
 
 					try {
-						HttpPost request = new HttpPost(link);
+						HttpGet request = new HttpGet(link);
+//						HttpPost request = new HttpPost(link);
 						request.addHeader("content-type", "application/json");
 						HttpResponse response2 = httpClient.execute(request);
+						LOGGER.log(Level.INFO, response2.toString());
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
