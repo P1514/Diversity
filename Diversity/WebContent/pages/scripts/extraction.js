@@ -37,6 +37,19 @@ $(window).on('load', function() {
 	}
 });
 
+function loadingscreen(){
+	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+	switch (choice){
+	case 1: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
+	case 2: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend seems to be hung up, please wait a little bit more...');break;
+	case 3: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Big amounts of data can take a long time, please wait...');break;
+	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
+	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
+	}
+	
+}
+var loadingtimer=window.setInterval(loadingscreen, 10000);
+
 $("#USER_LIST")
 		.on(
 				"change",
@@ -1451,6 +1464,7 @@ function drawChart() {
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);
+	window.clearInterval(loadingtimer);
 
 	if (!loaded) {
 		if (localStorage.tutorial != undefined

@@ -432,6 +432,19 @@ public final class Model {
 		return this.add_mediawiki;
 	}
 
+	public String getSources() {
+		String[] sources = this.uri.split(";");
+		String result="";
+		for(String s : sources) {
+			result+=s.split(",")[0]+",";
+		}
+		if(this.add_mediawiki) {
+			result+="mediawiki";
+		}else {
+			return result.substring(0, result.length()-1);
+		}
+		return result;
+	}
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
