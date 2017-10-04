@@ -42,6 +42,7 @@ public class Oversight extends TimerTask {
 	private HashMap<String, url> requesturl = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
+	private boolean loaddone = false;
 	private static final Logger LOGGER = new Logging().create(Oversight.class.getName());
 
 	/**
@@ -183,17 +184,20 @@ public class Oversight extends TimerTask {
 								if (!Settings.simulatedData)
 									(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
 								else {
-									Statement stmt=null;
-									String deleteOpinions = "delete from " + Settings.lotable;
-									String deletePosts = "delete from " + Settings.lptable;
-									stmt = cnlocal.createStatement();
-									stmt.execute(deleteOpinions);
-									stmt.close();
-									stmt = cnlocal.createStatement();
-									stmt.execute(deletePosts);
-									stmt.close();
-									(new Loader()).load(new JSONArray(
-											readUrl("http://localhost:8080/SimInterface/endpoints/getSimulatedData")));
+									if (!loaddone) {
+										loaddone = true;
+										Statement stmt = null;
+										String deleteOpinions = "delete from " + Settings.lotable;
+										String deletePosts = "delete from " + Settings.lptable;
+										stmt = cnlocal.createStatement();
+										stmt.execute(deleteOpinions);
+										stmt.close();
+										stmt = cnlocal.createStatement();
+										stmt.execute(deletePosts);
+										stmt.close();
+										(new Loader()).load(new JSONArray(readUrl(
+												"http://localhost:8080/SimInterface/endpoints/getSimulatedData")));
+									}
 								}
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -241,7 +245,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					});
-					
+
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -264,7 +268,7 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 			}
 		}
-		
+
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
@@ -273,8 +277,8 @@ public class Oversight extends TimerTask {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		Server.isloading=false;
+
+		Server.isloading = false;
 	}
 
 	private class url {

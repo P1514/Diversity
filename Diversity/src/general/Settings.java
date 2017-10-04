@@ -169,7 +169,7 @@ public class Settings {
 	public static final String geoip_uri = "https://freegeoip.net/json/";
 	
 	//public static final String JSON_uri = "https://diversity.euprojects.net/socialfeedbackextraction/getPosts/";
-	public static final boolean LocalPolarity = false; //to test data from simulated
+	public static final boolean LocalPolarity = true; //to test data from simulated
 	public static Boolean include_services = true;
 
 	// Received JSON Parameters
