@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
 					teamRoles[i] = users[i].Role;
+					userStorage[i] = users[i];
 			}
       //console.log(users);
 			var tmp = getMultipleParams("user");
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
-				$(#)
+				$('#all').click();
 			}
     }
 

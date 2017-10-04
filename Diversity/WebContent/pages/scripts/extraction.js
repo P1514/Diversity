@@ -48,8 +48,11 @@ $("#USER_LIST")
 					var json = {
 						"Op" : "tagcloud",
 						"Id" : sessionStorage.id,
-						"Param" : month != undefined ? "Month" : undefined,
-						"Values" : month != undefined ? month : undefined,
+						//"Param" : "Month",
+						//"Values" : month,
+						"Day" : day,
+						"Month" : month,
+						"Year" : year,
 						"Product" : product != undefined && product != "Global" ? product
 								: undefined,
 						'Key' : getCookie("JSESSIONID"),
@@ -400,8 +403,11 @@ function connect() {
 			var json = {
 				"Op" : "tagcloud",
 				"Id" : sessionStorage.id,
-				"Param" : month != undefined ? "Month" : undefined,
-				"Values" : month != undefined ? month : undefined,
+				//"Param" : "Month",
+				//"Values" : month,
+				"Day" : day,
+				"Month" : month,
+				"Year" : year,
 				"Product" : product != undefined && product != "Global" ? product
 						: undefined,
 				'Key' : getCookie("JSESSIONID"),
@@ -1104,14 +1110,14 @@ function drawChart() {
 				var time = jsonData[i].Date.split(" ");
 				if (jsonData[i].Value != 0) {
 
-					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
-							+ time[2])); // month comes as a number from
+					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
+							+ time[0])); // month comes as a number from
 					// server, if it changes use
 					// getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
-							+ time[2]));
+					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
+							+ time[0]));
 				}
 			}
 		}
@@ -1121,6 +1127,10 @@ function drawChart() {
 		}
 		finalProductColors = colors;
 		function midSelectHandler() {
+			var selection = bottom_middle.getSelection()[0];
+			var row = selection.row;
+			var col = selection.column;
+			console.log(sentimentdata.getValue(row, 0));
 			var selectedItem = bottom_middle.getSelection()[0] != undefined ? bottom_middle
 					.getSelection()[0]
 					: false;
@@ -1207,6 +1217,7 @@ function drawChart() {
 				max : start
 			}
 		}
+
 		google.visualization.events.addListener(bottom_middle, 'select',
 				midSelectHandler);
 
@@ -1248,7 +1259,7 @@ function drawChart() {
 			// options.vAxis.viewWindow.min = coords.y.min;
 			// options.vAxis.viewWindow.max = coords.y.max;
 		}
-		bottom_middle.draw(mid_data, mid_options);
+		bottom_middle.draw(data, mid_options);
 	}
 
 	var right_data;
@@ -1775,8 +1786,11 @@ function requestTagcloud(polarity) {
 	var json = {
 		"Op" : "tagcloud",
 		"Id" : sessionStorage.id,
-		"Param" : month != undefined ? "Month" : undefined,
-		"Values" : month != undefined ? month : undefined,
+		//"Param" : "Month",
+		//"Values" : month,
+		"Day" : day,
+		"Month" : month,
+		"Year" : year,
 		"Product" : product != undefined && product != "Global" ? product
 				: undefined,
 		'Key' : getCookie("JSESSIONID"),
