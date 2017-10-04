@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -636,17 +637,17 @@ public class Backend {
 			case 4:
 				if (msg.has("Product")) {
 					if (msg.has("word"))
-						tmp = gp.getTop(param, values, id, msg.getString("Product"), msg.getString("word"),
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, msg.getString("Product"), msg.getString("word"),
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 					else
-						tmp = gp.getTop(param, values, id, msg.getString("Product"), null,
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, msg.getString("Product"), null,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				} else {
 					if (msg.has("word"))
-						tmp = gp.getTop(param, values, id, "noproduct", msg.getString("word"),
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, "noproduct", msg.getString("word"),
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 					else
-						tmp = gp.getTop(param, values, id, "noproduct", null,
+						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN", id, "noproduct", null,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				}
 				return tmp;
@@ -741,9 +742,11 @@ public class Backend {
 					httpClient = HttpClientBuilder.create().build();
 
 					try {
-						HttpPost request = new HttpPost(link);
+						HttpGet request = new HttpGet(link);
+//						HttpPost request = new HttpPost(link);
 						request.addHeader("content-type", "application/json");
 						HttpResponse response2 = httpClient.execute(request);
+						LOGGER.log(Level.INFO, response2.toString());
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
