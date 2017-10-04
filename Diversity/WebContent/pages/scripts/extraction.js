@@ -79,6 +79,51 @@ function getCookie(name) {
 		return parts.pop().split(';').shift();
 }
 
+//Sends a message when a point in the bottom right chart is selected, which
+// will change the displayed posts in the table.
+function getPosts() {
+	var selection = bottom_right.getSelection()[0];
+	if (selection != undefined
+			&& (selection.hasOwnProperty('row') && selection.row != null)) {
+		var row = selection.row;
+		var col = selection.column;
+		month = monthNames[sentimentdata.getValue(row, 0).getMonth()];
+		product = sentimentdata.getColumnLabel(selection.column);
+
+		if (product != "Global" && filteredByProduct) {
+			json = {
+				"Op" : "getposts",
+				"Id" : sessionStorage.id,
+				"Param" : "Month",
+				"Values" : month,
+				"Product" : product,
+				'Key' : getCookie("JSESSIONID")
+			}
+		} else {
+			json = {
+				"Op" : "getposts",
+				"Id" : sessionStorage.id,
+				"Param" : "Month",
+				"Values" : month,
+				'Key' : getCookie("JSESSIONID")
+			}
+		}
+
+		ws.send(JSON.stringify(json));
+
+	} else {
+		month = undefined;
+		product = undefined;
+		json = {
+			"Op" : "getposts",
+			"Id" : sessionStorage.id,
+			'Key' : getCookie("JSESSIONID")
+		}
+
+		ws.send(JSON.stringify(json));
+	}
+}
+
 /*
  * Connects to the server and performs some initialization.
  */
@@ -110,52 +155,6 @@ function connect() {
 			.getElementById('reachline'));
 	bottom_right = new google.visualization.LineChart(document
 			.getElementById('globalline'));
-
-	// Sends a message when a point in the bottom right chart is selected, which
-	// will change the displayed posts in the table.
-	google.visualization.events.addListener(bottom_right, 'select', function() {
-		var selection = bottom_right.getSelection()[0];
-		if (selection != undefined
-				&& (selection.hasOwnProperty('row') && selection.row != null)) {
-			var row = selection.row;
-			var col = selection.column;
-			month = monthNames[sentimentdata.getValue(row, 0).getMonth()];
-			product = sentimentdata.getColumnLabel(selection.column);
-
-			if (product != "Global" && filteredByProduct) {
-				json = {
-					"Op" : "getposts",
-					"Id" : sessionStorage.id,
-					"Param" : "Month",
-					"Values" : month,
-					"Product" : product,
-					'Key' : getCookie("JSESSIONID")
-				}
-			} else {
-				json = {
-					"Op" : "getposts",
-					"Id" : sessionStorage.id,
-					"Param" : "Month",
-					"Values" : month,
-					'Key' : getCookie("JSESSIONID")
-				}
-			}
-
-			ws.send(JSON.stringify(json));
-
-		} else {
-			month = undefined;
-			product = undefined;
-			json = {
-				"Op" : "getposts",
-				"Id" : sessionStorage.id,
-				'Key' : getCookie("JSESSIONID")
-			}
-
-			ws.send(JSON.stringify(json));
-		}
-	});
-
 	document.getElementById("Cookie").innerHTML = "Model: "
 			+ window.sessionStorage.model + "; PSS: "
 			+ window.sessionStorage.pss;
@@ -429,10 +428,10 @@ google.charts.load('current', {
 $(document).ready(function() {
 	google.charts.setOnLoadCallback(connect);
 });
-$(window).load(function() {
+/*$(window).load(function() {
 	$('#overlay').hide();
 	$('#overlay-back').hide();
-});
+});*/
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
@@ -1117,7 +1116,8 @@ function drawChart() {
 						column : selectedItem.column,
 						row : selectedItem.row
 					} ]);
-					google.visualization.events.trigger(bottom_right, 'select');
+					//google.visualization.events.trigger(bottom_right, 'select');
+					getPosts();
 				}
 			} else {
 				bottom_right.setSelection([]);
@@ -1331,12 +1331,12 @@ function drawChart() {
 						column : selectedItem.column,
 						row : selectedItem.row
 					} ]);
-					google.visualization.events
-							.trigger(bottom_middle, 'select');
+					
 				}
 			} else {
 				bottom_middle.setSelection([]);
 			}
+			getPosts();
 		}
 
 		/*
@@ -1351,7 +1351,6 @@ function drawChart() {
 
 		var right_options = {
 			hAxis : {
-				format : 'MMM',
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
