@@ -289,7 +289,7 @@ public class Globalsentiment extends GetReach {
 		JSONObject obj;
 		obj = new JSONObject();
 		Model model = Data.getmodel(id);
-		double globalSentiment;
+		double globalSentiment=0;
 		if (model == null)
 			return Backend.error_message("Model not found");
 
@@ -327,12 +327,16 @@ public class Globalsentiment extends GetReach {
 			//System.out.println("Query:" + query1.toString());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
-			try (ResultSet rs = query1.executeQuery()) {
-				if (!rs.next())
-					globalSentiment = -1;
-				else
-					globalSentiment = rs.getDouble(1);
 
+			try (ResultSet rs = query1.executeQuery()) {
+				if (!rs.next()) {
+					globalSentiment = getLastSentiment(model);
+				}
+				else
+					if(rs.getDouble(1)!=0)
+					globalSentiment = rs.getDouble(1);
+					else
+						globalSentiment = getLastSentiment(model);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error", e);
@@ -806,6 +810,25 @@ public class Globalsentiment extends GetReach {
 
 		return result;
 
+	}
+	private Double getLastSentiment(Model model) {
+		int month;
+		double tempvalue, globalSentiment=0;
+		Calendar today = Calendar.getInstance();
+		Calendar firstdate = Calendar.getInstance();
+		Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", model.getPSS(), "0,150", "All", "-1", false, 0, 0, -1, true));
+		firstdate.setTimeInMillis(firstDate(-1));
+		Data.delmodel((long) -1);
+		Calendar data = firstdate;
+		for (month = firstdate.get(Calendar.MONTH); today.after(data); data.add(Calendar.MONTH, 1)) {
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", model.getPSS(), "0,150", "All", "-1", false, 0, 0, -1, true));
+			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+					data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+			if(tempvalue!=-1)
+				globalSentiment=tempvalue;
+		}	
+		return globalSentiment;
+		
 	}
 
 	private void dbconnect() throws ClassNotFoundException, SQLException {
