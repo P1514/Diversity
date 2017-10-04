@@ -51,7 +51,7 @@ public class GetPosts {
 	 * @throws JSONException
 	 *             in case creating json error occurs
 	 */
-	public JSONArray getTop(String param, String month, long id, String product, String word) throws JSONException {
+	public JSONArray getTop(String param, String month, long id, String product, String word, int day, int year) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -96,7 +96,7 @@ public class GetPosts {
 
 			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
 			try {
-				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + month));
+				inputdate.setTime(sdf.parse(day + " " + year + " " + month));
 			} catch (ParseException e1) {
 				LOGGER.log(Level.INFO, "ERROR", e1);
 				insert = insert.replace(
@@ -250,7 +250,7 @@ public class GetPosts {
 	}
 
 	public JSONArray getTopWithPolarity(String param, String month, long id, String product, String word, int min,
-			int max) throws JSONException {
+			int max, int day, int year) throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -298,7 +298,7 @@ public class GetPosts {
 
 			SimpleDateFormat sdf = new SimpleDateFormat("d yyyy MMM", Locale.ENGLISH);
 			try {
-				inputdate.setTime(sdf.parse("1 " + inputdate.get(Calendar.YEAR) + " " + month));
+				inputdate.setTime(sdf.parse(day + " " + year + " " + month));
 			} catch (ParseException e1) {
 				LOGGER.log(Level.INFO, "ERROR", e1);
 				insert = insert.replace(
@@ -504,9 +504,9 @@ public class GetPosts {
 			insert += " AND gender=?";
 		if (par.location != null)
 			insert += " AND location=?";
-		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=?)";
+		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=? ";
+		insert += " AND source in (?))";
 		// ResultSet rs = null;
-
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -532,8 +532,9 @@ public class GetPosts {
 			 * inputdate.add(Calendar.YEAR, -1); query1.setLong(rangeindex,
 			 * inputdate.getTimeInMillis()); rangeindex++;
 			 */
-			query1.setLong(rangeindex, model.getDate());
-
+			query1.setLong(rangeindex++, model.getDate());
+			query1.setString(rangeindex++, model.getSources());
+			LOGGER.log(Level.INFO,query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");
