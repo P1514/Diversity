@@ -230,7 +230,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					});
-					Server.isloading=false;
+					
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -253,6 +253,7 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 			}
 		}
+		
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
@@ -261,6 +262,8 @@ public class Oversight extends TimerTask {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Server.isloading=false;
 	}
 
 	private class url {

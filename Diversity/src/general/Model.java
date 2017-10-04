@@ -224,8 +224,8 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-
-		Monitor.update(msg.getString("URI"), pss);
+		if("".equals(uri))
+			Monitor.update(uri, pss);
 		return result;
 
 	}
@@ -242,6 +242,7 @@ public final class Model {
 	public JSONArray update_model(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
+		String uri = msg.has("URI") ? msg.getString("URI") : "";
 		Boolean delete = msg.has("Archive") ? msg.getBoolean("Archive") : false;
 		int rangeindex = 1;
 		if (!msg.get("Name").equals(this.name)
@@ -252,7 +253,7 @@ public final class Model {
 			result.put(obj);
 			return result;
 		}
-		String product = new String();
+		String product = "";
 
 		String insert = "Update " + Settings.lmtable
 				+ " Set "/*
@@ -277,7 +278,7 @@ public final class Model {
 
 			if (!delete) {
 				query1.setString(rangeindex++, products);
-				query1.setString(rangeindex++, msg.getString("URI").equals("true") ? "" : msg.getString("URI"));
+				query1.setString(rangeindex++, uri);
 				query1.setInt(rangeindex++, msg.getInt("Update"));
 				if (msg.has("mediawiki")) {
 					query1.setBoolean(rangeindex++, true);
@@ -314,16 +315,17 @@ public final class Model {
 
 		}
 
-		this.uri = msg.getString("URI");
+		this.uri = uri;
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = product.equals("") ? "," : product;
+		this.products = product.equals("") ? "" : product;
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
 		obj.put("Message", "Successfully updated model " + msg.getString("Name"));
 		result.put(obj);
-		Monitor.update(msg.getString("URI"), pss);
+		if(!"".equals(uri))
+		Monitor.update(uri, pss);
 		return result;
 	}
 

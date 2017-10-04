@@ -23,11 +23,11 @@ import general.Settings;
 import general.User;
 
 public class Snapshot {
-	
+
 	private static final String ALL_SNAPSHOTS = "all";
 	private static final String EXTRACTION_SNAPSHOTS = "extraction";
 	private static final String PREDICTION_SNAPSHOTS = "prediction";
-	
+
 	private static final Logger LOGGER = new Logging().create(Snapshot.class.getName());
 	private final Backend b;
 
@@ -43,7 +43,7 @@ public class Snapshot {
 		ResultSet rs;
 		Connection cnlocal;
 		try {
-			cnlocal=Settings.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return false;
@@ -123,7 +123,7 @@ public class Snapshot {
 			e.printStackTrace();
 		}
 		result = b.resolve();
-		//System.out.println("TEST" + result);
+		// System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 
 	}
@@ -203,7 +203,7 @@ public class Snapshot {
 		ResultSet rs;
 		Connection cnlocal;
 		try {
-			cnlocal=Settings.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
@@ -250,13 +250,14 @@ public class Snapshot {
 		}
 		Connection cnlocal;
 		try {
-			cnlocal=Settings.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT " + Settings.lsstable_result + "," + Settings.lsstable_creation_user + "," + Settings.lsstable_creation_date + "," + Settings.lsstable_model_id + " FROM " + Settings.lsstable + " where "
-				+ Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
+		String insert = new String("SELECT " + Settings.lsstable_result + "," + Settings.lsstable_creation_user + ","
+				+ Settings.lsstable_creation_date + "," + Settings.lsstable_model_id + " FROM " + Settings.lsstable
+				+ " where " + Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
 		long model;
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
@@ -265,10 +266,20 @@ public class Snapshot {
 			else
 				query1.setString(2, type);
 			try (ResultSet rs = query1.executeQuery()) {
-				if(!rs.next()) return "";
+				if (!rs.next())
+					return "";
 				JSONArray json = new JSONArray(rs.getString("result"));
 				JSONObject obj = new JSONObject();
-				obj.put("User", rs.getString("creation_user"));
+				String _userS = rs.getString("creation_user");
+				User _user;
+				try {
+					_user = Data.getUser(Long.parseLong(_userS));
+				} catch (NumberFormatException e) {
+					_user = null;
+				}
+				String user_name = _user != null ? _user.getUserName() : _userS;
+				 
+				obj.put("User", user_name);
 				obj.put("Date", new Date(rs.getLong("creation_date")));
 				model = rs.getLong("model_id");
 				if (Data.getmodel(model) != null) {
@@ -287,8 +298,7 @@ public class Snapshot {
 				LOGGER.log(Level.INFO, error, e);
 			}
 		}
-		
-		
+
 	}
 
 	// pss = -1 returns all snapshots from all PSS
@@ -300,35 +310,33 @@ public class Snapshot {
 		ResultSet rs;
 		Connection cnlocal;
 		try {
-			cnlocal=Settings.connlocal();
+			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error", e);
 			return null;
 		}
-		String insert;
-		
-		if (pss == -1) {
-			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_type + " like ?");
-		} else {
-			insert = new String("Select * from " + Settings.lsstable + " where " + Settings.lsstable_model_id
-					+ " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable + " where " + Settings.lmtable_pss
-					+ "=?) AND "+Settings.lsstable_type+" like '%all%'");
+		String insert = new String("Select * from " + Settings.lsstable + " where ");
+
+		if (pss != -1) {
+			insert += Settings.lsstable_model_id + " in (SELECT " + Settings.lmtable_id + " FROM " + Settings.lmtable
+					+ " where " + Settings.lmtable_pss + "=?) AND ";
 		}
-		
+
+		if ("all".equals(type)) {
+			insert += " (type = 'all' OR type = 'prediction')";
+		} else {
+			insert += " type = ?";
+		}
+
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			int i = 1;
 			if (pss != -1) {
 				query1.setInt(i++, pss);
-			} else {
-				if (type.equals(ALL_SNAPSHOTS)) {
-					query1.setString(i++, "%%");
-				} else if (type.equals(EXTRACTION_SNAPSHOTS)) {
-					query1.setString(i++, "%all%");
-				} else if (type.endsWith(PREDICTION_SNAPSHOTS)) {
-					query1.setString(i++, PREDICTION_SNAPSHOTS);
-				}
 			}
-
+			if (!"all".equals(type)) {
+				query1.setString(i++, type);
+			}
+			LOGGER.log(Level.INFO, "GetSnapshots Query => "+ query1.toString());
 			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
 			// rs.next();//verify
@@ -337,13 +345,13 @@ public class Snapshot {
 				obj.put("Name", rs.getString("name"));
 				String _userS = rs.getString("creation_user");
 				User _user;
-				try{
-				_user = Data.getUser(Long.parseLong(_userS));
-				}catch(NumberFormatException e) {
-					_user=null;
+				try {
+					_user = Data.getUser(Long.parseLong(_userS));
+				} catch (NumberFormatException e) {
+					_user = null;
 				}
 				String user_name = _user != null ? _user.getUserName() : _userS;
-				obj.put("Id", rs.getString("id") );
+				obj.put("Id", rs.getString("id"));
 				obj.put("User", user_name);
 				obj.put("Type", rs.getString("type"));
 				aux.put(obj);
