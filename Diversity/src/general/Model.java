@@ -224,7 +224,7 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-		if("".equals(uri))
+		if(!"".equals(uri))
 			Monitor.update(uri, pss);
 		return result;
 
