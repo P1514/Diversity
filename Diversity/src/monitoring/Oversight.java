@@ -26,6 +26,7 @@ import extraction.Globalsentiment;
 import general.Data;
 import general.Loader;
 import general.Logging;
+import general.Server;
 import general.Settings;
 
 /**
@@ -84,7 +85,7 @@ public class Oversight extends TimerTask {
 	 */
 	@Override
 	public void run() {
-
+		Server.isloading = true;
 		// TODO Introduce here loading PSS's and Products and save them on
 		// static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
@@ -240,7 +241,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					});
-
+					
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -263,6 +264,7 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 			}
 		}
+		
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
@@ -271,6 +273,8 @@ public class Oversight extends TimerTask {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Server.isloading=false;
 	}
 
 	private class url {

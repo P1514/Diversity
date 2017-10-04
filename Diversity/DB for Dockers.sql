@@ -48,35 +48,6 @@ INSERT INTO `access_rights` VALUES ('ADMIN',NULL,1,1,1,1,1,1),('Business Costume
 UNLOCK TABLES;
 
 --
--- Table structure for table `acess_rights`
---
-
-DROP TABLE IF EXISTS `acess_rights`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `acess_rights` (
-  `role` varchar(50) NOT NULL,
-  `description` varchar(500) DEFAULT NULL,
-  `view_opinion_model` bit(1) DEFAULT NULL,
-  `create_edit_delete_model` bit(1) DEFAULT NULL,
-  `view_opinion_results` bit(1) DEFAULT NULL,
-  `save_delete_snapshots` bit(1) DEFAULT NULL,
-  `use_opinion_prediction` bit(1) DEFAULT NULL,
-  PRIMARY KEY (`role`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `acess_rights`
---
-
-LOCK TABLES `acess_rights` WRITE;
-/*!40000 ALTER TABLE `acess_rights` DISABLE KEYS */;
-INSERT INTO `acess_rights` VALUES ('BUS_PART',NULL,'\0','\0','\0','\0','\0'),('DESIGNER',NULL,'','','','',''),('PROD_MAN',NULL,'\0','\0','','\0','\0'),('SYS_ENG',NULL,'','\0','','\0','\0');
-/*!40000 ALTER TABLE `acess_rights` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `authors`
 --
 
@@ -453,4 +424,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-09-28 15:56:37
+-- Dump completed on 2017-09-29 16:15:39

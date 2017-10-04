@@ -95,15 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "Error") {
       if(json[0].hasOwnProperty('id')){
 
-        if (document.getElementById("submit").value.toLowerCase() == "create") {
-          $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
-            var post = '//diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=' +localStorage.user + '&design_project_id=' + json[1].dp + '&status=1&lat=' + data.latitude + '&lng=' + data.longitude;
-            $.post(post);
-            console.log(post);
-          });
-        }
-
-  		  var id = json[0].id;
+        var id = json[0].id;
   		  var code = json[0].Message +  '<br> Do you want to create another model? <br><br><button class="btn btn-default" id="yes" onclick="location.href =\'models.html\'">Yes</button> <button class="btn btn-default" id="no" onclick="sessionStorage.Id=\'model=\'+id;location.href =\'index.html\';">No</button>';
   		  $('#alert').html(code);
   		  $('#overlay').show();
@@ -506,16 +498,21 @@ function addline() {
 
     if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
       name = "Facebook";
+      var tmp = value.split("/");
+      value = tmp[tmp.length - 1];
     }
 
     if (value.toLowerCase().indexOf("twitter") != -1) {
       name = "Twitter";
+      var tmp = value.split("/");
+      value = tmp[tmp.length - 1];
     }
 
-    var tmp = value.split("/");
-    value = tmp[tmp.length - 1];
-
-
+    if (value.toLowerCase().indexOf("amazon") != -1) {
+      name = "Amazon"
+      var tmp = value.split("/dp/");
+      value = tmp[tmp.length - 1];
+    }
   }
 
   $('#table_div2').append(
@@ -664,7 +661,7 @@ function send_config() {
     }
   var jsonData = {
     "Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
-    "URI" : configs != "" ? configs : document.getElementById('mediawikibox').checked ? "mediawiki" : erro = true,
+    "URI" : configs != "" ? configs : document.getElementById('mediawikibox').checked ? undefined : erro = true,
     "Update" : document.getElementById('frequency').value != "" ? document
         .getElementById('frequency').value
         : erro = true,
@@ -678,7 +675,7 @@ function send_config() {
     "Products" : final_products,
     "Archive" : false,
     "Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
-    "User" : 1,//TODO find this field
+    "User" : localStorage.user,
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),

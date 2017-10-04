@@ -73,7 +73,6 @@ public class Loader {
 	}
 
 	public String loadinit() throws JSONException{
-		Server.isloading = true;
 		users = new ArrayList<String>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
@@ -94,7 +93,7 @@ public class Loader {
 		err = loadmodels();
 		if (err != null)
 			return err;
-		Server.isloading=false;
+		
 		return null;
 	}
 	private String loadp1(JSONArray json) throws JSONException {
@@ -718,6 +717,7 @@ public class Loader {
 			if(a==null) continue;
 			a.getID();
 			querycond += a.getID() + ",";
+
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
@@ -1083,6 +1083,7 @@ public class Loader {
 		return null;
 	}
 
+
 //	private String loaduopid() throws JSONException {
 //		String err = null;
 //		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
@@ -1162,6 +1163,7 @@ public class Loader {
 //		}
 //		return err;
 //	}
+
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {
 		try {

@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
 
-
 /**
  * The Class Data.
  */
@@ -24,10 +23,10 @@ public class Data {
 
 	/** The designProjectdb. */
 	protected static final ConcurrentHashMap<Long, DesignProject> designProjectdb = new ConcurrentHashMap<>();
-	
+
 	/** The userdb. */
 	protected static final ConcurrentHashMap<Long, User> userdb = new ConcurrentHashMap<>();
-	
+
 	/** The servicedb. */
 	protected static final ConcurrentHashMap<Long, Product> servicedb = new ConcurrentHashMap<>();
 
@@ -62,7 +61,6 @@ public class Data {
 		}
 
 	}
-	
 
 	public static boolean usercheck(String id, int op) {
 		if (!security_users.containsKey(id))
@@ -103,6 +101,56 @@ public class Data {
 		return new Role();
 	}
 
+	public static String getRolesFromCR() {
+		String roles = "";
+
+		// Connection cncr = null;
+		PreparedStatement query1 = null;
+
+		try (Connection cncr = Settings.conncr();) {
+			String query = "SELECT name FROM diversity_common_repository.user_role;";
+			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+
+			try (ResultSet rs = query1.executeQuery(query)) {
+				while (rs.next()) {
+					roles += "," + rs.getString(1);
+				}
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+
+		return roles;
+	}
+
+	public static String getRolenameFromCR(long id) {
+		String role = "";
+
+		// Connection cncr = null;
+		PreparedStatement query1 = null;
+
+		try (Connection cncr = Settings.conncr();) {
+			String query = "SELECT name FROM diversity_common_repository.user_role where id = ";
+			query += id;
+			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+			
+			try (ResultSet rs = query1.executeQuery(query)) {
+				while(rs.next())
+				role = rs.getString(1);
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+
+		return role;
+	}
+
 	public static Model getmodel(long id) {
 		if (modeldb.containsKey(id))
 			return modeldb.get(id);
@@ -125,7 +173,7 @@ public class Data {
 	public static Collection<PSS> dbpssall() {
 		return pssdb.values();
 	}
-	
+
 	public static Collection<DesignProject> dbdpall() {
 		return designProjectdb.values();
 	}
@@ -136,25 +184,29 @@ public class Data {
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
 		return null;
 	}
-	
+
 	public static DesignProject getDp(long id) {
 		if (designProjectdb.containsKey(id))
 			return designProjectdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get Designproject");
 		return null;
 	}
-	
+
+	public static ConcurrentHashMap<Long, DesignProject> getallDp() {
+		return designProjectdb;
+	}
+
 	public static User getUser(long id) {
 		if (userdb.containsKey(id))
 			return userdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get user");
 		return null;
 	}
-	
+
 	public static Collection<User> dbuserall() {
 		return userdb.values();
 	}
-	
+
 	public static Company getCompany(long id) {
 		if (companydb.containsKey(id))
 			return companydb.get(id);
@@ -242,7 +294,7 @@ public class Data {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Identify product by message.
 	 *
@@ -259,7 +311,5 @@ public class Data {
 
 		return 0;
 	}
-	
-	
 
 }

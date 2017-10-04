@@ -64,9 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		if (json[0].Op == "Roles") {
-			roles = json[1].Roles.substring(0, json[1].Roles.length - 1).split(',');
+			roles = json[1].Roles.substring(1, json[1].Roles.length).split(',');
 			//console.log(roles);
-			json2 = {
+			var json2 = {
 				"Op" : "collaboration",
 				'Key' : getCookie("JSESSIONID"),
 				'Products' : getParam('products'),
@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			ws.send(JSON.stringify(json2));
 		}
 
+
+
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
       draw = true;
@@ -85,19 +87,53 @@ document.addEventListener('DOMContentLoaded', function() {
 					teamRoles[i] = users[i].Role;
 			}
       //console.log(users);
+			var tmp = getMultipleParams("user");
+			var users2 = [];
+			for (var i = 0; i < tmp.length; i++) {
+				users2.push({
+					'User_ID' : tmp[i].split(',')[0],
+					'Role_ID' : tmp[i].split(',')[1]
+				});
+			}
+			var json3 = {
+				'Op': 'get_user_roles',
+				'IDs' : users2,
+				'Key' : getCookie("JSESSIONID"),
+			}
+
+			ws.send(JSON.stringify(json3));
 
       drawTable();
+
 
 			if (getParam('products') === undefined && getParam('services') === undefined && getParam('company') === undefined) {
 				$('#all').click();
 				$('#unranked').click();
 			}
-	    
+
 	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
 			}
     }
+
+		if (json[0].Op == "names") {
+			for (var i = 0; i < json.length; i++) {
+				if (!json[i].hasOwnProperty('Op')) {
+					console.log(i);
+					for (var j = 0; j < userStorage.length; j++) {
+						console.log(userStorage[j]);
+						var name1 = json[i].First_name + ' ' + json[i].Last_name;
+						var name2 = userStorage[j].First_name + ' ' + userStorage[j].Last_name;
+						if (name1 == name2 /*&& json[i].Company == availableUsers[i].Company*/) {
+							userStorage[j].Role = json[i].Role;
+							addMember(j);
+
+						}
+					}
+				}
+			}
+		}
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
@@ -174,6 +210,20 @@ function getParam(param) {
 	}
 }
 
+function getMultipleParams(param) {
+  var query = location.search.substr(1);
+  var params = query.split("&");
+  var result = [];
+  for(var i=0; i<params.length; i++) {
+    var item = params[i].split("=");
+		if (item[0] == param) {
+		  result.push(item[1]);
+			console.log(item[1]);
+		}
+  }
+  return result;
+}
+
 $('#all').change(function() {
     // this will contain a reference to the checkbox
 		drawTable();
@@ -204,8 +254,9 @@ function addMember(position) {
 		'<select id="role' + position +'">' + rolesOptions + '</select>' +
 		'</td><td style="padding:2px;" class="company">' + company + '</td><td style="padding-right:10px;padding-left:2px;padding-top:2px;padding-bottom:2px;" class="rating">' + rating + '</td></tr>');
 		$('#user_' + position).remove();
-		availableUsers.splice(availableUsers.indexOf(user, 1));
 		team.push(user);
+		availableUsers.splice(availableUsers.indexOf(user));
+
 
 		var options = {
 			valueNames: [ 'name', 'role', 'company', 'rating']
@@ -244,21 +295,58 @@ function removeMember(position) {
 		var userList = new List('table', options);
 	}
 	$('#team_' + position).remove();
-	team.splice(team.indexOf(user, 1));
+	team.splice(team.indexOf(user));
 
+}
+
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+
+    // Check if the XMLHttpRequest object has a "withCredentials" property.
+    // "withCredentials" only exists on XMLHTTPRequest2 objects.
+    xhr.open(method, url, true);
+
+  } else if (typeof XDomainRequest != "undefined") {
+
+    // Otherwise, check if XDomainRequest.
+    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+
+  } else {
+
+    // Otherwise, CORS is not supported by the browser.
+    xhr = null;
+
+  }
+  return xhr;
 }
 
 function submit() {
 	var result = [];
+
 	var transaction = {
 		'transactionId' : getParam('transactionId')
 	}
 	result.push(transaction);
+
 	for (var i = 0; i < team.length; i++) {
 		team[i].Role = $('#role' + team[i].Position).val();
 		result.push(team[i]);
 		//console.log(team[i].Role);
 	}
+
+
+	var json = {
+		'Op' : 'send_collab',
+		'Message' : result,
+		'Key' : getCookie('JSESSIONID'),
+	};
+
+	ws.send(JSON.stringify(json));
+
+/*
 	$(function () {
 		$.ajax({
 	  	type: "POST",
@@ -268,4 +356,6 @@ function submit() {
 	  });
 	});
 	//console.log(JSON.stringify(result));
+*/
+
 }
