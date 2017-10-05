@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -482,9 +483,9 @@ public class BackendTest extends Thread {
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "collaboration");
-		obj.put("Products", "71,74");
-		obj.put("Services", "69,66");
-		obj.put("Company", "DESMA");
+		//obj.put("Products", "71,74");
+		//obj.put("Services", "69,66");
+		//obj.put("Company", "DESMA");
 		obj.put("Key", "10");
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
@@ -504,6 +505,29 @@ public class BackendTest extends Thread {
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
+
+		
+	}
+	@Test
+	public void resolveGet_user_roles() throws JSONException {
+		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
+		new Backend(22, obj1).resolve();
+		obj = new JSONObject();
+		obj.put("Op", "get_user_roles");
+		obj.put("Key", "10");
+		JSONArray arr = new JSONArray();
+		JSONObject obj2 = new JSONObject();
+		obj2.put("User_ID", 1);
+		obj2.put("Role_ID", 2);
+		arr.put(obj2);
+		obj2 = new JSONObject();
+		obj2.put("User_ID", 2);
+		obj2.put("Role_ID", 4);
+		arr.put(obj2);
+		obj.put("IDs", arr);
+		System.out.println(obj.toString());
+		tester = new Backend(37, obj);
+		System.out.println("Get_user_roles Test Output: " + tester.resolve().toString());
 
 		
 	}

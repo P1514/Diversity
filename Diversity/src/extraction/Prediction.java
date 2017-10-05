@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.json.JSONArray;
@@ -598,17 +599,20 @@ public class Prediction extends Globalsentiment {
 			return null;
 		}
 
-		Calendar data = Calendar.getInstance();
-		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -1);
+
 
 		totalWeight = 0;
 		totalGsweight = 0;
-
+		Calendar today = Calendar.getInstance();
+		
 		pssweights.forEach((k, v) -> {
-			for (month = data.get(Calendar.MONTH); month < 12 + data.get(Calendar.MONTH); month++) {
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
+			firstdate.setTimeInMillis(firstDate(-1));
+			Data.delmodel((long) -1);
+			Calendar data = firstdate;
+			for (month = firstdate.get(Calendar.MONTH); today.after(data); data.add(Calendar.MONTH, 1)) {
 				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12,
+				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
@@ -633,7 +637,12 @@ public class Prediction extends Globalsentiment {
 		ArrayList<Long> dp;
 
 		try {
-			dp = Data.getcompanybyname(company).get_design_projects();
+
+			if (company.equals("")) {
+				Set<Long> keySet = Data.getallDp().keySet();
+				dp = new ArrayList<Long>(keySet);
+			} else
+				dp = Data.getcompanybyname(company).get_design_projects();
 
 		} catch (Exception e1) {
 			// LOGGER.log(Level.SEVERE, "Company does not exist",e1);
@@ -651,19 +660,19 @@ public class Prediction extends Globalsentiment {
 			return null;
 		}
 
-		Calendar data = Calendar.getInstance();
-		data.add(Calendar.MONTH, 1);
-		data.add(Calendar.YEAR, -1);
-
 		totalWeight = 0;
 		totalGsweight = 0;
+		Calendar today = Calendar.getInstance();
 
 		for (Long pssid : pss) {
 
-			for (month = data.get(Calendar.MONTH); month < 12 + data.get(Calendar.MONTH); month++) {
-				Data.addmodel((long) -1,
-						new Model(-1, 0, 0, "", "", pssid, "0,150", "All", "-1", false, 0, 0, -1, true));
-				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month % 12,
+			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", pssid, "0,150", "All", "-1", false, 0, 0, -1, true));
+			firstdate.setTimeInMillis(firstDate(-1));
+			Data.delmodel((long) -1);
+			Calendar data = firstdate;
+			for (month = firstdate.get(Calendar.MONTH); today.after(data); data.add(Calendar.MONTH, 1)) {
+				Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", pssid, "0,150", "All", "-1", false, 0, 0, -1, true));
+				tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 						data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : tempvalue);
 				Data.delmodel((long) -1);

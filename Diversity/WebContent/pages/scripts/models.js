@@ -661,7 +661,7 @@ function send_config() {
     }
   var jsonData = {
     "Op" : document.getElementById("submit").value.toLowerCase()+"_model",//create or update
-    "URI" : configs != "" ? configs : document.getElementById('mediawikibox').checked ? "mediawiki" : erro = true,
+    "URI" : configs != "" ? configs : document.getElementById('mediawikibox').checked ? undefined : erro = true,
     "Update" : document.getElementById('frequency').value != "" ? document
         .getElementById('frequency').value
         : erro = true,
