@@ -432,13 +432,26 @@ public final class Model {
 		return this.add_mediawiki;
 	}
 
-	public String getSources() {
+	public String getSources(boolean all) {
 		String[] sources = this.uri.split(";");
 		String result="";
 		for(String s : sources) {
 			result+=s.split(",")[0]+",";
 		}
-		if(this.add_mediawiki) {
+		if(this.add_mediawiki && all) {
+			result+="mediawiki";
+		}else {
+			return result.substring(0, result.length()-1);
+		}
+		return result;
+	}
+	public String getAccounts(boolean all) {
+		String[] sources = this.uri.split(";");
+		String result="";
+		for(String s : sources) {
+			result+=s.split(",")[1]+",";
+		}
+		if(this.add_mediawiki && all) {
 			result+="mediawiki";
 		}else {
 			return result.substring(0, result.length()-1);

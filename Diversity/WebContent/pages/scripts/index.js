@@ -213,7 +213,7 @@ ws.onmessage = function(event) {
     } else if (localStorage.dp !== undefined) {
       dp = localStorage.dp;
     }
-
+    
     dp = dp.replace(/%20/g," ");
     var jsonData = {
         'Op' : 'getmodels',
