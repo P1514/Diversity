@@ -214,7 +214,7 @@ public class Backend {
 				obj = new JSONObject();
 				obj.put("Op", "OE_Redone");
 				result.put(obj);
-				result = convert(result, gp.getAmmount(true,param, values, "Global", id), "Graph", "Top_Left");
+
 				for (int i = 0; i < filter.length; i++) {
 
 					result = convert(result,
@@ -599,8 +599,8 @@ public class Backend {
 				result.put(obj);
 				// System.out.println("TEST:"+gp.getAmmount(param, values,
 				// "Global", id).getJSONObject(1).getInt("Value"));
-				if (gp.getAmmount(false,param, values, "Global", id).getJSONObject(1).getInt("Value") != 0) {
-					result = convert(result, gp.getAmmount(false,param, values, "Global", id), "Graph", "Top_Left");
+				if (gp.getAmmount(param, values, "Global", id).getJSONObject(1).getInt("Value") != 0) {
+					result = convert(result, gp.getAmmount(param, values, "Global", id), "Graph", "Top_Left");
 					result = convert(result, gs.getPolarityDistribution(id, param, values, "Global"), "Graph",
 							"Top_Middle");
 					result = convert(result, gs.getCurSentiment(param, values, id, Data.getmodel(id).getFrequency()),
