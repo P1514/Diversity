@@ -24,7 +24,6 @@ public class Opinion {
 	private long timestamp;
 	private long pss;
 	private long product;
-	private String account = "";
 
 	/**
 	 * Instantiates a new opinion.
@@ -36,15 +35,15 @@ public class Opinion {
 	 * @param _product
 	 *            the product id
 	 */
-	// public Opinion(Post _main, long _pss, long _product) {
-	// this.main = _main;
-	// this.author_id2 = main.getUID();
-	// timestamp = main.getTime();
-	// pss = _pss;
-	// product = _product;
-	// this.id = this.main.getID();
-	//
-	// }
+//	public Opinion(Post _main, long _pss, long _product) {
+//		this.main = _main;
+//		this.author_id2 = main.getUID();
+//		timestamp = main.getTime();
+//		pss = _pss;
+//		product = _product;
+//		this.id = this.main.getID();
+//
+//	}
 
 	/**
 	 * Instantiates a new opinion.
@@ -56,16 +55,16 @@ public class Opinion {
 	 * @param _product
 	 *            the product id
 	 * @param _URI
-	 *            the source and account list Example:"facebook,shoes;twitter,run;"
+	 *            the source and account list
+	 *            Example:"facebook,shoes;twitter,run;"
 	 */
-	public Opinion(Post _main, long _pss, long _product, String _source, String _account) {
+	public Opinion(Post _main, long _pss, long _product, String _source) {
 		this.main = _main;
 		this.author_id2 = main.getUID();
 		timestamp = main.getTime();
 		pss = _pss;
 		product = _product;
 		source = _source;
-		account = _account;
 		this.id = this.main.getID();
 
 	}
@@ -106,16 +105,6 @@ public class Opinion {
 	// }
 	//
 
-	private void evalPolaritywiki() {
-
-		comments.forEach((k, v) -> {
-			polarity += v.getPolarity();
-		});
-
-		polarity = polarity / ncomments();
-
-	}
-
 	/**
 	 * Calculate polarity 2.
 	 *
@@ -123,28 +112,26 @@ public class Opinion {
 	 *            the authordb
 	 */
 	public void evalPolarity2(ConcurrentHashMap<String, Author> authordb) {
-		if ("wiki".equals(getSource()) || "mediawiki".equals(getSource())) {
-			evalPolaritywiki();
-			return;
-		}
-		// authordb.forEach((k, v) -> {
-		// System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
-		//
-		// });
-		// System.out.println(author_id2);
+
+//		authordb.forEach((k, v) -> {
+//			System.out.println("Id:(" + k + ") AuthorId-->" + v.getID());
+//
+//		});
+		//System.out.println(author_id2);
 		Author auth = authordb.get(author_id2 + "," + source);
 		total_inf = auth.getInfluence();
 		polarity = total_inf * main.getPolarity();
 
 		comments.forEach((k, v) -> {
-			// System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
-
-			if (v.getSource() != null) {
-				total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
-				polarity += v.getPolarity() * authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
-			} else {
+			//System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
+			
+			if(v.getSource()!=null){
+			total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()+ "," + v.getSource()).getInfluence();
+			}
+			else{
 				total_inf += authordb.get(v.getUID()).getInfluence();
-				polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
+			polarity += v.getPolarity() * authordb.get(v.getUID()).getInfluence();
 			}
 		});
 
@@ -169,7 +156,6 @@ public class Opinion {
 	public double getPolarity() {
 		return polarity;
 	}
-
 	/**
 	 * Gets the polarity.
 	 *
@@ -178,6 +164,7 @@ public class Opinion {
 	public String getSource() {
 		return source;
 	}
+
 
 	/**
 	 * Gets the reach.
@@ -317,10 +304,6 @@ public class Opinion {
 			num += i.getViews();
 		}
 		return num;
-	}
-
-	public String getAccount() {
-		return this.account;
 	}
 
 	/**

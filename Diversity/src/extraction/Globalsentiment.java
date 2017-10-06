@@ -302,7 +302,7 @@ public class Globalsentiment extends GetReach {
 		 * values, id, frequency);
 		 */
 
-		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? and account in (?)";
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where timestamp between ? and ? and pss=? LIMIT 0, 50000";
 		/*
 		 * Calendar data1 = Calendar.getInstance();
 		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000);
@@ -324,7 +324,6 @@ public class Globalsentiment extends GetReach {
 			query1.setLong(1, model.getLastUpdate());
 			query1.setLong(2, model.getUpdate());
 			query1.setLong(3, model.getPSS());
-			query1.setString(4, model.getAccounts(false));
 			//System.out.println("Query:" + query1.toString());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
@@ -386,7 +385,7 @@ public class Globalsentiment extends GetReach {
 		 * values, id, frequency);
 		 */
 
-		String query = "SELECT avg(opinions.polarity) FROM sentimentanalysis.opinions where pss=? and source like 'mediawiki'";
+		String query = "SELECT sum(opinions.polarity*1)/count(opinions.polarity) FROM sentimentanalysis.opinions, sentimentanalysis.posts where posts.opinions_id = opinions.id and timestamp between ? and ? and pss=? and posts.id in (select post_id from post_source);";
 
 		/*
 		 * Calendar data1 = Calendar.getInstance();
@@ -406,7 +405,9 @@ public class Globalsentiment extends GetReach {
 			return Backend.error_message(Settings.err_dbconnect);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setLong(1, model.getPSS());
+			query1.setLong(1, model.getLastUpdate() - frequency * 86400000);
+			query1.setLong(2, model.getUpdate() - frequency * 86400000);
+			query1.setLong(3, model.getPSS());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
@@ -456,7 +457,7 @@ public class Globalsentiment extends GetReach {
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		return calc_global(false,"polar", insert, par, month, model, year, day, frequency);
+		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
 	}
 
@@ -533,9 +534,11 @@ public class Globalsentiment extends GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE (" + Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND opinions.source like 'mediawiki'";
+				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=?" + " AND (" + Settings.lptable
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id
+				+ ") AND posts.id IN (SELECT post_id FROM post_source)";
 
-		return calc_global(true,"polar", insert, par, month, model, year, day, frequency);
+		return calc_global("polar", insert, par, month, model, year, day, frequency);
 
 	}
 
@@ -734,9 +737,19 @@ public class Globalsentiment extends GetReach {
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
 				+ "=?" + " AND " + Settings.lotable_product
 				+ (par.products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "
-				+ Settings.lotable_timestamp + ">? ";
-		//query += ")";
-		query += "and opinions.source like 'mediawiki')";
+				+ Settings.lotable_timestamp + ">?) AND " + Settings.lptable_authorid + " in (Select "
+				+ Settings.latable_id + " from " + Settings.latable;
+		if (par.age != null || par.gender != null || par.location != null)
+			query += " where 1=1 ";
+		if (par.age != null)
+			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?";
+		if (par.gender != null)
+			query += " AND " + Settings.latable_gender + "=?";
+		if (par.location != null)
+			query += " AND " + Settings.latable_location + "=?";
+
+		query += ")";
+		query += "and posts.opinions_id in (select post_id from post_source where post_source LIKE 'wiki')";
 		try {
 			dbconnect();
 		} catch (Exception e) {
@@ -750,6 +763,15 @@ public class Globalsentiment extends GetReach {
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
 			}
 			query1.setLong(rangeindex++, model.getDate());
+			if (par.age != null) {
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]);
+			}
+
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location);
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");
@@ -776,7 +798,6 @@ public class Globalsentiment extends GetReach {
 				result.put(obj);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "QUERY:" + query);
 			LOGGER.log(Level.SEVERE, "Error", e);
 			return Backend.error_message("Error Fetching Data Please Try Again");
 		} finally {
