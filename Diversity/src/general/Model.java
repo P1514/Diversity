@@ -224,7 +224,7 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-		if("".equals(uri))
+		if(!"".equals(uri))
 			Monitor.update(uri, pss);
 		return result;
 
@@ -432,6 +432,32 @@ public final class Model {
 		return this.add_mediawiki;
 	}
 
+	public String getSources(boolean all) {
+		String[] sources = this.uri.split(";");
+		String result="";
+		for(String s : sources) {
+			result+=s.split(",")[0]+",";
+		}
+		if(this.add_mediawiki && all) {
+			result+="mediawiki";
+		}else {
+			return result.substring(0, result.length()-1);
+		}
+		return result;
+	}
+	public String getAccounts(boolean all) {
+		String[] sources = this.uri.split(";");
+		String result="";
+		for(String s : sources) {
+			result+=s.split(",")[1]+",";
+		}
+		if(this.add_mediawiki && all) {
+			result+="mediawiki";
+		}else {
+			return result.substring(0, result.length()-1);
+		}
+		return result;
+	}
 	private void dbconnect() {
 		try {
 			cnlocal = Settings.connlocal();
