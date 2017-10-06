@@ -32,8 +32,8 @@ public class GetReach {
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
 	/**
-	 * Returns an array list with the nTOP number of pss's with higher reach on
-	 * the of the last 12 months.
+	 * Returns an array list with the nTOP number of pss's with higher reach on the
+	 * of the last 12 months.
 	 * 
 	 * @param nTOP
 	 *            - Number of PSS wanted
@@ -74,8 +74,8 @@ public class GetReach {
 	/**
 	 * Calculates Reach over the time for the pss with the id provided, timespan
 	 * defines the ammount of years to evaluate, Param and Values are expected
-	 * string with filtering values separated by ',' , index are expected to
-	 * math from both Strings after split.
+	 * string with filtering values separated by ',' , index are expected to math
+	 * from both Strings after split.
 	 * 
 	 * 
 	 * @param timespan
@@ -102,15 +102,16 @@ public class GetReach {
 		data.add(Calendar.MONTH, 1);
 
 		int avg = 0;
-		double last_value=0;
+		double last_value = 0;
 		if (firstDate(id) != 0) {
 			for (; today.after(data); data.add(Calendar.MONTH, 1)) {
-				
-				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id,-1);
-				
-				if(Double.compare(last_value, value) != 0)
+
+				value += globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+						data.get(Calendar.YEAR), param, values, id, -1);
+
+				if (Double.compare(last_value, value) != 0)
 					avg++;
-				last_value=value;
+				last_value = value;
 			}
 		}
 		value = value / ((avg != 0) ? avg : 1);
@@ -121,6 +122,7 @@ public class GetReach {
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
+		value = value==(double)0 ? -1 : value;
 		obj.put("Param", "Global");
 		obj.put("Value", value);
 		result.put(obj);
@@ -128,7 +130,8 @@ public class GetReach {
 		return result;
 	}
 
-	private double globalsentimentby(int day, int month, int year, String param, String value, long id, long frequency) {
+	private double globalsentimentby(int day, int month, int year, String param, String value, long id,
+			long frequency) {
 
 		Model model = Data.getmodel(id);
 		String insert;
@@ -139,10 +142,11 @@ public class GetReach {
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<=? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global("reach", insert, par, month, model, year, day, frequency);
+		return calc_global(false,"reach", insert, par, month, model, year, day, frequency);
 	}
 
-	protected double  calc_global(String type, String insert, parameters par, int month, Model model, int year, int day, long frequency) {
+	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model, int year, int day,
+			long frequency) {
 		avg result = new avg();
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -161,11 +165,13 @@ public class GetReach {
 			if (!"polar".equals(type))
 				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
-		if (!model.getMediawiki()) 
+		if (!model.getMediawiki())
 			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
+		if (model.getId() != -1 && !wiki)
+			insert += " AND " + Settings.lotable + "." + Settings.lotable_account + " in (?)";
 		insert += ")";
 		int nmonth = month - 1;
-		
+
 		Calendar data = new GregorianCalendar(year, nmonth, day);
 		try {
 			dbconnect();
@@ -175,12 +181,11 @@ public class GetReach {
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setLong(1, model.getDate());
 			query1.setLong(2, data.getTimeInMillis());
-			if(frequency==-1){
-			data.add(Calendar.MONTH, 1);
-			data.add(Calendar.DAY_OF_MONTH, -1);
-			}
-			else
-				data.add(Calendar.DAY_OF_MONTH,(int)frequency);
+			if (frequency == -1) {
+				data.add(Calendar.MONTH, 1);
+				data.add(Calendar.DAY_OF_MONTH, -1);
+			} else
+				data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 
 			query1.setLong(3, data.getTimeInMillis());
 			query1.setLong(4, model.getPSS());
@@ -194,9 +199,10 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
-				
+
 				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			
+			if (model.getId() != -1 && !wiki)
+				query1.setString(rangeindex++, model.getAccounts(false));
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -246,9 +252,10 @@ public class GetReach {
 				result.total += rs.getDouble(Settings.lotable_reach);
 				notzero = true;
 			}
-			if(!notzero){
-				result.total=1;
-				result.auxcalc=-1;
+			
+			if (!notzero) {
+				result.total = 1;
+				result.auxcalc = -1;
 			}
 			break;
 		default:
@@ -278,7 +285,8 @@ public class GetReach {
 	 * @throws JSONException
 	 *             in case creating a JSON fails
 	 */
-	public JSONArray globalreach(String param, String values, String output, long id, long frequency) throws JSONException {
+	public JSONArray globalreach(String param, String values, String output, long id, long frequency)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj;
 		obj = new JSONObject();
@@ -290,19 +298,20 @@ public class GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		if (frequency != -1) {
-			data.add(Calendar.DAY_OF_MONTH, (int) frequency); 
+			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		} else {
 			data.add(Calendar.MONTH, 1);
 		}
-		
+
 		if (firstDate(id) != 0) {
 			if (frequency != -1) {
 				for (; today.after(data); data.add(Calendar.DAY_OF_MONTH, (int) frequency)) {
 					try {
 						obj = new JSONObject();
-						obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " " + data.get(Calendar.YEAR));
-						obj.put("Value",
-								globalreachby(data.get(Calendar.DAY_OF_MONTH),data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+						obj.put("Date", data.get(Calendar.DAY_OF_MONTH) + " " + (data.get(Calendar.MONTH) + 1) + " "
+								+ data.get(Calendar.YEAR));
+						obj.put("Value", globalreachby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+								data.get(Calendar.YEAR), param, values, id));
 						result.put(obj);
 					} catch (JSONException e) {
 						LOGGER.log(Level.INFO, "ERROR", e);
@@ -313,10 +322,10 @@ public class GetReach {
 					try {
 						obj = new JSONObject();
 						obj.put("Date", (data.get(Calendar.MONTH) + 1) + " 01 " + data.get(Calendar.YEAR));
-						obj.put("Value",
-								globalreachby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH), data.get(Calendar.YEAR), param, values, id));
+						obj.put("Value", globalreachby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
+								data.get(Calendar.YEAR), param, values, id));
 						result.put(obj);
-	
+
 					} catch (JSONException e) {
 						LOGGER.log(Level.INFO, "ERROR", e);
 					}
@@ -336,8 +345,8 @@ public class GetReach {
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		
-		return calc_global("reach", insert, par, month, model, year,day,-1);
+
+		return calc_global(false,"reach", insert, par, month, model, year, day, -1);
 
 	}
 

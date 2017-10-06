@@ -20,7 +20,7 @@ import java.sql.Connection;
  */
 public class Settings {
 	
-	public static final String version = "2.4";
+	public static final String version = "2.6";
 	
 	private static DataSource conlocal = null;
 	private static DataSource condata;
@@ -113,6 +113,7 @@ public class Settings {
 	public static final String lotable_product = "product";
 	public static final String lotable_comments = "comments";
 	public static final String lotable_source = "source";
+	public static final String lotable_account = "account";
 
 	// Models table
 	public static final String lmtable = "models";
@@ -272,6 +273,7 @@ public class Settings {
 
 	// PSS has Product Table
 	public static final String crpssproducttable = "pss_has_product";
+	public static final String crpssproducestable = "pss_produces_product";
 	public static final String crrpssproducttable_pss = "pss_id";
 	public static final String crrpssproducttable_product = "product_id";
 	
