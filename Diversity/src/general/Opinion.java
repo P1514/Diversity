@@ -148,7 +148,7 @@ public class Opinion {
 			}
 		});
 
-		polarity = polarity / total_inf;
+		polarity = total_inf != (double) 0 ? polarity / total_inf: main.getPolarity();
 	}
 
 	/**
