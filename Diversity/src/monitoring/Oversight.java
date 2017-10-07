@@ -156,13 +156,13 @@ public class Oversight extends TimerTask {
 									}
 								}
 							}
-							if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
+							/*if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
 								update tmp = new update();
 								tmp.account = "mediawiki";
 								tmp.date = Long.valueOf(date);
 								tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
 								updatelist.put(tmp.account, tmp);
-							}
+							}*/
 						}
 					} catch (ClassNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -186,6 +186,10 @@ public class Oversight extends TimerTask {
 
 					requesturl.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
+						//FIX Media Wiki
+						v.accounts+="&accounts[]=mediawiki";
+						v.epochs+="&epochsFrom[]=1&epochsTo[]=1507376292000";
+						
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +

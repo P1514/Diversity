@@ -369,7 +369,12 @@ public class LoadThreads {
 				ResultSet rs = null;
 				try {// TODO AQUI
 					boolean remote = false;
-					id = obj.getLong(Settings.JSON_postid);
+					if (obj.has("postId")) {
+						id = obj.getLong("postId");
+					} else {
+						id = (long) (Math.random() * -1000000000);
+						obj.put("postId", id);
+					}
 					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id="+id+" and opinions.id="+id);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
@@ -389,13 +394,6 @@ public class LoadThreads {
 					java.util.Date parsed = format.parse(formatted);
 
 					// //system.out.println(formatted);
-					long postid;
-					if (obj.has("postId")) {
-						postid = obj.getLong("postId");
-					} else {
-						postid = (long) (Math.random() * 200);
-						obj.put("postId", postid);
-					}
 					// //system.out.println(id);
 					String source = remote ? obj.getString(Settings.JSON_source)
 							: rs.getString(Settings.lotable_source);
@@ -421,6 +419,7 @@ public class LoadThreads {
 						time = date.getTime();
 
 					}*/
+					long postid=id;
 					// //system.out.println("IM HERE");
 					long likes, views, age;
 					String name, gender, location, message;
@@ -674,10 +673,10 @@ public class LoadThreads {
 			} else {
 				try {
 
-					if (obj.has(Settings.JSON_replies)) {
+					if (obj.has(Settings.JSON_replies) || obj.has("Replies")) {
 
 						// //system.out.println("HELLO2");
-						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
+						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies): obj.getJSONArray("Replies");
 						for (int index = 0; index < replies.length(); index++) {
 
 							String query = Settings.sqlselectall + Settings.lptable + " where " + Settings.lptable_id
@@ -685,7 +684,13 @@ public class LoadThreads {
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
-
+							
+							if (reply.has("postId")) {
+							} else {
+								long id1 = (long) (Math.random() * -1000000000);
+								reply.put("postId", id1);
+							}
+							
 							Date date;
 							if (reply.has(Settings.JSON_epoch)) {
 								date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
@@ -698,7 +703,7 @@ public class LoadThreads {
 							java.util.Date parsed = format.parse(formatted);
 
 							long postid = reply.getLong(Settings.JSON_postid);
-							String user_id = reply.getString(Settings.JSON_userid);
+							String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
 							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
 									? reply.has("likes") ? reply.getLong("likes") : 0
@@ -741,12 +746,11 @@ public class LoadThreads {
 							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
-							Author author = new Author(user_id, source, name, age, gender, location);
-							// if(Loader.) //se n�o existir na authors db2 tem
-							// de ser criado
-							if (!(Loader.users2.contains(author))) {
-								Loader.users2.add(author);
-
+							if (!"".equals(user_id)) {
+								Author author = new Author(user_id, source, name, age, gender, location);
+								if (!(Loader.users2.contains(author))) {
+									Loader.users2.add(author);
+								}
 							}
 							_opin.addcomment(_post);
 						}
