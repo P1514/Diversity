@@ -768,7 +768,7 @@ public class Loader {
 					}
 					if (authordb2.containsKey(user1 + "," + source1))
 						continue;
-					System.out.println("SOURCE: " + source1 + "\n");
+					//System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
 									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
@@ -975,7 +975,7 @@ public class Loader {
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			if (!authordb2.isEmpty())
+			//if (!authordb2.isEmpty())
 				v.evalPolarity2(authordb2);
 
 		});

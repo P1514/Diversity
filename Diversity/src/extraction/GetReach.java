@@ -122,7 +122,7 @@ public class GetReach {
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
-		value = value==(double)0 ? -1 : value;
+		value = value == (double) 0 ? -1 : value;
 		obj.put("Param", "Global");
 		obj.put("Value", value);
 		result.put(obj);
@@ -142,11 +142,11 @@ public class GetReach {
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<=? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
 				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
-		return calc_global(false,"reach", insert, par, month, model, year, day, frequency);
+		return calc_global(false, "reach", insert, par, month, model, year, day, frequency);
 	}
 
-	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model, int year, int day,
-			long frequency) {
+	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model,
+			int year, int day, long frequency) {
 		avg result = new avg();
 		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
@@ -155,15 +155,17 @@ public class GetReach {
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (par.location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		if (par.products != null) {
-			if (par.products.equals("-1")) {
-				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+		if (!wiki) {
+			if (par.products != null) {
+				if (par.products.equals("-1")) {
+					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+				} else {
+					insert += " AND " + Settings.lotable_product + "=?";
+				}
 			} else {
-				insert += " AND " + Settings.lotable_product + "=?";
+				if (!"polar".equals(type))
+					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 			}
-		} else {
-			if (!"polar".equals(type))
-				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
 		if (!model.getMediawiki())
 			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
@@ -252,7 +254,7 @@ public class GetReach {
 				result.total += rs.getDouble(Settings.lotable_reach);
 				notzero = true;
 			}
-			
+
 			if (!notzero) {
 				result.total = 1;
 				result.auxcalc = -1;
@@ -346,7 +348,7 @@ public class GetReach {
 				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
 				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		return calc_global(false,"reach", insert, par, month, model, year, day, -1);
+		return calc_global(false, "reach", insert, par, month, model, year, day, -1);
 
 	}
 

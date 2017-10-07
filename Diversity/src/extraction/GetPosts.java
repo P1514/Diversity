@@ -490,8 +490,9 @@ public class GetPosts {
 
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
-		insert = "Select count(*) FROM " + Settings.lotable + " where ( " + Settings.lotable_pss + "=? AND "
-				+ Settings.lotable_product;
+		insert = "Select count(*) FROM " + Settings.lotable + " where ( " + Settings.lotable_pss + "=?";
+		if (!wiki)
+			insert += " AND " + Settings.lotable_product;
 		Model model = Data.getmodel(id);
 		if (model == null) {
 			obj = new JSONObject();
@@ -500,10 +501,12 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (!model.getProducts().isEmpty()) {
-			insert += " in (" + model.getProducts() + ")";
-		} else {
-			insert += "=0";
+		if (!wiki) {
+			if (!model.getProducts().isEmpty()) {
+				insert += " in (" + model.getProducts() + ")";
+			} else {
+				insert += "=0";
+			}
 		}
 		parameters par = GetReach.split_params(param, value);
 		if (par.age != null)
@@ -514,7 +517,8 @@ public class GetPosts {
 			insert += " AND location=?";
 		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=? ";
 		insert += " AND source in (?) ";
-		if(!wiki) insert += "AND account in (?)";
+		if (!wiki)
+			insert += "AND account in (?)";
 		insert += ")";
 		// ResultSet rs = null;
 		try {
@@ -544,7 +548,8 @@ public class GetPosts {
 			 */
 			query1.setLong(rangeindex++, model.getDate());
 			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getSources(false));
-			if(!wiki) query1.setString(rangeindex++, model.getAccounts(false));
+			if (!wiki)
+				query1.setString(rangeindex++, model.getAccounts(false));
 			LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();

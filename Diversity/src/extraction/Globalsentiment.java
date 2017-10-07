@@ -732,8 +732,7 @@ public class Globalsentiment extends GetReach {
 				+ " sum(case when (" + Settings.lptable_polarity + " >80 AND " + Settings.lptable_polarity
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where " + Settings.lotable_pss
-				+ "=?" + " AND " + Settings.lotable_product
-				+ (par.products != null ? "=?" : " in (" + model.getProducts() + ")") + " AND "
+				+ "=?" + " AND "
 				+ Settings.lotable_timestamp + ">? ";
 		//query += ")";
 		query += "and opinions.source like 'mediawiki')";
@@ -746,9 +745,6 @@ public class Globalsentiment extends GetReach {
 		try (PreparedStatement query1 = cnlocal.prepareStatement(query)) {
 			query1.setLong(1, model.getPSS());
 			int rangeindex = 2;
-			if (par.products != null) {
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			}
 			query1.setLong(rangeindex++, model.getDate());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())

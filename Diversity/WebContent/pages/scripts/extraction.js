@@ -32,6 +32,7 @@ var snap_user;
 var snap_date;
 var snap_pss;
 var refreshTag = true;
+var triedwiki = false;
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
 $(window).on('load', function() {
@@ -320,6 +321,13 @@ function connect() {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if (json[1].hasOwnProperty("Error")) {
 				if (json[1].Error == "No_data") {
+					if(!triedwiki){
+						document.getElementById('radio_wiki').checked=true;
+						triedwiki=true;
+						changeRequest('wiki');
+						return;
+					}
+					
 					$('#loading')
 							.html(
 									'No data to display.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
@@ -936,6 +944,7 @@ function drawChart() {
 	var i = 1;
 	data.addColumn('string', 'Param');
 	if (jsonData[i].Graph == "Top_Left") {
+		triedwiki=false;
 		for (filt = 1; i < jsonData.length
 				&& jsonData[i].hasOwnProperty("Filter")
 				&& jsonData[i].Graph == "Top_Left"; filt++) {
@@ -1416,7 +1425,7 @@ function drawChart() {
 			legend : {
 				position : 'bottom'
 			},
-			colors : finalProductColors,
+			colors : colors,
 			animation : {
 				duration : 1000,
 				easing : 'out',
