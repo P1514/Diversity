@@ -2,7 +2,9 @@ package monitoring;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -170,8 +172,14 @@ public class Oversight extends TimerTask {
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
 								: new url();
-						local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
-						local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
+						try {
+						local.accounts += "&accounts[]=" + URLEncoder.encode(d.account.replace(" ", "%20"),"UTF-8");
+						local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date+"","UTF-8") + "&epochsTo[]=" + URLEncoder.encode(now.getTimeInMillis()+"","UTF-8");
+						}catch(UnsupportedEncodingException e) {
+							LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+							local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
+							local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
+						}
 						requesturl.put(d.pss.toString(), local);
 						// break;// TO TEST
 					}
