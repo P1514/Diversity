@@ -207,14 +207,14 @@ ws.onmessage = function(event) {
     giveAcessRights(json);
     var url = window.location.href.toString();
     var dp = "";
-    if (url.indexOf("design_project_id=") != -1) {
+    /*if (url.indexOf("design_project_id=") != -1) {
       dp = url.split("design_project_id=")[1].split("&")[0];
       localStorage.dp = dp;
     } else if (localStorage.dp !== undefined) {
       dp = localStorage.dp;
-    }
+    }*/
     
-    dp = dp.replace(/%20/g," ");
+    /*dp = dp.replace(/%20/g," ");*/
     var jsonData = {
         'Op' : 'getmodels',
         'Project' : dp != "" ? dp : undefined,

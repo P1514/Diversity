@@ -65,7 +65,7 @@ public class Tagcloud extends GetPosts {
 				JSONArray postComments = getComments(posts.getJSONObject(i).getLong("Id"));
 
 				for (int j = 0; j < postComments.length(); j++) {
-					String message = postComments.getString(i).toLowerCase();
+					String message = postComments.getString(j).toLowerCase();
 					message = message.replaceAll("[^A-Za-z0-9 ]", "");
 					String[] wordArray = message.split(" ");
 					for (String word : wordArray) {
