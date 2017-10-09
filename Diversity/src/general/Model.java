@@ -30,7 +30,7 @@ public final class Model {
 	private String name, uri, age, gender, products;
 	private boolean archived;
 	private long nextupdate, cdate;
-	private Boolean add_mediawiki;
+	private Boolean add_mediawiki = false;
 	private static final java.util.logging.Logger LOGGER = new Logging().create(Model.class.getName());
 
 	/**
@@ -101,6 +101,9 @@ public final class Model {
 		pss = Data.identifyPSSbyname(msg.getString("PSS"));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
+		if (msg.has("mediawiki") && msg.getBoolean("mediawiki")) {
+			add_mediawiki = true;
+		}
 		if (msg.has("design_project"))
 			design_project = msg.getLong("design_project");
 		else
@@ -149,7 +152,7 @@ public final class Model {
 			products += product.get_Id() + ",";
 		}
 		// products = msg.getString("Final_Product");
-		user = msg.getInt("User");
+		user = msg.has("User") ? msg.getInt("User") : 0;
 		nextupdate = cdate;
 		// age = msg.getString("Age");
 		// gender = msg.getString("Gender");
@@ -267,8 +270,12 @@ public final class Model {
 			query1.setBoolean(rangeindex++, msg.getBoolean("Archive"));
 
 			if (msg.has("Final_Products")) {
-				for (String a : msg.getString("Final_Products").split(";")) {
-					product += Data.identifyProduct(a) + ",";
+				if ("".equals(msg.getString("Final_Products"))) {
+					product ="";
+				} else {
+					for (String a : msg.getString("Final_Products").split(";")) {
+						product += Data.identifyProduct(a) + ",";
+					}
 				}
 			}
 
@@ -314,7 +321,7 @@ public final class Model {
 		this.uri = uri;
 		this.frequency = msg.getInt("Update");
 		this.archived = msg.getBoolean("Archive");
-		this.products = product.equals("") ? "" : product;
+		this.products = "".equals(product) ? "" : product;
 
 		obj.put("id", msg.getInt("Id"));
 		obj.put("Op", "Error");
