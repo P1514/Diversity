@@ -122,7 +122,7 @@ public class GetReach {
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
-		value = value == (double) 0 ? -1 : value;
+		value = value==(double)0 ? -1 : value;
 		obj.put("Param", "Global");
 		obj.put("Value", value);
 		result.put(obj);
@@ -137,40 +137,38 @@ public class GetReach {
 		String insert;
 		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
-				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", "
+				+ Settings.lotable_reach + " FROM " + Settings.latable + "," + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? and ";/* && (" + Settings.lptable + "."
-				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;*/
-		return calc_global(false, "reach", insert, par, month, model, year, day, frequency);
+				+ " AND timestamp>? && timestamp<=? && " + Settings.lotable_pss + "=? AND (" + Settings.lptable + "."
+				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
+		return calc_global(false,"reach", insert, par, month, model, year, day, frequency);
 	}
 
-	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model,
-			int year, int day, long frequency) {
+	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model, int year, int day,
+			long frequency) {
 		avg result = new avg();
-		/*if (par.age != null)
+		if (par.age != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
 					+ Settings.latable_age + ">?";
 		if (par.gender != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
 		if (par.location != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";*/
-		/*if (!wiki) {
-			if (par.products != null) {
-				if (par.products.equals("-1")) {
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-				} else {
-					insert += " AND " + Settings.lotable_product + "=?";
-				}
+			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
+		if (par.products != null) {
+			if (par.products.equals("-1")) {
+				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 			} else {
-				if (!"polar".equals(type))
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
+				insert += " AND " + Settings.lotable_product + "=?";
 			}
+		} else {
+			if (!"polar".equals(type))
+				insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
 		}
 		if (!model.getMediawiki())
-			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";*/
+			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		if (model.getId() != -1 && !wiki)
-			insert += " account in (?) and source in (?)";
+			insert += " AND " + Settings.lotable + "." + Settings.lotable_account + " in (?)";
 		insert += ")";
 		int nmonth = month - 1;
 
@@ -181,19 +179,18 @@ public class GetReach {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			int rangeindex = 1;
-			query1.setLong(rangeindex++, model.getDate());
-			query1.setLong(rangeindex++, data.getTimeInMillis());
+			query1.setLong(1, model.getDate());
+			query1.setLong(2, data.getTimeInMillis());
 			if (frequency == -1) {
 				data.add(Calendar.MONTH, 1);
 				data.add(Calendar.DAY_OF_MONTH, -1);
 			} else
 				data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 
-			query1.setLong(rangeindex++, data.getTimeInMillis());
-			
-			if(wiki || model.getId() == -1) query1.setLong(rangeindex++, model.getPSS());
-			/*if (par.age != null) {
+			query1.setLong(3, data.getTimeInMillis());
+			query1.setLong(4, model.getPSS());
+			int rangeindex = 5;
+			if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
 				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
@@ -202,13 +199,10 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
-*/
-				//query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
-			if (model.getId() != -1 && !wiki) {
+
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			if (model.getId() != -1 && !wiki)
 				query1.setString(rangeindex++, model.getAccounts(false));
-				query1.setString(rangeindex++, model.getSources(false));
-			}
-			LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -258,7 +252,7 @@ public class GetReach {
 				result.total += rs.getDouble(Settings.lotable_reach);
 				notzero = true;
 			}
-
+			
 			if (!notzero) {
 				result.total = 1;
 				result.auxcalc = -1;
@@ -346,12 +340,13 @@ public class GetReach {
 		Model model = Data.getmodel(id);
 		String insert;
 		parameters par = split_params(param, value);
-		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM "
+		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.latable + ","
 				+ Settings.lptable + ", " + Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND "
 				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND timestamp>? && timestamp<? && opinions.id in (Select id from opinions where ";
+				+ " AND timestamp>? && timestamp<? && " + Settings.lotable_pss + "=? " + "AND (" + Settings.lptable
+				+ "." + Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;
 
-		return calc_global(false, "reach", insert, par, month, model, year, day, -1);
+		return calc_global(false,"reach", insert, par, month, model, year, day, -1);
 
 	}
 

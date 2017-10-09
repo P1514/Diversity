@@ -490,12 +490,8 @@ public class GetPosts {
 
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
-		insert = "Select count(*) FROM " + Settings.lotable + " where (";
-		if (wiki)
-			insert += " " + Settings.lotable_pss + "=? AND";
-		/*
-		 * if (!wiki) insert += " AND " + Settings.lotable_product;
-		 */
+		insert = "Select count(*) FROM " + Settings.lotable + " where ( " + Settings.lotable_pss + "=? AND "
+				+ Settings.lotable_product;
 		Model model = Data.getmodel(id);
 		if (model == null) {
 			obj = new JSONObject();
@@ -504,21 +500,21 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		/*
-		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in (" +
-		 * model.getProducts() + ")"; } else { insert += "=0"; } }
-		 */
+		if (!model.getProducts().isEmpty()) {
+			insert += " in (" + model.getProducts() + ")";
+		} else {
+			insert += "=0";
+		}
 		parameters par = GetReach.split_params(param, value);
 		if (par.age != null)
-			insert += " age<=? AND age>? AND ";
+			insert += " AND age<=? AND age>?";
 		if (par.gender != null)
-			insert += " gender=? AND";
+			insert += " AND gender=?";
 		if (par.location != null)
-			insert += " location=? AND";
-		insert += " timestamp<? AND " + Settings.lotable_timestamp + ">=? AND ";
-		insert += " source in (?) AND ";
-		// if (!wiki)
-		insert += "account in (?)";
+			insert += " AND location=?";
+		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=? ";
+		insert += " AND source in (?) ";
+		if(!wiki) insert += "AND account in (?)";
 		insert += ")";
 		// ResultSet rs = null;
 		try {
@@ -528,9 +524,8 @@ public class GetPosts {
 			return Backend.error_message("Cannot connect to database please try again later");
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			int rangeindex = 1;
-			if (wiki)
-				query1.setLong(rangeindex++, model.getPSS());
+			int rangeindex = 2;
+			query1.setLong(1, model.getPSS());
 
 			if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
@@ -549,9 +544,8 @@ public class GetPosts {
 			 */
 			query1.setLong(rangeindex++, model.getDate());
 			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getSources(false));
-			// if (!wiki)
-			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getAccounts(false));
-			//LOGGER.log(Level.INFO, query1.toString());
+			if(!wiki) query1.setString(rangeindex++, model.getAccounts(false));
+			LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");
