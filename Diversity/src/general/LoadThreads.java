@@ -39,7 +39,7 @@ public class LoadThreads {
 		public void run() {
 			try (Connection cnlocal = Settings.connlocal()) {
 				String update = "INSERT INTO " + Settings.lotable + " "
-						+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+						+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 						+ Settings.lotable_influence + "=?," + Settings.lotable_comments + "=?,"
 						+ Settings.lotable_polarity + "=?";
 
@@ -58,11 +58,10 @@ public class LoadThreads {
 					query1.setLong(8, opinion.ncomments());
 					query1.setLong(9, opinion.getProduct());
 					query1.setString(10, opinion.getSource());
-					query1.setString(11, opinion.getAccount());
-					query1.setDouble(12, opinion.getReach());
-					query1.setDouble(13, opinion.getTotalInf());
-					query1.setLong(14, opinion.ncomments());
-					query1.setDouble(15, opinion.getPolarity());
+					query1.setDouble(11, opinion.getReach());
+					query1.setDouble(12, opinion.getTotalInf());
+					query1.setLong(13, opinion.ncomments());
+					query1.setDouble(14, opinion.getPolarity());
 					while (true) {
 						try {
 							query1.executeUpdate();
@@ -275,7 +274,7 @@ public class LoadThreads {
 
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
 			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_source);
-			String account = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_account);
+
 			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
 				return;
@@ -286,8 +285,7 @@ public class LoadThreads {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid,
-					new Opinion(_post, Data.identifyPSSbyproduct(product), product, source, account));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 
 		}
 
@@ -304,7 +302,7 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
 						+ Settings.sqlwhere + "posts." + Settings.lptable_id + " = " + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
@@ -398,8 +396,7 @@ public class LoadThreads {
 					}
 					// //system.out.println(id);
 					String source = obj.getString(Settings.JSON_source);
-					String account = "wiki".equals(source) ? "mediawiki" : obj.getString(Settings.JSON_account);
-					String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
+					String user_id = obj.getString(Settings.JSON_userid);
 					long time = parsed.getTime();
 					if (!remote) {
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -441,14 +438,12 @@ public class LoadThreads {
 																								// specific
 																								// info
 
-					if (!"".equals(user_id)) {
-						Author author = new Author(user_id, source, name, age, gender, location);
-						if (!(Loader.users2.contains(author))) {
-							Loader.users2.add(author);
-						}
+					Author author = new Author(user_id, source, name, age, gender, location);
+					if (!(Loader.users2.contains(author))) {
+						Loader.users2.add(author);
 					}
 					Loader.opiniondb.put(postid,
-							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source, account));
+							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 					// find
 					// url
 					// to
