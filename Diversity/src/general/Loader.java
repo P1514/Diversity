@@ -47,13 +47,14 @@ public class Loader {
 	public static boolean first_load = true;
 
 	public String load(JSONArray json) throws JSONException {
-		if(json==null) return null;
+		if (json == null)
+			return null;
 		authordb2 = new ConcurrentHashMap<>();
 		opiniondb = new ConcurrentHashMap<>();
-		//TODO protect for empty json
-		//System.out.println("json: " + json.length());
+		// TODO protect for empty json
+		// System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
-		//if(json.length()<1) return "";
+		// if(json.length()<1) return "";
 		loadp1(json);
 		first_load = false;
 		String err = updatelocal();
@@ -72,7 +73,7 @@ public class Loader {
 
 	}
 
-	public String loadinit() throws JSONException{
+	public String loadinit() throws JSONException {
 		users = new ArrayList<String>();
 		users2 = new ArrayList<Author>();
 		totalposts = 0;
@@ -93,9 +94,10 @@ public class Loader {
 		err = loadmodels();
 		if (err != null)
 			return err;
-		
+
 		return null;
 	}
+
 	private String loadp1(JSONArray json) throws JSONException {
 		Server.isloading = true;
 		users = new ArrayList<String>();
@@ -157,7 +159,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(10*1000);
+					Thread.sleep(10 * 1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -166,8 +168,7 @@ public class Loader {
 		}
 		pausetime = System.nanoTime() - pausetime;
 		ExecutorService es = Executors.newFixedThreadPool(10);
-		
-		
+
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
@@ -184,7 +185,7 @@ public class Loader {
 			return err;
 
 		evaluatedata();
-		//System.out.println("1");
+		// System.out.println("1");
 
 		Server.isloading = false;
 		return Backend.error_message("Loaded Successfully").toString();
@@ -424,15 +425,15 @@ public class Loader {
 			}
 			return;
 		}
-		select = Settings.sqlselectall + Settings.crdbname+"."+Settings.cictable;
-		//System.out.println(select);
+		select = Settings.sqlselectall + Settings.crdbname + "." + Settings.cictable;
+		// System.out.println(select);
 
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
 			try (ResultSet rs = query.executeQuery()) {
 
 				while (rs.next()) {
-					//System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
-					
+					// System.out.println(Data.companydb.get(rs.getLong(Settings.cictable_company_id)).getName());
+
 					Data.companydb.get(rs.getLong(Settings.cictable_company_id))
 							.add_design_project(rs.getLong(Settings.cictable_design_project_id));
 				}
@@ -446,8 +447,9 @@ public class Loader {
 			}
 			return;
 		}
-		
-		select = Settings.sqlselectall + Settings.crpssproducttable;
+
+		select = Settings.sqlselectall + Settings.crpssproducttable + " union " + Settings.sqlselectall
+				+ Settings.crpssproducestable;
 
 		try (PreparedStatement query = cncr.prepareStatement(select)) {
 			try (ResultSet rs = query.executeQuery()) {
@@ -556,7 +558,7 @@ public class Loader {
 				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."
 				+ Settings.crusertable_user_role_id + "=" + Settings.cruserrtable + "." + Settings.cruserrtable_id
 				+ ";";
-		//system.out.println(select);
+		// system.out.println(select);
 		Connection cncr = null;
 		try {
 			cncr = Settings.conncr();
@@ -714,25 +716,26 @@ public class Loader {
 
 		String querycond = "(";
 		for (Author a : users2) {
-			if(a==null) continue;
+			if (a == null)
+				continue;
 			a.getID();
 			querycond += a.getID() + ",";
 
 		}
 		if (querycond.length() > 2)
 			querycond = querycond.substring(0, querycond.length() - 2);
-		
+
 		else {
 			for (String a : users) {
 				querycond += a + ",";
 			}
 			if (querycond.length() > 1)
-			querycond = querycond.substring(0, querycond.length() - 1);
+				querycond = querycond.substring(0, querycond.length() - 1);
 			else
 				querycond += "-1";
 		}
 		querycond += ");";
-		//system.out.println(querycond);
+		// system.out.println(querycond);
 		// From local DB
 		err = loadlocalusers(querycond);
 		if (err != null)
@@ -745,73 +748,76 @@ public class Loader {
 		} else {
 			// Load users from JSON
 			Author auth;
-			String source1="";
+			String source1 = "";
 			for (int i = 0; i < json.length(); i++) {
-				
+
 				JSONObject obj = json.getJSONObject(i);
-				source1 = obj.has(Settings.JSON_source) ? obj.getString(Settings.JSON_source): source1;
-				//System.out.println("SOURCE: " + source1 + "\n");
-				JSONArray obj1 = obj.getJSONArray(Settings.JSON_replies);
-				String user1 = obj.getString(Settings.JSON_userid);
-				
-				
-				for (int j = 0;j < obj1.length(); j++) {//TO LOAD REPLIES
-					obj=obj1.getJSONObject(j);
-					user1 = obj.getString(Settings.JSON_userid);
-					if (authordb2.containsKey(user1 +","+ source1))
+				source1 = obj.has(Settings.JSON_source) ? obj.getString(Settings.JSON_source) : source1;
+				// System.out.println("SOURCE: " + source1 + "\n");
+				JSONArray obj1 = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies)
+						: new JSONArray();
+				String user1 = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
+
+				for (int j = 0; j < obj1.length(); j++) {// TO LOAD REPLIES
+					obj = obj1.getJSONObject(j);
+					user1 = "";
+					if (obj.has(Settings.JSON_userid)) {
+						user1 = obj.getString(Settings.JSON_userid);
+					} else {
 						continue;
-					System.out.println("SOURCE: " + source1 + "\n");
+					}
+					if (authordb2.containsKey(user1 + "," + source1))
+						continue;
+					//System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
-							+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""), 0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+							0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
-					
+
 					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
 						authordb2.put(auth.getID() + "," + auth.getSource(), auth);
-					
-					//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
-					
+
+					// authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+
 				}
-				
-				obj = json.getJSONObject(i);
-				user1 = obj.getString(Settings.JSON_userid);
-				if (authordb2.containsKey(user1 +","+ source1))
-					continue;
-				System.out.println("SOURCE: " + source1 + "\n");
+				if (obj.has(Settings.JSON_userid)) {
+					obj = json.getJSONObject(i);
+					user1 = obj.getString(Settings.JSON_userid);
+					if (authordb2.containsKey(user1 + "," + source1))
+						continue;
+					System.out.println("SOURCE: " + source1 + "\n");
 
-				auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
-						(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
-								+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
-						/*
-						 * (obj.has(Settings.JSON_age) ?
-						 * obj.getLong(Settings.JSON_age) : 0)
-						 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
-						(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
-				
-				/*
-				 * auth.setComments(obj.has(Settings.JSON_fname) ?
-				 * obj.getLong(Settings.JSON_comments) : 0);
-				 * auth.setLikes(obj.has(Settings.JSON_likes) ?
-				 * obj.getLong(Settings.JSON_likes) : 0);
-				 * auth.setPosts(obj.getLong(Settings.JSON_replies) - 1);
-				 * auth.setViews(obj.getLong(Settings.JSON_views));
-				 */
-				if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
-					authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
+									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+							/*
+							 * (obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0)
+							 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
 
-				//authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
-				
-				
+					/*
+					 * auth.setComments(obj.has(Settings.JSON_fname) ?
+					 * obj.getLong(Settings.JSON_comments) : 0);
+					 * auth.setLikes(obj.has(Settings.JSON_likes) ? obj.getLong(Settings.JSON_likes)
+					 * : 0); auth.setPosts(obj.getLong(Settings.JSON_replies) - 1);
+					 * auth.setViews(obj.getLong(Settings.JSON_views));
+					 */
+					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
+						authordb2.put(auth.getID() + "," + auth.getSource(), auth);
+
+					// authordb2.get(auth.getID() + "," + auth.getSource()).addPosts();
+
+				}
 
 			}
 
 			/*
 			 * for (int i = 0; i < json.length(); i++) { JSONObject obj =
-			 * json.getJSONObject(i); if
-			 * (authordb.containsKey(obj.getLong("id"))) continue;
+			 * json.getJSONObject(i); if (authordb.containsKey(obj.getLong("id"))) continue;
 			 * authordb.put(obj.getLong("id"), new Author(obj.getLong("id"),
-			 * obj.getString("name"), obj.getLong("age"),
-			 * obj.getString("gender"), obj.getString("location")));
+			 * obj.getString("name"), obj.getLong("age"), obj.getString("gender"),
+			 * obj.getString("location")));
 			 * 
 			 * }
 			 */
@@ -866,7 +872,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
-		//System.out.println(query);
+		// System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -876,11 +882,11 @@ public class Loader {
 		try (Statement stmt = cnlocal.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				if (authordb2.containsKey(rs.getString("id")+","+rs.getString("source")))
+				if (authordb2.containsKey(rs.getString("id") + "," + rs.getString("source")))
 					continue;
-				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_source),rs.getString(Settings.latable_name),
-						rs.getLong(Settings.latable_age), rs.getString(Settings.latable_gender),
-						rs.getString(Settings.latable_location));
+				Author auth = new Author(rs.getString(Settings.latable_id), rs.getString(Settings.latable_source),
+						rs.getString(Settings.latable_name), rs.getLong(Settings.latable_age),
+						rs.getString(Settings.latable_gender), rs.getString(Settings.latable_location));
 				auth.setComments(rs.getLong(Settings.latable_comments));
 				auth.setLikes(rs.getLong(Settings.latable_likes));
 				auth.setPosts(rs.getLong(Settings.latable_posts) - 1);
@@ -905,6 +911,7 @@ public class Loader {
 	private void update(String type) {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
+				if("wiki".equals(v.getSource()) || "mediawiki".equals(v.getSource())) return;
 				List<String> uniqueauthors = new ArrayList<>();
 				HashMap<Long, Post> temppost = v.getPosts();
 				temppost.forEach((k2, v2) -> {
@@ -968,8 +975,8 @@ public class Loader {
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			if(!authordb2.isEmpty())
-			v.evalPolarity2(authordb2);
+			//if (!authordb2.isEmpty())
+				v.evalPolarity2(authordb2);
 
 		});
 		LOGGER.log(Level.INFO, " calc eval and reach " + (System.nanoTime() - stime));
@@ -1007,7 +1014,7 @@ public class Loader {
 				query1.setLong(15, author.getViews());
 				query1.setLong(16, author.getPosts());
 				query1.executeUpdate();
-				//system.out.println(query1.toString());
+				// system.out.println(query1.toString());
 			} catch (Exception e) {
 				LOGGER.log(Level.FINE, "Error Inserting Author into Database");
 				try {
@@ -1035,9 +1042,9 @@ public class Loader {
 		for (Opinion opinion : opiniondb.values()) {
 			es.execute(multiThread.new Tinsert(opinion));
 		}
-		String err=null;
+		String err = null;
 		es.shutdown();
-		err = awaittermination(es,"insert calculated opinions");
+		err = awaittermination(es, "insert calculated opinions");
 
 		LOGGER.log(Level.INFO, " insert opinions and posts " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
@@ -1087,9 +1094,9 @@ public class Loader {
 		String err = null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
-				+ Settings.rptable_rpostid + " end as 'ID' from " + Settings.rptable + Settings.sqlwhere + Settings.ptime
-				+ " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && " + Settings.ptime + " <= \'"
-				+ new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
+				+ Settings.rptable_rpostid + " end as 'ID' from " + Settings.rptable + Settings.sqlwhere
+				+ Settings.ptime + " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && "
+				+ Settings.ptime + " <= \'" + new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
 		Connection cndata = null;
 		Connection cnlocal = null;
 		try {
