@@ -271,7 +271,7 @@ public class GetPosts {
 		for (int i = 0; i < uri.length; i++) {
 			queryAdd += "(" + Settings.lotable_source + "=? " + "AND " + Settings.lotable_account + "=?)";  
 			if (i != (uri.length - 1)) {
-				queryAdd +=  "OR (";
+				queryAdd +=  "OR ";
 			}
 		}
 		
