@@ -264,13 +264,29 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);´
+		
+		Model m = Data.getmodel(id);
+		String[] uri = m.getURI().split(";");
+		String queryAdd = "";
+		for (int i = 0; i < uri.length; i++) {
+			queryAdd += "(" + Settings.lotable_source + "=? " + "AND " + Settings.lotable_account + "=?)";  
+			if (i != (uri.length - 1)) {
+				queryAdd +=  "OR (";
+			}
+		}
+		
+		
+		
 		if (min == -1)
 			min = 0;
 		if (max == -1)
 			max = 100;
-
-		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND "
+//		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
+//				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND "
+//				+ Settings.lotable_polarity + ">=" + min;
+		
+		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_timestamp + ">=? "
+				+ "AND " + Settings.lotable_polarity + "<=" + max + " AND "
 				+ Settings.lotable_polarity + ">=" + min;
 
 		if (!"Global".equals(product))
@@ -319,7 +335,7 @@ public class GetPosts {
 																											// // More
 																											// comment
 		}
-
+		insert += "AND (" + queryAdd + ")" ;
 		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
@@ -333,10 +349,9 @@ public class GetPosts {
 		LOGGER.log(Level.INFO, "TagCloud Query: " + insert);
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
-			int rangeindex = 3;
+			int rangeindex = 2;
 			int i = 0;
-			query1.setLong(1, model.getPSS());
-			query1.setLong(2, model.getDate());
+			query1.setLong(1, model.getDate());
 			if (param != null && !dateerror) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
@@ -346,12 +361,20 @@ public class GetPosts {
 				rangeindex++;
 				query1.setLong(rangeindex, inputdate.getTimeInMillis());
 				rangeindex++;
-
+			}
+			for (String s1 : uri) {
+				query1.setString(rangeindex, s1.split(",")[0]);
+				rangeindex++;
+				query1.setString(rangeindex, s1.split(",")[1]);
+				rangeindex++;
 			}
 
+			
 			// System.out.print(query1);
 			query1.setInt(rangeindex, MAXTOP);
-
+			
+			
+			LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {
