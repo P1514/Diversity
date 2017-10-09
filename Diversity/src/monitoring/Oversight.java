@@ -2,7 +2,9 @@ package monitoring;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -154,13 +156,13 @@ public class Oversight extends TimerTask {
 									}
 								}
 							}
-							if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
+							/*if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
 								update tmp = new update();
 								tmp.account = "mediawiki";
 								tmp.date = Long.valueOf(date);
 								tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
 								updatelist.put(tmp.account, tmp);
-							}
+							}*/
 						}
 					} catch (ClassNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -170,14 +172,24 @@ public class Oversight extends TimerTask {
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
 								: new url();
-						local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
-						local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
+						try {
+						local.accounts += "&accounts[]=" + URLEncoder.encode(d.account.replace(" ", "%20"),"UTF-8");
+						local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date+"","UTF-8") + "&epochsTo[]=" + URLEncoder.encode(now.getTimeInMillis()+"","UTF-8");
+						}catch(UnsupportedEncodingException e) {
+							LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+							local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
+							local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
+						}
 						requesturl.put(d.pss.toString(), local);
 						// break;// TO TEST
 					}
 
 					requesturl.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
+						//FIX Media Wiki
+						v.accounts+="&accounts[]=mediawiki";
+						v.epochs+="&epochsFrom[]=1&epochsTo[]=1507376292000";
+						
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
