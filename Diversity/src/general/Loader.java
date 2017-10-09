@@ -45,7 +45,11 @@ public class Loader {
 	public static List<String> users;
 	public static List<Author> users2;
 	public static boolean first_load = true;
+	private static boolean request=true;
 
+	public static void requestPSS() {
+		new Loader().loadPSS();	
+	}
 	public String load(JSONArray json) throws JSONException {
 		if(json==null) return null;
 		authordb2 = new ConcurrentHashMap<>();
@@ -335,7 +339,8 @@ public class Loader {
 	}
 
 	private void loadPSS() {
-
+		if(!request) return;
+		request=false;
 		String select = Settings.sqlselectall + Settings.crpsstable;
 		Connection cncr = null;
 		try {
@@ -491,6 +496,8 @@ public class Loader {
 		} catch (Exception e) {
 			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
 		}
+		
+		request = true;
 	}
 
 	private void loadDesignProjects() {

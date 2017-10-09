@@ -339,6 +339,7 @@ function connect() {
 			// Request posts to build the post table
 			var json = {
 				"Op" : "getposts",
+				"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 				"Id" : sessionStorage.id,
 				'Key' : getCookie("JSESSIONID")
 			}
@@ -386,16 +387,23 @@ function connect() {
 					type = 'All';
 			}
 			// Request the tagcloud for the current user
-			var json = {
-				"Op" : "tagcloud",
-				"Id" : sessionStorage.id,
-				"Param" : month != undefined ? "Month" : undefined,
-				"Values" : month != undefined ? month : undefined,
-				"Product" : product != undefined && product != "Global" ? product
-						: undefined,
-				'Key' : getCookie("JSESSIONID"),
-				'User' : user,
-				'Type' : type
+			if (refreshTag) {
+				var json = {
+					"Op" : "tagcloud",
+					"Id" : sessionStorage.id,
+					//"Param" : "Month",
+					//"Values" : month,
+					"Wiki" : document.getElementById('radio_wiki').checked ? true:false,
+					"Day" : day,
+					"Month" : month,
+					"Year" : year !== undefined ? 1900 + year : undefined,
+					"Product" : product != undefined && product != "Global" ? product
+							: undefined,
+					'Key' : getCookie("JSESSIONID"),
+					'User' : user,
+					'Type' : type
+				}
+				ws.send(JSON.stringify(json));
 			}
 			ws.send(JSON.stringify(json));
 			return;
@@ -754,8 +762,15 @@ function ignore_words(word) { // sends a message to start ignoring the word we
 function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
+	var avg_frequency=0;
+	for(var i=0; i < words.length;i++){
+		avg_frequency+=words[i].frequency;
+	}
+	avg_frequency = avg_frequency/words.length;
+	
 
 	for (var i = 0; i < words.length; i++) {
+		if(words[i].frequency < avg_frequency) continue;
 		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
 				+ '");\' rel=' + words[i].frequency + '>' + words[i].word
 				+ '</a>';
@@ -1760,8 +1775,13 @@ function requestTagcloud(polarity) {
 	var json = {
 		"Op" : "tagcloud",
 		"Id" : sessionStorage.id,
-		"Param" : month != undefined ? "Month" : undefined,
-		"Values" : month != undefined ? month : undefined,
+		//"Param" : "Month",
+		//"Values" : month,
+		"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
+		"Day" : day,
+		"Month" : month,
+		"Year" : year !== undefined ? 1900 + year : undefined,
+
 		"Product" : product != undefined && product != "Global" ? product
 				: undefined,
 		'Key' : getCookie("JSESSIONID"),
