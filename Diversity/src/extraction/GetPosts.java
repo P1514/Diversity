@@ -64,9 +64,9 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);
+		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_source
+				+ " in (?) AND "+Settings.lotable_account+" in (?) AND " + Settings.lotable_timestamp + ">=?";
 
-		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_timestamp + ">=?";
 		if (!"Global".equals(product))
 			insert += " AND " + Settings.lotable_product;
 
@@ -126,10 +126,11 @@ public class GetPosts {
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
-			int rangeindex = 3;
+			int rangeindex = 4;
 			int i = 0;
-			query1.setLong(1, model.getPSS());
-			query1.setLong(2, model.getDate());
+			query1.setString(1, model.getSources(false));
+			query1.setString(2, model.getAccounts(false));
+			query1.setLong(3, model.getDate());
 			if (param != null && !dateerror) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
@@ -269,12 +270,12 @@ public class GetPosts {
 		if (max == -1)
 			max = 100;
 
-		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND "
-				+ Settings.lotable_polarity + ">=" + min;
-
+	
+		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_source
+				+ " in (?) AND "+Settings.lotable_account+" in (?) AND " + Settings.lotable_timestamp + ">=?";
 		if (!"Global".equals(product))
 			insert += " AND " + Settings.lotable_product;
+
 
 		Model model = Data.getmodel(id);
 
@@ -333,10 +334,13 @@ public class GetPosts {
 		LOGGER.log(Level.INFO, "TagCloud Query: " + insert);
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
-			int rangeindex = 3;
+			
+			int rangeindex = 4;
 			int i = 0;
-			query1.setLong(1, model.getPSS());
-			query1.setLong(2, model.getDate());
+		
+			query1.setString(1, model.getSources(false));
+			query1.setString(2, model.getAccounts(false));
+			query1.setLong(3, model.getDate());
 			if (param != null && !dateerror) {
 				Calendar date = Calendar.getInstance();
 				if (!date.after(inputdate))
