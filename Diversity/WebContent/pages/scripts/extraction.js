@@ -20,8 +20,6 @@ var snapshots;
 var monthNames = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG",
 		"SEP", "OCT", "NOV", "DEC" ];
 var month;
-var year;
-var day;
 var product;
 var user = localStorage.user;
 var finalProductColors = [];
@@ -31,8 +29,6 @@ var snap_name;
 var snap_user;
 var snap_date;
 var snap_pss;
-var refreshTag = true;
-var triedwiki = false;
 // DEBUG STUFF - DELETE WHEN DONE TESTING---------------------------------------
 
 $(window).on('load', function() {
@@ -40,19 +36,6 @@ $(window).on('load', function() {
 		$("#DEBUG_USER").toggle();
 	}
 });
-
-function loadingscreen(){
-	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
-	switch (choice){
-	case 1: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
-	case 2: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend seems to be hung up, please wait a little bit more...');break;
-	case 3: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Big amounts of data can take a long time, please wait...');break;
-	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
-	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
-	}
-	
-}
-var loadingtimer=window.setInterval(loadingscreen, 10000);
 
 $("#USER_LIST")
 		.on(
@@ -63,11 +46,8 @@ $("#USER_LIST")
 					var json = {
 						"Op" : "tagcloud",
 						"Id" : sessionStorage.id,
-						//"Param" : "Month",
-						//"Values" : month,
-						"Day" : day,
-						"Month" : month,
-						"Year" : year !== undefined ? 1900 + year : undefined,
+						"Param" : month != undefined ? "Month" : undefined,
+						"Values" : month != undefined ? month : undefined,
 						"Product" : product != undefined && product != "Global" ? product
 								: undefined,
 						'Key' : getCookie("JSESSIONID"),
@@ -97,59 +77,6 @@ function getCookie(name) {
 	var parts = value.split('; ' + name + '=');
 	if (parts.length == 2)
 		return parts.pop().split(';').shift();
-}
-
-//Sends a message when a point in the bottom right chart is selected, which
-// will change the displayed posts in the table.
-function getPosts() {
-	var selection = bottom_right.getSelection()[0];
-	if (selection != undefined
-			&& (selection.hasOwnProperty('row') && selection.row != null)) {
-		var row = selection.row;
-		var col = selection.column;
-		month = sentimentdata.getValue(row, 0) != null ? monthNames[sentimentdata.getValue(row, 0).getMonth()] : 'JAN';
-		day = sentimentdata.getValue(row, 0) != null ? sentimentdata.getValue(row, 0).getDay() : 1;
-		year = sentimentdata.getValue(row, 0) != null? sentimentdata.getValue(row, 0).getYear() : 1970;
-		product = sentimentdata.getColumnLabel(selection.column);
-
-		if (product != "Global" && filteredByProduct) {
-			json = {
-				"Op" : "getposts",
-				"Id" : sessionStorage.id,
-				//"Param" : "Month",
-				//"Values" : month,
-				"Day" : day,
-				"Month" : month,
-				"Year" : year !== undefined ? 1900 + year : undefined,
-				"Product" : product,
-				'Key' : getCookie("JSESSIONID")
-			}
-		} else {
-			json = {
-				"Op" : "getposts",
-				"Id" : sessionStorage.id,
-				//"Param" : "Month",
-				//"Values" : month,
-				"Day" : day,
-				"Month" : month,
-				"Year" : year !== undefined ? 1900 + year : undefined,
-				'Key' : getCookie("JSESSIONID")
-			}
-		}
-		refreshTag = true;
-		ws.send(JSON.stringify(json));
-
-	} else {
-		month = undefined;
-		product = undefined;
-		json = {
-			"Op" : "getposts",
-			"Id" : sessionStorage.id,
-			'Key' : getCookie("JSESSIONID")
-		}
-
-		ws.send(JSON.stringify(json));
-	}
 }
 
 /*
@@ -183,6 +110,52 @@ function connect() {
 			.getElementById('reachline'));
 	bottom_right = new google.visualization.LineChart(document
 			.getElementById('globalline'));
+
+	// Sends a message when a point in the bottom right chart is selected, which
+	// will change the displayed posts in the table.
+	google.visualization.events.addListener(bottom_right, 'select', function() {
+		var selection = bottom_right.getSelection()[0];
+		if (selection != undefined
+				&& (selection.hasOwnProperty('row') && selection.row != null)) {
+			var row = selection.row;
+			var col = selection.column;
+			month = monthNames[sentimentdata.getValue(row, 0).getMonth()];
+			product = sentimentdata.getColumnLabel(selection.column);
+
+			if (product != "Global" && filteredByProduct) {
+				json = {
+					"Op" : "getposts",
+					"Id" : sessionStorage.id,
+					"Param" : "Month",
+					"Values" : month,
+					"Product" : product,
+					'Key' : getCookie("JSESSIONID")
+				}
+			} else {
+				json = {
+					"Op" : "getposts",
+					"Id" : sessionStorage.id,
+					"Param" : "Month",
+					"Values" : month,
+					'Key' : getCookie("JSESSIONID")
+				}
+			}
+
+			ws.send(JSON.stringify(json));
+
+		} else {
+			month = undefined;
+			product = undefined;
+			json = {
+				"Op" : "getposts",
+				"Id" : sessionStorage.id,
+				'Key' : getCookie("JSESSIONID")
+			}
+
+			ws.send(JSON.stringify(json));
+		}
+	});
+
 	document.getElementById("Cookie").innerHTML = "Model: "
 			+ window.sessionStorage.model + "; PSS: "
 			+ window.sessionStorage.pss;
@@ -321,13 +294,6 @@ function connect() {
 			jsonData = JSON.parse(JSON.stringify(json));
 			if (json[1].hasOwnProperty("Error")) {
 				if (json[1].Error == "No_data") {
-					if(!triedwiki){
-						document.getElementById('radio_wiki').checked=true;
-						triedwiki=true;
-						changeRequest('wiki');
-						return;
-					}
-					
 					$('#loading')
 							.html(
 									'No data to display.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
@@ -336,13 +302,12 @@ function connect() {
 				}
 			} else {
 				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
-					if (jsonData[jsonData.length-1].has_wiki == false) {
-						$('#radio_wiki_label').hide();
+					if (!jsonData[jsonData.length-1].has_wiki) {
+						$('#radio_wiki').hide();
 					} else {
-						$('#radio_wiki_label').show();
+						$('#radio_wiki').show();
 					}
-				} else {
-					$('#radio_wiki_label').show();
+					$('#radio_wiki').show();
 				}
 				// console.log("redone");
 				drawChart();
@@ -440,6 +405,7 @@ function connect() {
 				}
 				ws.send(JSON.stringify(json));
 			}
+			ws.send(JSON.stringify(json));
 			return;
 		}
 
@@ -471,10 +437,10 @@ google.charts.load('current', {
 $(document).ready(function() {
 	google.charts.setOnLoadCallback(connect);
 });
-/*$(window).load(function() {
+$(window).load(function() {
 	$('#overlay').hide();
 	$('#overlay-back').hide();
-});*/
+});
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
@@ -836,15 +802,11 @@ function tagClick(word) {
 		"Op" : "getposts",
 		"Id" : sessionStorage.id,
 		"word" : word,
-		//"Param" : "Month",
-		//"Values" : month,
-		"Day" : day,
-		"Month" : month,
-		"Year" : year !== undefined ? 1900 + year : undefined,
+		"Month" : month != undefined ? month : undefined,
 		"Product" : product != undefined ? product : undefined,
 		'Key' : getCookie("JSESSIONID")
 	}
-	refreshTag = false;
+
 	ws.send(JSON.stringify(json));
 }
 
@@ -953,7 +915,6 @@ function drawChart() {
 	var i = 1;
 	data.addColumn('string', 'Param');
 	if (jsonData[i].Graph == "Top_Left") {
-		triedwiki=false;
 		for (filt = 1; i < jsonData.length
 				&& jsonData[i].hasOwnProperty("Filter")
 				&& jsonData[i].Graph == "Top_Left"; filt++) {
@@ -1084,9 +1045,7 @@ function drawChart() {
 		for (ii = 0; i < jsonData.length && jsonData[i].Graph == "Bottom_Left"; ii++, i++) {
 			data.addRow();
 			data.setCell(ii, 0, jsonData[i].Param);
-			if (jsonData[i].Value != -1) {
-				data.setCell(ii, 1, jsonData[i].Value)
-			}
+			data.setCell(ii, 1, jsonData[i].Value)
 		}
 		filt = 2;
 		colors = new Array();
@@ -1143,30 +1102,25 @@ function drawChart() {
 					data.addRow();
 				}
 				var time = jsonData[i].Date.split(" ");
-				if (jsonData[i].Value != -1 ) {
+				if (jsonData[i].Value != 0) {
 
-					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
-							+ time[0])); // month comes as a number from
+					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
+							+ time[2])); // month comes as a number from
 					// server, if it changes use
 					// getMonthFromString
 					data.setCell(ii, filt, jsonData[i].Value)
 				} else {
-					data.setCell(ii, 0, new Date(time[2] + "/" + time[1] + "/"
-							+ time[0]));
+					data.setCell(ii, 0, new Date(time[1] + "/" + time[0] + "/"
+							+ time[2]));
 				}
 			}
 		}
-
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(data.getColumnLabel(color)));
 		}
 		finalProductColors = colors;
 		function midSelectHandler() {
-			var selection = bottom_middle.getSelection()[0];
-			var row = selection.row;
-			var col = selection.column;
-			console.log(sentimentdata.getValue(row, 0));
 			var selectedItem = bottom_middle.getSelection()[0] != undefined ? bottom_middle
 					.getSelection()[0]
 					: false;
@@ -1178,9 +1132,7 @@ function drawChart() {
 						column : selectedItem.column,
 						row : selectedItem.row
 					} ]);
-					//google.visualization.events.trigger(bottom_right, 'select');
-					sentimentdata = data;
-					getPosts();
+					google.visualization.events.trigger(bottom_right, 'select');
 				}
 			} else {
 				bottom_right.setSelection([]);
@@ -1255,7 +1207,6 @@ function drawChart() {
 				max : start
 			}
 		}
-
 		google.visualization.events.addListener(bottom_middle, 'select',
 				midSelectHandler);
 
@@ -1297,7 +1248,7 @@ function drawChart() {
 			// options.vAxis.viewWindow.min = coords.y.min;
 			// options.vAxis.viewWindow.max = coords.y.max;
 		}
-		bottom_middle.draw(data, mid_options);
+		bottom_middle.draw(mid_data, mid_options);
 	}
 
 	var right_data;
@@ -1351,11 +1302,10 @@ function drawChart() {
 
 					}
 				} else {
-					sentimentdata.setCell(ii--, 0, new Date(time[2] +"/"+ time[1] - 1+"/"+
+					sentimentdata.setCell(ii, 0, new Date(time[2], time[1] - 1,
 							time[0]));
 
 				}
-
 			}
 			var time2;
 			for (var iii = count; i < jsonData.length
@@ -1371,13 +1321,10 @@ function drawChart() {
 						columns.push('Extrapolation for ' + name);
 						series.push(sentimentdata.getNumberOfColumns() - 2);
 					}
-					if (jsonData[i].Value != -1) {
-						sentimentdata.addRow();
-						sentimentdata.setCell(iii, 0, new Date(time2[2],
+					sentimentdata.addRow();
+					sentimentdata.setCell(iii, 0, new Date(time2[2],
 							time2[1] - 1, time2[0]));
-
-						sentimentdata.setCell(iii, filt, jsonData[i].Value);
-					}
+					sentimentdata.setCell(iii, filt, jsonData[i].Value);
 				}
 			}
 		}
@@ -1399,12 +1346,12 @@ function drawChart() {
 						column : selectedItem.column,
 						row : selectedItem.row
 					} ]);
-
+					google.visualization.events
+							.trigger(bottom_middle, 'select');
 				}
 			} else {
 				bottom_middle.setSelection([]);
 			}
-			getPosts();
 		}
 
 		/*
@@ -1419,6 +1366,7 @@ function drawChart() {
 
 		var right_options = {
 			hAxis : {
+				format : 'MMM',
 				showTextEvery : 1,
 				textStyle : {
 					fontSize : 8
@@ -1434,7 +1382,7 @@ function drawChart() {
 			legend : {
 				position : 'bottom'
 			},
-			colors : colors,
+			colors : finalProductColors,
 			animation : {
 				duration : 1000,
 				easing : 'out',
@@ -1519,7 +1467,6 @@ function drawChart() {
 	}
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(2000);
-	window.clearInterval(loadingtimer);
 
 	if (!loaded) {
 		if (localStorage.tutorial != undefined
@@ -1825,7 +1772,6 @@ function wikiPosts() {
 }
 
 function requestTagcloud(polarity) {
-	requestTag = true;
 	var json = {
 		"Op" : "tagcloud",
 		"Id" : sessionStorage.id,
@@ -1835,6 +1781,7 @@ function requestTagcloud(polarity) {
 		"Day" : day,
 		"Month" : month,
 		"Year" : year !== undefined ? 1900 + year : undefined,
+
 		"Product" : product != undefined && product != "Global" ? product
 				: undefined,
 		'Key' : getCookie("JSESSIONID"),
