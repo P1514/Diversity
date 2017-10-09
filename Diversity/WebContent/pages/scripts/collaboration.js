@@ -26,7 +26,7 @@ function loadingscreen(){
 	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
 	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
 	}
-	
+
 }
 var loadingtimer=window.setInterval(loadingscreen, 10000);
 function getCookie(name) { //not being used
@@ -132,10 +132,11 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
+/*
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
 				$('#all').click();
 			}
-
+*/
 	    		return;
 
     }
