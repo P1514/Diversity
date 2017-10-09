@@ -17,18 +17,6 @@ var availableUsers = [];
 var team = [];
 var roles = [];
 
-function loadingscreen(){
-	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
-	switch (choice){
-	case 1: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
-	case 2: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend seems to be hung up, please wait a little bit more...');break;
-	case 3: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Big amounts of data can take a long time, please wait...');break;
-	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
-	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
-	}
-	
-}
-var loadingtimer=window.setInterval(loadingscreen, 10000);
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -37,9 +25,8 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-	$('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Loading, please wait...');
-	$('#overlay').show();
-	$('#overlay-back').show();
+  $('#overlay-back').hide();
+  $('#overlay').hide();
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
 	var str = userCompany;
 
@@ -74,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json));
-			return;
 		}
 
 		if (json[0].Op == "Roles") {
@@ -89,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json2));
-			return;
 		}
 
 
@@ -100,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
 					teamRoles[i] = users[i].Role;
-					userStorage[i] = users[i];
 			}
       //console.log(users);
 			var tmp = getMultipleParams("user");
@@ -127,17 +111,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
-	    if (getParam('products') == 'null' && getParam('services') == 'null') {
+	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
 			}
-
-			if (getParam('company') == 'null' || getParam('company') === undefined) {
-				$('#all').click();
-			}
-
-	    		return;
-
     }
 
 		if (json[0].Op == "names") {
@@ -219,9 +196,6 @@ function drawTable() {
 	};
 
 	var userList = new List('table', options);
-	window.clearInterval(loadingtimer);
-	$('#overlay').fadeOut(2000);
-	$('#overlay-back').fadeOut(3000);
 }
 
 function getParam(param) {

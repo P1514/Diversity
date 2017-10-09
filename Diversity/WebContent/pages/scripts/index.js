@@ -1,7 +1,4 @@
 google.charts.load('current', {packages:['corechart','controls']});
-if (document.cookie.indexOf('JSESSIONID') == -1) {
-  document.cookie = 'JSESSIONID = ' + (Math.random().toString(36)+'00000000000000000').slice(2, 15+2);
-}
 if (window.location.href.indexOf('https://') != -1) {
   ws = new WebSocket('wss://' + window.location.hostname + ":"
       + window.location.port + '/Diversity/server');
@@ -155,6 +152,7 @@ function setCookie2(name, id, pss) {
 
 // dev only feature - removes the need to set the user type every time
 ws.onopen = function() {
+
   if (sessionStorage.userKey == undefined) {
     sessionStorage.userKey = Math.floor(Math.random() * 100000000);
   }
@@ -210,10 +208,8 @@ ws.onmessage = function(event) {
     if (url.indexOf("design_project_id=") != -1) {
       dp = url.split("design_project_id=")[1].split("&")[0];
       localStorage.dp = dp;
-    } else if (localStorage.dp !== undefined) {
-      dp = localStorage.dp;
     }
-    
+
     dp = dp.replace(/%20/g," ");
     var jsonData = {
         'Op' : 'getmodels',

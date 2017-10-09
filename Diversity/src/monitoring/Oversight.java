@@ -55,8 +55,8 @@ public class Oversight extends TimerTask {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 0/* 1 */);
 		/*
-		 * c.set(Calendar.HOUR, 0); c.set(Calendar.MINUTE, 1); c.set(Calendar.SECOND,
-		 * 0); c.set(Calendar.AM_PM, Calendar.AM);
+		 * c.set(Calendar.HOUR, 0); c.set(Calendar.MINUTE, 1);
+		 * c.set(Calendar.SECOND, 0); c.set(Calendar.AM_PM, Calendar.AM);
 		 */
 		c.add(Calendar.SECOND, 15);
 
@@ -94,29 +94,22 @@ public class Oversight extends TimerTask {
 
 		// TODO This is the method that run at 00:00 each 24h to update
 		// everything
-		String getsources = "Select " + Settings.lmtable_uri + "," + Settings.lmtable_pss + ","
-				+ Settings.lmtable_add_mediawiki + " from " + Settings.lmtable + " where " + Settings.lmtable_udate
-				+ "<=? AND " + Settings.lmtable_uri + " LIKE ?";
+		String getsources = "Select " + Settings.lmtable_uri + "," + Settings.lmtable_pss + " from " + Settings.lmtable
+				+ " where " + Settings.lmtable_udate + "<=? AND " + Settings.lmtable_uri + " LIKE ?";
 		String getpss = "Select distinct( " + Settings.lutable_source + ")," + Settings.lutable_lastupdate + " from "
 				+ Settings.lutable;
 
 		if (local == true) {
+			dbconnect();
 			try {
-				PreparedStatement query;
+				PreparedStatement query = cnlocal.prepareStatement(getpss);
 				ResultSet rs;
-				try (Connection cnlocal = Settings.connlocal()) {
-					query = cnlocal.prepareStatement(getpss);
-					
-					// System.out.println("QUERY: " + query.toString());
-					rs = query.executeQuery();
+				// System.out.println("QUERY: " + query.toString());
+				rs = query.executeQuery();
 
-					while (rs.next()) {
-						sourcelist.add(rs.getString(Settings.lutable_source) + ";;;"
-								+ rs.getString(Settings.lutable_lastupdate));
-					}
-				} catch (ClassNotFoundException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+				while (rs.next()) {
+					sourcelist.add(
+							rs.getString(Settings.lutable_source) + ";;;" + rs.getString(Settings.lutable_lastupdate));
 				}
 				for (String a : sourcelist) {
 
@@ -124,48 +117,38 @@ public class Oversight extends TimerTask {
 
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();
-					try (Connection cnlocal = Settings.connlocal()) {
-						query = cnlocal.prepareStatement(getsources);
-						query.setLong(1, now.getTimeInMillis());
-						String source = a.split(";;;")[0];
-						String date = a.split(";;;")[1];
-						query.setString(2, "%" + source + ",%");
 
-						rs = query.executeQuery();
+					query = cnlocal.prepareStatement(getsources);
+					query.setLong(1, now.getTimeInMillis());
+					String source = a.split(";;;")[0];
+					String date = a.split(";;;")[1];
+					query.setString(2, "%" + source + ",%");
 
-						// System.out.println("query: " + query.toString());
+					rs = query.executeQuery();
 
-						Calendar c = Calendar.getInstance();
-						while (rs.next()) {
-							c.setTimeInMillis(Long.valueOf(date));
-							if (now.after(c)) {
-								String[] uri = rs.getString(Settings.lmtable_uri).split(";");
-								for (String b : uri) {
-									if (updatelist.containsKey(b.split(",")[1])) {
-										update tmp = updatelist.get(b.split(",")[1]);
-										if (tmp.date > Long.valueOf(date))
-											tmp.date = Long.valueOf(date);
-									} else {
-										update tmp = new update();
-										tmp.account = b.split(",")[1];
+					// System.out.println("query: " + query.toString());
+
+					Calendar c = Calendar.getInstance();
+					while (rs.next()) {
+						c.setTimeInMillis(Long.valueOf(date));
+						if (now.after(c)) {
+							String[] uri = rs.getString(Settings.lmtable_uri).split(";");
+							for (String b : uri) {
+								if (updatelist.containsKey(b.split(",")[1])) {
+									update tmp = updatelist.get(b.split(",")[1]);
+									if (tmp.date > Long.valueOf(date))
 										tmp.date = Long.valueOf(date);
-										tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
-										updatelist.put(tmp.account, tmp);
-									}
+								} else {
+									update tmp = new update();
+									tmp.account = b.split(",")[1];
+									tmp.date = Long.valueOf(date);
+									tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
+									updatelist.put(tmp.account, tmp);
 								}
 							}
-							if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
-								update tmp = new update();
-								tmp.account = "mediawiki";
-								tmp.date = Long.valueOf(date);
-								tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
-								updatelist.put(tmp.account, tmp);
-							}
 						}
-					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
 					}
+					cnlocal.close();
 
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
@@ -194,9 +177,8 @@ public class Oversight extends TimerTask {
 							try {
 								// System.out.println("TESTE: " +
 								// readUrl(request));
-								// request = request.replaceAll(" ", "%20");
+								//request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
-								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
@@ -209,9 +191,13 @@ public class Oversight extends TimerTask {
 									+ "=?) AND (";
 							try {
 								/*
-								 * TODO Missing check standard update time update time, currently doing update
-								 * each day Calendar cal=now; for (Model m : Data.modeldb.values()) { if
-								 * (m.getPSS().equals(k)) { cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());
+								 * TODO Missing check standard update time
+								 * update time, currently doing update each day
+								 * Calendar cal=now; for (Model m :
+								 * Data.modeldb.values()) { if
+								 * (m.getPSS().equals(k)) {
+								 * cal.add(Calendar.DAY_OF_MONTH,
+								 * m.getFrequency());
 								 */
 								String[] account = v.accounts.replaceAll("\"", "").replaceFirst("&", "").split("&");
 								for (int i = 0; i < account.length; i++) {
@@ -221,19 +207,19 @@ public class Oversight extends TimerTask {
 								update += ")";
 								Calendar cc = (Calendar) now.clone();
 								cc.add(Calendar.DAY_OF_MONTH, 1);
-								try (Connection cnlocal = Settings.connlocal()) {
-									PreparedStatement query1 = cnlocal.prepareStatement(update);
-									query1.setLong(1, now.getTimeInMillis());
-									query1.setString(2, k);
-									query1.setString(3, a.split(";;;")[0]);
-									int i = 4;
-									for (String acc : account) {
-										query1.setString(i++, acc.split("=")[1]);
-									}
-									// System.out.println(query1);
-									query1.execute();
-
+								dbconnect();
+								PreparedStatement query1 = cnlocal.prepareStatement(update);
+								query1.setLong(1, now.getTimeInMillis());
+								query1.setString(2, k);
+								query1.setString(3, a.split(";;;")[0]);
+								int i = 4;
+								for (String acc : account) {
+									query1.setString(i++, acc.split("=")[1]);
 								}
+								// System.out.println(query1);
+								query1.execute();
+
+								cnlocal.close();
 								/*
 								 * } }
 								 */
@@ -244,7 +230,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					});
-
+					
 					// break;// TO TEST
 				}
 				// TODO missing uodate DB
@@ -253,7 +239,12 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
-			
+			try {
+				cnlocal.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			try {
 				(new Loader()).loadinit();
@@ -262,7 +253,7 @@ public class Oversight extends TimerTask {
 				e.printStackTrace();
 			}
 		}
-
+		
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
@@ -271,8 +262,8 @@ public class Oversight extends TimerTask {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		Server.isloading = false;
+		
+		Server.isloading=false;
 	}
 
 	private class url {

@@ -52,10 +52,10 @@ $(document).ready(function(){
 		<product>
 		<div id="Cookie">Error: no product to display</div>
 		</product>
-		<button onclick="window.history.back();" id="home"
-			class="btn btn-default">Back</button>
-			<label id="radio_social_label" style="width:300px;"><input type="radio" name="source_radio" value="social" id="radio_social" onclick="changeRequest('')"> Use social network data</label><br>
-			<label id="radio_wiki_label" style="width:300px;"><input type="radio" name="source_radio" value="wiki" id="radio_wiki" onclick="changeRequest('wiki')"> Use media wiki</label><br>
+		<button onclick="location.href = 'index.html';" id="home"
+			class="btn btn-default">Home</button>
+			<input type="radio" name="source_radio" value="social" id="radio_social" onclick="changeRequest('')"> Use social network data<br>
+			<input type="radio" name="source_radio" value="wiki" id="radio_wiki" onclick="changeRequest('wiki')"> Use media wiki<br>
 			<center>
 				<button onclick="save();" id="save"
 					class="btn btn-default">Save snapshot</button>
