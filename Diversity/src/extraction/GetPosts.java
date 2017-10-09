@@ -51,7 +51,8 @@ public class GetPosts {
 	 * @throws JSONException
 	 *             in case creating json error occurs
 	 */
-	public JSONArray getTop(String param, String month, long id, String product, String word, int day, int year) throws JSONException {
+	public JSONArray getTop(String param, String month, long id, String product, String word, int day, int year)
+			throws JSONException {
 		JSONArray result = new JSONArray();
 		String[] pre_result = new String[MAXTOP];
 		JSONObject obj = new JSONObject();
@@ -169,11 +170,12 @@ public class GetPosts {
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
-					rs.next();
-					pre_result[i] = topid[i] + ",," + rs.getString(Settings.latable_name) + ",,"
-							+ rs.getDouble(Settings.latable_influence) + ",," + rs.getString(Settings.latable_location)
-							+ ",," + rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age)
-							+ ",,";
+					if (rs.next()) {
+						pre_result[i] = topid[i] + ",," + rs.getString(Settings.latable_name) + ",,"
+								+ rs.getDouble(Settings.latable_influence) + ",,"
+								+ rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
+								+ ",," + rs.getInt(Settings.latable_age) + ",,";
+					}
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, "ERROR", e);
@@ -262,11 +264,14 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);´
-		if (min == -1) min = 0;
-		if (max == -1) max = 100;
+		if (min == -1)
+			min = 0;
+		if (max == -1)
+			max = 100;
 
 		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_pss
-				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">=" + min;
+				+ "=? AND " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable_polarity + "<=" + max + " AND "
+				+ Settings.lotable_polarity + ">=" + min;
 
 		if (!"Global".equals(product))
 			insert += " AND " + Settings.lotable_product;
@@ -325,7 +330,7 @@ public class GetPosts {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return Backend.error_message("Cannot connect to Database Please Try Again Later");
 		}
-		LOGGER.log(Level.INFO, "TagCloud Query: "+ insert);
+		LOGGER.log(Level.INFO, "TagCloud Query: " + insert);
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			int rangeindex = 3;
@@ -383,18 +388,19 @@ public class GetPosts {
 
 			}
 		}
-	
-			insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + ","
-					+ Settings.lotable_reach + "," + Settings.lotable_comments + " from " + Settings.lotable + " where "
-					+ Settings.lotable_id + " = ? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">=" + min;
-		
+
+		insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
+				+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
+				+ " = ? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">="
+				+ min;
 
 		for (int i = 0; i < n_tops; i++) {
 
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
-					if(rs.next()==false)continue;
+					if (rs.next() == false)
+						continue;
 					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
 							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
 							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
@@ -408,7 +414,8 @@ public class GetPosts {
 				+ " = ?";
 
 		for (int i = 0; i < n_tops; i++) {
-			if(topid[i]==0 )continue;
+			if (topid[i] == 0)
+				continue;
 			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 
@@ -432,7 +439,8 @@ public class GetPosts {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < n_tops; i++) {
-			if("".equals(pre_result[i])) continue;
+			if ("".equals(pre_result[i]))
+				continue;
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
 			obj.put("Id", pre_results[0]);
@@ -476,14 +484,18 @@ public class GetPosts {
 	 * @throws JSONException
 	 *             when creating JSON fails to execute
 	 */
-	public JSONArray getAmmount(String param, String value, String filter, long id) throws JSONException {
+	public JSONArray getAmmount(boolean wiki, String param, String value, String filter, long id) throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
 		Calendar inputdate = Calendar.getInstance();
 		String insert = new String();
-		insert = "Select count(*) FROM " + Settings.lotable + " where ( " + Settings.lotable_pss + "=? AND "
-				+ Settings.lotable_product;
+		insert = "Select count(*) FROM " + Settings.lotable + " where (";
+		if (wiki)
+			insert += " " + Settings.lotable_pss + "=? AND";
+		/*
+		 * if (!wiki) insert += " AND " + Settings.lotable_product;
+		 */
 		Model model = Data.getmodel(id);
 		if (model == null) {
 			obj = new JSONObject();
@@ -492,20 +504,22 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		if (!model.getProducts().isEmpty()) {
-			insert += " in (" + model.getProducts() + ")";
-		} else {
-			insert += "=0";
-		}
+		/*
+		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in (" +
+		 * model.getProducts() + ")"; } else { insert += "=0"; } }
+		 */
 		parameters par = GetReach.split_params(param, value);
 		if (par.age != null)
-			insert += " AND age<=? AND age>?";
+			insert += " age<=? AND age>? AND ";
 		if (par.gender != null)
-			insert += " AND gender=?";
+			insert += " gender=? AND";
 		if (par.location != null)
-			insert += " AND location=?";
-		insert += " AND timestamp<? AND " + Settings.lotable_timestamp + ">=? ";
-		insert += " AND source in (?))";
+			insert += " location=? AND";
+		insert += " timestamp<? AND " + Settings.lotable_timestamp + ">=? AND ";
+		insert += " source in (?) AND ";
+		// if (!wiki)
+		insert += "account in (?)";
+		insert += ")";
 		// ResultSet rs = null;
 		try {
 			dbconnect();
@@ -514,8 +528,9 @@ public class GetPosts {
 			return Backend.error_message("Cannot connect to database please try again later");
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-			int rangeindex = 2;
-			query1.setLong(1, model.getPSS());
+			int rangeindex = 1;
+			if (wiki)
+				query1.setLong(rangeindex++, model.getPSS());
 
 			if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
@@ -533,8 +548,10 @@ public class GetPosts {
 			 * inputdate.getTimeInMillis()); rangeindex++;
 			 */
 			query1.setLong(rangeindex++, model.getDate());
-			query1.setString(rangeindex++, model.getSources());
-			LOGGER.log(Level.INFO,query1.toString());
+			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getSources(false));
+			// if (!wiki)
+			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getAccounts(false));
+			//LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");
