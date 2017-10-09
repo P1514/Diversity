@@ -320,7 +320,7 @@ public class Globalsentiment extends GetReach {
 			query1.setString(1, model.getSources(false));
 			query1.setString(2, model.getAccounts(false));
 			// System.out.println("Query:" + query1.toString());
-			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
+			//LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
 
 			try (ResultSet rs = query1.executeQuery()) {
@@ -447,7 +447,7 @@ public class Globalsentiment extends GetReach {
 				+ " AND timestamp>? && timestamp<? && opinions.id in  (Select id from opinions where " 
 				+ (model.getId() == -1 ? Settings.lotable_pss + "=?" : "");
 
-		LOGGER.log(Level.INFO, "PRE-QUery" + insert);
+		//LOGGER.log(Level.INFO, "PRE-QUery" + insert);
 		return calc_global(false, "polar", insert, par, month, model, year, day, frequency);
 
 	}

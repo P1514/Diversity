@@ -551,7 +551,7 @@ public class GetPosts {
 			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getSources(false));
 			// if (!wiki)
 			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getAccounts(false));
-			LOGGER.log(Level.INFO, query1.toString());
+			//LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");

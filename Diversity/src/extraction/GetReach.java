@@ -208,6 +208,7 @@ public class GetReach {
 				query1.setString(rangeindex++, model.getAccounts(false));
 				query1.setString(rangeindex++, model.getSources(false));
 			}
+			LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
