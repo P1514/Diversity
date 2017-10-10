@@ -36,6 +36,8 @@ import extraction.Tagcloud;
 import modeling.GetModels;
 import security.Roles;
 
+import javax.websocket.Session;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Backend.
@@ -45,6 +47,7 @@ public class Backend {
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
+	private Session session=null;
 
 	/**
 	 * Instantiates a new backend.
@@ -54,12 +57,19 @@ public class Backend {
 	 * @param _msg
 	 *            the msg
 	 */
+	public Backend(int _op, JSONObject _msg, Session _session) {
+		op = _op;
+		msg = _msg;
+		session=_session;
+
+	}
+
 	public Backend(int _op, JSONObject _msg) {
 		op = _op;
 		msg = _msg;
 
 	}
-
+	
 	public void setMessage(int _op, JSONObject _msg) throws JSONException {
 		op = _op;
 		_msg.put("Key", msg.get("Key"));
@@ -279,7 +289,7 @@ public class Backend {
 
 				result.put(col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
 						msg.has("Services") ? msg.getString("Services") : "",
-						msg.has("Company") ? msg.getString("Company") : ""));
+						msg.has("Company") ? msg.getString("Company") : "", session));
 				if (result.isNull(1)) {
 					obj = new JSONObject();
 					result = new JSONArray();
@@ -335,20 +345,20 @@ public class Backend {
 				if (msg.has("Type")) {
 					switch (msg.getString("Type")) {
 					case "Positive":
-						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 
 					case "Negative":
-						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
-						tag = new Tagcloud(gp.getTop(param, values, id,
+						tag = new Tagcloud(gp.getTop(msg.getBoolean("Wiki"), param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
@@ -356,7 +366,7 @@ public class Backend {
 					}
 				} else {
 					tag = new Tagcloud(
-							gp.getTop(param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"),
+							gp.getTop(msg.getBoolean("Wiki"),param, values, id, (msg.has("Product") ? msg.getString("Product") : "noproduct"),
 									"", msg.has("Day") ? msg.getInt("Day") : 1,
 									msg.has("Year") ? msg.getInt("Year") : 2017),
 							id, msg.has("User") ? msg.getLong("User") : 0);
@@ -378,7 +388,7 @@ public class Backend {
 					switch (msg.getString("Type")) {
 					case "Positive":
 						// System.out.println("POSITIVE");
-						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
@@ -386,19 +396,19 @@ public class Backend {
 
 					case "Negative":
 						// System.out.println("NEGATIVE");
-						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
-						tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 					}
 				} else {
-					tag = new Tagcloud(gp.getTopWithPolarity(param, values, id,
+					tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
 							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
 							msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017), id,
 							msg.has("User") ? msg.getLong("User") : 0);
@@ -635,21 +645,21 @@ public class Backend {
 			case 4:
 				if (msg.has("Product")) {
 					if (msg.has("word"))
-						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
+						tmp = gp.getTop(msg.getBoolean("Wiki"),msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
 								id, msg.getString("Product"), msg.getString("word"),
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017)
 								.toString();
 					else
-						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
+						tmp = gp.getTop(msg.getBoolean("Wiki"),msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
 								id, msg.getString("Product"), null, msg.has("Day") ? msg.getInt("Day") : 1,
 								msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				} else {
 					if (msg.has("word"))
-						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
+						tmp = gp.getTop(msg.getBoolean("Wiki"),msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
 								id, "noproduct", msg.getString("word"), msg.has("Day") ? msg.getInt("Day") : 1,
 								msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 					else
-						tmp = gp.getTop(msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
+						tmp = gp.getTop(msg.getBoolean("Wiki"),msg.has("Day") ? " " : param, msg.has("Month") ? msg.getString("Month") : "JAN",
 								id, "noproduct", null, msg.has("Day") ? msg.getInt("Day") : 1,
 								msg.has("Year") ? msg.getInt("Year") : 2017).toString();
 				}
@@ -766,6 +776,7 @@ public class Backend {
 				return tmp;
 			case 17:
 				result = new JSONArray();
+				Loader.requestPSS();
 				result.put(new JSONObject().put("Op", "pss"));
 
 				for (PSS a : Data.dbpssall()) {

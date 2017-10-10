@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import org.json.JSONArray;
 
 import extraction.Extrapolation;
+import general.Backend;
 import general.Data;
 import general.DesignProject;
 import general.Logging;
@@ -20,12 +21,16 @@ import org.json.JSONObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.websocket.Session;
+
 public class Prediction extends Globalsentiment {
 
 	double totalSentiment, totalWeight, totalGsweight, variance, numbOfProd, maxValue, mean, tempvalue, stDeviation;
 	int month, i;
 	public static final Logger LOGGER = new Logging().create(Data.class.getName());
 	Calendar data = Calendar.getInstance();
+	private long update_size=0;
+	private long hidden_size;
 
 	public Prediction() {
 
@@ -629,8 +634,26 @@ public class Prediction extends Globalsentiment {
 
 		return pssSentiment;
 	}
+	
+	private void updateLoadBar(long step, long done, long total, Session session) {
+		if(session == null)return;
+		if(total!=0) {
+			update_size=total;
+		}
+		double percentage= ((double)done)/((double)update_size)*100;
+		JSONArray msg=null;
+		try {
+			msg = Backend.error_message(" "+percentage+"%");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(msg==null) return;
+		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
+		session.getAsyncRemote().sendText(msg.toString());
+	}
 
-	public HashMap<Long, Double> predict(String company) throws JSONException {
+	public HashMap<Long, Double> predict(String company,Session session) throws JSONException {
 
 		HashMap<Long, Double> pssSentiment = new HashMap<Long, Double>();
 		ArrayList<Long> pss = new ArrayList<Long>();
@@ -663,9 +686,10 @@ public class Prediction extends Globalsentiment {
 		totalWeight = 0;
 		totalGsweight = 0;
 		Calendar today = Calendar.getInstance();
-
+		updateLoadBar(0, 0, pss.size(), session);
+		hidden_size=1;
 		for (Long pssid : pss) {
-
+			updateLoadBar(0, hidden_size++, pss.size(), session);
 			Data.addmodel((long) -1, new Model(-1, 0, 0, "", "", pssid, "0,150", "All", "-1", false, 0, 0, -1, true));
 			firstdate.setTimeInMillis(firstDate(-1));
 			Data.delmodel((long) -1);
