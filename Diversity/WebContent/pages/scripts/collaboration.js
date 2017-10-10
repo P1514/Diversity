@@ -17,18 +17,18 @@ var availableUsers = [];
 var team = [];
 var roles = [];
 
-function loadingscreen(){
+function loadingscreen(amount){
 	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
 	switch (choice){
-	case 1: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
-	case 2: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend seems to be hung up, please wait a little bit more...');break;
-	case 3: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Big amounts of data can take a long time, please wait...');break;
-	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
-	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
+	case 1: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
+	case 2: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Backend seems to be hung up, please wait a little bit more...');break;
+	case 3: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Big amounts of data can take a long time, please wait...');break;
+	case 4: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Backend says it’s almost done, please wait...');break;
+	case 5: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Data should show up any moment now, please wait...');break;
 	}
 
 }
-var loadingtimer=window.setInterval(loadingscreen, 10000);
+var loadingtimer=window.setInterval(loadingscreen(20), 10000);
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -37,7 +37,7 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-	$('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Loading, please wait...');
+	$('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
+		if (json[0].Op == "Loading") {
+
+		}
 
 		if (json[0].Op == "Rights") {
 			json = {
