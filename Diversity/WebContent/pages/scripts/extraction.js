@@ -122,6 +122,7 @@ function getPosts() {
 				"Month" : month,
 				"Year" : year !== undefined ? 1900 + year : undefined,
 				"Product" : product,
+				"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 				'Key' : getCookie("JSESSIONID")
 			}
 		} else {
@@ -133,6 +134,7 @@ function getPosts() {
 				"Day" : day,
 				"Month" : month,
 				"Year" : year !== undefined ? 1900 + year : undefined,
+				"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 				'Key' : getCookie("JSESSIONID")
 			}
 		}
@@ -145,7 +147,8 @@ function getPosts() {
 		json = {
 			"Op" : "getposts",
 			"Id" : sessionStorage.id,
-			'Key' : getCookie("JSESSIONID")
+			'Key' : getCookie("JSESSIONID"),
+			"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 		}
 
 		ws.send(JSON.stringify(json));
@@ -335,14 +338,25 @@ function connect() {
 					$('#overlay-back').show();
 				}
 			} else {
-				if (jsonData[jsonData.length-1].hasOwnProperty('has_wiki')) {
-					if (jsonData[jsonData.length-1].has_wiki == false) {
+				if (jsonData[jsonData.length-2].hasOwnProperty('has_wiki')) {
+					if (jsonData[jsonData.length-2].has_wiki == false) {
 						$('#radio_wiki_label').hide();
 					} else {
 						$('#radio_wiki_label').show();
 					}
 				} else {
 					$('#radio_wiki_label').show();
+				}
+
+				if (jsonData[jsonData.length-1].hasOwnProperty('has_social')) {
+
+					if (jsonData[jsonData.length-1].has_social == false) {
+						$('#radio_social_label').hide();
+					} else {
+						$('#radio_social_label').show();
+					}
+				} else {
+					$('#radio_social_label').show();
 				}
 				// console.log("redone");
 				drawChart();
@@ -779,7 +793,8 @@ function ignore_words(word) { // sends a message to start ignoring the word we
 		"Id" : sessionStorage.id,
 		'Word' : word,
 		'User' : user,
-		'Key' : getCookie("JSESSIONID")
+		'Key' : getCookie("JSESSIONID"),
+		'Wiki' : document.getElementById('radio_wiki').checked 
 	}
 
 	ws.send(JSON.stringify(json));
@@ -1392,20 +1407,23 @@ function drawChart() {
 			var selectedItem = bottom_right.getSelection()[0] != undefined ? bottom_right
 					.getSelection()[0]
 					: false;
-			if (selectedItem) {
-				if ((selectedItem.row != null && bottom_middle.getSelection()[0] == undefined)
-						|| (selectedItem.row != null && selectedItem.row != bottom_middle
-								.getSelection()[0].row)) {
-					bottom_middle.setSelection([ {
-						column : selectedItem.column,
-						row : selectedItem.row
-					} ]);
+			if (!document.getElementById('radio_wiki').checked) {
+				if (selectedItem) {
+					if ((selectedItem.row != null && bottom_middle.getSelection()[0] == undefined)
+							|| (selectedItem.row != null && selectedItem.row != bottom_middle
+									.getSelection()[0].row)) {
+						bottom_middle.setSelection([ {
+							column : selectedItem.column,
+							row : selectedItem.row
+						} ]);
 
+					}
+				} else {
+					bottom_middle.setSelection([]);
 				}
-			} else {
-				bottom_middle.setSelection([]);
 			}
 			getPosts();
+
 		}
 
 		/*
