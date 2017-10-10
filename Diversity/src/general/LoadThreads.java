@@ -39,7 +39,7 @@ public class LoadThreads {
 		public void run() {
 			try (Connection cnlocal = Settings.connlocal()) {
 				String update = "INSERT INTO " + Settings.lotable + " "
-						+ "Values (?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
+						+ "Values (?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + Settings.lotable_reach + "=?,"
 						+ Settings.lotable_influence + "=?," + Settings.lotable_comments + "=?,"
 						+ Settings.lotable_polarity + "=?";
 
@@ -58,11 +58,10 @@ public class LoadThreads {
 					query1.setLong(8, opinion.ncomments());
 					query1.setLong(9, opinion.getProduct());
 					query1.setString(10, opinion.getSource());
-					query1.setString(11, opinion.getAccount());
-					query1.setDouble(12, opinion.getReach());
-					query1.setDouble(13, opinion.getTotalInf());
-					query1.setLong(14, opinion.ncomments());
-					query1.setDouble(15, opinion.getPolarity());
+					query1.setDouble(11, opinion.getReach());
+					query1.setDouble(12, opinion.getTotalInf());
+					query1.setLong(13, opinion.ncomments());
+					query1.setDouble(14, opinion.getPolarity());
 					while (true) {
 						try {
 							query1.executeUpdate();
@@ -275,7 +274,7 @@ public class LoadThreads {
 
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
 			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_source);
-			String account = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_account);
+
 			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
 				return;
@@ -286,8 +285,7 @@ public class LoadThreads {
 				Loader.users.add(user_id);
 			}
 
-			Loader.opiniondb.put(postid,
-					new Opinion(_post, Data.identifyPSSbyproduct(product), product, source, account));
+			Loader.opiniondb.put(postid, new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 
 		}
 
@@ -304,7 +302,7 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
 						+ Settings.sqlwhere + "posts." + Settings.lptable_id + " = " + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
@@ -369,13 +367,8 @@ public class LoadThreads {
 				ResultSet rs = null;
 				try {// TODO AQUI
 					boolean remote = false;
-					if (obj.has("postId")) {
-						id = obj.getLong("postId");
-					} else {
-						id = (long) (Math.random() * -1000000000);
-						obj.put("postId", id);
-					}
-					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id="+id+" and opinions.id="+id);
+					String query = (Settings.sqlselectall + Settings.lptable + Settings.sqlwhere + Settings.lptable_id
+							+ " = " + id);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
@@ -394,71 +387,63 @@ public class LoadThreads {
 					java.util.Date parsed = format.parse(formatted);
 
 					// //system.out.println(formatted);
-					// //system.out.println(id);
-					String source = remote ? obj.getString(Settings.JSON_source)
-							: rs.getString(Settings.lotable_source);
-					String account;
-					if (remote) {
-						account = "wiki".equals(source) ? "mediawiki" : obj.getString(Settings.JSON_account);
+					long postid;
+					if (obj.has("postId")) {
+						postid = obj.getLong("postId");
 					} else {
-						account = rs.getString(Settings.lotable_account);
+						postid = (long) (Math.random() * 200);
+						obj.put("postId", postid);
 					}
-					String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
-
+					// //system.out.println(id);
+					String source = obj.getString(Settings.JSON_source);
+					String user_id = obj.getString(Settings.JSON_userid);
 					long time = parsed.getTime();
-					
-					/*if (!remote) {
+					if (!remote) {
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						date = null;
 						try {
-							date = (Date) df.parse(obj.getString(Settings.JSON_epoch));
+							date = (Date) df.parse(rs.getString(Settings.lptable_timestamp));
 						} catch (ParseException e) {
-							LOGGER.log(Level.SEVERE, "ERROR Parsing Data" + obj.getString(Settings.JSON_epoch));
-							
+							// system.out.print("Error Parsing Date from Local
+							// DB");
 						}
 						time = date.getTime();
 
-					}*/
-					long postid=id;
-					// //system.out.println("IM HERE");
-					long likes, views, age;
-					String name, gender, location, message;
-					double polarity = 0;
-					long product;
-					Post _post;
-					if (remote) {
-						likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
-						views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
-						message = obj.getString("post");
-						/*
-						 * if (product == 0) { rs.close(); stmt.close(); conlocal.close();
-						 * condata.close(); return; }
-						 */
-						_post = new Post(postid, source, user_id, time, likes, views, message);
-					} else {
-						likes = rs.getLong(Settings.lptable_likes);
-						views = rs.getLong(Settings.lptable_views);
-						message = rs.getString(Settings.lptable_message);
-						polarity = rs.getLong(Settings.lptable_polarity);
-						_post = new Post(postid, user_id, time, likes, views, message, polarity, source);
 					}
-					product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
-					name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
+					// //system.out.println("IM HERE");
+					long likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
+					long views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
+					String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
-					age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
+					long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
 							? obj.getLong(Settings.JSON_age)
 							: 0;
-					gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
-					location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
+					String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
+					String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "";
+					String message = obj.getString("post");
+					long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
+					/*
+					 * if (product == 0) { rs.close(); stmt.close(); conlocal.close();
+					 * condata.close(); return; }
+					 */
+					Post _post = new Post(postid, source, user_id, time, likes, views, message);// TODO
+																								// create
+																								// constructor
+																								// for
+																								// the
+																								// different
+																								// type
+																								// of
+																								// media
+																								// specific
+																								// info
 
-					if (!"".equals(user_id)) {
-						Author author = new Author(user_id, source, name, age, gender, location);
-						if (!(Loader.users2.contains(author))) {
-							Loader.users2.add(author);
-						}
+					Author author = new Author(user_id, source, name, age, gender, location);
+					if (!(Loader.users2.contains(author))) {
+						Loader.users2.add(author);
 					}
 					Loader.opiniondb.put(postid,
-							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source, account));
+							new Opinion(_post, Data.identifyPSSbyproduct(product), product, source));
 					// find
 					// url
 					// to
@@ -673,24 +658,16 @@ public class LoadThreads {
 			} else {
 				try {
 
-					if (obj.has(Settings.JSON_replies) || obj.has("Replies")) {
+					if (obj.has(Settings.JSON_replies)) {
 
 						// //system.out.println("HELLO2");
-						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies): obj.getJSONArray("Replies");
+						JSONArray replies = obj.getJSONArray(Settings.JSON_replies);
 						for (int index = 0; index < replies.length(); index++) {
 
-							String query = Settings.sqlselectall + Settings.lptable + " where " + Settings.lptable_id
-									+ "=?";
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
-							
-							if (reply.has("postId")) {
-							} else {
-								long id1 = (long) (Math.random() * -1000000000);
-								reply.put("postId", id1);
-							}
-							
+
 							Date date;
 							if (reply.has(Settings.JSON_epoch)) {
 								date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
@@ -703,7 +680,7 @@ public class LoadThreads {
 							java.util.Date parsed = format.parse(formatted);
 
 							long postid = reply.getLong(Settings.JSON_postid);
-							String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
+							String user_id = reply.getString(Settings.JSON_userid);
 							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
 									? reply.has("likes") ? reply.getLong("likes") : 0
@@ -714,30 +691,7 @@ public class LoadThreads {
 							String message = reply.getString(Settings.JSON_message);
 
 							String source = obj.getString(Settings.JSON_source);
-							Post _post=null;
-							try (Connection cnlocalnew = Settings.connlocal()) {
-								try(PreparedStatement ps = cnlocalnew.prepareStatement(query)){
-									ps.setLong(1, postid);
-									try(ResultSet rsnew = ps.executeQuery()){
-										if(!rsnew.next()) {
-											_post = new Post(postid, source, user_id, time, likes, views, message);
-										}else {
-											double polarity = rsnew.getDouble(Settings.lptable_polarity);
-											_post = new Post(postid, user_id, time, likes, views, message,polarity, source);
-										}
-									}
-								}
-								
-							} catch (ClassNotFoundException e) {
-								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
-							} catch (SQLException e) {
-								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
-							}
-
-							
-
+							Post _post = new Post(postid, source, user_id, time, likes, views, message);
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
 							long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
@@ -746,11 +700,12 @@ public class LoadThreads {
 							String gender = obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "";
 							String location = obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location)
 									: "";
-							if (!"".equals(user_id)) {
-								Author author = new Author(user_id, source, name, age, gender, location);
-								if (!(Loader.users2.contains(author))) {
-									Loader.users2.add(author);
-								}
+							Author author = new Author(user_id, source, name, age, gender, location);
+							// if(Loader.) //se n�o existir na authors db2 tem
+							// de ser criado
+							if (!(Loader.users2.contains(author))) {
+								Loader.users2.add(author);
+
 							}
 							_opin.addcomment(_post);
 						}

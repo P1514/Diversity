@@ -182,7 +182,7 @@ public class Data {
 		if (pssdb.containsKey(id))
 			return pssdb.get(id);
 		LOGGER.log(Level.INFO, "INJECTION ATTEMPT on get pss");
-		return new PSS();
+		return null;
 	}
 
 	public static DesignProject getDp(long id) {
