@@ -277,7 +277,14 @@ public class Backend {
 										: filter[i]),
 								id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right_Ex");
 				}
-
+				JSONObject mw = new JSONObject();
+				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
+				result.put(mw);
+				
+				JSONObject sn = new JSONObject();
+				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				result.put(sn);
+				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
 				LOGGER.log(Level.INFO, result.toString());
 				// System.out.println(result.toString());
 				return result.toString();
@@ -593,9 +600,14 @@ public class Backend {
 										: filter[i]),
 								id, Data.getmodel(id).getFrequency()), "Graph", "Bottom_Right_Ex");
 				}
-				JSONObject mw = new JSONObject();
+				mw = new JSONObject();
 				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
 				result.put(mw);
+				
+				sn = new JSONObject();
+				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "" );
+				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				result.put(sn);
 				LOGGER.log(Level.INFO, result.toString());
 
 				return result.toString();
@@ -629,6 +641,12 @@ public class Backend {
 				mw = new JSONObject();
 				mw.put("has_wiki", Data.getmodel(id).getMediawiki());
 				result.put(mw);
+				
+				sn = new JSONObject();
+				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				result.put(sn);
+				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, result.toString());
 				return result.toString();
 			/*
 			 * case 1: SentimentChart sc = new SentimentChart(); result = new JSONArray();
