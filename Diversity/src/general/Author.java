@@ -16,7 +16,7 @@ public final class Author {
 	private String gender;
 	private String location;
 	private long comments;
-	private long posts = 1;
+	private long posts = 0;
 	private long likes;
 	private long views;
 
