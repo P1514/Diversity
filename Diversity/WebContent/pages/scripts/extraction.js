@@ -341,6 +341,8 @@ function connect() {
 				if (jsonData[jsonData.length-2].hasOwnProperty('has_wiki')) {
 					if (jsonData[jsonData.length-2].has_wiki == false) {
 						$('#radio_wiki_label').hide();
+						document.getElementById('radio_social').checked = true;
+						//$('#radio_social').click(); //this triggers the onclick event, we dont want that
 					} else {
 						$('#radio_wiki_label').show();
 					}
@@ -352,6 +354,8 @@ function connect() {
 
 					if (jsonData[jsonData.length-1].has_social == false) {
 						$('#radio_social_label').hide();
+						document.getElementById('radio_wiki').checked = true;
+						//$('#radio_wiki').click(); //this triggers the onclick event, we dont want that
 					} else {
 						$('#radio_social_label').show();
 					}
@@ -936,6 +940,17 @@ function requestSnapshot(val) {
 	snap = true;
 	ws.send(JSON.stringify(json));
 }
+
+
+$(document).keyup(function(e) {
+	//console.log(e.keyCode);
+	if (e.keyCode == 27) {
+		//console.log("ESCAPE!");
+		if (document.getElementById('displaybox').style.display != "none") {
+			return clicker();
+		}
+	}
+});
 
 /*
  * Detects a table click and displays an overlay window with comments from the
