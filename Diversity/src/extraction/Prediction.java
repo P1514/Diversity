@@ -641,9 +641,12 @@ public class Prediction extends Globalsentiment {
 			update_size=total;
 		}
 		double percentage= ((double)done)/((double)update_size)*100;
-		JSONArray msg=null;
+		JSONArray msg=new JSONArray();
 		try {
-			msg = Backend.error_message(" "+percentage+"%");
+			JSONObject obj = new JSONObject();
+			obj.put("Op", "Loading");
+			obj.put("Ammount", percentage);
+			msg.put(obj);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

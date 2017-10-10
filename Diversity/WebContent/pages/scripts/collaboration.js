@@ -37,7 +37,7 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-	$('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Loading, please wait...');
+	$('#loading').html('<br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 		if (json[0].Op == "Loading") {
-
+			loadingscreen(json[0].Ammount);
 		}
 
 		if (json[0].Op == "Rights") {
