@@ -794,7 +794,7 @@ function ignore_words(word) { // sends a message to start ignoring the word we
 		'Word' : word,
 		'User' : user,
 		'Key' : getCookie("JSESSIONID"),
-		'Wiki' : document.getElementById('radio_wiki').checked 
+		'Wiki' : document.getElementById('radio_wiki').checked
 	}
 
 	ws.send(JSON.stringify(json));
@@ -943,14 +943,14 @@ function requestSnapshot(val) {
  */
 function clicker(hidden) {
 	var thediv = document.getElementById('displaybox');
-	var embedCode = '<iframe width="75%" height="45%" src="comments.html?id='
-			+ hidden + ' frameborder="0" allowfullscreen="no"></iframe>';
+	var embedCode = '<div style="background-color: #ffffff; width:75%; height:45%" align="right"><a href="#" align="left" onclick="return clicker();"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i></a><iframe width="100%" height="95%" src="comments.html?id='
+			+ hidden + ' frameborder="0" seamless="seamless" allowfullscreen="no"></iframe></div>';
 	if (thediv.style.display == "none") {
 		thediv.style.display = "";
 		thediv.innerHTML = "<script>$(document).keyup(function(e) {if (e.keyCode == 27) { return clicker(); }})</script><table width='100%' height='100%'><tr><td align='center' valign='bottom' width='80%' height='80%'>"
 				+ "<param name='bgcolor' value='#000000'>"
 				+ embedCode
-				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center><a href='#' align='center' onclick='return clicker();'>CLOSE WINDOW</a></center></td></tr></table>";
+				+ "</tr><tr align='center' valign='top' width='10%' height='10%'><td><center></center></td></tr></table>";
 		// thediv.innerHTML = ""++ "<button onclick='clicker()' id='closepage'
 		// class='btn btn-default'>Close Page</button>";
 	} else {
