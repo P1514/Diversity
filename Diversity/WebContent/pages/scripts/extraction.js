@@ -50,7 +50,7 @@ function loadingscreen(){
 	case 4: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Backend says it’s almost done, please wait...');break;
 	case 5: $('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Data should show up any moment now, please wait...');break;
 	}
-	
+
 }
 var loadingtimer=window.setInterval(loadingscreen, 10000);
 
@@ -327,7 +327,7 @@ function connect() {
 						changeRequest('wiki');
 						return;
 					}
-					
+
 					$('#loading')
 							.html(
 									'No data to display.<br><br><button class="btn btn-default" id="ok" onclick="location.href = \'index.html\'">OK</button>');
@@ -801,7 +801,7 @@ function makeCloud(words) {
 		avg_frequency+=words[i].frequency;
 	}
 	avg_frequency = avg_frequency/words.length;
-	
+
 
 	for (var i = 0; i < words.length; i++) {
 		if(words[i].frequency < avg_frequency) continue;
@@ -842,6 +842,7 @@ function tagClick(word) {
 		"Month" : month,
 		"Year" : year !== undefined ? 1900 + year : undefined,
 		"Product" : product != undefined ? product : undefined,
+		"Wiki" : document.getElementById('radio_wiki').checked,
 		'Key' : getCookie("JSESSIONID")
 	}
 	refreshTag = false;
