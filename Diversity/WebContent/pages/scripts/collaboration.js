@@ -18,17 +18,11 @@ var team = [];
 var roles = [];
 var loadAmount = 0;
 function loadingscreen(amount){
-	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
-	switch (choice){
-	case 1: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br><div>Apparently, it is taking too long. I’ll try again, please wait...</div>');break;
-	case 2: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br><div>Backend seems to be hung up, please wait a little bit more...</div>');break;
-	case 3: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br><div>Big amounts of data can take a long time, please wait...</div>');break;
-	case 4: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br><div>Backend says it’s almost done, please wait...</div>');break;
-	case 5: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br><div>Data should show up any moment now, please wait...</div>');break;
-	}
-
+	$('#loading').html('<center><div style="width: 90%"><div class="progress-bar active" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="margin-left:5px; margin-right: 5px; min-height:20px; background-color: #604460; width:' + amount + '%">' + amount + '%</div><br><div>Loading, please wait...</div></div>');
 }
-var loadingtimer=window.setInterval(loadingscreen(loadAmount), 10000);
+
+
+//var loadingtimer=window.setInterval(loadingscreen(loadAmount), 10000);
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -37,7 +31,7 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-	$('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:' + amount + '%">' + amount + '%</div><br><div>Loading, please wait...</div>');
+	$('#loading').html('<div class="progress-bar active" role="progressbar" aria-valuenow="' + loadAmount + '" aria-valuemin="0" aria-valuemax="100" style="margin-left:5px; margin-right: 5px; min-height:20px; background-color: #604460; width:' + loadAmount + '%">' + loadAmount + '%</div><br><div>Loading, please wait...</div>');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
@@ -67,8 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
   ws.onmessage = function(event) {
     var json = JSON.parse(event.data.replace(/\\/g,''));
 		if (json[0].Op == "Loading") {
-			loadAmount = json[0].Amount
-			loadingscreen(loadAmount);
+			loadAmount = json[0].Ammount
+			loadingscreen(Math.round(loadAmount));
 		}
 
 		if (json[0].Op == "Rights") {
@@ -100,6 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //If the message Op is 'collaboration', draw the team composition table
     if (json[0].Op == "collaboration") {
+			$('#loading').fadeOut(2000);
+			$('#overlay-back').fadeOut(2000);
       draw = true;
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
@@ -161,13 +157,14 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 				}
 			}
+			return;
 		}
 
     //If the message Op is 'Error', it contains a message from the server, which is displayed in an overlay box
     if (json[0].Op == "Error") {
         $('#overlay-back').show();
         $('#overlay').show();
-        $('#error').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
+        $('#loading').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
 
     }
   }
@@ -224,7 +221,7 @@ function drawTable() {
 	};
 
 	var userList = new List('table', options);
-	window.clearInterval(loadingtimer);
+	//window.clearInterval(loadingtimer);
 	$('#overlay').fadeOut(2000);
 	$('#overlay-back').fadeOut(3000);
 }
