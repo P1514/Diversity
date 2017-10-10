@@ -441,7 +441,7 @@ public class Backend {
 							msg.has("Products") ? msg.getString("Products") : "",
 							msg.has("Services") ? msg.getString("Services") : "");
 				} else {
-					res = snapshot.saveExtraction(msg.getString("name"), msg.getString("creation_date"),
+					res = snapshot.saveExtraction((msg.has("Wiki") ? msg.getBoolean("Wiki") : false),msg.getString("name"), msg.getString("creation_date"),
 							msg.getInt("timespan"), msg.getString("user"), msg.has("Id") ? msg.getInt("Id") : 0);
 
 				}
