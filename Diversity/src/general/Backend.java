@@ -36,6 +36,8 @@ import extraction.Tagcloud;
 import modeling.GetModels;
 import security.Roles;
 
+import javax.websocket.Session;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Backend.
@@ -45,6 +47,7 @@ public class Backend {
 	private int op = 0;
 	private JSONObject msg, obj;
 	private JSONArray result;
+	private Session session=null;
 
 	/**
 	 * Instantiates a new backend.
@@ -54,12 +57,19 @@ public class Backend {
 	 * @param _msg
 	 *            the msg
 	 */
+	public Backend(int _op, JSONObject _msg, Session _session) {
+		op = _op;
+		msg = _msg;
+		session=_session;
+
+	}
+
 	public Backend(int _op, JSONObject _msg) {
 		op = _op;
 		msg = _msg;
 
 	}
-
+	
 	public void setMessage(int _op, JSONObject _msg) throws JSONException {
 		op = _op;
 		_msg.put("Key", msg.get("Key"));
@@ -279,7 +289,7 @@ public class Backend {
 
 				result.put(col.teamRating(msg.has("Products") ? msg.getString("Products") : "",
 						msg.has("Services") ? msg.getString("Services") : "",
-						msg.has("Company") ? msg.getString("Company") : ""));
+						msg.has("Company") ? msg.getString("Company") : "", session));
 				if (result.isNull(1)) {
 					obj = new JSONObject();
 					result = new JSONArray();
