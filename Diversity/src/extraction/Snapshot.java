@@ -128,7 +128,7 @@ public class Snapshot {
 
 	}
 
-	public String saveExtraction(String name, String date, int timespan, String user, int id) {
+	public String saveExtraction(boolean wiki, String name, String date, int timespan, String user, int id) {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
@@ -146,28 +146,29 @@ public class Snapshot {
 		try {
 			obj.put("Id", id);
 			obj.put("Filter", "");
-			b.setMessage(19, obj);
+			int operation = wiki ? 34 : 19;
+			b.setMessage(operation, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "all", result, id);
-
+			/*
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Location");
-			b.setMessage(19, obj);
+			b.setMessage(operation, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "location", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Gender");
-			b.setMessage(19, obj);
+			b.setMessage(operation, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "gender", result, id);
 
 			obj = new JSONObject();
 			obj.put("Id", id);
 			obj.put("Filter", "Age");
-			b.setMessage(19, obj);
+			b.setMessage(operation, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "age", result, id);
 
@@ -176,7 +177,7 @@ public class Snapshot {
 			obj.put("Filter", "Product");
 			b.setMessage(19, obj);
 			result = b.resolve();
-
+			*/
 			return create(name, cdate, timespan, user, "product", result, id) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {
