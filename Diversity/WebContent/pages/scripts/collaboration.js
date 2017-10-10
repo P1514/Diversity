@@ -37,7 +37,7 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-	$('#loading').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Loading, please wait...');
+	$('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
