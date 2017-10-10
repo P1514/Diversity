@@ -650,7 +650,12 @@ public class Prediction extends Globalsentiment {
 		}
 		if(msg==null) return;
 		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
-		session.getAsyncRemote().sendText(msg.toString());
+		try {
+			session.getBasicRemote().sendText(msg.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public HashMap<Long, Double> predict(String company,Session session) throws JSONException {
