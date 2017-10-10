@@ -373,6 +373,8 @@ function submit() {
 	};
 
 	ws.send(JSON.stringify(json));
+	
+	
 
 /*
 	$(function () {
