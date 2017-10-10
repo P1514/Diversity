@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json));
+			return;
 		}
 
 		if (json[0].Op == "Roles") {
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json2));
+			return;
 		}
 
 
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
 					teamRoles[i] = users[i].Role;
+					userStorage[i] = users[i];
 			}
       //console.log(users);
 			var tmp = getMultipleParams("user");
@@ -128,11 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
-	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
+	    if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
 			}
-
 
 /*
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
@@ -222,6 +224,9 @@ function drawTable() {
 	};
 
 	var userList = new List('table', options);
+	window.clearInterval(loadingtimer);
+	$('#overlay').fadeOut(2000);
+	$('#overlay-back').fadeOut(3000);
 }
 
 function getParam(param) {
