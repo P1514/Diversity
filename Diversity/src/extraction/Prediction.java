@@ -641,16 +641,24 @@ public class Prediction extends Globalsentiment {
 			update_size=total;
 		}
 		double percentage= ((double)done)/((double)update_size)*100;
-		JSONArray msg=null;
+		JSONArray msg=new JSONArray();
 		try {
-			msg = Backend.error_message(" "+percentage+"%");
+			JSONObject obj = new JSONObject();
+			obj.put("Op", "Loading");
+			obj.put("Ammount", percentage);
+			msg.put(obj);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(msg==null) return;
 		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
-		session.getAsyncRemote().sendText(msg.toString());
+		try {
+			session.getBasicRemote().sendText(msg.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public HashMap<Long, Double> predict(String company,Session session) throws JSONException {
