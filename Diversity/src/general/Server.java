@@ -166,7 +166,7 @@ public class Server {
 					result.put(obj);
 					session.getAsyncRemote().sendText(result.toString());
 				}
-				be = new Backend(op.getOP(msg.getString("Op")), msg);
+				be = new Backend(op.getOP(msg.getString("Op")), msg,session);
 				if (op.getOP(msg.getString("Op")) == 2)
 					Server.isloading = false;
 				String answer = be.resolve().toString();

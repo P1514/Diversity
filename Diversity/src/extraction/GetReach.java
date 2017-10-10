@@ -185,7 +185,7 @@ public class GetReach {
 			query1.setLong(3, data.getTimeInMillis());
 			query1.setLong(4, model.getPSS());
 			int rangeindex = 5;
-			if (par.age != null) {
+			/*if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
 				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
@@ -194,9 +194,15 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
-				
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+
+*/
+				//query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			if (model.getId() != -1 && !wiki) {
+				query1.setString(rangeindex++, model.getAccounts(false));
+				query1.setString(rangeindex++, model.getSources(false));
+			}
 			
+
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
