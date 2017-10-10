@@ -50,6 +50,10 @@ public class PSS {
 		products.put("Austin Soccer", 3);*/
 	}
 
+	public PSS() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * Gets the id.
 	 *

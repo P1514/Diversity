@@ -18,7 +18,6 @@ var team = [];
 var roles = [];
 
 function loadingscreen(amount){
-
 	var choice = Math.floor(Math.random() * (5 - 1 + 1)) + 1;
 	switch (choice){
 	case 1: $('#loading').html('<div class="progress-bar" role="progressbar" aria-valuenow="' + amount + '" aria-valuemin="0" aria-valuemax="100" style="width:70%">' + amount + '%</div><br>Apparently, it is taking too long. I’ll try again, please wait...');break;
@@ -29,7 +28,7 @@ function loadingscreen(amount){
 	}
 
 }
-
+var loadingtimer=window.setInterval(loadingscreen(20), 10000);
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
@@ -38,11 +37,9 @@ function getCookie(name) { //not being used
 	}
 document.addEventListener('DOMContentLoaded', function() {
 
-
 	$('#loading').html('<br>Loading, please wait...');
 	$('#overlay').show();
 	$('#overlay-back').show();
-
 	userCompany = getParam("company") !== undefined ? getParam("company").toLowerCase() : "no company specified";
 	var str = userCompany;
 
@@ -80,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json));
+			return;
 		}
 
 		if (json[0].Op == "Roles") {
@@ -94,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			ws.send(JSON.stringify(json2));
+			return;
 		}
 
 
@@ -104,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			users = json[1];
 			for (var i = 0; i < users.length; i++) {
 					teamRoles[i] = users[i].Role;
+					userStorage[i] = users[i];
 			}
       //console.log(users);
 			var tmp = getMultipleParams("user");
@@ -130,11 +130,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('#unranked').click();
 			}
 
-	    		if (getParam('products') == 'null' && getParam('services') == 'null') {
+	    if (getParam('products') == 'null' && getParam('services') == 'null') {
 				$('#all').click();
 				$('#unranked').click();
 			}
-
 
 /*
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
@@ -224,6 +223,9 @@ function drawTable() {
 	};
 
 	var userList = new List('table', options);
+	window.clearInterval(loadingtimer);
+	$('#overlay').fadeOut(2000);
+	$('#overlay-back').fadeOut(3000);
 }
 
 function getParam(param) {

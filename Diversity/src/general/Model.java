@@ -163,10 +163,7 @@ public final class Model {
 				+ Settings.lmtable_monitorfinal + "," + Settings.lmtable_creator + "," + Settings.lmtable_cdate + ","
 				+ Settings.lmtable_udate + "," + Settings.lmtable_add_mediawiki + ","
 				+ Settings.lmtable_designproject /*
-													 * + "," +
-													 * Settings.lmtable_age +
-													 * "," +
-													 * Settings.lmtable_gender
+													 * + "," + Settings.lmtable_age + "," + Settings.lmtable_gender
 													 */
 				+ ") values (?,?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
 		PreparedStatement query1 = null;
@@ -227,7 +224,7 @@ public final class Model {
 		obj.put("Op", "Error2");
 		obj.put("Message", "Successfully added model " + name + " to monitor module");
 		result.put(obj);
-		if("".equals(uri))
+		if (!"".equals(uri))
 			Monitor.update(uri, pss);
 		return result;
 
@@ -260,8 +257,7 @@ public final class Model {
 
 		String insert = "Update " + Settings.lmtable
 				+ " Set "/*
-							 * + Settings.lmtable_age + "=?, " +
-							 * Settings.lmtable_gender + "=?, "
+							 * + Settings.lmtable_age + "=?, " + Settings.lmtable_gender + "=?, "
 							 */ + Settings.lmtable_archived + "=? "
 				+ (delete ? ""
 						: ", " + Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
@@ -331,8 +327,8 @@ public final class Model {
 		obj.put("Op", "Error");
 		obj.put("Message", "Successfully updated model " + msg.getString("Name"));
 		result.put(obj);
-		if(!"".equals(uri))
-		Monitor.update(uri, pss);
+		if (!"".equals(uri))
+			Monitor.update(uri, pss);
 		return result;
 	}
 
@@ -437,6 +433,37 @@ public final class Model {
 
 	public Boolean getMediawiki() {
 		return this.add_mediawiki;
+	}
+
+	public String getSources(boolean all) {
+		String[] sources = this.uri.split(";");
+		String result = "";
+		for (String s : sources) {
+			result += s.split(",")[0] + ",";
+		}
+		if (this.add_mediawiki && all) {
+			result += "mediawiki";
+		} else {
+			return result.substring(0, result.length() - 1);
+		}
+		return result;
+	}
+
+	public String getAccounts(boolean all) {
+		String[] sources = this.uri.split(";");
+		String result = "";
+		for (String s : sources) {
+			String[] temp = s.split(",");
+			if (temp.length > 1)
+				result += s.split(",")[1] + ",";
+		}
+		if (this.add_mediawiki && all) {
+			result += "mediawiki";
+		} else {
+			if (!result.isEmpty())
+				return result.substring(0, result.length() - 1);
+		}
+		return result;
 	}
 
 	private void dbconnect() {
