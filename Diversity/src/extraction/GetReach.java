@@ -202,12 +202,18 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
 			if (par.products != null)
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> refs/remotes/origin/master
 */
 				//query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
 			if (model.getId() != -1 && !wiki) {
 				query1.setString(rangeindex++, model.getAccounts(false));
 				query1.setString(rangeindex++, model.getSources(false));
 			}
+
 			//LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);

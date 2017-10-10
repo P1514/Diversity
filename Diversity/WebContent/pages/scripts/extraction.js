@@ -879,6 +879,7 @@ function send(val) {
 	var json = {
 		"Op" : "Snapshot",
 		"type" : "Extraction",
+		"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 		"name" : val,
 		"creation_date" : new Date(),
 		"timespan" : 12,
