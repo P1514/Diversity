@@ -384,7 +384,8 @@ public class LoadThreads {
 						stmt.close();
 						cnlocal.close();
 					} else {
-						Loader.totalposts--;
+						Loader.repeatpost();
+						Loader.repeatcomment();
 					}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
 					// Date date = new Date(0);
@@ -721,7 +722,8 @@ public class LoadThreads {
 									try(ResultSet rsnew = ps.executeQuery()){
 										if(!rsnew.next()) {
 											_post = new Post(postid, source, user_id, time, likes, views, message);
-										}else {
+										}else{
+											Loader.repeatcomment();
 											double polarity = rsnew.getDouble(Settings.lptable_polarity);
 											_post = new Post(postid, user_id, time, likes, views, message,polarity, source);
 										}
