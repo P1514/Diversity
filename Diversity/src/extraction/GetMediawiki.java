@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.*;
-import extraction.Snapshot;
+
 
 public class GetMediawiki {
 	private Connection cnlocal;
@@ -31,15 +31,13 @@ public class GetMediawiki {
 			LOGGER.log(Level.SEVERE, error, e);
 			return null;
 		}
-		String insert = new String("SELECT " + Settings.lmwtable_name + " FROM " + Settings.lmwtable + " where "
-				+ Settings.lmwtable_pss + "=?;");
+		String insert = "SELECT " + Settings.lmwtable_name + " FROM " + Settings.lmwtable + " where "
+				+ Settings.lmwtable_pss + "=?;";
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			query1.setString(1, pss);
 
-			// System.out.println("****Names:" + query1.toString());
 			rs = query1.executeQuery();
-			// rs.next();//verify
 			while (rs.next()) {
 				obj = new JSONObject();
 				obj.put("Name", rs.getString("name"));
@@ -52,11 +50,10 @@ public class GetMediawiki {
 			LOGGER.log(Level.SEVERE, error, e);
 		}
 		try {
-			if (cnlocal != null)
 				cnlocal.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, error, e);
+
 		}
 		return result;
 

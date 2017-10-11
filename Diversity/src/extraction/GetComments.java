@@ -11,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Backend;
-import general.Data;
 import general.Logging;
 import general.Settings;
 
@@ -131,10 +130,10 @@ public class GetComments {
 	 * @return the string
 	 */
 	static String trunc(String number) {
-
-		double result = Double.valueOf(number);
-		number = String.format("%.1f", result);
-		result = Double.parseDouble(number.replaceAll(",", "."));
+		String numberef =number;
+		double result = Double.parseDouble(numberef);
+		numberef = String.format("%.1f", result);
+		result = Double.parseDouble(numberef.replaceAll(",", "."));
 
 		return Double.toString(result);
 
