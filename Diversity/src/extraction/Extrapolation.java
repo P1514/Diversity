@@ -13,9 +13,9 @@ import general.Data;
 import general.Logging;
 import general.PSS;
 import general.Product;
+import general.Settings;
 
 import org.apache.commons.math3.fitting.*;
-import org.apache.commons.math3.analysis.function.*;
 
 public final class Extrapolation extends Globalsentiment {
 	private static Extrapolation instance;
@@ -86,7 +86,7 @@ public final class Extrapolation extends Globalsentiment {
 		double lastvalue;
 
 		indexaux = obs.toList().size() - 1;
-		lastvalue = (double) obs.toList().get(indexaux).getY();
+		lastvalue =  obs.toList().get(indexaux).getY();
 
 		coeff[0] = lastvalue
 				- (coeff[1] * indexaux + coeff[2] * indexaux * indexaux + coeff[3] * indexaux * indexaux * indexaux);
@@ -126,8 +126,7 @@ public final class Extrapolation extends Globalsentiment {
 				index++;
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, Settings.err_unknown,e);
 			}
 		}
 
@@ -144,15 +143,15 @@ public final class Extrapolation extends Globalsentiment {
 		return instance;
 	}
 
-	private static double get_Similarity(long product_id1, long product_id2) {
+	private static double getSimilarity(long productId1, long productId2) {
 		ArrayList<Long> commonid = new ArrayList<Long>();
-		if (product_id1 == product_id2)
+		if (productId1 == productId2)
 			return 1;
-		if (!(Data.dbhasproduct(product_id1) && Data.dbhasproduct(product_id2)))
+		if (!(Data.dbhasproduct(productId1) && Data.dbhasproduct(productId2)))
 			return 0;
 
-		Product pro1 = Data.getProduct(product_id1);
-		commonid.add(product_id1);
+		Product pro1 = Data.getProduct(productId1);
+		commonid.add(productId1);
 		int depth1 = 2;
 		int founddepth = -1;
 		if (pro1.getParent() != 0) {
@@ -163,9 +162,9 @@ public final class Extrapolation extends Globalsentiment {
 
 			} while (pro1.getParent() != 0);
 		}
-		Product pro2 = Data.getProduct(product_id2);
+		Product pro2 = Data.getProduct(productId2);
 		int depth2 = 2;
-		if (commonid.contains(product_id2))
+		if (commonid.contains(productId2))
 			founddepth = 0;
 		if (pro2.getParent() != 0) {
 			do {
@@ -177,19 +176,18 @@ public final class Extrapolation extends Globalsentiment {
 				depth2++;
 			} while (pro2.getParent() != 0);
 		}
-		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
-		return result;
+		return ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
 	}
 
-	private static double get_Similarity_Services(long service_id1, long service_id2) {
+	private static double getSimilarityServices(long serviceId1, long serviceId2) {
 		ArrayList<Long> commonid = new ArrayList<Long>();
-		if (service_id1 == service_id2)
+		if (serviceId1 == serviceId2)
 			return 1;
-		if (!(Data.dbhasservice(service_id1) && Data.dbhasservice(service_id2)))
+		if (!(Data.dbhasservice(serviceId1) && Data.dbhasservice(serviceId2)))
 			return 0;
 
-		Product ser1 = Data.getService(service_id1);
-		commonid.add(service_id1);
+		Product ser1 = Data.getService(serviceId1);
+		commonid.add(serviceId1);
 		int depth1 = 2;
 		int founddepth = -1;
 		if (ser1.getParent() != 0) {
@@ -200,9 +198,9 @@ public final class Extrapolation extends Globalsentiment {
 
 			} while (ser1.getParent() != 0);
 		}
-		Product ser2 = Data.getService(service_id2);
+		Product ser2 = Data.getService(serviceId2);
 		int depth2 = 2;
-		if (commonid.contains(service_id2))
+		if (commonid.contains(serviceId2))
 			founddepth = 0;
 		if (ser2.getParent() != 0) {
 			do {
@@ -214,24 +212,23 @@ public final class Extrapolation extends Globalsentiment {
 				depth2++;
 			} while (ser2.getParent() != 0);
 		}
-		double result = ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
-		return result;
+		return ((double) 2 * (founddepth == -1 ? 1 : depth2 - founddepth)) / ((double) (depth1 + depth2));
 	}
 
-	public static HashMap<Long, Double> get_Similarity_Threshold(String productsId, double threshold,
-			boolean is_product) {
+	public static HashMap<Long, Double> getSimilarityThreshold(String productsId, double threshold,
+			boolean isProduct) {
 		if (productsId.isEmpty())
 			return new HashMap<Long, Double>();
 
 		HashMap<Long, Double> pssweights = new HashMap<Long, Double>();
 		String[] products = productsId.split(";");
-		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
+		HashMap<Long, Double> idSimilarity = new HashMap<Long, Double>();
 		for (String p : products) {
 			try {
-				id_similarity = get_Similarity_Threshold(Long.parseLong(p), threshold, is_product);
-				id_similarity.forEach((k, v) -> {
+				idSimilarity = getSimilarityThreshold(Long.parseLong(p), threshold, isProduct);
+				idSimilarity.forEach((k, v) -> {
 					for (PSS pss : Data.dbpssall()) {
-						if (is_product) {
+						if (isProduct) {
 							if (pss.get_products().contains(k)) {
 								if (pssweights.containsKey(pss.getID())) {
 									pssweights.put(pss.getID(), pssweights.get(pss.getID()) + v);
@@ -255,7 +252,7 @@ public final class Extrapolation extends Globalsentiment {
 					}
 				});
 			} catch (NumberFormatException e1) {
-				LOGGER.log(Level.SEVERE, "Parsing String to Long error String = " + p);
+				LOGGER.log(Level.INFO, Settings.err_unknown,e1);
 				return null;
 			}
 		}
@@ -264,18 +261,19 @@ public final class Extrapolation extends Globalsentiment {
 
 	}
 
-	private static HashMap<Long, Double> get_Similarity_Threshold(long product_id, double threshold,
-			boolean is_product) {
-		HashMap<Long, Double> id_similarity = new HashMap<Long, Double>();
-		while (threshold > 1)
-			threshold = threshold / ((double) 100);
-		if (is_product) {
+	private static HashMap<Long, Double> getSimilarityThreshold(long productId, double threshold,
+			boolean isProduct) {
+		double thresholdef= threshold;
+		HashMap<Long, Double> idSimilarity = new HashMap<Long, Double>();
+		while (thresholdef > 1)
+			thresholdef = thresholdef / ((double) 100);
+		if (isProduct) {
 			for (Product pro : Data.dbproductall()) {
 				// if (pro.get_Id() == product_id)
 				// continue;
 
-				if (get_Similarity(product_id, pro.get_Id()) >= threshold) {
-					id_similarity.put(pro.get_Id(), get_Similarity(product_id, pro.get_Id()));
+				if (getSimilarity(productId, pro.get_Id()) >= thresholdef) {
+					idSimilarity.put(pro.get_Id(), getSimilarity(productId, pro.get_Id()));
 					// System.out.println("SIMILARITY OF PRODUCTS(" +
 					// pro.get_Id() + "," + product_id + ") -->"
 					// + get_Similarity(product_id, pro.get_Id()));
@@ -286,8 +284,8 @@ public final class Extrapolation extends Globalsentiment {
 				// if (ser.get_Id() == product_id)
 				// continue;
 
-				if (get_Similarity_Services(product_id, ser.get_Id()) >= threshold) {
-					id_similarity.put(ser.get_Id(), get_Similarity_Services(product_id, ser.get_Id()));
+				if (getSimilarityServices(productId, ser.get_Id()) >= thresholdef) {
+					idSimilarity.put(ser.get_Id(), getSimilarityServices(productId, ser.get_Id()));
 					// System.out.println("SIMILARITY OF SERVICES(" +
 					// ser.get_Id() + "," + product_id + ") -->"
 					// + get_Similarity_Services(product_id, ser.get_Id()));
@@ -295,7 +293,7 @@ public final class Extrapolation extends Globalsentiment {
 			}
 		}
 
-		return id_similarity;
+		return idSimilarity;
 
 	}
 
