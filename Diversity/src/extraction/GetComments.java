@@ -60,7 +60,7 @@ public class GetComments {
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "comments");
 		result.put(obj);
-		String insert = new String();
+		String insert;
 		int ntops = 0;
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + "," + Settings.lptable_polarity + ","
@@ -72,7 +72,7 @@ public class GetComments {
 		try {
 			dbconnect();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error", e);
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 			return Backend.error_message("Error Connecting to Database Please Try Again Later");
 		}
 		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
@@ -93,16 +93,16 @@ public class GetComments {
 				}
 
 			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "ERROR", e);
+				LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 		} finally {
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
 		}
 
@@ -147,7 +147,7 @@ public class GetComments {
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 		}
 
 	}

@@ -21,8 +21,7 @@ public final class Extrapolation extends Globalsentiment {
 	private static Extrapolation instance;
 	private static final Logger LOGGER = new Logging().create(Extrapolation.class.getName());
 
-	public Extrapolation() {
-	}
+
 
 	static {
 		instance = new Extrapolation();
@@ -31,7 +30,7 @@ public final class Extrapolation extends Globalsentiment {
 	public JSONArray extrapolate(String param, String values, String output, long id, long frequency)
 			throws JSONException {
 		JSONArray result = new JSONArray();
-		JSONObject obj = new JSONObject();
+		JSONObject obj;
 		double globalSentiment;
 		boolean extraTest = true;
 
@@ -81,7 +80,6 @@ public final class Extrapolation extends Globalsentiment {
 		// Retrieve fitted parameters (coefficients of the polynomial function).
 		double[] coeff = fitter.fit(obs.toList());
 		data.add(Calendar.DAY_OF_MONTH, (int) -frequency);
-		index--;
 		int indexaux;
 		double lastvalue;
 
@@ -120,7 +118,6 @@ public final class Extrapolation extends Globalsentiment {
 										 * index) *20))
 										 */);
 
-				// obj.put("Value",sig.value(1.25));
 
 				result.put(obj);
 				index++;
@@ -144,7 +141,7 @@ public final class Extrapolation extends Globalsentiment {
 	}
 
 	private static double getSimilarity(long productId1, long productId2) {
-		ArrayList<Long> commonid = new ArrayList<Long>();
+		ArrayList<Long> commonid = new ArrayList<>();
 		if (productId1 == productId2)
 			return 1;
 		if (!(Data.dbhasproduct(productId1) && Data.dbhasproduct(productId2)))
@@ -168,8 +165,8 @@ public final class Extrapolation extends Globalsentiment {
 			founddepth = 0;
 		if (pro2.getParent() != 0) {
 			do {
-				if (founddepth == -1) {
-					if (commonid.contains(pro2.getParent()))
+				if (founddepth == -1 &&commonid.contains(pro2.getParent())) {
+			
 						founddepth = depth2 - 1;
 				}
 				pro2 = Data.getProduct(pro2.getParent());
@@ -180,7 +177,7 @@ public final class Extrapolation extends Globalsentiment {
 	}
 
 	private static double getSimilarityServices(long serviceId1, long serviceId2) {
-		ArrayList<Long> commonid = new ArrayList<Long>();
+		ArrayList<Long> commonid = new ArrayList<>();
 		if (serviceId1 == serviceId2)
 			return 1;
 		if (!(Data.dbhasservice(serviceId1) && Data.dbhasservice(serviceId2)))
@@ -204,8 +201,7 @@ public final class Extrapolation extends Globalsentiment {
 			founddepth = 0;
 		if (ser2.getParent() != 0) {
 			do {
-				if (founddepth == -1) {
-					if (commonid.contains(ser2.getParent()))
+				if (founddepth == -1 &&commonid.contains(ser2.getParent())) {
 						founddepth = depth2 - 1;
 				}
 				ser2 = Data.getService(ser2.getParent());
@@ -218,11 +214,11 @@ public final class Extrapolation extends Globalsentiment {
 	public static HashMap<Long, Double> getSimilarityThreshold(String productsId, double threshold,
 			boolean isProduct) {
 		if (productsId.isEmpty())
-			return new HashMap<Long, Double>();
+			return new HashMap<>();
 
-		HashMap<Long, Double> pssweights = new HashMap<Long, Double>();
+		HashMap<Long, Double> pssweights = new HashMap<>();
 		String[] products = productsId.split(";");
-		HashMap<Long, Double> idSimilarity = new HashMap<Long, Double>();
+		HashMap<Long, Double> idSimilarity;
 		for (String p : products) {
 			try {
 				idSimilarity = getSimilarityThreshold(Long.parseLong(p), threshold, isProduct);
@@ -264,31 +260,21 @@ public final class Extrapolation extends Globalsentiment {
 	private static HashMap<Long, Double> getSimilarityThreshold(long productId, double threshold,
 			boolean isProduct) {
 		double thresholdef= threshold;
-		HashMap<Long, Double> idSimilarity = new HashMap<Long, Double>();
+		HashMap<Long, Double> idSimilarity = new HashMap<>();
 		while (thresholdef > 1)
 			thresholdef = thresholdef / ((double) 100);
 		if (isProduct) {
 			for (Product pro : Data.dbproductall()) {
-				// if (pro.get_Id() == product_id)
-				// continue;
 
 				if (getSimilarity(productId, pro.get_Id()) >= thresholdef) {
 					idSimilarity.put(pro.get_Id(), getSimilarity(productId, pro.get_Id()));
-					// System.out.println("SIMILARITY OF PRODUCTS(" +
-					// pro.get_Id() + "," + product_id + ") -->"
-					// + get_Similarity(product_id, pro.get_Id()));
 				}
 			}
 		} else {
 			for (Product ser : Data.dbserviceall()) {
-				// if (ser.get_Id() == product_id)
-				// continue;
 
 				if (getSimilarityServices(productId, ser.get_Id()) >= thresholdef) {
 					idSimilarity.put(ser.get_Id(), getSimilarityServices(productId, ser.get_Id()));
-					// System.out.println("SIMILARITY OF SERVICES(" +
-					// ser.get_Id() + "," + product_id + ") -->"
-					// + get_Similarity_Services(product_id, ser.get_Id()));
 				}
 			}
 		}
