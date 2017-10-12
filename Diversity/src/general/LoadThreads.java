@@ -385,7 +385,7 @@ public class LoadThreads {
 						cnlocal.close();
 					} else {
 						Loader.repeatpost();
-						Loader.repeatcomment();
+						//Loader.repeatcomment();
 					}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
 					// Date date = new Date(0);

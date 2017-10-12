@@ -2,8 +2,7 @@ package endpoints;
 import general.Logging;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
+
 import java.net.URLEncoder;
 import java.util.logging.Level;
 
@@ -18,11 +17,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.*;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
-import extraction.Snapshot;
-import general.Loader;
-import general.Logging;
 
 @Path("/getSnapshots") // Path of the Endpoint
 public class GetSnapshots {
@@ -58,42 +54,41 @@ public class GetSnapshots {
 	 * Returns all snapshots of a given PSS, or all snapshots of all PSSs if -1
 	 * is passed
 	 * 
-	 * @param pss_id
+	 * @param pssId
 	 *            - id of the pss from which to retrieve the snapshots, or -1 to
 	 *            retrieve all snapshots
 	 * @return - a JSON string with the list of snapshots
 	 */
-	private String getAll(int pss_id, String type) {
+	private String getAll(int pssId, String type) {
 		String url = ui.getBaseUri().toString();
 		String urlExt = url.split("Diversity/")[0] + "Diversity/pages/opinion_extraction_page.html?snapshot=";
 		String urlPred = url.split("Diversity/")[0] + "Diversity/pages/prediction_settings.html?snapshot=";
 		JSONArray response;
 		try {
-			response = extraction.Snapshot.getAll(pss_id, type);
+			response = extraction.Snapshot.getAll(pssId, type);
 			JSONObject obj;
 			JSONArray snapshots = response.getJSONArray(1);
-			String output="";
+			StringBuilder bld = new StringBuilder();
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
 				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
-					output=urlPred;
+					bld.append(urlPred);
 				} else {
-					output=urlExt;
-				}
-				
+					bld.append(urlExt);
+				}				
 					try {
-						output += URLEncoder.encode(obj.getString("Name"), "UTF-8");
+						bld.append(URLEncoder.encode(obj.getString("Name"), "UTF-8"));
 					} catch (UnsupportedEncodingException e) {
-						LOGGER.log(Level.SEVERE, "Error While creating URL for snapshots => " + output);
+						LOGGER.log(Level.SEVERE, "Error While creating URL for snapshots => " + bld);
 					}
 				
-				obj.put("URL", output);
+				obj.put("URL", bld.toString());
 				obj.remove("Id");
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			LOGGER.log(Level.SEVERE, "Error", e);
 			return "";
 		}
 

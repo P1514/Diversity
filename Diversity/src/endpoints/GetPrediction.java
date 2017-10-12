@@ -3,7 +3,7 @@ package endpoints;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
+
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -26,10 +26,7 @@ import general.Backend;
 @Path("/getPrediction")
 public class GetPrediction {
 
-	// private static final String ENDPOINT =
-	// "https://www.khira.it/LeanDesignRules/LDRServices/designProject_leanRule";
-	// private static final String DP_PARAMETER = "design_project_id";
-	// private static final String VALIDATED_PARAMETER = "validated";
+
 
 	@DefaultValue("")
 	@QueryParam("products")

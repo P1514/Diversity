@@ -12,45 +12,41 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import general.Backend;
 import general.Company;
+import general.User;
 import general.Data;
 import general.DesignProject;
 import general.Logging;
-import general.Server;
-import general.User;
+import general.Settings;
 
 public class Collaboration {
 
 	Prediction pre = new Prediction();
 	
 	private static final Logger LOGGER = new Logging().create(Collaboration.class.getName());
-	public Collaboration() {
 
-	}
 
 	
 
 	public JSONArray teamRating(String productsId, String servicesId, String company, Session session)
 			throws JSONException {
 		JSONArray result = new JSONArray();
-		productsId = productsId.replace(",", ";");
-		servicesId = servicesId.replace(",", ";");
+		String productsIdef = productsId.replace(",", ";");
+		String servicesIdef = servicesId.replace(",", ";");
+		String companyef = company;
 
-		// System.out.println(productsId);
-		// System.out.println(servicesId);
-		if ("null".equals(productsId))
-			productsId = "";
-		if ("null".equals(company))
-			company = "";
-		if ("null".equals(servicesId))
-			servicesId = "";
-		if ("-%20Select%20-".equals(company))
-			company = "";
-		//updateLoadBar(step++, 0, 1, session);
-		HashMap<Long, Double> pssSentiment = pre.predict(productsId, servicesId);
+
+		if ("null".equals(productsIdef))
+			productsIdef = "";
+		if ("null".equals(companyef))
+			companyef = "";
+		if ("null".equals(servicesIdef))
+			servicesIdef = "";
+		if ("-%20Select%20-".equals(companyef))
+			companyef = "";
+		HashMap<Long, Double> pssSentiment = pre.predict(productsIdef, servicesIdef);
 		if (pssSentiment == null) {
-			pssSentiment = pre.predict(company,session);
+			pssSentiment = pre.predict(companyef,session);
 		}
 		HashMap<Long, ArrayList<Double>> userRating = new HashMap<>();
 
@@ -58,11 +54,8 @@ public class Collaboration {
 			HashMap<Long, Double> dpSentiment = new HashMap<>();
 
 			Collection<DesignProject> designprojects = Data.dbdpall();
-			//updateLoadBar(step, 0, pssSentiment.size(), session);
-			//hidden_size=1;
 			pssSentiment.forEach((k, v) -> { // gives design projects average
 												// sentiment
-				//updateLoadBar(step, hidden_size++, 0, session);
 				for (DesignProject dp : designprojects) {
 					if (dp.getProducesPssId() == k) {
 						dpSentiment.put(dp.getID(), v);
@@ -70,10 +63,7 @@ public class Collaboration {
 				}
 
 			});
-			//updateLoadBar(++step, 0, dpSentiment.size(), session);
-			//hidden_size=1;
 			dpSentiment.forEach((k, v) -> {
-				//updateLoadBar(step, hidden_size++, 0, session);
 				for (Long userid : Data.getDp(k).get_team()) {
 					if (!userRating.containsKey(userid))
 						userRating.put(userid, new ArrayList<Double>());
@@ -81,12 +71,8 @@ public class Collaboration {
 					userRating.get(userid).add(v);
 				}
 			});
-			// return null;
 		}
-		//updateLoadBar(++step, 0, Data.dbuserall().size(), session);
-		//hidden_size=1;
 		for (User user0 : Data.dbuserall()) {
-			//updateLoadBar(step, hidden_size, 0, session);
 			if (!userRating.containsKey(user0.getID())) {
 				Company company0 = Data.getCompany(user0.getcompany_id());
 				try {
@@ -98,16 +84,13 @@ public class Collaboration {
 					result.put(obj);
 
 				} catch (JSONException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.INFO, Settings.err_unknown,e);
 				}
 
 			}
 
 		}
-		//updateLoadBar(++step, 0, userRating.size(), session);
-		//hidden_size=1;
 		userRating.forEach((k, v) -> {
-			//updateLoadBar(step, hidden_size, 0, session);
 			User user1 = Data.getUser(k);
 			Double avg = 0.0;
 			for (Double aux : v)
@@ -124,7 +107,7 @@ public class Collaboration {
 				result.put(obj);
 
 			} catch (JSONException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, Settings.err_unknown,e);
 			}
 		});
 
