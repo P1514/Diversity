@@ -21,7 +21,6 @@ import general.Settings;
  */
 public class GetComments {
 
-	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(GetComments.class.getName());
 
 	/**
@@ -31,14 +30,14 @@ public class GetComments {
 	/**
 	 * User to fetch all comments to a specific parent post
 	 * <p>
-	 * Returns and JSONArray with all comments for a specific post referring to
-	 * the the entry JSONObject.
+	 * Returns and JSONArray with all comments for a specific post referring to the
+	 * the entry JSONObject.
 	 * <p>
 	 * Examples:
 	 * <ul>
-	 * <li>Input:{"Values":"70182","Id":"820"}, it will then fetch comments from
-	 * the Database regarding the parent posts with id "70182" and model with
-	 * the id "820".</li>
+	 * <li>Input:{"Values":"70182","Id":"820"}, it will then fetch comments from the
+	 * Database regarding the parent posts with id "70182" and model with the id
+	 * "820".</li>
 	 * <li>Output: [{"Op":"comments"},{"Message":"They launched the new Austin
 	 * Cricket! These are average
 	 * sneakers!","Influence":"1.0","Polarity":"50.0","Gender":"Male","Age":"35","Name":"David
@@ -64,17 +63,12 @@ public class GetComments {
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + "," + Settings.lptable_polarity + ","
 				+ Settings.lptable_message + " from " + Settings.lptable + "," + Settings.latable + " where ( ("
-				+ Settings.lptable + "." + Settings.lptable_id + "=? OR";
-		insert += " " + Settings.lptable_opinion + "=? )AND " + Settings.lptable + "." + Settings.lptable_authorid + "="
+				+ Settings.lptable + "." + Settings.lptable_id + "=? OR"
+				+ " " + Settings.lptable_opinion + "=? )AND " + Settings.lptable + "." + Settings.lptable_authorid + "="
 				+ Settings.latable + "." + Settings.latable_id + ") ORDER BY " + Settings.lptable + "."
 				+ Settings.lptable_id + " ASC";
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-			return Backend.error_message("Error Connecting to Database Please Try Again Later");
-		}
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, msg.getString("Values"));
 			query1.setInt(2, msg.getInt("Values"));
 
@@ -88,7 +82,7 @@ public class GetComments {
 							+ ",," + rs.getString(Settings.latable_location) + ",,"
 							+ rs.getString(Settings.latable_gender) + ",," + rs.getInt(Settings.latable_age) + ",,";
 					preresult[i] += rs.getDouble(Settings.lptable_polarity) + ",,";
-					preresult[i] += rs.getString(Settings.lptable_message);
+					preresult[i] += rs.getString(Settings.lptable_message) + " ";
 				}
 
 			} catch (Exception e) {
@@ -96,13 +90,6 @@ public class GetComments {
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-		} finally {
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e);
-			}
 		}
 
 		for (int i = 0; i < ntops; i++) {
@@ -130,24 +117,12 @@ public class GetComments {
 	 * @return the string
 	 */
 	static String trunc(String number) {
-		String numberef =number;
+		String numberef = number;
 		double result = Double.parseDouble(numberef);
 		numberef = String.format("%.1f", result);
 		result = Double.parseDouble(numberef.replaceAll(",", "."));
 
 		return Double.toString(result);
-
-	}
-
-	/**
-	 * Dbconnect.
-	 */
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-		}
 
 	}
 }

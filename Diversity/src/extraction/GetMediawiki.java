@@ -13,9 +13,7 @@ import org.json.JSONObject;
 
 import general.*;
 
-
 public class GetMediawiki {
-	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(GetMediawiki.class.getName());
 	String error = "error";
 
@@ -24,43 +22,27 @@ public class GetMediawiki {
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
-		ResultSet rs;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
-			return null;
-		}
+
 		String insert = "SELECT " + Settings.lmwtable_name + " FROM " + Settings.lmwtable + " where "
 				+ Settings.lmwtable_pss + "=?;";
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			query1.setString(1, pss);
 
-			rs = query1.executeQuery();
-			while (rs.next()) {
-				obj = new JSONObject();
-				obj.put("Name", rs.getString("name"));
-				aux.put(obj);
+			try (ResultSet rs = query1.executeQuery()) {
+				while (rs.next()) {
+					obj = new JSONObject();
+					obj.put("Name", rs.getString("name"));
+					aux.put(obj);
+				}
+				result.put("Media_Wiki");
+				result.put(aux);
 			}
-			result.put("Media_Wiki");
-			result.put(aux);
-
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 		}
-		try {
-				cnlocal.close();
-		} catch (SQLException e) {
-			LOGGER.log(Level.SEVERE, error, e);
-
-		}
 		return result;
 
-	}
-
-	private void dbconnect() throws ClassNotFoundException, SQLException {
-		cnlocal = Settings.connlocal();
 	}
 
 }

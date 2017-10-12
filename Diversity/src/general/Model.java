@@ -24,7 +24,6 @@ import monitoring.Monitor;;
  */
 public final class Model {
 
-	private Connection cnlocal;
 	private long id, pss, design_project;
 	private long frequency, user;
 	private String name, uri, age, gender, products;
@@ -156,7 +155,6 @@ public final class Model {
 		nextupdate = cdate;
 		// age = msg.getString("Age");
 		// gender = msg.getString("Gender");
-		dbconnect();
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
@@ -166,9 +164,8 @@ public final class Model {
 													 * + "," + Settings.lmtable_age + "," + Settings.lmtable_gender
 													 */
 				+ ") values (?,?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
-		PreparedStatement query1 = null;
-		try {
-			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setString(1, name);
 			query1.setString(2, uri);
 			query1.setLong(3, pss);
@@ -187,10 +184,11 @@ public final class Model {
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
 			query1.executeUpdate();
-			ResultSet generatedKeys = query1.getGeneratedKeys();
+			try(ResultSet generatedKeys = query1.getGeneratedKeys()){
 			if (generatedKeys.next())
 				id = generatedKeys.getLong(1);
 			obj.put("id", id);
+			}
 		} catch (SQLIntegrityConstraintViolationException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
@@ -204,21 +202,8 @@ public final class Model {
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+		} catch (ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "No Class Found");
 		}
 
 		obj.put("Op", "Error2");
@@ -263,15 +248,13 @@ public final class Model {
 						: ", " + Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
 								+ Settings.lmtable_update + "=?, " + Settings.lmtable_add_mediawiki + "=? ")
 				+ "Where " + Settings.lmtable_id + "=? ";
-		PreparedStatement query1 = null;
-		try {
-			dbconnect();
-			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cnlocal = Settings.connlocal();
+			PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)){
 			query1.setBoolean(rangeindex++, msg.getBoolean("Archive"));
 
 			if (msg.has("Final_Products")) {
 				if ("".equals(msg.getString("Final_Products"))) {
-					product ="";
+					product = "";
 				} else {
 					for (String a : msg.getString("Final_Products").split(";")) {
 						product += Data.identifyProduct(a) + ",";
@@ -294,28 +277,12 @@ public final class Model {
 			// query1.setString(2, msg.getString("Gender"));
 			// System.out.println(query1);
 			query1.execute();
-		} catch (SQLException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
 		}
 
 		this.uri = uri;
@@ -464,14 +431,5 @@ public final class Model {
 				return result.substring(0, result.length() - 1);
 		}
 		return result;
-	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 }

@@ -27,7 +27,6 @@ import general.Settings;
  */
 public class GetReach {
 
-	private Connection cnlocal;
 	private static final Logger LOGGER = new Logging().create(GetReach.class.getName());
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
@@ -47,24 +46,15 @@ public class GetReach {
 				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
 				+ Settings.lotable_reach + ") desc limit " + nTOP;
 
-		try {
-			dbconnect();
-			try (PreparedStatement query1 = cnlocal.prepareStatement(select); ResultSet rs = query1.executeQuery()) {
-				while (rs.next()) {
-					tops.add(rs.getLong(Settings.lotable_pss));
-				}
+		try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(select);
+				ResultSet rs = query1.executeQuery()) {
+			while (rs.next()) {
+				tops.add(rs.getLong(Settings.lotable_pss));
 			}
-
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
 			return new ArrayList<>();
-		} finally {
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.SEVERE, "ERROR", e);
-			}
 		}
 
 		return tops;
@@ -137,50 +127,51 @@ public class GetReach {
 		String insert;
 		parameters par = split_params(param, value);
 		insert = "SELECT " + Settings.lptable + "." + Settings.lptable_polarity + ", " + Settings.lotable + "."
-				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", "
-				+ Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
-				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? and ";/* && (" + Settings.lptable + "."
-				+ Settings.lptable_authorid + "=" + Settings.latable + "." + Settings.latable_id;*/
+				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", " + Settings.lotable + " WHERE "
+				+ Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "." + Settings.lotable_id + "="
+				+ Settings.lptable + "." + Settings.lptable_opinion
+				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? and ";/*
+																										 * &&
+																										 * (" + Settings.lptable + "
+																										 * ." +
+																										 * Settings.
+																										 * lptable_authorid
+																										 * + "=" +
+																										 * Settings.
+																										 * latable + "."
+																										 * + Settings.
+																										 * latable_id;
+																										 */
 		return calc_global(false, "reach", insert, par, month, model, year, day, frequency);
 	}
 
 	protected double calc_global(boolean wiki, String type, String insert, parameters par, int month, Model model,
 			int year, int day, long frequency) {
 		avg result = new avg();
-		/*if (par.age != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
-					+ Settings.latable_age + ">?";
-		if (par.gender != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
-		if (par.location != null)
-			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";*/
-		/*if (!wiki) {
-			if (par.products != null) {
-				if (par.products.equals("-1")) {
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-				} else {
-					insert += " AND " + Settings.lotable_product + "=?";
-				}
-			} else {
-				if (!"polar".equals(type))
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")";
-			}
-		}
-		if (!model.getMediawiki())
-			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";*/
+		/*
+		 * if (par.age != null) insert += " AND " + Settings.latable + "." +
+		 * Settings.latable_age + "<=? AND " + Settings.latable + "." +
+		 * Settings.latable_age + ">?"; if (par.gender != null) insert += " AND " +
+		 * Settings.latable + "." + Settings.latable_gender + "=?"; if (par.location !=
+		 * null) insert += " AND " + Settings.latable + "." + Settings.latable_location
+		 * + "=?";
+		 */
+		/*
+		 * if (!wiki) { if (par.products != null) { if (par.products.equals("-1")) {
+		 * insert += " AND " + Settings.lotable_product + " in (" + model.getProducts()
+		 * + ")"; } else { insert += " AND " + Settings.lotable_product + "=?"; } } else
+		 * { if (!"polar".equals(type)) insert += " AND " + Settings.lotable_product +
+		 * " in (" + model.getProducts() + ")"; } } if (!model.getMediawiki()) insert +=
+		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
+		 */
 		if (model.getId() != -1 && !wiki)
 			insert += " account in (?) and source in (?)";
 		insert += ")";
 		int nmonth = month - 1;
 
 		Calendar data = new GregorianCalendar(year, nmonth, day);
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-		}
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			int rangeindex = 1;
 			query1.setLong(rangeindex++, model.getDate());
 			query1.setLong(rangeindex++, data.getTimeInMillis());
@@ -191,43 +182,33 @@ public class GetReach {
 				data.add(Calendar.DAY_OF_MONTH, (int) frequency);
 
 			query1.setLong(rangeindex++, data.getTimeInMillis());
-			
-			if(wiki || model.getId() == -1) query1.setLong(rangeindex++, model.getPSS());
-			/*if (par.age != null) {
-				query1.setString(rangeindex++, par.age.split("-")[1]);
-				query1.setString(rangeindex++, par.age.split("-")[0]);
-			}
-			if (par.gender != null)
-				query1.setString(rangeindex++, par.gender);
-			if (par.location != null)
-				query1.setString(rangeindex++, par.location);
-			if (par.products != null)
-<<<<<<< HEAD
 
-
-=======
->>>>>>> refs/remotes/origin/master
-*/
-				//query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			if (wiki || model.getId() == -1)
+				query1.setLong(rangeindex++, model.getPSS());
+			/*
+			 * if (par.age != null) { query1.setString(rangeindex++, par.age.split("-")[1]);
+			 * query1.setString(rangeindex++, par.age.split("-")[0]); } if (par.gender !=
+			 * null) query1.setString(rangeindex++, par.gender); if (par.location != null)
+			 * query1.setString(rangeindex++, par.location); if (par.products != null)
+			 * <<<<<<< HEAD
+			 * 
+			 * 
+			 * ======= >>>>>>> refs/remotes/origin/master
+			 */
+			// query1.setLong(rangeindex++,
+			// Long.valueOf(Data.identifyProduct(par.products)));
 			if (model.getId() != -1 && !wiki) {
 				query1.setString(rangeindex++, model.getAccounts(false));
 				query1.setString(rangeindex++, model.getSources(false));
 			}
 
-			//LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
+			// LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR -> " + insert, e);
-		} finally {
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
-			}
 		}
 		result.auxcalc = result.auxcalc / (result.total == 0 ? 1 : result.total);
 		String temp;
@@ -352,9 +333,9 @@ public class GetReach {
 		Model model = Data.getmodel(id);
 		String insert;
 		parameters par = split_params(param, value);
-		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM "
-				+ Settings.lptable + ", " + Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND "
-				+ Settings.lotable + "." + Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
+		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.lptable + ", "
+				+ Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
+				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
 				+ " AND timestamp>? && timestamp<? && opinions.id in (Select id from opinions where ";
 
 		return calc_global(false, "reach", insert, par, month, model, year, day, -1);
@@ -400,41 +381,23 @@ public class GetReach {
 
 	}
 
-	private void dbconnect() throws ClassNotFoundException, SQLException {
-		cnlocal = Settings.connlocal();
-	}
-
 	public long firstDate(long id) {
 		Model model = Data.getmodel(id);
 		long result = 0;
-		ResultSet rs;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return (Long) null;
-		}
 		String insert = new String("Select min(timestamp) from opinions where pss=?");
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			query1.setLong(1, model.getPSS());
 
-			rs = query1.executeQuery();
-			rs.next();
-			if (model.getDate() > rs.getLong(1))
-				result = model.getDate();
-			else
-				result = rs.getLong(1);
-
+			try (ResultSet rs = query1.executeQuery()) {
+				rs.next();
+				if (model.getDate() > rs.getLong(1))
+					result = model.getDate();
+				else
+					result = rs.getLong(1);
+			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "ERROR", e);
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return result;
 

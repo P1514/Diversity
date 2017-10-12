@@ -56,13 +56,13 @@ public class Monitor {
 		for (int i = 0; i < urilists.length; i++) {
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "&type[]=" + source  ;
+			url += account + "&type[]=" + source;
 		}
-		//url = url.substring(0, url.length() - 1);
-		//url += pssName + finalProductId + finalProductName;
-		//System.out.println(url);
+		// url = url.substring(0, url.length() - 1);
+		// url += pssName + finalProductId + finalProductName;
+		// System.out.println(url);
 		try {
-			//System.out.println(url);
+			// System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -117,9 +117,9 @@ public class Monitor {
 		 * String status; while ((status = in.readLine()) != null)
 		 * System.out.println(status); in.close();
 		 * 
-		 * } catch (MalformedURLException e) { // TODO Auto-generated catch
-		 * block e.printStackTrace(); } catch (IOException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
+		 * } catch (MalformedURLException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } catch (IOException e) { // TODO Auto-generated catch
+		 * block e.printStackTrace(); }
 		 */
 
 	}
@@ -143,20 +143,15 @@ public class Monitor {
 		int count = 1;
 
 		for (int i = 0; i < urilist.length; i++) {
-			Connection cnlocal = null;
-			ResultSet rs;
-			try {
-				cnlocal = Settings.connlocal();
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "error", e);
-			}
-			// System.out.println(urilist[i]);
+
 			String insert = new String("SELECT COUNT(id) FROM models WHERE archived=0 and uri=?;");
-			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setString(1, urilist[i]);
 				// System.out.println(query1.toString());
-				rs = query1.executeQuery();
+				try(ResultSet rs = query1.executeQuery()){
 				count = rs.getInt(1);
+				}
 
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "error", e);

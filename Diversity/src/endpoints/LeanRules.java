@@ -23,7 +23,7 @@ import general.Logging;
 import general.Settings;
 
 public class LeanRules {
-	private static final Logger LOGGER = new Logging().create(Collaboration.class.getName());
+	private static final Logger LOGGER = new Logging().create(LeanRules.class.getName());
 
 	public static class LeanRule {
 
@@ -364,7 +364,7 @@ public class LeanRules {
 
 
 		try (Connection cncr = Settings.conncr(); PreparedStatement query1 = cncr.prepareStatement(select1);) {
-			query1.setInt(1, dpId);
+			if(dpId != -1) query1.setInt(1, dpId);
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
 					pss = rs.getInt(1);

@@ -648,10 +648,9 @@ public class Prediction extends Globalsentiment {
 			obj.put("Ammount", percentage);
 			msg.put(obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			return;
 		}
-		if(msg==null) return;
 		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
 		try {
 			session.getBasicRemote().sendText(msg.toString());

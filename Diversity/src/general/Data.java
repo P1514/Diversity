@@ -105,11 +105,10 @@ public class Data {
 		String roles = "";
 
 		// Connection cncr = null;
-		PreparedStatement query1 = null;
+		String query = "SELECT name FROM diversity_common_repository.user_role;";
 
-		try (Connection cncr = Settings.conncr();) {
-			String query = "SELECT name FROM diversity_common_repository.user_role;";
-			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cncr = Settings.conncr();
+			PreparedStatement query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
 			try (ResultSet rs = query1.executeQuery(query)) {
 				while (rs.next()) {
@@ -129,13 +128,12 @@ public class Data {
 	public static String getRolenameFromCR(long id) {
 		String role = "";
 
-		// Connection cncr = null;
-		PreparedStatement query1 = null;
-
-		try (Connection cncr = Settings.conncr();) {
-			String query = "SELECT name FROM diversity_common_repository.user_role where id = ";
+		String query = "SELECT name FROM diversity_common_repository.user_role where id = ";
+		try (Connection cncr = Settings.conncr();
+				PreparedStatement query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+			
 			query += id;
-			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+			
 			
 			try (ResultSet rs = query1.executeQuery(query)) {
 				while(rs.next())
