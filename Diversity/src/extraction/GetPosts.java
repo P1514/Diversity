@@ -3,7 +3,6 @@ package extraction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,9 +35,9 @@ public class GetPosts {
 	private static final Logger LOGGER = new Logging().create(GetPosts.class.getName());
 
 	/**
-	 * Method that uses the input to get Top 5 parent posts information, uses month
-	 * for the month requested, param defines if any filtering is expected, the id
-	 * is the model ID requested.
+	 * Method that uses the input to get Top 5 parent posts information, uses
+	 * month for the month requested, param defines if any filtering is
+	 * expected, the id is the model ID requested.
 	 * 
 	 * @param param
 	 *            String any value
@@ -63,7 +62,7 @@ public class GetPosts {
 		int[] topid = new int[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);
-		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (";
+		insert = Settings.sqlselect + Settings.lotable_id + " FROM " + Settings.lotable + " where (";
 
 		if (wiki) {
 			insert += " " + Settings.lotable_pss + "=? AND " + Settings.lotable_source + " like 'mediawiki' AND ";
@@ -74,8 +73,10 @@ public class GetPosts {
 
 		insert += Settings.lotable_timestamp + ">=?";
 
-		/*if (!"Global".equals(product) && !wiki)
-			insert += " AND " + Settings.lotable_product;*/
+		/*
+		 * if (!"Global".equals(product) && !wiki) insert += " AND " +
+		 * Settings.lotable_product;
+		 */
 
 		Model model = Data.getmodel(id);
 
@@ -87,17 +88,14 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		/*if (!"Global".equals(product) && !wiki) {
-			if (!model.getProducts().isEmpty()) {
-				if (product == "noproduct")
-					insert += " in (" + model.getProducts() + ")";
-				else
-					insert += "=" + Data.identifyProduct(product);
-			} else {
-				insert += "=0";
-			}
-
-		}*/
+		/*
+		 * if (!"Global".equals(product) && !wiki) { if
+		 * (!model.getProducts().isEmpty()) { if (product == "noproduct") insert
+		 * += " in (" + model.getProducts() + ")"; else insert += "=" +
+		 * Data.identifyProduct(product); } else { insert += "=0"; }
+		 * 
+		 * }
+		 */
 
 		if (param != null) {
 			insert += " && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?";
@@ -106,7 +104,7 @@ public class GetPosts {
 			try {
 				inputdate.setTime(sdf.parse(day + " " + year + " " + month));
 			} catch (ParseException e1) {
-				LOGGER.log(Level.INFO, "ERROR", e1);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e1);
 				insert = insert.replace(
 						" && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?", "");
 				dateerror = true;
@@ -117,7 +115,8 @@ public class GetPosts {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
 					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and
 																											// views>0)";
-																											// // More
+																											// //
+																											// More
 																											// comment
 		}
 
@@ -155,20 +154,21 @@ public class GetPosts {
 
 				for (i = 0; rs.next(); i++) {
 					topid[i] = rs.getInt("id");
-					pre_result[i] = topid[i]+",,";
+					pre_result[i] = topid[i] + ",,";
 					n_tops++;
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 		}
-		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
-				+ "," + Settings.latable_gender + "," + Settings.latable_age + " from " + Settings.latable + " where "
-				+ Settings.latable_id + " in (Select " + Settings.lotable_author + " from " + Settings.lotable
-				+ " where " + Settings.lotable_id + " = ? )";
+		insert = Settings.sqlselect + Settings.latable_name + "," + Settings.latable_influence + ","
+				+ Settings.latable_location + "," + Settings.latable_gender + "," + Settings.latable_age + " from "
+				+ Settings.latable + " where " + Settings.latable_id + " in (Select " + Settings.lotable_author
+				+ " from " + Settings.lotable + " where " + Settings.lotable_id + " = ? )";
 		for (int i = 0; i < n_tops; i++) {
 
-			try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
@@ -179,17 +179,18 @@ public class GetPosts {
 					}
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 
 			}
 		}
 
-		insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
-				+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
-				+ " = ?";
+		insert = Settings.sqlselect + Settings.lotable_timestamp + "," + Settings.lotable_polarity + ","
+				+ Settings.lotable_reach + "," + Settings.lotable_comments + " from " + Settings.lotable + " where "
+				+ Settings.lotable_id + " = ?";
 		for (int i = 0; i < n_tops; i++) {
 
-			try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					rs.next();
@@ -198,16 +199,17 @@ public class GetPosts {
 							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
 		}
 
-		insert = "Select " + Settings.lptable_message + " from " + Settings.lptable + " where " + Settings.lptable_id
-				+ " = ?";
+		insert = Settings.sqlselect + Settings.lptable_message + " from " + Settings.lptable + " where "
+				+ Settings.lptable_id + " = ?";
 
 		for (int i = 0; i < n_tops; i++) {
 
-			try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 
 				try (ResultSet rs = query1.executeQuery()) {
@@ -217,7 +219,7 @@ public class GetPosts {
 						pre_result[i] += "";
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
 		}
 
@@ -270,35 +272,40 @@ public class GetPosts {
 
 		Model m = Data.getmodel(id);
 		String[] uri = m.getURI().split(";");
-		String queryAdd = "";
+		StringBuilder queryAdd = new StringBuilder();
 		if (wiki) {
-			queryAdd += " pss=? AND source like 'mediawiki'";
+			queryAdd.append(" pss=? AND source like 'mediawiki'");
 		} else {
 			for (int i = 0; i < uri.length; i++) {
-				queryAdd += "(" + Settings.lotable_source + "=? " + "AND " + Settings.lotable_account + "=?)";
+				queryAdd.append("(" + Settings.lotable_source + "=? " + "AND " + Settings.lotable_account + "=?)");
 				if (i != (uri.length - 1)) {
-					queryAdd += "OR ";
+					queryAdd.append("OR ");
 				}
 			}
 		}
 
+		int minef=min;
+		int maxef=max;
 		if (min == -1)
-			min = 0;
+			minef = 0;
 		if (max == -1)
-			max = 100;
+			maxef = 100;
 
-		// insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + "
+		// insert = Settings.sqlselect + Settings.lotable_id + " FROM " +
+		// Settings.lotable + "
 		// where (" + Settings.lotable_pss
 		// + "=? AND " + Settings.lotable_timestamp + ">=? AND " +
 		// Settings.lotable_polarity + "<=" + max + " AND "
 		// + Settings.lotable_polarity + ">=" + min;
 
-		insert = "Select " + Settings.lotable_id + " FROM " + Settings.lotable + " where (" + Settings.lotable_timestamp
-				+ ">=? " + "AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">="
-				+ min;
+		insert = Settings.sqlselect + Settings.lotable_id + " FROM " + Settings.lotable + " where ("
+				+ Settings.lotable_timestamp + ">=? " + "AND " + Settings.lotable_polarity + "<=" + maxef + " AND "
+				+ Settings.lotable_polarity + ">=" + minef;
 
-		/*if (!"Global".equals(product) && !wiki)
-			insert += " AND " + Settings.lotable_product;*/
+		/*
+		 * if (!"Global".equals(product) && !wiki) insert += " AND " +
+		 * Settings.lotable_product;
+		 */
 
 		Model model = Data.getmodel(id);
 
@@ -310,17 +317,14 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
-		/*if (!"Global".equals(product) && !wiki) {
-			if (!model.getProducts().isEmpty()) {
-				if (product == "noproduct")
-					insert += " in (" + model.getProducts() + ")";
-				else
-					insert += "=" + Data.identifyProduct(product);
-			} else {
-				insert += "=0";
-			}
-
-		}*/
+		/*
+		 * if (!"Global".equals(product) && !wiki) { if
+		 * (!model.getProducts().isEmpty()) { if (product == "noproduct") insert
+		 * += " in (" + model.getProducts() + ")"; else insert += "=" +
+		 * Data.identifyProduct(product); } else { insert += "=0"; }
+		 * 
+		 * }
+		 */
 
 		if (param != null) {
 			insert += " && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?";
@@ -329,7 +333,7 @@ public class GetPosts {
 			try {
 				inputdate.setTime(sdf.parse(day + " " + year + " " + month));
 			} catch (ParseException e1) {
-				LOGGER.log(Level.INFO, "ERROR", e1);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e1);
 				insert = insert.replace(
 						" && " + Settings.lotable_timestamp + " >= ? && " + Settings.lotable_timestamp + " <= ?", "");
 				dateerror = true;
@@ -340,16 +344,17 @@ public class GetPosts {
 			insert += " AND " + Settings.lotable_id + " in (Select " + Settings.lptable_opinion + " FROM "
 					+ Settings.lptable + " where " + Settings.lptable_message + " LIKE '%" + word + "%')"; // and
 																											// views>0)";
-																											// // More
+																											// //
+																											// More
 																											// comment
 		}
-		insert += "AND (" + queryAdd + ")";
+		insert += "AND (" + queryAdd.toString() + ")";
 		insert += ")";
 
 		insert += " ORDER BY reach DESC LIMIT ?";
 
 		LOGGER.log(Level.INFO, "TagCloud Query: " + insert);
-		try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 
 			int rangeindex = 2;
 			int i = 0;
@@ -388,16 +393,17 @@ public class GetPosts {
 				}
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return Backend.error_message("ERROR");
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+			return Backend.error_message(Settings.err_unknown);
 		}
-		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
-				+ "," + Settings.latable_gender + "," + Settings.latable_age + " from " + Settings.latable + " where "
-				+ Settings.latable_id + " in (Select " + Settings.lotable_author + " from " + Settings.lotable
-				+ " where " + Settings.lotable_id + " = ? )";
+		insert = Settings.sqlselect + Settings.latable_name + "," + Settings.latable_influence + ","
+				+ Settings.latable_location + "," + Settings.latable_gender + "," + Settings.latable_age + " from "
+				+ Settings.latable + " where " + Settings.latable_id + " in (Select " + Settings.lotable_author
+				+ " from " + Settings.lotable + " where " + Settings.lotable_id + " = ? )";
 		for (int i = 0; i < n_tops; i++) {
 
-			try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
@@ -408,49 +414,51 @@ public class GetPosts {
 					}
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 
 			}
 		}
 
-		insert = "Select " + Settings.lotable_timestamp + "," + Settings.lotable_polarity + "," + Settings.lotable_reach
-				+ "," + Settings.lotable_comments + " from " + Settings.lotable + " where " + Settings.lotable_id
-				+ " = ? AND " + Settings.lotable_polarity + "<=" + max + " AND " + Settings.lotable_polarity + ">="
-				+ min;
+		insert = Settings.sqlselect + Settings.lotable_timestamp + "," + Settings.lotable_polarity + ","
+				+ Settings.lotable_reach + "," + Settings.lotable_comments + " from " + Settings.lotable + " where "
+				+ Settings.lotable_id + " = ? AND " + Settings.lotable_polarity + "<=" + maxef + " AND "
+				+ Settings.lotable_polarity + ">=" + minef;
 
 		for (int i = 0; i < n_tops; i++) {
 
-			try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
-					if (rs.next() == false)
+					if (!rs.next())
 						continue;
 					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
 							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
 							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
 		}
 
-		insert = "Select " + Settings.lptable_message + " from " + Settings.lptable + " where " + Settings.lptable_id
-				+ " = ?";
+		insert = Settings.sqlselect + Settings.lptable_message + " from " + Settings.lptable + " where "
+				+ Settings.lptable_id + " = ?";
 
 		for (int i = 0; i < n_tops; i++) {
 			if (topid[i] == 0)
 				continue;
-			try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next())
-						pre_result[i] += rs.getString(Settings.lptable_message)+ " ";
+						pre_result[i] += rs.getString(Settings.lptable_message) + " ";
 					else
 						pre_result[i] += " ";
 				}
 			} catch (Exception e) {
-				LOGGER.log(Level.INFO, "ERROR", e);
+				LOGGER.log(Level.INFO, Settings.err_unknown, e);
 			}
 		}
 
@@ -491,10 +499,11 @@ public class GetPosts {
 
 	/**
 	 * Method that returns the amount of parent post that exist to the specific
-	 * model, with the filtering specified. The Value param expects a String with
-	 * parameters to filter separated by ',', same with value but regarding values
-	 * to that specific parameters. Filter specifies what are you filtering by, for
-	 * the output JSON. Id is reference to the model that we want the results for.
+	 * model, with the filtering specified. The Value param expects a String
+	 * with parameters to filter separated by ',', same with value but regarding
+	 * values to that specific parameters. Filter specifies what are you
+	 * filtering by, for the output JSON. Id is reference to the model that we
+	 * want the results for.
 	 * <p>
 	 * Filtering
 	 * 
@@ -531,8 +540,8 @@ public class GetPosts {
 			return result;
 		}
 		/*
-		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in (" +
-		 * model.getProducts() + ")"; } else { insert += "=0"; } }
+		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in ("
+		 * + model.getProducts() + ")"; } else { insert += "=0"; } }
 		 */
 		parameters par = GetReach.split_params(param, value);
 		if (par.age != null)
@@ -547,7 +556,7 @@ public class GetPosts {
 		insert += "account in (?)";
 		insert += ")";
 		// ResultSet rs = null;
-		try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			int rangeindex = 1;
 			if (wiki)
 				query1.setLong(rangeindex++, model.getPSS());
@@ -581,8 +590,8 @@ public class GetPosts {
 				result.put(obj);
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-		} 
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+		}
 
 		return result;
 
@@ -600,37 +609,36 @@ public class GetPosts {
 		JSONArray result = new JSONArray();
 		String insert = new String();
 
-		insert = "Select " + Settings.lptable_message + " FROM " + Settings.lptable + " WHERE "
+		insert = Settings.sqlselect + Settings.lptable_message + " FROM " + Settings.lptable + " WHERE "
 				+ Settings.lptable_opinion + "=?";
 
-		try (Connection cnlocal=Settings.connlocal();PreparedStatement query = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query = cnlocal.prepareStatement(insert)) {
 			query.setLong(1, post_id);
 			try (ResultSet rs = query.executeQuery()) {
-				for (int i = 0; rs.next(); i++) {
-					result.put(rs.getString(1));
-				}
+				result.put(rs.getString(1));
+
 			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			
-			return Backend.error_message("ERROR");
+			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
+
+			return Backend.error_message(Settings.err_unknown);
 		}
-		
+
 		return result;
 
 	}
 
 	private String trunc(String number) {
 		double result = 0;
+		String numberef = number;
 		try {
-
-			result = Double.valueOf(number);
-			number = String.format("%.2f", result);
-			result = Double.parseDouble(number);
+			result = Double.valueOf(numberef);
+			numberef = String.format("%.2f", result);
+			result = Double.parseDouble(numberef);
 
 		} catch (Exception e) {
-			number = number.replaceAll(",", ".");
-			result = Double.parseDouble(number);
+			numberef = numberef.replaceAll(",", ".");
+			result = Double.parseDouble(numberef);
 
 		}
 		return Double.toString(result);
