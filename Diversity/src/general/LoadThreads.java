@@ -166,13 +166,13 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
 		public void run() {
 			Connection cnlocal = null;
-			LOGGER.log(Level.SEVERE, "started thread n�" + counter);
+			LOGGER.log(Level.SEVERE, "started thread nº" + counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -246,7 +246,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
@@ -407,7 +407,7 @@ public class LoadThreads {
 					String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
 
 					long time = parsed.getTime();
-					
+
 					/*if (!remote) {
 						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						date = null;
@@ -415,7 +415,7 @@ public class LoadThreads {
 							date = (Date) df.parse(obj.getString(Settings.JSON_epoch));
 						} catch (ParseException e) {
 							LOGGER.log(Level.SEVERE, "ERROR Parsing Data" + obj.getString(Settings.JSON_epoch));
-							
+
 						}
 						time = date.getTime();
 
@@ -551,7 +551,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
@@ -685,13 +685,13 @@ public class LoadThreads {
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
-							
+
 							if (reply.has("postId")) {
 							} else {
 								long id1 = (long) (Math.random() * -1000000000);
 								reply.put("postId", id1);
 							}
-							
+
 							Date date;
 							if (reply.has(Settings.JSON_epoch)) {
 								date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
@@ -729,7 +729,7 @@ public class LoadThreads {
 										}
 									}
 								}
-								
+
 							} catch (ClassNotFoundException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
 								e.printStackTrace();
@@ -738,7 +738,7 @@ public class LoadThreads {
 								e.printStackTrace();
 							}
 
-							
+
 
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
@@ -804,7 +804,7 @@ public class LoadThreads {
 		/*
 		 * class Tmodels implements Runnable { private Model model; private Connection
 		 * conlocal;
-		 * 
+		 *
 		 * public Tmodels() { }
 		 */
 		public void Tmodels() {
