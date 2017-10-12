@@ -50,6 +50,15 @@ public class Loader {
 	public static void requestPSS() {
 		new Loader().loadPSS();	
 	}
+	
+	public static synchronized void repeatcomment() {
+        totalcomments--;
+    }
+	
+	public static synchronized void repeatpost() {
+        totalposts--;
+    }
+	
 	public String load(JSONArray json) throws JSONException {
 		if (json == null)
 			return null;
