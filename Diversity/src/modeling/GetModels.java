@@ -1,17 +1,22 @@
 package modeling;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import general.Data;
+import general.Logging;
 import general.Model;
+import general.Startup;
 
 /**
  * The Class GetModels.
  */
 public class GetModels {
-
+	private static final Logger LOGGER = new Logging().create(GetModels.class.getName());
 	/**
 	 * Gets the all models.
 	 *
@@ -20,7 +25,7 @@ public class GetModels {
 	 *             the JSON exception
 	 */
 	public JSONArray get_models() throws JSONException {
-
+		
 		JSONArray result = new JSONArray();
 		result.put(new JSONObject().put("Op", "Models"));
 
@@ -34,8 +39,7 @@ public class GetModels {
 					obj.put("Project", model.getProject());
 					result.put(obj);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:GetModels Error 1");
 				}
 			}
 		}
@@ -57,8 +61,7 @@ public class GetModels {
 						obj.put("Project", model.getProject());
 						result.put(obj);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:GetModels Error 2");
 					}
 				}
 			}

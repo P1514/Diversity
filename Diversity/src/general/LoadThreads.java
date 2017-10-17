@@ -116,21 +116,10 @@ public class LoadThreads {
 					}
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 1");
 				}
-				try {
-					cnlocal.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (ClassNotFoundException | SQLException e1) {
+				LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 2");
 			}
 		}
 	}
@@ -209,7 +198,6 @@ public class LoadThreads {
 	class Topinions implements Runnable {
 		private long id;
 		private JSONObject obj = null;
-		private long counter;
 
 		/**
 		 * Instantiates a new topinions referenced to local data.
@@ -270,8 +258,8 @@ public class LoadThreads {
 			}
 			Post _post = remote ? new Post(postid, source, user_id, time, likes, views, message)
 					: new Post(postid, user_id, (long) 0, likes, views, message, polarity, "");
-			if (!(Loader.users.contains(user_id))) {
-				Loader.users.add(user_id);
+			if (!(Loader.users_contains(user_id))) {
+				Loader.users_add(user_id);
 			}
 
 			Loader.opiniondb.put(postid,
@@ -442,8 +430,8 @@ public class LoadThreads {
 
 					if (!"".equals(user_id)) {
 						Author author = new Author(user_id, source, name, age, gender, location);
-						if (!(Loader.users2.contains(author))) {
-							Loader.users2.add(author);
+						if (!(Loader.users_contains(author))) {
+							Loader.users_add(author);
 						}
 					}
 					Loader.opiniondb.put(postid,
@@ -459,44 +447,9 @@ public class LoadThreads {
 						stmt.close();
 					if (cnlocal != null)
 						cnlocal.close();
-				} catch (SQLException | JSONException e) {
-					// system.out.println("ERROR loading Opinions");
-					e.printStackTrace();
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} finally {
-					try {
-						if (rs != null)
-							rs.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					try {
-						if (stmt != null)
-							stmt.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					try {
-						if (cnlocal != null)
-							cnlocal.close();
-
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				} catch (SQLException | JSONException | ParseException e) {
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 3");
 				}
-
-			}
-			try {
-				if (cndata != null)
-					cndata.close();
-
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 
@@ -582,8 +535,8 @@ public class LoadThreads {
 							if (message.length() <= 1)
 								continue;
 							Post _post = new Post(postid, "", user_id, time, likes, views, message);
-							if (!(Loader.users.contains(user_id))) {
-								Loader.users.add(user_id);
+							if (!(Loader.users_contains(user_id))) {
+								Loader.users_add(user_id);
 							}
 							_opin.addcomment(_post);
 						} while (rs.next());
@@ -609,8 +562,8 @@ public class LoadThreads {
 							double polarity = rs.getDouble(Settings.lptable_polarity);
 							String source = rs.getString(Settings.latable_source);
 							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity, source);
-							if (!(Loader.users.contains(user_id)))
-								Loader.users.add(user_id);
+							if (!(Loader.users_contains(user_id)))
+								Loader.users_add(user_id);
 							_opin.addcomment(_post);
 						} while (rs.next());
 					}
@@ -624,37 +577,34 @@ public class LoadThreads {
 						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					// system.out.println("ERROR loading Posts");
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 4");
 				} catch (SQLException e) {
-					//
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 5");
 				} finally {
 					try {
 						if (rs != null)
 							rs.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 6");
 					}
 					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 7");
 					}
 					try {
 						if (cndata != null)
 							cndata.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 8");
 					}
 					try {
 						if (cnlocal != null)
 							cnlocal.close();
 
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 9");
 					}
 
 				}
@@ -722,10 +672,10 @@ public class LoadThreads {
 
 							} catch (ClassNotFoundException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
+								
 							} catch (SQLException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
+								
 							}
 
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
@@ -738,8 +688,8 @@ public class LoadThreads {
 									: "";
 							if (!"".equals(user_id)) {
 								Author author = new Author(user_id, source, name, age, gender, location);
-								if (!(Loader.users2.contains(author))) {
-									Loader.users2.add(author);
+								if (!(Loader.users_contains(author))) {
+									Loader.users_add(author);
 								}
 							}
 							_opin.addcomment(_post);
@@ -749,36 +699,34 @@ public class LoadThreads {
 
 					// //system.out.println("HELLO");
 				} catch (JSONException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 9");
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 10");
 				} finally {
 					try {
 						if (rs != null)
 							rs.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 11");
 					}
 					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 12");
 					}
 					try {
 						if (cndata != null)
 							cndata.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 13");
 					}
 					try {
 						if (cnlocal != null)
 							cnlocal.close();
 
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 14");
 					}
 
 				}
@@ -803,8 +751,7 @@ public class LoadThreads {
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 15");
 				return;
 			}
 			try {
@@ -836,21 +783,20 @@ public class LoadThreads {
 					if (rs != null)
 						rs.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 16");
 				}
 				try {
 					if (stmt != null)
 						stmt.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 17");
 				}
 				try {
 					if (cnlocal != null)
 						cnlocal.close();
 
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 18");
 				}
 
 			}

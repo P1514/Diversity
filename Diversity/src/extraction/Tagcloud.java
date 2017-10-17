@@ -11,15 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import general.Logging;
 import general.Settings;
 
 public class Tagcloud extends GetPosts {
 
+	private static final Logger LOGGER = new Logging().create(Tagcloud.class.getName());
 	private Map<String, Integer> wordWeights;
 	private List<String> ignoreWords;
 	private JSONArray posts;
@@ -104,7 +107,7 @@ public class Tagcloud extends GetPosts {
 		} catch (
 
 		Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Tagcloud, ERROR 1");
 		}
 
 		if (userModelPairExists < 1) {
@@ -135,7 +138,7 @@ public class Tagcloud extends GetPosts {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Tagcloud, ERROR 2");
 		}
 	}
 
@@ -146,33 +149,32 @@ public class Tagcloud extends GetPosts {
 
 		String insert = "INSERT INTO " + Settings.tctable + "(" + Settings.tctable_user + "," + Settings.tctable_model
 				+ "," + Settings.tctable_ignored_words + ") VALUES (?,?,?)";
-		
+
 		try (Connection cnlocal = Settings.connlocal();
-			PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)){
+				PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			query1.setString(3, ignore_words);
 			query1.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Tagcloud, ERROR 3");
 		}
 	}
 
 	public void addIgnoreWord(String word) {
-		
 
 		String update = "UPDATE " + Settings.tctable + " SET " + Settings.tctable_ignored_words + " = CONCAT(IFNULL("
 				+ Settings.tctable_ignored_words + ",''), '" + word + ",') WHERE " + Settings.tctable_user + " = ? AND "
 				+ Settings.tctable_model + " = ?";
-		
+
 		try (Connection cnlocal = Settings.connlocal();
-			PreparedStatement query1 = cnlocal.prepareStatement(update, PreparedStatement.RETURN_GENERATED_KEYS)){
+				PreparedStatement query1 = cnlocal.prepareStatement(update, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			query1.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
-		} 
+			LOGGER.log(Level.WARNING,"Class:Tagcloud, ERROR 4");
+		}
 
 		fillMaps();
 	}

@@ -28,7 +28,7 @@ import general.Settings;
  * The Class Monitor.
  */
 public class Monitor {
-	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
+	private static final Logger LOGGER = new Logging().create(Monitor.class.getName());
 	String error = "error";
 
 	/**
@@ -66,8 +66,7 @@ public class Monitor {
 			//System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 1");
 		}
 		}
 		PreparedStatement stmt = null;
@@ -91,25 +90,21 @@ public class Monitor {
 			stmt.execute();
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 2");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 3");
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Monitor Error 4");
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Monitor Error 5");
 			}
 		}
 

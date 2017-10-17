@@ -116,10 +116,10 @@ public class Data {
 				}
 
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Data ERROR 1");
 			}
 		} catch (Exception e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Data ERROR 2");
 		}
 
 		return roles;
@@ -140,10 +140,10 @@ public class Data {
 				role = rs.getString(1);
 
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Data ERROR 3");
 			}
 		} catch (Exception e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Data ERROR 4");
 		}
 
 		return role;
