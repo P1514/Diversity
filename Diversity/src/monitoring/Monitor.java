@@ -52,25 +52,30 @@ public class Monitor {
 
 			}
 		}
-		url = Settings.register_uri + "?accounts[]=";
+	
 		for (int i = 0; i < urilists.length; i++) {
+			url = Settings.register_uri + "?accounts[]=";
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
 			url += account + "&type[]=" + source;
-		}
+		
 		// url = url.substring(0, url.length() - 1);
 		// url += pssName + finalProductId + finalProductName;
 		// System.out.println(url);
 		try {
-			// System.out.println(url);
+			//System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		}
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
 		try {
+			for (int i = 0; i < urilists.length; i++) {
+				source = urilists[i].split(",")[0];
+				account = urilists[i].split(",")[1];
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
 					+ Settings.lutable_account + "," + Settings.lutable_pss + "," + Settings.lutable_lastupdate
@@ -84,7 +89,7 @@ public class Monitor {
 			// System.out.println(query);
 
 			stmt.execute();
-
+			}
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
