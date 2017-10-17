@@ -498,9 +498,50 @@ function escapeHtml(html)//stops the user from injecting html in forms
 }
 
 function addline() {
-  var name = escapeHtml2(document.getElementById("new_name").value);
-  var value = escapeHtml2(document.getElementById("new_URI").value);
+  var name = document.getElementById("new_name").value;
+  var value = document.getElementById("new_URI").value;
+  console.log(1);
+  if (name == "" || value == "")
+    return;
 
+  if (name == "URL") {
+
+    if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
+      name = "Facebook";
+      console.log('entrou no facebook');
+      var tmp = value.split("/");
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
+    }
+
+    if (value.toLowerCase().indexOf("twitter") != -1) {
+      name = "Twitter";
+      console.log('entrou no twitter');
+      var tmp = value.split("/");
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
+    }
+
+    if (value.toLowerCase().indexOf("amazon") != -1) {
+      name = "Amazon"
+
+      var tmp = value.split("/dp/");
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
+    }
+  }
+
+  $('#table_div2').append(
+      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+escapeHtml2(value)+'"" checked>'
+          + name + " / " + escapeHtml2(value) +  '</label></div>');
+
+  //document.getElementById("new_name").value = "";
+  document.getElementById("new_URI").value = "";
+}
+
+function addline2(name, value) {
+  console.log(2);
+  //console.log("line added");
   if (name == "" || value == "")
     return;
 
@@ -509,34 +550,24 @@ function addline() {
     if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
       name = "Facebook";
       var tmp = value.split("/");
-      value = tmp[tmp.length - 1];
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
     }
 
     if (value.toLowerCase().indexOf("twitter") != -1) {
       name = "Twitter";
       var tmp = value.split("/");
-      value = tmp[tmp.length - 1];
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
     }
 
     if (value.toLowerCase().indexOf("amazon") != -1) {
       name = "Amazon"
       var tmp = value.split("/dp/");
-      value = tmp[tmp.length - 1];
+      //value = tmp[tmp.length - 1];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
     }
   }
-
-  $('#table_div2').append(
-      '<div class="checkbox"><label><input type="checkbox" value="'+name+","+value+'"" checked>'
-          + name + " / " + value +  '</label></div>');
-
-  document.getElementById("new_name").value = "";
-  document.getElementById("new_URI").value = "";
-}
-
-function addline2(name, value) {
-  //console.log("line added");
-  if (name == "" || value == "")
-    return;
   $('#table_div2').append(
       '<div class="checkbox"><label name="user"><input type="checkbox" value="'+name+","+value+'"">'
           + name + " / " + value +  '</label></div>');
