@@ -615,7 +615,10 @@ public class GetPosts {
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query = cnlocal.prepareStatement(insert)) {
 			query.setLong(1, post_id);
 			try (ResultSet rs = query.executeQuery()) {
-				result.put(rs.getString(1));
+				boolean b;
+				while(b = rs.next()) {
+					result.put(rs.getString(1));
+				}
 
 			}
 		} catch (Exception e) {
