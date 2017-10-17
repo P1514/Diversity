@@ -335,6 +335,8 @@ public class Settings {
 
 	public static final String sqlwhere = " Where ";
 	public static final String sqlselectall = "Select * from ";
+	public static final String sqlselect = "Select ";
+
 	// Errors
 	public static final String err_unknown = "ERROR ";
 	public static final String err_dbconnect = "Cannot connect to database Please Try Again Later.";

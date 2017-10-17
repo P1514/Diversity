@@ -80,13 +80,11 @@ public class LoadThreads {
 						return;
 					}
 					for (Post post : opinion.getPosts().values()) {
-						PreparedStatement query2 = null;
 
-						try {
-							String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
-									+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?,"
-									+ Settings.lptable_likes + "=?";
-							query2 = cnlocal.prepareStatement(update1);
+						String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
+								+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?," + Settings.lptable_likes
+								+ "=?";
+						try (PreparedStatement query2 = cnlocal.prepareStatement(update1)) {
 							query2.setLong(1, post.getID());
 							if (post.getPolarity() != -1) {
 								query2.setDouble(2, post.getPolarity());
@@ -97,10 +95,7 @@ public class LoadThreads {
 							query2.setLong(4, post.getLikes());
 							query2.setLong(5, post.getViews());
 							query2.setLong(6, opinion.getID());
-							if (!Settings.JSON_use)
-								query2.setString(7, post.getUID());
-							else
-								query2.setString(7, post.getUID());
+							query2.setString(7, post.getUID());
 							query2.setLong(8, post.getLikes());
 							query2.setLong(9, post.getViews());
 							while (true) {
@@ -114,16 +109,9 @@ public class LoadThreads {
 								}
 								break;
 							}
-							if (query2 != null)
-								query2.close();
 						} catch (Exception e) {
 							LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 							continue;
-						}
-						try {
-							if (query2 != null)
-								query2.close();
-						} catch (Exception e) {
 						}
 					}
 
@@ -166,13 +154,13 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
 		public void run() {
 			Connection cnlocal = null;
-			LOGGER.log(Level.SEVERE, "started thread n�" + counter);
+			LOGGER.log(Level.SEVERE, "started thread nº" + counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -246,7 +234,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
@@ -375,7 +363,8 @@ public class LoadThreads {
 						id = (long) (Math.random() * -1000000000);
 						obj.put("postId", id);
 					}
-					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id="+id+" and opinions.id="+id);
+					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id=" + id
+							+ " and opinions.id=" + id);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
@@ -385,7 +374,7 @@ public class LoadThreads {
 						cnlocal.close();
 					} else {
 						Loader.repeatpost();
-						//Loader.repeatcomment();
+						// Loader.repeatcomment();
 					}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
 					// Date date = new Date(0);
@@ -407,20 +396,19 @@ public class LoadThreads {
 					String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
 
 					long time = parsed.getTime();
-					
-					/*if (!remote) {
-						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						date = null;
-						try {
-							date = (Date) df.parse(obj.getString(Settings.JSON_epoch));
-						} catch (ParseException e) {
-							LOGGER.log(Level.SEVERE, "ERROR Parsing Data" + obj.getString(Settings.JSON_epoch));
-							
-						}
-						time = date.getTime();
 
-					}*/
-					long postid=id;
+					/*
+					 * if (!remote) { SimpleDateFormat df = new
+					 * SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); date = null; try { date = (Date)
+					 * df.parse(obj.getString(Settings.JSON_epoch)); } catch (ParseException e) {
+					 * LOGGER.log(Level.SEVERE, "ERROR Parsing Data" +
+					 * obj.getString(Settings.JSON_epoch));
+					 * 
+					 * } time = date.getTime();
+					 * 
+					 * }
+					 */
+					long postid = id;
 					// //system.out.println("IM HERE");
 					long likes, views, age;
 					String name, gender, location, message;
@@ -551,7 +539,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
@@ -677,7 +665,8 @@ public class LoadThreads {
 					if (obj.has(Settings.JSON_replies) || obj.has("Replies")) {
 
 						// //system.out.println("HELLO2");
-						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies): obj.getJSONArray("Replies");
+						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies)
+								: obj.getJSONArray("Replies");
 						for (int index = 0; index < replies.length(); index++) {
 
 							String query = Settings.sqlselectall + Settings.lptable + " where " + Settings.lptable_id
@@ -685,13 +674,13 @@ public class LoadThreads {
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
-							
+
 							if (reply.has("postId")) {
 							} else {
 								long id1 = (long) (Math.random() * -1000000000);
 								reply.put("postId", id1);
 							}
-							
+
 							Date date;
 							if (reply.has(Settings.JSON_epoch)) {
 								date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
@@ -715,21 +704,22 @@ public class LoadThreads {
 							String message = reply.getString(Settings.JSON_message);
 
 							String source = obj.getString(Settings.JSON_source);
-							Post _post=null;
+							Post _post = null;
 							try (Connection cnlocalnew = Settings.connlocal()) {
-								try(PreparedStatement ps = cnlocalnew.prepareStatement(query)){
+								try (PreparedStatement ps = cnlocalnew.prepareStatement(query)) {
 									ps.setLong(1, postid);
-									try(ResultSet rsnew = ps.executeQuery()){
-										if(!rsnew.next()) {
+									try (ResultSet rsnew = ps.executeQuery()) {
+										if (!rsnew.next()) {
 											_post = new Post(postid, source, user_id, time, likes, views, message);
-										}else{
+										} else {
 											Loader.repeatcomment();
 											double polarity = rsnew.getDouble(Settings.lptable_polarity);
-											_post = new Post(postid, user_id, time, likes, views, message,polarity, source);
+											_post = new Post(postid, user_id, time, likes, views, message, polarity,
+													source);
 										}
 									}
 								}
-								
+
 							} catch (ClassNotFoundException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
 								e.printStackTrace();
@@ -737,8 +727,6 @@ public class LoadThreads {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
 								e.printStackTrace();
 							}
-
-							
 
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
@@ -804,7 +792,7 @@ public class LoadThreads {
 		/*
 		 * class Tmodels implements Runnable { private Model model; private Connection
 		 * conlocal;
-		 * 
+		 *
 		 * public Tmodels() { }
 		 */
 		public void Tmodels() {

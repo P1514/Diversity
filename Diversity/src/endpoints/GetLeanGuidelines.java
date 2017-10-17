@@ -34,14 +34,7 @@ public class GetLeanGuidelines {
 	public Response welcome() throws JSONException {
 		if ("".equals(dp))
 			return Response.status(Response.Status.BAD_REQUEST).build();
-		
-		int dpInt;
-		try {
-			dpInt = Integer.parseInt(dp);
-		} catch (NumberFormatException e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
-		
+
 		LeanRules lr = new LeanRules(dp);
 
 		JSONArray json = lr.getGuidelineResult();

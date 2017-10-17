@@ -40,8 +40,8 @@ public class Prediction extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
-		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
+		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
+		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
 		// pssweights.forEach((k, v) -> {
 		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
@@ -187,8 +187,8 @@ public class Prediction extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
-		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
+		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
+		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
 		// pssweights.forEach((k, v) -> {
 		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
@@ -387,8 +387,8 @@ public class Prediction extends Globalsentiment {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 
-		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
-		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
+		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
+		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
 		// pssweights.forEach((k, v) -> {
 		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
@@ -572,8 +572,8 @@ public class Prediction extends Globalsentiment {
 
 		HashMap<Long, Double> pssSentiment = new HashMap<Long, Double>();
 
-		HashMap<Long, Double> pssweights = Extrapolation.get_Similarity_Threshold(productsId, 75, true);
-		HashMap<Long, Double> pssweightss = Extrapolation.get_Similarity_Threshold(servicesId, 60, false);
+		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
+		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
 		// pssweights.forEach((k, v) -> {
 		// System.out.println("SIMILARITY OF PRODUCTS(" + k + ") -->" + v);
@@ -648,10 +648,9 @@ public class Prediction extends Globalsentiment {
 			obj.put("Ammount", percentage);
 			msg.put(obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			return;
 		}
-		if(msg==null) return;
 		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
 		try {
 			session.getBasicRemote().sendText(msg.toString());

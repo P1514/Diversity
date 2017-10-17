@@ -116,7 +116,7 @@ public class Post {
 					count++;
 				}
 			}
-			sentiment = count > 0 ? sum/count : 50;
+			sentiment = count > 0 ? sum/(double)count : 50;
 			// End of To Replace
 
 			this.polarity = sentiment;

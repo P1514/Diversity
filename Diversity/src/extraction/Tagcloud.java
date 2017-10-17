@@ -24,10 +24,9 @@ public class Tagcloud extends GetPosts {
 	private List<String> ignoreWords;
 	private JSONArray posts;
 	private JSONArray comments;
-	private Connection cnlocal;
 	private long model_id;
 	private long user_id;
-	
+
 	public Tagcloud(JSONArray posts, long model_id, long user_id) {
 		wordWeights = new HashMap<String, Integer>();
 		ignoreWords = new ArrayList<String>();
@@ -35,17 +34,6 @@ public class Tagcloud extends GetPosts {
 		this.user_id = user_id;
 		addUserIfNotExists();
 		this.posts = posts;
-	}
-
-	
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	public JSONArray calculateWeights() throws JSONException {
@@ -57,7 +45,7 @@ public class Tagcloud extends GetPosts {
 		// getComments(posts.getJSONObject(i).getLong("Id")));
 		// }
 		// }
-		
+
 		fillMaps();
 
 		for (int i = 0; i < posts.length(); i++) {
@@ -105,57 +93,42 @@ public class Tagcloud extends GetPosts {
 		String select = "SELECT COUNT(*) FROM " + Settings.tctable + " WHERE " + Settings.tctable_user + " =? AND "
 				+ Settings.tctable_model + " = ?";
 
-		PreparedStatement query1 = null;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				userModelPairExists = rs.getInt(1);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			cnlocal.close();
-		} catch (SQLException e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 		}
 
 		if (userModelPairExists < 1) {
 			setIgnoreWords();
 		}
-		
-//		fillMaps();
+
+		// fillMaps();
 	}
 
 	private void fillMaps() {
-		
-		ignoreWords = new ArrayList<String>();
-		String select = "SELECT " + Settings.tctable_ignored_words + " FROM " + Settings.tctable + " WHERE " + Settings.tctable_user + " =? AND "
-				+ Settings.tctable_model + " = ?";
 
-		PreparedStatement query1 = null;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS);
+		ignoreWords = new ArrayList<String>();
+		String select = "SELECT " + Settings.tctable_ignored_words + " FROM " + Settings.tctable + " WHERE "
+				+ Settings.tctable_user + " =? AND " + Settings.tctable_model + " = ?";
+
+		try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(select, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				if (rs.getString(1) != null) {
 					String[] words = rs.getString(1).split(",");
-					
+
 					for (String word : words) {
 						ignoreWords.add(word);
 					}
@@ -164,81 +137,43 @@ public class Tagcloud extends GetPosts {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		try {
-			cnlocal.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
-
-
 
 	private void setIgnoreWords() {
 
-		dbconnect();
 		String ignore_words = "and,or,so,of,the,me,i,to,get,a,you,us,we,they,he,she,"
 				+ "check,also,too,tell,these,no,yes,hum,are,say,in,what,theyre,re,have,";
 
 		String insert = "INSERT INTO " + Settings.tctable + "(" + Settings.tctable_user + "," + Settings.tctable_model
 				+ "," + Settings.tctable_ignored_words + ") VALUES (?,?,?)";
-
-		PreparedStatement query1 = null;
-
-		try {
-			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
+		
+		try (Connection cnlocal = Settings.connlocal();
+			PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)){
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			query1.setString(3, ignore_words);
 			query1.executeUpdate();
-		} catch (SQLException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
 	public void addIgnoreWord(String word) {
-		dbconnect();
+		
 
 		String update = "UPDATE " + Settings.tctable + " SET " + Settings.tctable_ignored_words + " = CONCAT(IFNULL("
 				+ Settings.tctable_ignored_words + ",''), '" + word + ",') WHERE " + Settings.tctable_user + " = ? AND "
 				+ Settings.tctable_model + " = ?";
-
-		PreparedStatement query1 = null;
-
-		try {
-			query1 = cnlocal.prepareStatement(update, PreparedStatement.RETURN_GENERATED_KEYS);
+		
+		try (Connection cnlocal = Settings.connlocal();
+			PreparedStatement query1 = cnlocal.prepareStatement(update, PreparedStatement.RETURN_GENERATED_KEYS)){
 			query1.setLong(1, user_id);
 			query1.setLong(2, model_id);
 			query1.executeUpdate();
-		} catch (SQLException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
+		} 
+
 		fillMaps();
 	}
 }
