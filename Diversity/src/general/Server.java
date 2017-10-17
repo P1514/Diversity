@@ -65,8 +65,7 @@ public class Server {
 		try {
 			resolve = new JSONObject(msg);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Server Error 1");
 		}
 		// Assistant a = new Assistant(session, resolve);
 		// Thread assist = new Thread(a);
@@ -85,8 +84,7 @@ public class Server {
 		try {
 			session.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Server Error 2");
 		}
 
 	}
@@ -116,8 +114,7 @@ public class Server {
 		try {
 			session.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Server Error 3");
 		}
 	}
 
@@ -172,8 +169,7 @@ public class Server {
 				String answer = be.resolve().toString();
 				send_message(answer);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Server Error 4");
 			}
 		}
 		// System.out.println(result.toString());

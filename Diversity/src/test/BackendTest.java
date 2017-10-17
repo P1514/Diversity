@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 
@@ -12,11 +14,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import general.Backend;
+import general.Logging;
 import general.Settings;
+import monitoring.Monitor;
 import monitoring.Oversight;
 
 public class BackendTest extends Thread {
-
+	private static final Logger LOGGER = new Logging().create(BackendTest.class.getName());
 	JSONObject obj, obj1;
 	Backend tester;
 	String result;
@@ -75,8 +79,7 @@ public class BackendTest extends Thread {
 				break;
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:BackendTest Error 1");
 		}
 	}
 

@@ -31,6 +31,9 @@ public class GetNumPosts {
 
 
 	private static final Logger LOGGER = new Logging().create(Collaboration.class.getName());
+	private final String select = "select count(*) from " + Settings.lptable + " inner join " + Settings.lotable + " where "
+			+ Settings.lotable + "." + Settings.lotable_id + " = " + Settings.lptable + "."
+			+ Settings.lptable_opinion + " and " + Settings.lotable + "." + Settings.lotable_pss + " = ?;";
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
@@ -44,12 +47,7 @@ public class GetNumPosts {
 
 	private int getNumPosts() {
 		int numPosts = 0;
-		String select = "select count(*) from " + Settings.lptable + " inner join " + Settings.lotable + " where "
-				+ Settings.lotable + "." + Settings.lotable_id + " = " + Settings.lptable + "."
-				+ Settings.lptable_opinion + " and " + Settings.lotable + "." + Settings.lotable_pss + " = ?;";
-
-	
-		
+				
 		try(Connection cnlocal=Settings.connlocal();
 				PreparedStatement query1 = cnlocal.prepareStatement(select);) {
 			

@@ -7,7 +7,10 @@ import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import com.sun.media.jfxmedia.logging.Logger;
 
 import general.Settings;
 
@@ -54,11 +57,9 @@ public class DBHandler extends Handler {
 				insert.setString(3, record.getLevel() + " " + record.getMessage());
 				insert.executeUpdate();
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
 		}
 
 	}

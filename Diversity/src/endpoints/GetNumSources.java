@@ -26,6 +26,7 @@ import general.Settings;
 @Path("/getNumSources")
 public class GetNumSources {
 	private static final Logger LOGGER = new Logging().create(Collaboration.class.getName());
+	private final String select = "select count(*) from " + Settings.lutable + " where pss=?";
 
 
 	@DefaultValue("")
@@ -50,7 +51,6 @@ public class GetNumSources {
 
 	private int getNumPosts() {
 		int numPosts = 0;
-		String select = "select count(*) from " + Settings.lutable + " where pss=?";
 		try(Connection cnlocal=Settings.connlocal();
 				PreparedStatement query1 = cnlocal.prepareStatement(select);) {
 			query1.setInt(1, Integer.parseInt(pss));

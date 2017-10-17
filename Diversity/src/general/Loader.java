@@ -42,11 +42,23 @@ public class Loader {
 	// ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
-	public static List<String> users;
-	public static List<Author> users2;
+	private static final ArrayList<String> users = new ArrayList<String>();
+	private static final ArrayList<Author> users2 = new ArrayList<Author>();
 	public static boolean first_load = true;
 	private static boolean request = true;
 
+	public static boolean users_contains(String user_id) {
+		return users.contains(user_id);
+	}
+	public static void users_add(String user_id) {
+		users.add(user_id);
+	}
+	public static boolean users_contains(Author author) {
+		return users2.contains(author);
+	}
+	public static void users_add(Author author) {
+		users2.add(author);
+	}
 	public static void requestPSS() {
 		new Loader().loadPSS();
 	}
@@ -87,8 +99,8 @@ public class Loader {
 	}
 
 	public String loadinit() throws JSONException {
-		users = new ArrayList<String>();
-		users2 = new ArrayList<Author>();
+		users.clear();
+		users2.clear();
 		totalposts = 0;
 		totalviews = 0;
 		totalcomments = 0;
@@ -113,8 +125,8 @@ public class Loader {
 
 	private String loadp1(JSONArray json) throws JSONException {
 		Server.isloading = true;
-		users = new ArrayList<String>();
-		users2 = new ArrayList<Author>();
+		users.clear();
+		users2.clear();
 		totalposts = 0;
 		totalviews = 0;
 		totalcomments = 0;
@@ -1143,8 +1155,7 @@ public class Loader {
 			}
 
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Loader Error 1");
 			return null;
 		}
 

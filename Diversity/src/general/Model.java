@@ -190,14 +190,14 @@ public final class Model {
 			obj.put("id", id);
 			}
 		} catch (SQLIntegrityConstraintViolationException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.INFO,"Model name Already Exists");
 			obj.put("Op", "Error");
 			obj.put("Message", "Model name Already Exists");
 			result.put(obj);
 			return result;
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.INFO, "Error adding model to DB");
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
@@ -278,7 +278,7 @@ public final class Model {
 			// System.out.println(query1);
 			query1.execute();
 		} catch (SQLException | ClassNotFoundException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.INFO,"Error adding model to DB");
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
