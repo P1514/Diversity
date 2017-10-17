@@ -155,6 +155,7 @@ public class Monitor {
 				query1.setString(1, urilist[i]);
 				// System.out.println(query1.toString());
 				try(ResultSet rs = query1.executeQuery()){
+					rs.next();
 				count = rs.getInt(1);
 				}
 
@@ -165,8 +166,22 @@ public class Monitor {
 			// System.out.println(count);
 			if (count > 0) {
 				LOGGER.log(Level.INFO, "Source not deleted");
-			} else
+			} else {
 				LOGGER.log(Level.INFO, "Source deleted");
+				String delete = new String("delete FROM sentimentanalysis.sources where source=? and account=?;");
+				try (Connection cnlocal = Settings.connlocal();
+						PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
+					query1.setString(1, urilist[i].split(",")[0]);
+					query1.setString(1, urilist[i].split(",")[1]);
+					System.out.println(query1.toString());
+					query1.execute();
+						
+					
+
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, "error", e);
+				}	
+			}
 		}
 
 	}
