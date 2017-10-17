@@ -500,7 +500,7 @@ function escapeHtml(html)//stops the user from injecting html in forms
 function addline() {
   var name = document.getElementById("new_name").value;
   var value = document.getElementById("new_URI").value;
-  console.log(1);
+  //console.log(1);
   if (name == "" || value == "")
     return;
 
@@ -508,7 +508,7 @@ function addline() {
 
     if (value.toLowerCase().indexOf("facebook") != -1 || value.toLowerCase().indexOf("fb.com") != -1) {
       name = "Facebook";
-      console.log('entrou no facebook');
+      //console.log('entrou no facebook');
       var tmp = value.split("/");
       //value = tmp[tmp.length - 1];
       value = value.substring(value.lastIndexOf("/") + 1, value.length);
@@ -516,7 +516,7 @@ function addline() {
 
     if (value.toLowerCase().indexOf("twitter") != -1) {
       name = "Twitter";
-      console.log('entrou no twitter');
+      //console.log('entrou no twitter');
       var tmp = value.split("/");
       //value = tmp[tmp.length - 1];
       value = value.substring(value.lastIndexOf("/") + 1, value.length);
@@ -540,7 +540,7 @@ function addline() {
 }
 
 function addline2(name, value) {
-  console.log(2);
+  //console.log(2);
   //console.log("line added");
   if (name == "" || value == "")
     return;
@@ -733,7 +733,7 @@ function send_config() {
     //alert("All Fields must be filled");
     return;
   }
-  console.log(jsonData);
+  //console.log(jsonData);
   ws.send(JSON.stringify(jsonData));
 }
 
@@ -793,7 +793,7 @@ function get_ip_address() {
 }
 
 function escapeHtml2 (string) {
-  console.log("called for " + string);
+  //console.log("called for " + string);
   return String(string).replace(/[&<>"'`=\/]/g, function (s) {
     return entityMap[s];
   });
