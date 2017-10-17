@@ -1,11 +1,9 @@
 package modeling;
 
-<<<<<<< HEAD
+
 import java.io.UnsupportedEncodingException;
-=======
 import java.util.logging.Level;
 import java.util.logging.Logger;
->>>>>>> refs/remotes/origin/Guilherme
 
 import org.json.JSONArray;
 import org.json.JSONException;
