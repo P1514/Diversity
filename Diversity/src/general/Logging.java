@@ -53,7 +53,7 @@ public class Logging {
 
 		return LOGGER;
 	}
-
+/*
 	public static JSONArray getAllLogs() throws IOException, JSONException {
 
 		String select = "SELECT * FROM " + Settings.ltable;
@@ -80,7 +80,7 @@ public class Logging {
 							 * JSONObject obj = new JSONObject(); obj.put("User", rs.getInt(2));
 							 * obj.put("Timestamp", rs.getTimestamp(3)); obj.put("Log", rs.getString(4));
 							 * logs.put(obj);
-							 */
+							 
 						}
 					} catch (IOException e) {
 
@@ -134,7 +134,6 @@ public class Logging {
 		 * logs.put(getLogs("monitoring.Oversight.log"));
 		 * 
 		 * return logs;
-		 */
 	}
 
 	public static JSONObject getLogs(String classname) throws IOException, JSONException {
@@ -152,4 +151,4 @@ public class Logging {
 		// System.out.println(classname);
 		return logsJSON;
 	}
-}
+*/}

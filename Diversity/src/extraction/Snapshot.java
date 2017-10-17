@@ -88,8 +88,7 @@ public class Snapshot {
 			if (services != "")
 				obj.put("Services", services);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 1");
 		}
 
 		try {
@@ -106,8 +105,7 @@ public class Snapshot {
 		try {
 			b.setMessage(23, obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 2");
 		}
 		result = b.resolve();
 		// System.out.println("TEST" + result);
@@ -156,8 +154,7 @@ public class Snapshot {
 			return create(name, cdate, timespan, user, "product", result, id) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 3");
 		}
 		return "";
 

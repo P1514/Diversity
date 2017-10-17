@@ -142,8 +142,7 @@ public class Prediction extends Globalsentiment {
 				result.put(obj);
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Prediction, ERROR1");
 			}
 		}
 		String productsName = "";
@@ -172,8 +171,7 @@ public class Prediction extends Globalsentiment {
 			obj.put("Services", servicesName);
 			result.put(obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 2");
 		}
 
 		return result;
@@ -345,8 +343,7 @@ public class Prediction extends Globalsentiment {
 				result.put(obj);
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 3");
 			}
 			month++;
 		}
@@ -375,8 +372,7 @@ public class Prediction extends Globalsentiment {
 			obj.put("Services", servicesName);
 			result.put(obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 4");
 		}
 
 		return result;
@@ -531,8 +527,7 @@ public class Prediction extends Globalsentiment {
 				result.put(obj);
 				firstdate.add(Calendar.MONTH, 1);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 5");
 			}
 
 		}
@@ -561,8 +556,7 @@ public class Prediction extends Globalsentiment {
 			obj.put("Services", servicesName);
 			result.put(obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 6");
 		}
 
 		return result;
@@ -648,7 +642,7 @@ public class Prediction extends Globalsentiment {
 			obj.put("Ammount", percentage);
 			msg.put(obj);
 		} catch (JSONException e) {
-			
+			LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 7");
 			return;
 		}
 		LOGGER.log(Level.INFO, "OUT: " + msg.toString());
@@ -656,7 +650,7 @@ public class Prediction extends Globalsentiment {
 			session.getBasicRemote().sendText(msg.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 8");
 		}
 	}
 

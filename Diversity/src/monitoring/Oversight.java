@@ -35,7 +35,6 @@ import general.Settings;
  */
 public class Oversight extends TimerTask {
 
-	private Connection cnlocal;
 	private ArrayList<String> sourcelist = new ArrayList<String>();
 	private Data dat = new Data();
 	private HashMap<String, update> updatelist = new HashMap<String, update>();
@@ -116,8 +115,7 @@ public class Oversight extends TimerTask {
 						}
 					}
 				} catch (ClassNotFoundException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Oversight Error 1");
 				}
 				for (String a : sourcelist) {
 
@@ -164,8 +162,7 @@ public class Oversight extends TimerTask {
 							}
 						}
 					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Oversight Error 2");
 					}
 
 					for (update d : updatelist.values()) {
@@ -212,8 +209,6 @@ public class Oversight extends TimerTask {
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
 							}
@@ -252,8 +247,6 @@ public class Oversight extends TimerTask {
 								 */
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
-
-								e.printStackTrace();
 							}
 						}
 					});
@@ -262,8 +255,6 @@ public class Oversight extends TimerTask {
 				}
 				// TODO missing uodate DB
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
 
@@ -271,8 +262,7 @@ public class Oversight extends TimerTask {
 			try {
 				(new Loader()).loadinit();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Oversight Error 3");
 			}
 		}
 
@@ -281,8 +271,7 @@ public class Oversight extends TimerTask {
 		try {
 			gs.globalsentiment(null, null, gr.getTOPReach(5));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Oversight Error 4");
 		}
 
 		Server.isloading = false;
@@ -297,16 +286,6 @@ public class Oversight extends TimerTask {
 		public String account;
 		public Long date;
 		public Long pss;
-	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 	public static String readUrl(String urlString) throws Exception {

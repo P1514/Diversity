@@ -127,7 +127,7 @@ public class Backend {
 				try {
 					id = msg.getLong("Id");
 				} catch (JSONException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Backend, ERROR 1");
 				}
 			}
 
@@ -207,7 +207,7 @@ public class Backend {
 					request.setEntity(params);
 					HttpResponse response = httpClient.execute(request);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Backend, ERROR 2");
 				}
 				break;
 			case 35:
@@ -330,19 +330,6 @@ public class Backend {
 				result = lr.getResult();
 
 				return result.toString();
-			case 30:
-				obj = new JSONObject();
-				result = new JSONArray();
-				try {
-					obj.put("Logs", Logging.getAllLogs());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				result.put(obj);
-
-				return result.toString();
-
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();
 
@@ -744,7 +731,7 @@ public class Backend {
 					try {
 						in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 4");
 					}
 					String output;
 					StringBuffer response = new StringBuffer();
@@ -754,7 +741,7 @@ public class Backend {
 							response.append(output);
 						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 5");
 					}
 					in.close();
 					obj = new JSONObject(response.toString());
@@ -780,7 +767,7 @@ public class Backend {
 						HttpResponse response2 = httpClient.execute(request);
 						LOGGER.log(Level.INFO, response2.toString());
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 6");
 					}
 				}
 
@@ -812,11 +799,9 @@ public class Backend {
 
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 7");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 8");
 		}
 		return result.toString();
 	}
