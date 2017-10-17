@@ -1,5 +1,7 @@
 package modeling;
 
+import java.io.UnsupportedEncodingException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,8 +76,9 @@ public class GetModels {
 	 * @return the JSON array
 	 * @throws JSONException
 	 *             the JSON exception
+	 * @throws UnsupportedEncodingException 
 	 */
-	public JSONArray create_model(JSONObject msg) throws JSONException {
+	public JSONArray create_model(JSONObject msg) throws JSONException, UnsupportedEncodingException {
 		Model add = new Model();
 		JSONArray result;
 		result = add.add_model(msg);

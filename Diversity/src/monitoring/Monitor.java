@@ -63,7 +63,7 @@ public class Monitor {
 		// System.out.println(url);
 		try {
 			// System.out.println(url);
-			Oversight.readUrl(url);
+			Oversight.readUrl(url.replace(" ", "%20"));
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

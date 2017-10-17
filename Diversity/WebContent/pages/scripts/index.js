@@ -16,6 +16,16 @@ var jsonData;
 var newData;
 var all_models = [];
 var timespan;
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
 
 $(window).on('load', function() {
   if (document.cookie.indexOf('JSESSIONID') == -1) {
@@ -149,7 +159,10 @@ function setCookie() {
 
 function setCookie2(name, id, pss) {
   sessionStorage.model = name;
-  sessionStorage.id = id;
+  if (id !== undefined) {
+    sessionStorage.id = escapeHtml(id);
+  }
+  //t = t.replace(/\"/g, '\\\"');;
   sessionStorage.pss = pss;
 }
 
@@ -213,7 +226,7 @@ ws.onmessage = function(event) {
     } else if (localStorage.dp !== undefined) {
       dp = localStorage.dp;
     }*/
-    
+
     /*dp = dp.replace(/%20/g," ");*/
     var jsonData = {
         'Op' : 'getmodels',
@@ -356,6 +369,13 @@ function populatePSS() {
     x.add(option);
   }
   all_models = Models;
+  for (var i = 0; i < all_models.length; i++) {
+    if (all_models[i].Name !== undefined) {
+      var x = all_models[i].Name.replace(/\\\'/g, '\'');
+      x = all_models[i].Name.replace(/\\\"/g, '\"');
+      all_models[i].Name = x;
+    }
+  }
   displayModels();
   // checkEditable();
 }
@@ -608,7 +628,7 @@ function displayModels() {
     var button = document.createElement('button');
     button.setAttribute("id", "model_box");
     button.setAttribute("class", "btn btn-default text-left");
-    button.setAttribute("onclick", "setCookie2('" + all_models[i].Name + "','" + all_models[i].Id + "','" + all_models[i].PSS + "');");
+    button.setAttribute("onclick", 'setCookie2("' + all_models[i].Name + '","' + all_models[i].Id + '","' + all_models[i].PSS + '");');
     button.setAttribute("type", "submit");
     button.innerHTML = ("value", "<b>Opinion Model: </b>" + all_models[i].Name + "<br><b>PSS: </b>" + all_models[i].PSS);
     button.setAttribute("style", "text-align:left;border-radius: 0; width: 90%; margin-bottom: 5px;box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .1);");
@@ -690,4 +710,10 @@ window.onclick = function(event) {
       }
     }
   }
+};
+
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
 }

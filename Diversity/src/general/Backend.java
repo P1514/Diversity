@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -798,7 +799,7 @@ public class Backend {
 				result.put(new JSONObject().put("Op", "pss"));
 
 				for (PSS a : Data.dbpssall()) {
-					result.put(new JSONObject().put("Pss", a.getName()));
+					result.put(new JSONObject().put("Pss",a.getName()));
 				}
 
 				return result.toString();

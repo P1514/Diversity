@@ -4,6 +4,16 @@ var i = 0;
 var id=0;
 var jsonData;
 var final_products = "";
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
 
 var datefield=document.createElement("input")
 datefield.setAttribute("type", "date")
@@ -474,7 +484,7 @@ function populatePSS() {
   var products = JSON.parse(JSON.stringify(jsonData));
   for (var i = 1; i < products.length; i++) {
   //console.log(products[i].Pss);
-  $('#pss').append('<option value="'+products[i].Pss+'">'+products[i].Pss+'</option>');
+  $('#pss').append('<option value="'+escapeHtml2(products[i].Pss)+'">'+escapeHtml2(products[i].Pss)+'</option>');
   }
 
 }
@@ -488,8 +498,8 @@ function escapeHtml(html)//stops the user from injecting html in forms
 }
 
 function addline() {
-  var name = escapeHtml(document.getElementById("new_name").value);
-  var value = escapeHtml(document.getElementById("new_URI").value);
+  var name = escapeHtml2(document.getElementById("new_name").value);
+  var value = escapeHtml2(document.getElementById("new_URI").value);
 
   if (name == "" || value == "")
     return;
@@ -645,7 +655,7 @@ function send_config() {
   var configs = ""; //to make sure it has the checkbox active
   $('#table_div2').find('input[type=checkbox]').each(function() {
     if (this.checked == true) {
-      configs += this.value + ";";
+      configs += escapeHtml2(this.value) + ";";
     }
   });
   var erro = false;
@@ -665,8 +675,8 @@ function send_config() {
     "Update" : document.getElementById('frequency').value != "" ? document
         .getElementById('frequency').value
         : erro = true,
-    "PSS" : document.getElementById('pss').value != "" ? document
-        .getElementById('pss').value : erro = true,
+    "PSS" : document.getElementById('pss').value != "" ? escapeHtml2(document
+        .getElementById('pss').value) : erro = true,
     /*"Age" : document.getElementById('age').value != "" ? document
         .getElementById('age').value : erro = true,
     "Gender" : document.getElementById('gender').value != "" ? document
@@ -674,8 +684,8 @@ function send_config() {
     "Final_Products" : final_products,//document.getElementById('final').checked,
     "Products" : final_products,
     "Archive" : false,
-    "Name" : document.getElementById('model_name').value != "" ? document.getElementById('model_name').value : erro = true,
-    "User" : localStorage.user,
+    "Name" : document.getElementById('model_name').value != "" ? escapeHtml2(document.getElementById('model_name').value) : erro = true,
+    "User" : escapeHtml2(localStorage.user),
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),
@@ -749,4 +759,11 @@ function get_ip_address() {
         $arr_ip = json_decode($json_ip, true);
         return $arr_ip["ip"];
     }
+}
+
+function escapeHtml2 (string) {
+  console.log("called for " + string);
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
 }
