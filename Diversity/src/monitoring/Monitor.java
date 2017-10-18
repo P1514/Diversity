@@ -3,8 +3,10 @@ package monitoring;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,14 +58,20 @@ public class Monitor {
 		for (int i = 0; i < urilists.length; i++) {
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "&type[]=" + source;
+			try {
+				url += URLEncoder.encode(account, "UTF-8") + "&type[]=" + URLEncoder.encode(source, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Unsupported encoding exception");
+			}
 		}
 		// url = url.substring(0, url.length() - 1);
 		// url += pssName + finalProductId + finalProductName;
 		// System.out.println(url);
 		try {
 			// System.out.println(url);
-			Oversight.readUrl(url.replace(" ", "%20"));
+			Oversight.readUrl(url);
 		} catch (Exception e1) {
 			LOGGER.log(Level.WARNING,"Class:Monitor Error 1");
 		}
