@@ -63,8 +63,10 @@ public class Loader {
 		new Loader().loadPSS();
 	}
 
-	public static synchronized void repeatcomment() {
+	public static synchronized void repeatcomment(long likes, long views) {
 		totalcomments--;
+		totallikes-=likes;
+		totalviews-=views;
 	}
 
 	public static synchronized void repeatpost() {
@@ -729,7 +731,7 @@ public class Loader {
 
 		}
 		if (querycond.length() > 2)
-			querycond = querycond.substring(0, querycond.length() - 2);
+			querycond = querycond.substring(0, querycond.length() - 1);
 
 		else {
 			for (String a : users) {

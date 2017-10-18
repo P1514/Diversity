@@ -1,5 +1,7 @@
 package general;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sun.media.jfxmedia.logging.Logger;
-
+import org.apache.commons.text.StringEscapeUtils;
 import monitoring.Monitor;;
 
 // TODO: Auto-generated Javadoc
@@ -90,14 +92,16 @@ public final class Model {
 	 * @return the JSON array with information if successful or not
 	 * @throws JSONException
 	 *             the JSON exception
+	 * @throws UnsupportedEncodingException 
 	 */
-	public JSONArray add_model(JSONObject msg) throws JSONException {
+	public JSONArray add_model(JSONObject msg) throws JSONException, UnsupportedEncodingException {
 		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		name = msg.getString("Name");
-		uri = msg.has("URI") ? msg.getString("URI") : "";
-		pss = Data.identifyPSSbyname(msg.getString("PSS"));
+		name = StringEscapeUtils.unescapeHtml4(msg.getString("Name"));
+		uri = msg.has("URI") ? StringEscapeUtils.unescapeHtml4(msg.getString("URI")) : "";
+		//System.out.println(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
+		pss = Data.identifyPSSbyname(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
 		if (msg.has("mediawiki") && msg.getBoolean("mediawiki")) {
