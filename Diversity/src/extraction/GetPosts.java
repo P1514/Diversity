@@ -615,11 +615,9 @@ public class GetPosts {
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query = cnlocal.prepareStatement(insert)) {
 			query.setLong(1, post_id);
 			try (ResultSet rs = query.executeQuery()) {
-				boolean b;
-				while(b = rs.next()) {
+				while(rs.next()) {
 					result.put(rs.getString(1));
 				}
-
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
