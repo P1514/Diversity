@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						snap_pss = chartData[i].PSS;
 					}
 				}
-				$('#page_title').html('Snapshot: ' + snap_name);
+				$('#page_title').html('Snapshot: ' + snap_name.replace(/\+/g, ' '));
 				$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p>');
 				$('#tip').hide();
 				$('#prod_list').hide();
@@ -153,6 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
+		if (json[0].Op == "DBLoading") {
+			$('#dbload').show();
+		}
     //If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
     if (json[0] == "Snapshots") {
 	      snapshots = json[1];

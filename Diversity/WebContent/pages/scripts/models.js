@@ -126,6 +126,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	 }
     return;
     }
+
+    if (json[0].Op == "DBLoading") {
+			$('#dbload').show();
+		}
+    
     if (json[0].Op == "pss") {
       jsonData = JSON.parse(JSON.stringify(json));
       populatePSS();

@@ -141,7 +141,7 @@ public class Server {
 		if (session.isOpen()) {
 			try {
 				if(Server.isloading == true) {
-					obj.put("Op", "Error");
+					obj.put("Op", "DBLoading");
 					obj.put("Message", "Database is Loading, data may be incoherent");
 					result.put(obj);
 					as.sendText(result.toString());

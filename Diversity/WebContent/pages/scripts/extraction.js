@@ -235,6 +235,10 @@ function connect() {
 			return;
 		}
 
+		if (json[0].Op == "DBLoading") {
+			$('#dbload').show();
+		}
+
 		// If the message contains 'Snapshots', build a dropdown with the
 		// availiable snapshots to be loaded
 		if (json[0] == "Snapshots") {

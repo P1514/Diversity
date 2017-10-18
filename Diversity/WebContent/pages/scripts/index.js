@@ -190,6 +190,11 @@ ws.onmessage = function(event) {
 	$('#overlay').show();
 	$('#overlay-back').show();
   }
+
+  if (json[0].Op == "DBLoading") {
+    $('#dbload').show();
+  }
+  
   if (json[0].Op == 'Models') {
     populatePSS();
     var jsonData = {

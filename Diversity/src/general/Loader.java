@@ -47,16 +47,16 @@ public class Loader {
 	public static boolean first_load = true;
 	private static boolean request = true;
 
-	public static boolean users_contains(String user_id) {
+	public static synchronized boolean users_contains(String user_id) {
 		return users.contains(user_id);
 	}
-	public static void users_add(String user_id) {
+	public static synchronized void users_add(String user_id) {
 		users.add(user_id);
 	}
-	public static boolean users_contains(Author author) {
+	public static synchronized boolean users_contains(Author author) {
 		return users2.contains(author);
 	}
-	public static void users_add(Author author) {
+	public static synchronized void users_add(Author author) {
 		users2.add(author);
 	}
 	public static void requestPSS() {
@@ -729,7 +729,7 @@ public class Loader {
 
 		}
 		if (querycond.length() > 2)
-			querycond = querycond.substring(0, querycond.length() - 2);
+			querycond = querycond.substring(0, querycond.length() - 1);
 
 		else {
 			for (String a : users) {
@@ -878,7 +878,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
-		// System.out.println(query);
+		System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
