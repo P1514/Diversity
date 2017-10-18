@@ -3,8 +3,10 @@ package monitoring;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,7 +41,7 @@ public class Monitor {
 	 */
 	public static void update(String uri, long pss) {
 		String[] urilists = uri.split(";");
-		String account = "", source = "", url, finalProductId = "", finalProductName = "";
+		String account = "", source = "", url="", finalProductId = "", finalProductName = "";
 		PSS pssInstance = Data.getpss(pss);
 		String pssName = "&pssName=" + pssInstance.getName();
 		ArrayList<Long> products = pssInstance.get_products();
@@ -57,8 +59,16 @@ public class Monitor {
 			url = Settings.register_uri + "?accounts[]=";
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "&type[]=" + source;
-		
+
+			try {
+				url += URLEncoder.encode(account, "UTF-8") + "&type[]=" + URLEncoder.encode(source, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Unsupported encoding exception");
+			}
+		}
+
 		// url = url.substring(0, url.length() - 1);
 		// url += pssName + finalProductId + finalProductName;
 		// System.out.println(url);
@@ -68,9 +78,10 @@ public class Monitor {
 		} catch (Exception e1) {
 			LOGGER.log(Level.WARNING,"Class:Monitor Error 1");
 		}
-		}
+		
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
+		
 		try {
 			for (int i = 0; i < urilists.length; i++) {
 				source = urilists[i].split(",")[0];
