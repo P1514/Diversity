@@ -47,16 +47,16 @@ public class Loader {
 	public static boolean first_load = true;
 	private static boolean request = true;
 
-	public static boolean users_contains(String user_id) {
+	public static synchronized boolean users_contains(String user_id) {
 		return users.contains(user_id);
 	}
-	public static void users_add(String user_id) {
+	public static synchronized void users_add(String user_id) {
 		users.add(user_id);
 	}
-	public static boolean users_contains(Author author) {
+	public static synchronized boolean users_contains(Author author) {
 		return users2.contains(author);
 	}
-	public static void users_add(Author author) {
+	public static synchronized void users_add(Author author) {
 		users2.add(author);
 	}
 	public static void requestPSS() {
@@ -940,9 +940,9 @@ public class Loader {
 					}
 				});
 
-				totalcomments += v.newcomments();
-				totallikes += v.newlikes();
-				totalviews += v.newviews();
+				totalcomments += v.ncomments();
+				totallikes += v.nlikes();
+				totalviews += v.nviews();
 			});
 			LOGGER.log(Level.INFO, " update opinions " + (System.nanoTime() - stime));
 			stime = System.nanoTime();

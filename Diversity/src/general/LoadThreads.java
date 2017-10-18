@@ -285,8 +285,6 @@ public class LoadThreads {
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (rs.next()) {
-							if (Loader.first_load)
-								Loader.totalposts--;
 							load(rs, false);
 						}
 					}
