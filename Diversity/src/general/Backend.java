@@ -283,9 +283,9 @@ public class Backend {
 				result.put(mw);
 				
 				JSONObject sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				LOGGER.log(Level.INFO, result.toString());
 				// System.out.println(result.toString());
 				return result.toString();
@@ -593,8 +593,8 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "" );
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty() );
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				result.put(sn);
 				LOGGER.log(Level.INFO, result.toString());
 
@@ -631,9 +631,9 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty() + "");
 				LOGGER.log(Level.INFO, result.toString());
 				return result.toString();
 			/*

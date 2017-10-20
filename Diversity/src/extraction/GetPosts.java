@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -35,9 +36,9 @@ public class GetPosts {
 	private static final Logger LOGGER = new Logging().create(GetPosts.class.getName());
 
 	/**
-	 * Method that uses the input to get Top 5 parent posts information, uses
-	 * month for the month requested, param defines if any filtering is
-	 * expected, the id is the model ID requested.
+	 * Method that uses the input to get Top 5 parent posts information, uses month
+	 * for the month requested, param defines if any filtering is expected, the id
+	 * is the model ID requested.
 	 * 
 	 * @param param
 	 *            String any value
@@ -64,20 +65,6 @@ public class GetPosts {
 		// System.out.print("TEST:"+product);
 		insert = Settings.sqlselect + Settings.lotable_id + " FROM " + Settings.lotable + " where (";
 
-		if (wiki) {
-			insert += " " + Settings.lotable_pss + "=? AND " + Settings.lotable_source + " like 'mediawiki' AND ";
-		} else {
-
-			insert += Settings.lotable_source + " in (?) AND " + Settings.lotable_account + " in (?) AND ";
-		}
-
-		insert += Settings.lotable_timestamp + ">=?";
-
-		/*
-		 * if (!"Global".equals(product) && !wiki) insert += " AND " +
-		 * Settings.lotable_product;
-		 */
-
 		Model model = Data.getmodel(id);
 
 		if (model == null) {
@@ -88,11 +75,35 @@ public class GetPosts {
 			result.put(obj);
 			return result;
 		}
+
+		if (wiki) {
+			insert += " " + Settings.lotable_pss + "=? AND " + Settings.lotable_source + " like 'mediawiki' AND ";
+		} else {
+
+			insert += Settings.lotable_source + " in (";
+			int sourceaccountlength = model.getSources(false).size();
+			for (int i = 0; i < sourceaccountlength; i++)
+				insert += "?,";
+			insert = insert.substring(0, insert.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+			sourceaccountlength = model.getAccounts(false).size();
+			for (int i = 0; i < sourceaccountlength; i++)
+				insert += "?,";
+
+			insert = insert.substring(0, insert.length() - 1) + ") AND ";
+		}
+
+		insert += Settings.lotable_timestamp + ">=?";
+
 		/*
-		 * if (!"Global".equals(product) && !wiki) { if
-		 * (!model.getProducts().isEmpty()) { if (product == "noproduct") insert
-		 * += " in (" + model.getProducts() + ")"; else insert += "=" +
-		 * Data.identifyProduct(product); } else { insert += "=0"; }
+		 * if (!"Global".equals(product) && !wiki) insert += " AND " +
+		 * Settings.lotable_product;
+		 */
+
+		/*
+		 * if (!"Global".equals(product) && !wiki) { if (!model.getProducts().isEmpty())
+		 * { if (product == "noproduct") insert += " in (" + model.getProducts() + ")";
+		 * else insert += "=" + Data.identifyProduct(product); } else { insert += "=0";
+		 * }
 		 * 
 		 * }
 		 */
@@ -131,8 +142,12 @@ public class GetPosts {
 			if (wiki) {
 				query1.setLong(rangeindex++, model.getPSS());
 			} else {
-				query1.setString(rangeindex++, model.getSources(false));
-				query1.setString(rangeindex++, model.getAccounts(false));
+				ArrayList<String> sourceaccount = model.getSources(false);
+				for (int ii = 0; ii < sourceaccount.size(); ii++)
+					query1.setString(rangeindex++, sourceaccount.get(ii));
+				sourceaccount = model.getAccounts(false);
+				for (int ii = 0; ii < sourceaccount.size(); ii++)
+					query1.setString(rangeindex++, sourceaccount.get(ii));
 			}
 			query1.setLong(rangeindex++, model.getDate());
 			if (param != null && !dateerror) {
@@ -284,8 +299,8 @@ public class GetPosts {
 			}
 		}
 
-		int minef=min;
-		int maxef=max;
+		int minef = min;
+		int maxef = max;
 		if (min == -1)
 			minef = 0;
 		if (max == -1)
@@ -318,10 +333,10 @@ public class GetPosts {
 			return result;
 		}
 		/*
-		 * if (!"Global".equals(product) && !wiki) { if
-		 * (!model.getProducts().isEmpty()) { if (product == "noproduct") insert
-		 * += " in (" + model.getProducts() + ")"; else insert += "=" +
-		 * Data.identifyProduct(product); } else { insert += "=0"; }
+		 * if (!"Global".equals(product) && !wiki) { if (!model.getProducts().isEmpty())
+		 * { if (product == "noproduct") insert += " in (" + model.getProducts() + ")";
+		 * else insert += "=" + Data.identifyProduct(product); } else { insert += "=0";
+		 * }
 		 * 
 		 * }
 		 */
@@ -499,11 +514,10 @@ public class GetPosts {
 
 	/**
 	 * Method that returns the amount of parent post that exist to the specific
-	 * model, with the filtering specified. The Value param expects a String
-	 * with parameters to filter separated by ',', same with value but regarding
-	 * values to that specific parameters. Filter specifies what are you
-	 * filtering by, for the output JSON. Id is reference to the model that we
-	 * want the results for.
+	 * model, with the filtering specified. The Value param expects a String with
+	 * parameters to filter separated by ',', same with value but regarding values
+	 * to that specific parameters. Filter specifies what are you filtering by, for
+	 * the output JSON. Id is reference to the model that we want the results for.
 	 * <p>
 	 * Filtering
 	 * 
@@ -540,8 +554,8 @@ public class GetPosts {
 			return result;
 		}
 		/*
-		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in ("
-		 * + model.getProducts() + ")"; } else { insert += "=0"; } }
+		 * if (!wiki) { if (!model.getProducts().isEmpty()) { insert += " in (" +
+		 * model.getProducts() + ")"; } else { insert += "=0"; } }
 		 */
 		parameters par = GetReach.split_params(param, value);
 		if (par.age != null)
@@ -551,9 +565,19 @@ public class GetPosts {
 		if (par.location != null)
 			insert += " location=? AND";
 		insert += " timestamp<? AND " + Settings.lotable_timestamp + ">=? AND ";
-		insert += " source in (?) AND ";
+		insert += " source in (";
+		int source_length = model.getSources(false).size();
+		for (int i = 0; i < source_length; i++)
+			insert += "?,";
+		insert = insert.substring(0, insert.length() - 1);
+
+		insert += ") AND ";
 		// if (!wiki)
-		insert += "account in (?)";
+		insert += "account in (";
+		int account_length = model.getAccounts(false).size();
+		for (int i = 0; i < account_length; i++)
+			insert += "?,";
+		insert = insert.substring(0, insert.length() - 1) + ")";
 		insert += ")";
 		// ResultSet rs = null;
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
@@ -577,10 +601,14 @@ public class GetPosts {
 			 * inputdate.getTimeInMillis()); rangeindex++;
 			 */
 			query1.setLong(rangeindex++, model.getDate());
-			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getSources(false));
+			ArrayList<String> sourceaccounts = model.getSources(false);
+			for (int i = 0; i < account_length; i++)
+				query1.setString(rangeindex++, wiki ? "mediawiki" : sourceaccounts.get(i));
 			// if (!wiki)
-			query1.setString(rangeindex++, wiki ? "mediawiki" : model.getAccounts(false));
-			// LOGGER.log(Level.INFO, query1.toString());
+			sourceaccounts = model.getAccounts(false);
+			for (int i = 0; i < account_length; i++)
+				query1.setString(rangeindex++, wiki ? "mediawiki" : sourceaccounts.get(i));
+			LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				rs.next();
 				obj.put("Filter", "Global");
@@ -615,7 +643,7 @@ public class GetPosts {
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query = cnlocal.prepareStatement(insert)) {
 			query.setLong(1, post_id);
 			try (ResultSet rs = query.executeQuery()) {
-				while(rs.next()) {
+				while (rs.next()) {
 					result.put(rs.getString(1));
 				}
 			}
