@@ -263,10 +263,11 @@ public class Prediction extends Globalsentiment {
 				dateToShift.add(Calendar.MONTH, month);
 
 				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
-						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+						dateToShift.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
 				totalWeight += (tempvalue == -1 ? 0 : v);
+				if(tempvalue!=-1)
 				numbOfProd++;
 			});
 			pssweightss.forEach((k, v) -> {
@@ -281,10 +282,11 @@ public class Prediction extends Globalsentiment {
 				dateToShift.add(Calendar.MONTH, month);
 
 				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
-						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+						dateToShift.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 				totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 				Data.delmodel((long) -1);
 				totalWeight += (tempvalue == -1 ? 0 : v);
+				if(tempvalue!=-1)
 				numbOfProd++;
 			});
 
@@ -302,7 +304,8 @@ public class Prediction extends Globalsentiment {
 				dateToShift.add(Calendar.MONTH, month);
 
 				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
-						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+						dateToShift.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+				if(tempvalue!=-1)
 				variance += Math.pow(tempvalue - mean, 2);
 				Data.delmodel((long) -1);
 			});
@@ -317,7 +320,8 @@ public class Prediction extends Globalsentiment {
 				// dateToShift.get(Calendar.YEAR));
 				dateToShift.add(Calendar.MONTH, month);
 				tempvalue = globalsentimentby(dateToShift.get(Calendar.DAY_OF_MONTH), dateToShift.get(Calendar.MONTH),
-						dateToShift.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+						dateToShift.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+				if(tempvalue!=-1)
 				variance += Math.pow(tempvalue - mean, 2);
 				Data.delmodel((long) -1);
 
@@ -461,10 +465,13 @@ public class Prediction extends Globalsentiment {
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
 					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+					if(tempvalue==0)
+						tempvalue=-1;
 					totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 					Data.delmodel((long) -1);
 					totalWeight += (tempvalue == -1 ? 0 : v);
+					if(tempvalue!=-1)
 					numbOfProd++;
 				});
 				pssweightss.forEach((k, v) -> {
@@ -473,10 +480,13 @@ public class Prediction extends Globalsentiment {
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
 					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+					if(tempvalue==0)
+						tempvalue=-1;
 					totalGsweight += (tempvalue == -1 ? 0 : v * tempvalue);
 					Data.delmodel((long) -1);
 					totalWeight += (tempvalue == -1 ? 0 : v);
+					if(tempvalue!=-1)
 					numbOfProd++;
 				});
 			}
@@ -491,7 +501,10 @@ public class Prediction extends Globalsentiment {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+					if(tempvalue==0)
+						tempvalue=-1;
+					if(tempvalue!=-1)
 					variance += Math.pow(tempvalue - mean, 2);
 					Data.delmodel((long) -1);
 				});
@@ -500,7 +513,10 @@ public class Prediction extends Globalsentiment {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-							data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
+					if(tempvalue==0)
+						tempvalue=-1;
+					if(tempvalue!=-1)
 					variance += Math.pow(tempvalue - mean, 2);
 					Data.delmodel((long) -1);
 				});

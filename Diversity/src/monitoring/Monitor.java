@@ -41,7 +41,7 @@ public class Monitor {
 	 */
 	public static void update(String uri, long pss) {
 		String[] urilists = uri.split(";");
-		String account = "", source = "", url, finalProductId = "", finalProductName = "";
+		String account = "", source = "", url="", finalProductId = "", finalProductName = "";
 		PSS pssInstance = Data.getpss(pss);
 		String pssName = "&pssName=" + pssInstance.getName();
 		ArrayList<Long> products = pssInstance.get_products();
@@ -54,10 +54,12 @@ public class Monitor {
 
 			}
 		}
-		url = Settings.register_uri + "?accounts[]=";
+	
 		for (int i = 0; i < urilists.length; i++) {
+			url = Settings.register_uri + "?accounts[]=";
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
+
 			try {
 				url += URLEncoder.encode(account, "UTF-8") + "&type[]=" + URLEncoder.encode(source, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
@@ -66,18 +68,24 @@ public class Monitor {
 				LOGGER.log(Level.WARNING, "Unsupported encoding exception");
 			}
 		}
+
 		// url = url.substring(0, url.length() - 1);
 		// url += pssName + finalProductId + finalProductName;
 		// System.out.println(url);
 		try {
-			// System.out.println(url);
+			//System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
 			LOGGER.log(Level.WARNING,"Class:Monitor Error 1");
 		}
+		
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
+		
 		try {
+			for (int i = 0; i < urilists.length; i++) {
+				source = urilists[i].split(",")[0];
+				account = urilists[i].split(",")[1];
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
 					+ Settings.lutable_account + "," + Settings.lutable_pss + "," + Settings.lutable_lastupdate
@@ -91,7 +99,7 @@ public class Monitor {
 			// System.out.println(query);
 
 			stmt.execute();
-
+			}
 		} catch (ClassNotFoundException e) {
 			LOGGER.log(Level.WARNING,"Class:Monitor Error 2");
 		} catch (SQLException e) {
@@ -153,6 +161,7 @@ public class Monitor {
 				query1.setString(1, urilist[i]);
 				// System.out.println(query1.toString());
 				try(ResultSet rs = query1.executeQuery()){
+					rs.next();
 				count = rs.getInt(1);
 				}
 
@@ -163,8 +172,22 @@ public class Monitor {
 			// System.out.println(count);
 			if (count > 0) {
 				LOGGER.log(Level.INFO, "Source not deleted");
-			} else
+			} else {
 				LOGGER.log(Level.INFO, "Source deleted");
+				String delete = new String("delete FROM sentimentanalysis.sources where source=? and account=?;");
+				try (Connection cnlocal = Settings.connlocal();
+						PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
+					query1.setString(1, urilist[i].split(",")[0]);
+					query1.setString(1, urilist[i].split(",")[1]);
+					System.out.println(query1.toString());
+					query1.execute();
+						
+					
+
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, "error", e);
+				}	
+			}
 		}
 
 	}
