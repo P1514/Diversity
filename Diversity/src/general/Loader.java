@@ -880,7 +880,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
-		// System.out.println(query);
+		System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {

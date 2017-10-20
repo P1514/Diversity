@@ -167,6 +167,10 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#loading').html(json[0].Message + '<br>' + '<input id="submit" class="btn btn-default" onclick="$(\'#overlay-back\').hide();$(\'#overlay\').hide();" style="margin-top:20px" type="submit" value="OK" />');
 
     }
+
+		if (json[0].Op == "DBLoading") {
+			$('#dbload').show();
+		}
   }
 });
 
@@ -373,8 +377,8 @@ function submit() {
 	};
 
 	ws.send(JSON.stringify(json));
-	
-	
+
+
 
 /*
 	$(function () {

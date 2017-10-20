@@ -195,10 +195,15 @@ public class Oversight extends TimerTask {
 							// "/intelligent-search/getFeedback"
 							// + v.epochs.replaceFirst("&", "?") + v.accounts +
 							// "&pssId=\"" + k + "\"";
-							String request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
-									+ "&pssId=" + k + "&pssName=" + Data.getpss(Long.parseLong(k)).getName()
-									+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + prodid
-											+ "&finalProductName=" + Data.getProduct(prodid).get_Name() : "");
+							String request = "";
+							try {
+								request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
+										+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
+										+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
+												+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+							} catch (NumberFormatException | UnsupportedEncodingException e1) {
+								LOGGER.log(Level.SEVERE, "Unsupported encoding exception");
+							} 
 							// request = Settings.JSON_uri;
 							// System.out.println("REQUEST:" + request);
 							try {
@@ -207,7 +212,7 @@ public class Oversight extends TimerTask {
 								// request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
-								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
+								(new Loader()).load(new JSONArray(readUrl(request)));
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
