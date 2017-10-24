@@ -105,11 +105,10 @@ public class Data {
 		String roles = "";
 
 		// Connection cncr = null;
-		PreparedStatement query1 = null;
+		String query = "SELECT name FROM diversity_common_repository.user_role;";
 
-		try (Connection cncr = Settings.conncr();) {
-			String query = "SELECT name FROM diversity_common_repository.user_role;";
-			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cncr = Settings.conncr();
+			PreparedStatement query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
 			try (ResultSet rs = query1.executeQuery(query)) {
 				while (rs.next()) {
@@ -117,10 +116,10 @@ public class Data {
 				}
 
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Data ERROR 1");
 			}
 		} catch (Exception e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Data ERROR 2");
 		}
 
 		return roles;
@@ -129,23 +128,22 @@ public class Data {
 	public static String getRolenameFromCR(long id) {
 		String role = "";
 
-		// Connection cncr = null;
-		PreparedStatement query1 = null;
-
-		try (Connection cncr = Settings.conncr();) {
-			String query = "SELECT name FROM diversity_common_repository.user_role where id = ";
+		String query = "SELECT name FROM diversity_common_repository.user_role where id = ";
+		try (Connection cncr = Settings.conncr();
+				PreparedStatement query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+			
 			query += id;
-			query1 = cncr.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+			
 			
 			try (ResultSet rs = query1.executeQuery(query)) {
 				while(rs.next())
 				role = rs.getString(1);
 
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Data ERROR 3");
 			}
 		} catch (Exception e2) {
-			e2.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Data ERROR 4");
 		}
 
 		return role;

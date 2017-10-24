@@ -32,32 +32,69 @@ public class Loader {
 	private long pausetime = 0;
 	private long new_posts = 0;
 	LoadThreads multiThread = new LoadThreads();
-	static long totalposts;
-	static long totalviews;
-	static long totalcomments;
-	static long totallikes;
+	private static long totalposts;
+	private static long totalviews;
+	private static long totalcomments;
+	private static long totallikes;
 	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	// protected ConcurrentHashMap<Long, Author> authordb = new
 	// ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
-	public static List<String> users;
-	public static List<Author> users2;
+	private static final ArrayList<String> users = new ArrayList<String>();
+	private static final ArrayList<Author> users2 = new ArrayList<Author>();
 	public static boolean first_load = true;
-	private static boolean request=true;
+	private static boolean request = true;
 
+	public static synchronized boolean users_contains(String user_id) {
+		return users.contains(user_id);
+	}
+	public static synchronized void users_add(String user_id) {
+		users.add(user_id);
+	}
+	public static synchronized boolean users_contains(Author author) {
+		return users2.contains(author);
+	}
+	public static synchronized void users_add(Author author) {
+		users2.add(author);
+	}
 	public static void requestPSS() {
-		new Loader().loadPSS();	
+		new Loader().loadPSS();
+	}
+
+	public static synchronized void repeatcomment(long likes, long views) {
+		totalcomments--;
+		
+		if (totallikes > 0) {
+			totallikes-=likes;
+			totalviews-=views;
+		}
+	}
+
+	public static synchronized void repeatpost() {
+		totalposts--;
+	}
+
+	private synchronized void incrementPosts(int amount) {
+		totalposts += amount;
 	}
 	
-	public static synchronized void repeatcomment() {
-        totalcomments--;
-    }
+	private synchronized void incrementComments(long l) {
+		totalcomments += l;
+	}
 	
-	public static synchronized void repeatpost() {
-        totalposts--;
-    }
+	private synchronized void incrementViews(long l) {
+		if (totalposts > 0 || totalcomments > 0) {
+			totalviews += l;
+		}
+	}
+	
+	private synchronized void incrementLikes(long l) {
+		if (totalposts > 0 || totalcomments > 0) {
+			totallikes += l;
+		}
+	}
 	
 	public String load(JSONArray json) throws JSONException {
 		if (json == null)
@@ -82,13 +119,14 @@ public class Loader {
 			return err;
 		loadtimescalc();
 		first_load = true;
+		System.out.println("Posts: " + totalposts + "\nComments: " + totalcomments + "\nViews: " + totalviews + "\nLikes: " + totallikes);
 		return done;
 
 	}
 
 	public String loadinit() throws JSONException {
-		users = new ArrayList<String>();
-		users2 = new ArrayList<Author>();
+		users.clear();
+		users2.clear();
 		totalposts = 0;
 		totalviews = 0;
 		totalcomments = 0;
@@ -113,8 +151,8 @@ public class Loader {
 
 	private String loadp1(JSONArray json) throws JSONException {
 		Server.isloading = true;
-		users = new ArrayList<String>();
-		users2 = new ArrayList<Author>();
+		users.clear();
+		users2.clear();
 		totalposts = 0;
 		totalviews = 0;
 		totalcomments = 0;
@@ -172,11 +210,11 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(10 * 1000);
+					Thread.sleep(10 * (long) 1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.INFO, "Thread Interrupted");
+				Thread.currentThread().interrupt();
 			}
 		}
 		pausetime = System.nanoTime() - pausetime;
@@ -207,30 +245,16 @@ public class Loader {
 	private boolean finishcalc() {
 		String query = "Select * from " + Settings.lptable + " Where " + Settings.lptable_polarity + " is null";
 		boolean done = false;
-		Connection cnlocal = null;
-		try {
-			cnlocal = Settings.connlocal();
+
+		try (Connection cnlocal = Settings.connlocal(); Statement st = cnlocal.createStatement()) {
+			try (ResultSet rs = st.executeQuery(query)) {
+				done = rs.next();
+				rs.close();
+			}
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
+			LOGGER.log(Level.INFO, Settings.err_unknown, e);
 		}
 
-		try (Statement st = cnlocal.createStatement()) {
-			ResultSet rs;
-			rs = st.executeQuery(query);
-			done = rs.next();
-			rs.close();
-		} catch (Exception e) {
-			try {
-				cnlocal.close();
-			} catch (SQLException e1) {
-				LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-			}
-		}
-		try {
-			cnlocal.close();
-		} catch (SQLException e1) {
-			LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-		}
 		return done;
 	}
 
@@ -245,6 +269,7 @@ public class Loader {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "Error on Thread Opinions while loading data");
+			Thread.currentThread().interrupt();
 		}
 		es = Executors.newFixedThreadPool(10);
 		for (int id = 0; id < json.length(); id++)
@@ -254,20 +279,15 @@ public class Loader {
 			es.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "Error on Thread Posts while loading data");
+			Thread.currentThread().interrupt();
 		}
 		LOGGER.log(Level.INFO, " Load posts from remote " + (System.nanoTime() - stime));
 		stime = System.nanoTime();
 
 		// Fetch local DB models
-		Connection cnlocal = null;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, Settings.err_dbconnect);
-		}
 		String select = Settings.sqlselectall + Settings.lmtable;
 
-		try (Statement stmt = cnlocal.createStatement()) {
+		try (Connection cnlocal = Settings.connlocal();Statement stmt = cnlocal.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(select)) {
 
 				if (rs.next()) {
@@ -311,7 +331,7 @@ public class Loader {
 				select += "?,";
 			select += "?)";
 
-			try (PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
+			try (Connection cnlocal = Settings.connlocal();PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
 				for (int i = 0; i < users2.size(); i++) {
 					stmt2.setString(i + 1, querycond.split(",")[i]);
 				}
@@ -337,11 +357,6 @@ public class Loader {
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-				try {
-					cnlocal.close();
-				} catch (SQLException e1) {
-					LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-				}
 			}
 			LOGGER.log(Level.INFO, " Load users local " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
@@ -349,8 +364,9 @@ public class Loader {
 	}
 
 	private void loadPSS() {
-		if(!request) return;
-		request=false;
+		if (!request)
+			return;
+		request = false;
 		String select = Settings.sqlselectall + Settings.crpsstable;
 		Connection cncr = null;
 		try {
@@ -507,7 +523,7 @@ public class Loader {
 		} catch (Exception e) {
 			LOGGER.log(Level.FINEST, "Nothing can be done here", e);
 		}
-		
+
 		request = true;
 	}
 
@@ -739,7 +755,7 @@ public class Loader {
 
 		}
 		if (querycond.length() > 2)
-			querycond = querycond.substring(0, querycond.length() - 2);
+			querycond = querycond.substring(0, querycond.length() - 1);
 
 		else {
 			for (String a : users) {
@@ -784,7 +800,7 @@ public class Loader {
 					}
 					if (authordb2.containsKey(user1 + "," + source1))
 						continue;
-					//System.out.println("SOURCE: " + source1 + "\n");
+					// System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
 									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
@@ -888,7 +904,7 @@ public class Loader {
 		String query = Settings.sqlselectall + Settings.latable + Settings.sqlwhere + Settings.latable_id + " in "
 				+ querycond;
 		Connection cnlocal = null;
-		// System.out.println(query);
+		System.out.println(query);
 		try {
 			cnlocal = Settings.connlocal();
 		} catch (Exception e) {
@@ -927,7 +943,8 @@ public class Loader {
 	private void update(String type) {
 		if ("opinions".equals(type)) {
 			opiniondb.forEach((k, v) -> {
-				if("wiki".equals(v.getSource()) || "mediawiki".equals(v.getSource())) return;
+				if ("wiki".equals(v.getSource()) || "mediawiki".equals(v.getSource()))
+					return;
 				List<String> uniqueauthors = new ArrayList<>();
 				HashMap<Long, Post> temppost = v.getPosts();
 				temppost.forEach((k2, v2) -> {
@@ -947,9 +964,12 @@ public class Loader {
 					}
 				});
 
-				totalcomments += v.newcomments();
-				totallikes += v.newlikes();
-				totalviews += v.newviews();
+//				totalcomments += v.ncomments();
+				incrementComments(v.ncomments());
+//				totallikes += v.nlikes();
+				incrementLikes(v.nlikes());
+//				totalviews += v.nviews();
+				incrementViews(v.nviews());
 			});
 			LOGGER.log(Level.INFO, " update opinions " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
@@ -991,8 +1011,8 @@ public class Loader {
 		opiniondb.forEach((k, v) -> {
 			v.evalReach(totalcomments / ((double) totalposts), totallikes / ((double) totalposts),
 					totalviews / ((double) totalposts));
-			//if (!authordb2.isEmpty())
-				v.evalPolarity2(authordb2);
+			// if (!authordb2.isEmpty())
+			v.evalPolarity2(authordb2);
 
 		});
 		LOGGER.log(Level.INFO, " calc eval and reach " + (System.nanoTime() - stime));
@@ -1083,7 +1103,8 @@ public class Loader {
 			return Backend.error_message(Settings.err_dbconnect).toString();
 
 		}
-		totalposts += opiniondb.size();
+//		totalposts += opiniondb.size();
+		incrementPosts(opiniondb.size());
 		try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 			query1.setLong(1, totalposts);
 			query1.setLong(2, totallikes);
@@ -1164,8 +1185,7 @@ public class Loader {
 			}
 
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Loader Error 1");
 			return null;
 		}
 

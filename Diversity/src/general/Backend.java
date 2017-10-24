@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,7 +127,7 @@ public class Backend {
 				try {
 					id = msg.getLong("Id");
 				} catch (JSONException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Backend, ERROR 1");
 				}
 			}
 
@@ -206,7 +207,7 @@ public class Backend {
 					request.setEntity(params);
 					HttpResponse response = httpClient.execute(request);
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Backend, ERROR 2");
 				}
 				break;
 			case 35:
@@ -282,9 +283,9 @@ public class Backend {
 				result.put(mw);
 				
 				JSONObject sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				LOGGER.log(Level.INFO, result.toString());
 				// System.out.println(result.toString());
 				return result.toString();
@@ -329,19 +330,6 @@ public class Backend {
 				result = lr.getResult();
 
 				return result.toString();
-			case 30:
-				obj = new JSONObject();
-				result = new JSONArray();
-				try {
-					obj.put("Logs", Logging.getAllLogs());
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				result.put(obj);
-
-				return result.toString();
-
 			case 28:
 				return wiki.getNames(msg.getString("PSS")).toString();
 
@@ -605,8 +593,8 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "" );
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty() );
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				result.put(sn);
 				LOGGER.log(Level.INFO, result.toString());
 
@@ -643,9 +631,9 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty() + "");
 				LOGGER.log(Level.INFO, result.toString());
 				return result.toString();
 			/*
@@ -743,7 +731,7 @@ public class Backend {
 					try {
 						in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 4");
 					}
 					String output;
 					StringBuffer response = new StringBuffer();
@@ -753,15 +741,15 @@ public class Backend {
 							response.append(output);
 						}
 					} catch (IOException e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 5");
 					}
 					in.close();
 					obj = new JSONObject(response.toString());
 
-					int user = msg.getInt("User");
-					int dp = msg.getInt("design_project");
-					String lat = obj.getString("latitude");
-					String lon = obj.getString("longitude");
+					int user = msg.has("User")?msg.getInt("User"):0;
+					int dp = msg.has("design_project")?msg.getInt("design_project"):0;
+					String lat = obj.has("latitude")?obj.getString("latitude"):"";
+					String lon = obj.has("longitude")?obj.getString("longitude"):"";
 
 					String link = Settings.has_steps_uri;
 
@@ -779,7 +767,7 @@ public class Backend {
 						HttpResponse response2 = httpClient.execute(request);
 						LOGGER.log(Level.INFO, response2.toString());
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Backend, ERROR 6");
 					}
 				}
 
@@ -798,7 +786,7 @@ public class Backend {
 				result.put(new JSONObject().put("Op", "pss"));
 
 				for (PSS a : Data.dbpssall()) {
-					result.put(new JSONObject().put("Pss", a.getName()));
+					result.put(new JSONObject().put("Pss",a.getName()));
 				}
 
 				return result.toString();
@@ -811,11 +799,9 @@ public class Backend {
 
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 7");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 8");
 		}
 		return result.toString();
 	}

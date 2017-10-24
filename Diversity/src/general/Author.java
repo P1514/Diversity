@@ -278,9 +278,9 @@ public final class Author {
 		// System.out.println(avgcom + " / " + avglike + " / " +
 		// avgview+"/"+this.posts);
 		this.influence = Settings.aWcomments
-				* ((this.comments / this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
-				+ Settings.aWlikes * ((this.likes / this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
-				+ Settings.aWviews * ((this.views / this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
+				* ((this.comments / (double)this.posts) / (double) (avgcom != (double) 0 ? avgcom : (double) 1))
+				+ Settings.aWlikes * ((this.likes / (double)this.posts) / (avglike != (double) 0 ? avglike : (double) 1))
+				+ Settings.aWviews * ((this.views / (double)this.posts) / (avgview != (double) 0 ? avgview : (double) 1));
 		//System.out.println(avgcom + " / " + avglike + " / " + avgview);
 	}
 

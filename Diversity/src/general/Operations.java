@@ -33,7 +33,7 @@ public class Operations {
 		permission.put(26, 2);
 		permission.put(27, 3);
 		permission.put(28, 1);
-		permission.put(30, 4);
+		//permission.put(30, 4);
 		permission.put(31, 1);
 		permission.put(32, 1);
 		permission.put(33, 1);
@@ -74,7 +74,7 @@ public class Operations {
 		op.put("tagcloud", 26); // View Results
 		op.put("set_ignore_word", 27); // set user ignored words
 		op.put("get_mediawiki", 28); // Create model
-		op.put("get_log", 30); // get all logs
+		//op.put("get_log", 30); // get all logs
 		op.put("get_rules", 31); // get lean design rules
 		op.put("get_dp", 32); // get all design projects
 		op.put("collaboration", 33); // get collaboration info

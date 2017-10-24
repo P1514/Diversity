@@ -35,7 +35,6 @@ import general.Settings;
  */
 public class Oversight extends TimerTask {
 
-	private Connection cnlocal;
 	private ArrayList<String> sourcelist = new ArrayList<String>();
 	private Data dat = new Data();
 	private HashMap<String, update> updatelist = new HashMap<String, update>();
@@ -62,7 +61,7 @@ public class Oversight extends TimerTask {
 		 */
 		c.add(Calendar.SECOND, 15);
 
-		timer.scheduleAtFixedRate(this, c.getTime(), 24 * 60 * 60 * 1000);
+		timer.scheduleAtFixedRate(this, c.getTime(), 24 * 60 * 60 * (long) 1000);
 	}
 
 	/**
@@ -104,21 +103,19 @@ public class Oversight extends TimerTask {
 
 		if (local == true) {
 			try {
-				PreparedStatement query;
-				ResultSet rs;
-				try (Connection cnlocal = Settings.connlocal()) {
-					query = cnlocal.prepareStatement(getpss);
-					
-					// System.out.println("QUERY: " + query.toString());
-					rs = query.executeQuery();
+				try (Connection cnlocal = Settings.connlocal();
+						PreparedStatement query = cnlocal.prepareStatement(getpss)) {
 
-					while (rs.next()) {
-						sourcelist.add(rs.getString(Settings.lutable_source) + ";;;"
-								+ rs.getString(Settings.lutable_lastupdate));
+					// System.out.println("QUERY: " + query.toString());
+					try (ResultSet rs = query.executeQuery()) {
+
+						while (rs.next()) {
+							sourcelist.add(rs.getString(Settings.lutable_source) + ";;;"
+									+ rs.getString(Settings.lutable_lastupdate));
+						}
 					}
 				} catch (ClassNotFoundException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+					LOGGER.log(Level.WARNING,"Class:Oversight Error 1");
 				}
 				for (String a : sourcelist) {
 
@@ -126,56 +123,57 @@ public class Oversight extends TimerTask {
 
 					updatelist = new HashMap<String, update>();
 					requesturl = new HashMap<String, url>();
-					try (Connection cnlocal = Settings.connlocal()) {
-						query = cnlocal.prepareStatement(getsources);
+					try (Connection cnlocal = Settings.connlocal();
+							PreparedStatement query = cnlocal.prepareStatement(getsources)) {
 						query.setLong(1, now.getTimeInMillis());
 						String source = a.split(";;;")[0];
 						String date = a.split(";;;")[1];
 						query.setString(2, "%" + source + ",%");
 
-						rs = query.executeQuery();
+						try (ResultSet rs = query.executeQuery()) {
 
-						// System.out.println("query: " + query.toString());
+							// System.out.println("query: " + query.toString());
 
-						Calendar c = Calendar.getInstance();
-						while (rs.next()) {
-							c.setTimeInMillis(Long.valueOf(date));
-							if (now.after(c)) {
-								String[] uri = rs.getString(Settings.lmtable_uri).split(";");
-								for (String b : uri) {
-									if (updatelist.containsKey(b.split(",")[1])) {
-										update tmp = updatelist.get(b.split(",")[1]);
-										if (tmp.date > Long.valueOf(date))
+							Calendar c = Calendar.getInstance();
+							while (rs.next()) {
+								c.setTimeInMillis(Long.valueOf(date));
+								if (now.after(c)) {
+									String[] uri = rs.getString(Settings.lmtable_uri).split(";");
+									for (String b : uri) {
+										if (updatelist.containsKey(b.split(",")[1])) {
+											update tmp = updatelist.get(b.split(",")[1]);
+											if (tmp.date > Long.valueOf(date))
+												tmp.date = Long.valueOf(date);
+										} else {
+											update tmp = new update();
+											tmp.account = b.split(",")[1];
 											tmp.date = Long.valueOf(date);
-									} else {
-										update tmp = new update();
-										tmp.account = b.split(",")[1];
-										tmp.date = Long.valueOf(date);
-										tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
-										updatelist.put(tmp.account, tmp);
+											tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
+											updatelist.put(tmp.account, tmp);
+										}
 									}
 								}
+								/*
+								 * if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) { update tmp = new
+								 * update(); tmp.account = "mediawiki"; tmp.date = Long.valueOf(date); tmp.pss =
+								 * Long.valueOf(rs.getString(Settings.lmtable_pss)); updatelist.put(tmp.account,
+								 * tmp); }
+								 */
 							}
-							/*if (rs.getBoolean(Settings.lmtable_add_mediawiki) == true) {
-								update tmp = new update();
-								tmp.account = "mediawiki";
-								tmp.date = Long.valueOf(date);
-								tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
-								updatelist.put(tmp.account, tmp);
-							}*/
 						}
 					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						LOGGER.log(Level.WARNING,"Class:Oversight Error 2");
 					}
 
 					for (update d : updatelist.values()) {
 						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
 								: new url();
 						try {
-						local.accounts += "&accounts[]=" + URLEncoder.encode(d.account.replace(" ", "%20"),"UTF-8");
-						local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date+"","UTF-8") + "&epochsTo[]=" + URLEncoder.encode(now.getTimeInMillis()+"","UTF-8");
-						}catch(UnsupportedEncodingException e) {
+							local.accounts += "&accounts[]="
+									+ URLEncoder.encode(d.account.replace(" ", "%20"), "UTF-8");
+							local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date + "", "UTF-8") + "&epochsTo[]="
+									+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
+						} catch (UnsupportedEncodingException e) {
 							LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
 							local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
 							local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
@@ -186,10 +184,10 @@ public class Oversight extends TimerTask {
 
 					requesturl.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
-						//FIX Media Wiki
-						v.accounts+="&accounts[]=mediawiki";
-						v.epochs+="&epochsFrom[]=1&epochsTo[]=1507376292000";
-						
+						// FIX Media Wiki
+						v.accounts += "&accounts[]=mediawiki";
+						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
+
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
@@ -197,10 +195,15 @@ public class Oversight extends TimerTask {
 							// "/intelligent-search/getFeedback"
 							// + v.epochs.replaceFirst("&", "?") + v.accounts +
 							// "&pssId=\"" + k + "\"";
-							String request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
-									+ "&pssId=" + k + "&pssName=" + Data.getpss(Long.parseLong(k)).getName()
-									+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + prodid
-											+ "&finalProductName=" + Data.getProduct(prodid).get_Name() : "");
+							String request = "";
+							try {
+								request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
+										+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
+										+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
+												+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+							} catch (NumberFormatException | UnsupportedEncodingException e1) {
+								LOGGER.log(Level.SEVERE, "Unsupported encoding exception");
+							} 
 							// request = Settings.JSON_uri;
 							// System.out.println("REQUEST:" + request);
 							try {
@@ -209,10 +212,8 @@ public class Oversight extends TimerTask {
 								// request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
-								(new Loader()).load(new JSONArray(readUrl(request.replaceAll(" ", "%20"))));
+								(new Loader()).load(new JSONArray(readUrl(request)));
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
 							}
@@ -233,8 +234,8 @@ public class Oversight extends TimerTask {
 								update += ")";
 								Calendar cc = (Calendar) now.clone();
 								cc.add(Calendar.DAY_OF_MONTH, 1);
-								try (Connection cnlocal = Settings.connlocal()) {
-									PreparedStatement query1 = cnlocal.prepareStatement(update);
+								try (Connection cnlocal = Settings.connlocal();
+										PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 									query1.setLong(1, now.getTimeInMillis());
 									query1.setString(2, k);
 									query1.setString(3, a.split(";;;")[0]);
@@ -251,8 +252,6 @@ public class Oversight extends TimerTask {
 								 */
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
-
-								e.printStackTrace();
 							}
 						}
 					});
@@ -261,17 +260,14 @@ public class Oversight extends TimerTask {
 				}
 				// TODO missing uodate DB
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
-			
+
 		} else {
 			try {
 				(new Loader()).loadinit();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Oversight Error 3");
 			}
 		}
 
@@ -280,8 +276,7 @@ public class Oversight extends TimerTask {
 		try {
 			gs.globalsentiment(null, null, gr.getTOPReach(5));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Oversight Error 4");
 		}
 
 		Server.isloading = false;
@@ -296,16 +291,6 @@ public class Oversight extends TimerTask {
 		public String account;
 		public Long date;
 		public Long pss;
-	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 	public static String readUrl(String urlString) throws Exception {

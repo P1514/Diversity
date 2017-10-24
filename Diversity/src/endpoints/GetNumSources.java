@@ -3,8 +3,8 @@ package endpoints;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -16,12 +16,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.json.*;
 
+import extraction.Collaboration;
+import general.Logging;
 import general.Settings;
+
+
 
 @Path("/getNumSources")
 public class GetNumSources {
+	private static final Logger LOGGER = new Logging().create(Collaboration.class.getName());
+	private final String select = "select count(*) from " + Settings.lutable + " where pss=?";
+
 
 	@DefaultValue("")
 	@QueryParam("pss")
@@ -30,7 +36,6 @@ public class GetNumSources {
 	@Context
 	UriInfo ui;
 
-	private Connection cnlocal;
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
@@ -38,36 +43,16 @@ public class GetNumSources {
 		if ("".equals(pss)) {
 			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
-		int id;
-		try {
-			id = Integer.parseInt(pss);
-		} catch (NumberFormatException e) {
-			return Response.status(Response.Status.BAD_REQUEST).build();
-		}
 
-		return Response.status(Response.Status.OK).entity(getNumPosts() + "").build();
+		return Response.status(Response.Status.OK).entity(Integer.toString(getNumPosts())).build();
 	}
 
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
 
 	private int getNumPosts() {
 		int numPosts = 0;
-		String select = "select count(*) from " + Settings.lutable + " where pss=?";
-
-		PreparedStatement query1 = null;
-		try {
-			dbconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			query1 = cnlocal.prepareStatement(select);
+		try(Connection cnlocal=Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(select);) {
 			query1.setInt(1, Integer.parseInt(pss));
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
@@ -75,14 +60,9 @@ public class GetNumSources {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, "Error", e);
 		}
-		try {
-			cnlocal.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		System.out.println(numPosts);
+
 		return numPosts;
 	}
 }

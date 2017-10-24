@@ -3,8 +3,10 @@ package monitoring;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +30,7 @@ import general.Settings;
  * The Class Monitor.
  */
 public class Monitor {
-	private static final Logger LOGGER = new Logging().create(Globalsentiment.class.getName());
+	private static final Logger LOGGER = new Logging().create(Monitor.class.getName());
 	String error = "error";
 
 	/**
@@ -39,7 +41,7 @@ public class Monitor {
 	 */
 	public static void update(String uri, long pss) {
 		String[] urilists = uri.split(";");
-		String account = "", source = "", url, finalProductId = "", finalProductName = "";
+		String account = "", source = "", url="", finalProductId = "", finalProductName = "";
 		PSS pssInstance = Data.getpss(pss);
 		String pssName = "&pssName=" + pssInstance.getName();
 		ArrayList<Long> products = pssInstance.get_products();
@@ -52,25 +54,38 @@ public class Monitor {
 
 			}
 		}
-		url = Settings.register_uri + "?accounts[]=";
+	
 		for (int i = 0; i < urilists.length; i++) {
+			url = Settings.register_uri + "?accounts[]=";
 			source = urilists[i].split(",")[0];
 			account = urilists[i].split(",")[1];
-			url += account + "&type[]=" + source  ;
+
+			try {
+				url += URLEncoder.encode(account, "UTF-8") + "&type[]=" + URLEncoder.encode(source, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				LOGGER.log(Level.WARNING, "Unsupported encoding exception");
+			}
 		}
-		//url = url.substring(0, url.length() - 1);
-		//url += pssName + finalProductId + finalProductName;
-		//System.out.println(url);
+
+		// url = url.substring(0, url.length() - 1);
+		// url += pssName + finalProductId + finalProductName;
+		// System.out.println(url);
 		try {
 			//System.out.println(url);
 			Oversight.readUrl(url);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 1");
 		}
+		
 		PreparedStatement stmt = null;
 		Connection cnlocal = null;
+		
 		try {
+			for (int i = 0; i < urilists.length; i++) {
+				source = urilists[i].split(",")[0];
+				account = urilists[i].split(",")[1];
 			cnlocal = Settings.connlocal();
 			String query = "INSERT INTO " + Settings.lutable + " (" + Settings.lutable_source + ","
 					+ Settings.lutable_account + "," + Settings.lutable_pss + "," + Settings.lutable_lastupdate
@@ -84,27 +99,23 @@ public class Monitor {
 			// System.out.println(query);
 
 			stmt.execute();
-
+			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 2");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Monitor Error 3");
 		} finally {
 			try {
 				if (stmt != null)
 					stmt.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Monitor Error 4");
 			}
 			try {
 				if (cnlocal != null)
 					cnlocal.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.log(Level.WARNING,"Class:Monitor Error 5");
 			}
 		}
 
@@ -117,9 +128,9 @@ public class Monitor {
 		 * String status; while ((status = in.readLine()) != null)
 		 * System.out.println(status); in.close();
 		 * 
-		 * } catch (MalformedURLException e) { // TODO Auto-generated catch
-		 * block e.printStackTrace(); } catch (IOException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
+		 * } catch (MalformedURLException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } catch (IOException e) { // TODO Auto-generated catch
+		 * block e.printStackTrace(); }
 		 */
 
 	}
@@ -143,20 +154,16 @@ public class Monitor {
 		int count = 1;
 
 		for (int i = 0; i < urilist.length; i++) {
-			Connection cnlocal = null;
-			ResultSet rs;
-			try {
-				cnlocal = Settings.connlocal();
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, "error", e);
-			}
-			// System.out.println(urilist[i]);
+
 			String insert = new String("SELECT COUNT(id) FROM models WHERE archived=0 and uri=?;");
-			try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setString(1, urilist[i]);
 				// System.out.println(query1.toString());
-				rs = query1.executeQuery();
+				try(ResultSet rs = query1.executeQuery()){
+					rs.next();
 				count = rs.getInt(1);
+				}
 
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "error", e);
@@ -165,8 +172,22 @@ public class Monitor {
 			// System.out.println(count);
 			if (count > 0) {
 				LOGGER.log(Level.INFO, "Source not deleted");
-			} else
+			} else {
 				LOGGER.log(Level.INFO, "Source deleted");
+				String delete = new String("delete FROM sentimentanalysis.sources where source=? and account=?;");
+				try (Connection cnlocal = Settings.connlocal();
+						PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
+					query1.setString(1, urilist[i].split(",")[0]);
+					query1.setString(1, urilist[i].split(",")[1]);
+					System.out.println(query1.toString());
+					query1.execute();
+						
+					
+
+				} catch (Exception e) {
+					LOGGER.log(Level.SEVERE, "error", e);
+				}	
+			}
 		}
 
 	}

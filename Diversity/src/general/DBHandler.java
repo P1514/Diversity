@@ -7,7 +7,10 @@ import java.sql.Timestamp;
 import java.sql.Date;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import com.sun.media.jfxmedia.logging.Logger;
 
 import general.Settings;
 
@@ -17,21 +20,12 @@ import general.Settings;
  */
 public class DBHandler extends Handler {
 
-	private Connection cnlocal;
 	private int user_id;
 	private Timestamp timestamp;
 
 	public DBHandler(int user_id, long timestamp) {
 		this.user_id = user_id;
 		this.timestamp = new Timestamp(timestamp);
-	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -50,28 +44,22 @@ public class DBHandler extends Handler {
 			return;
 		}
 
-		try (Connection cnlocal = Settings.connlocal()) {
 
 			String sql = "INSERT INTO " + Settings.ltable + "(" + Settings.ltable_user + "," + Settings.ltable_timestamp
 					+ "," + Settings.ltable_log + ") VALUES (?,?,?)";
 
-			PreparedStatement insert = null;
+			
 
-			try {
-				insert = cnlocal.prepareStatement(sql);
+			try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement insert = cnlocal.prepareStatement(sql)){
 				insert.setInt(1, user_id);
 				insert.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
 				insert.setString(3, record.getLevel() + " " + record.getMessage());
 				insert.executeUpdate();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
 		}
 
 	}
@@ -82,17 +70,10 @@ public class DBHandler extends Handler {
 		return;
 	}
 
-	/**
-	 * Closes the connection.
-	 */
 	@Override
 	public void close() throws SecurityException {
-		try {
-			cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// TODO Auto-generated method stub
+		
 	}
 
 }

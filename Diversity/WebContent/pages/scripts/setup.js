@@ -148,6 +148,11 @@ ws.onmessage = function(event) {
 
     return;
   }
+
+  if (json[0].Op == "DBLoading") {
+    $('#dbload').show();
+  }
+
   if (json[0].Op == "Configs") {
     json = JSON.parse(event.data);
     setConfig();

@@ -40,22 +40,16 @@ public class Snapshot {
 	String error = "error";
 
 	public boolean create(String name, long date, int timespan, String user, String type, String result, int id) {
-		ResultSet rs;
-		Connection cnlocal;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
-			return false;
-		}
+		
 		String insert = new String("SELECT * FROM " + Settings.lsstable + " where " + Settings.lsstable_name + "=? && "
 				+ Settings.lsstable_type + "=?;");
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setString(2, type);
-			rs = query1.executeQuery();
-			if (rs.next())
-				return false;
+			try (ResultSet rs = query1.executeQuery()) {
+				if (rs.next())
+					return false;
+			}
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
@@ -65,7 +59,7 @@ public class Snapshot {
 				+ Settings.lsstable_creation_date + "," + Settings.lsstable_creation_user + ","
 				+ Settings.lsstable_result + "," + Settings.lsstable_type + "," + Settings.lsstable_timespan + ","
 				+ Settings.lsstable_model_id + ")" + " values (?,?,?,?,?,?,?)");
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			query1.setLong(2, date);
 			query1.setString(3, user);
@@ -78,13 +72,6 @@ public class Snapshot {
 
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return true;
 	}
@@ -101,8 +88,7 @@ public class Snapshot {
 			if (services != "")
 				obj.put("Services", services);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 1");
 		}
 
 		try {
@@ -119,8 +105,7 @@ public class Snapshot {
 		try {
 			b.setMessage(23, obj);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 2");
 		}
 		result = b.resolve();
 		// System.out.println("TEST" + result);
@@ -151,92 +136,56 @@ public class Snapshot {
 			result = b.resolve();
 			create(name, cdate, timespan, user, "all", result, id);
 			/*
-			obj = new JSONObject();
-			obj.put("Id", id);
-			obj.put("Filter", "Location");
-			b.setMessage(operation, obj);
-			result = b.resolve();
-			create(name, cdate, timespan, user, "location", result, id);
-
-			obj = new JSONObject();
-			obj.put("Id", id);
-			obj.put("Filter", "Gender");
-			b.setMessage(operation, obj);
-			result = b.resolve();
-			create(name, cdate, timespan, user, "gender", result, id);
-
-			obj = new JSONObject();
-			obj.put("Id", id);
-			obj.put("Filter", "Age");
-			b.setMessage(operation, obj);
-			result = b.resolve();
-			create(name, cdate, timespan, user, "age", result, id);
-
-			obj = new JSONObject();
-			obj.put("Id", id);
-			obj.put("Filter", "Product");
-			b.setMessage(19, obj);
-			result = b.resolve();
-			*/
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Location");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "location", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Gender");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "gender", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Age");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "age", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Product");
+			 * b.setMessage(19, obj); result = b.resolve();
+			 */
 			return create(name, cdate, timespan, user, "product", result, id) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 3");
 		}
 		return "";
 
-	}
-
-	private String extraction(JSONObject msg) {
-
-		return "";
-	}
-
-	private static void dbconnect() throws ClassNotFoundException, SQLException {
-		Connection cnlocal = Settings.connlocal();
 	}
 
 	public JSONArray loadNames(String type) {
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
-		ResultSet rs;
-		Connection cnlocal;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
-			return null;
-		}
+
 		String insert = new String("SELECT " + Settings.lsstable_name + " FROM " + Settings.lsstable + " where "
 				+ Settings.lsstable_type + "=?;");
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			if (type.equals("Prediction"))
 				query1.setString(1, "prediction");
 			else
 				query1.setString(1, "all");
 
 			// System.out.println("****Names:" + query1.toString());
-			rs = query1.executeQuery();
-			// rs.next();//verify
-			while (rs.next()) {
-				obj = new JSONObject();
-				obj.put("Name", rs.getString("name"));
-				aux.put(obj);
+			try (ResultSet rs = query1.executeQuery()) {
+				// rs.next();//verify
+				while (rs.next()) {
+					obj = new JSONObject();
+					obj.put("Name", rs.getString("name"));
+					aux.put(obj);
+				}
+				result.put("Snapshots");
+				result.put(aux);
 			}
-			result.put("Snapshots");
-			result.put(aux);
-
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return result;
 
@@ -249,18 +198,12 @@ public class Snapshot {
 			LOGGER.log(Level.SEVERE, "Error Decoding Snapshot Name => " + name);
 			return null;
 		}
-		Connection cnlocal;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, error, e);
-			return null;
-		}
+
 		String insert = new String("SELECT " + Settings.lsstable_result + "," + Settings.lsstable_creation_user + ","
 				+ Settings.lsstable_creation_date + "," + Settings.lsstable_model_id + " FROM " + Settings.lsstable
 				+ " where " + Settings.lsstable_name + "=? && " + Settings.lsstable_type + "=?;");
 		long model;
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, name);
 			if (type.equals(""))
 				query1.setString(2, "prediction");
@@ -279,7 +222,7 @@ public class Snapshot {
 					_user = null;
 				}
 				String user_name = _user != null ? _user.getUserName() : _userS;
-				 
+
 				obj.put("User", user_name);
 				obj.put("Date", new Date(rs.getLong("creation_date")));
 				model = rs.getLong("model_id");
@@ -292,12 +235,6 @@ public class Snapshot {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, error, e);
 			return Backend.error_message(error).toString();
-		} finally {
-			try {
-				cnlocal.close();
-			} catch (SQLException e) {
-				LOGGER.log(Level.INFO, error, e);
-			}
 		}
 
 	}
@@ -308,14 +245,7 @@ public class Snapshot {
 		JSONArray result = new JSONArray();
 		JSONArray aux = new JSONArray();
 		JSONObject obj = new JSONObject();
-		ResultSet rs;
-		Connection cnlocal;
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error", e);
-			return null;
-		}
+
 		String insert = new String("Select * from " + Settings.lsstable + " where ");
 
 		if (pss != -1) {
@@ -329,7 +259,7 @@ public class Snapshot {
 			insert += " type = ?";
 		}
 
-		try (PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			int i = 1;
 			if (pss != -1) {
 				query1.setInt(i++, pss);
@@ -337,38 +267,31 @@ public class Snapshot {
 			if (!"all".equals(type)) {
 				query1.setString(i++, type);
 			}
-			LOGGER.log(Level.INFO, "GetSnapshots Query => "+ query1.toString());
+			LOGGER.log(Level.INFO, "GetSnapshots Query => " + query1.toString());
 			// System.out.println("****Names:" + query1.toString());
-			rs = query1.executeQuery();
-			// rs.next();//verify
-			while (rs.next()) {
-				obj = new JSONObject();
-				obj.put("Name", rs.getString("name"));
-				String _userS = rs.getString("creation_user");
-				User _user;
-				try {
-					_user = Data.getUser(Long.parseLong(_userS));
-				} catch (NumberFormatException e) {
-					_user = null;
+			try (ResultSet rs = query1.executeQuery()) {
+				// rs.next();//verify
+				while (rs.next()) {
+					obj = new JSONObject();
+					obj.put("Name", rs.getString("name"));
+					String _userS = rs.getString("creation_user");
+					User _user;
+					try {
+						_user = Data.getUser(Long.parseLong(_userS));
+					} catch (NumberFormatException e) {
+						_user = null;
+					}
+					String user_name = _user != null ? _user.getUserName() : _userS;
+					obj.put("Id", rs.getString("id"));
+					obj.put("User", user_name);
+					obj.put("Type", rs.getString("type"));
+					aux.put(obj);
 				}
-				String user_name = _user != null ? _user.getUserName() : _userS;
-				obj.put("Id", rs.getString("id"));
-				obj.put("User", user_name);
-				obj.put("Type", rs.getString("type"));
-				aux.put(obj);
+				result.put(new JSONObject().put("Op", "Snapshots"));
+				result.put(aux);
 			}
-			result.put(new JSONObject().put("Op", "Snapshots"));
-			result.put(aux);
-
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error", e);
-		}
-		try {
-			if (cnlocal != null)
-				cnlocal.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return result;
 	}

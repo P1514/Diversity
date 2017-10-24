@@ -80,13 +80,11 @@ public class LoadThreads {
 						return;
 					}
 					for (Post post : opinion.getPosts().values()) {
-						PreparedStatement query2 = null;
 
-						try {
-							String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
-									+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?,"
-									+ Settings.lptable_likes + "=?";
-							query2 = cnlocal.prepareStatement(update1);
+						String update1 = "INSERT INTO " + Settings.lptable + " " + "Values (?,?,?,?,?,?,?) "
+								+ "ON DUPLICATE KEY UPDATE " + Settings.lptable_views + "=?," + Settings.lptable_likes
+								+ "=?";
+						try (PreparedStatement query2 = cnlocal.prepareStatement(update1)) {
 							query2.setLong(1, post.getID());
 							if (post.getPolarity() != -1) {
 								query2.setDouble(2, post.getPolarity());
@@ -97,10 +95,7 @@ public class LoadThreads {
 							query2.setLong(4, post.getLikes());
 							query2.setLong(5, post.getViews());
 							query2.setLong(6, opinion.getID());
-							if (!Settings.JSON_use)
-								query2.setString(7, post.getUID());
-							else
-								query2.setString(7, post.getUID());
+							query2.setString(7, post.getUID());
 							query2.setLong(8, post.getLikes());
 							query2.setLong(9, post.getViews());
 							while (true) {
@@ -114,35 +109,17 @@ public class LoadThreads {
 								}
 								break;
 							}
-							if (query2 != null)
-								query2.close();
 						} catch (Exception e) {
 							LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
 							continue;
 						}
-						try {
-							if (query2 != null)
-								query2.close();
-						} catch (Exception e) {
-						}
 					}
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 1");
 				}
-				try {
-					cnlocal.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (ClassNotFoundException | SQLException e1) {
+				LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 2");
 			}
 		}
 	}
@@ -166,13 +143,13 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
 		public void run() {
 			Connection cnlocal = null;
-			LOGGER.log(Level.SEVERE, "started thread n�" + counter);
+			LOGGER.log(Level.SEVERE, "started thread nº" + counter);
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e) {
@@ -221,7 +198,6 @@ public class LoadThreads {
 	class Topinions implements Runnable {
 		private long id;
 		private JSONObject obj = null;
-		private long counter;
 
 		/**
 		 * Instantiates a new topinions referenced to local data.
@@ -246,7 +222,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 
@@ -282,8 +258,8 @@ public class LoadThreads {
 			}
 			Post _post = remote ? new Post(postid, source, user_id, time, likes, views, message)
 					: new Post(postid, user_id, (long) 0, likes, views, message, polarity, "");
-			if (!(Loader.users.contains(user_id))) {
-				Loader.users.add(user_id);
+			if (!(Loader.users_contains(user_id))) {
+				Loader.users_add(user_id);
 			}
 
 			Loader.opiniondb.put(postid,
@@ -309,8 +285,6 @@ public class LoadThreads {
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (rs.next()) {
-							if (Loader.first_load)
-								Loader.totalposts--;
 							load(rs, false);
 						}
 					}
@@ -375,7 +349,8 @@ public class LoadThreads {
 						id = (long) (Math.random() * -1000000000);
 						obj.put("postId", id);
 					}
-					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id="+id+" and opinions.id="+id);
+					String query = ("SELECT *,opinions.source,opinions.account FROM posts,opinions where posts.id=" + id
+							+ " and opinions.id=" + id);
 					stmt = cnlocal.createStatement();
 					rs = stmt.executeQuery(query);
 					if (!rs.next()) {
@@ -385,7 +360,7 @@ public class LoadThreads {
 						cnlocal.close();
 					} else {
 						Loader.repeatpost();
-						//Loader.repeatcomment();
+						// Loader.repeatcomment();
 					}
 					Date date = new Date(Long.valueOf(obj.getString("postEpoch")));
 					// Date date = new Date(0);
@@ -407,20 +382,19 @@ public class LoadThreads {
 					String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
 
 					long time = parsed.getTime();
-					
-					/*if (!remote) {
-						SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						date = null;
-						try {
-							date = (Date) df.parse(obj.getString(Settings.JSON_epoch));
-						} catch (ParseException e) {
-							LOGGER.log(Level.SEVERE, "ERROR Parsing Data" + obj.getString(Settings.JSON_epoch));
-							
-						}
-						time = date.getTime();
 
-					}*/
-					long postid=id;
+					/*
+					 * if (!remote) { SimpleDateFormat df = new
+					 * SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); date = null; try { date = (Date)
+					 * df.parse(obj.getString(Settings.JSON_epoch)); } catch (ParseException e) {
+					 * LOGGER.log(Level.SEVERE, "ERROR Parsing Data" +
+					 * obj.getString(Settings.JSON_epoch));
+					 * 
+					 * } time = date.getTime();
+					 * 
+					 * }
+					 */
+					long postid = id;
 					// //system.out.println("IM HERE");
 					long likes, views, age;
 					String name, gender, location, message;
@@ -428,9 +402,9 @@ public class LoadThreads {
 					long product;
 					Post _post;
 					if (remote) {
+						message = obj.getString("post");
 						likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 						views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
-						message = obj.getString("post");
 						/*
 						 * if (product == 0) { rs.close(); stmt.close(); conlocal.close();
 						 * condata.close(); return; }
@@ -441,6 +415,10 @@ public class LoadThreads {
 						views = rs.getLong(Settings.lptable_views);
 						message = rs.getString(Settings.lptable_message);
 						polarity = rs.getLong(Settings.lptable_polarity);
+						Loader.repeatcomment(likes, views);
+						
+						likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
+						views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 						_post = new Post(postid, user_id, time, likes, views, message, polarity, source);
 					}
 					product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
@@ -454,8 +432,8 @@ public class LoadThreads {
 
 					if (!"".equals(user_id)) {
 						Author author = new Author(user_id, source, name, age, gender, location);
-						if (!(Loader.users2.contains(author))) {
-							Loader.users2.add(author);
+						if (!(Loader.users_contains(author))) {
+							Loader.users_add(author);
 						}
 					}
 					Loader.opiniondb.put(postid,
@@ -471,44 +449,9 @@ public class LoadThreads {
 						stmt.close();
 					if (cnlocal != null)
 						cnlocal.close();
-				} catch (SQLException | JSONException e) {
-					// system.out.println("ERROR loading Opinions");
-					e.printStackTrace();
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} finally {
-					try {
-						if (rs != null)
-							rs.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					try {
-						if (stmt != null)
-							stmt.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					try {
-						if (cnlocal != null)
-							cnlocal.close();
-
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				} catch (SQLException | JSONException | ParseException e) {
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 3");
 				}
-
-			}
-			try {
-				if (cndata != null)
-					cndata.close();
-
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 
@@ -551,7 +494,7 @@ public class LoadThreads {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
@@ -594,8 +537,8 @@ public class LoadThreads {
 							if (message.length() <= 1)
 								continue;
 							Post _post = new Post(postid, "", user_id, time, likes, views, message);
-							if (!(Loader.users.contains(user_id))) {
-								Loader.users.add(user_id);
+							if (!(Loader.users_contains(user_id))) {
+								Loader.users_add(user_id);
 							}
 							_opin.addcomment(_post);
 						} while (rs.next());
@@ -621,8 +564,8 @@ public class LoadThreads {
 							double polarity = rs.getDouble(Settings.lptable_polarity);
 							String source = rs.getString(Settings.latable_source);
 							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity, source);
-							if (!(Loader.users.contains(user_id)))
-								Loader.users.add(user_id);
+							if (!(Loader.users_contains(user_id)))
+								Loader.users_add(user_id);
 							_opin.addcomment(_post);
 						} while (rs.next());
 					}
@@ -636,37 +579,34 @@ public class LoadThreads {
 						cnlocal.close();
 					Loader.opiniondb.put(id, _opin);
 				} catch (ClassNotFoundException e) {
-					// system.out.println("ERROR loading Posts");
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 4");
 				} catch (SQLException e) {
-					//
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 5");
 				} finally {
 					try {
 						if (rs != null)
 							rs.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 6");
 					}
 					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 7");
 					}
 					try {
 						if (cndata != null)
 							cndata.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 8");
 					}
 					try {
 						if (cnlocal != null)
 							cnlocal.close();
 
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 9");
 					}
 
 				}
@@ -677,7 +617,8 @@ public class LoadThreads {
 					if (obj.has(Settings.JSON_replies) || obj.has("Replies")) {
 
 						// //system.out.println("HELLO2");
-						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies): obj.getJSONArray("Replies");
+						JSONArray replies = obj.has(Settings.JSON_replies) ? obj.getJSONArray(Settings.JSON_replies)
+								: obj.getJSONArray("Replies");
 						for (int index = 0; index < replies.length(); index++) {
 
 							String query = Settings.sqlselectall + Settings.lptable + " where " + Settings.lptable_id
@@ -685,13 +626,13 @@ public class LoadThreads {
 							JSONObject reply;
 
 							reply = replies.getJSONObject(index);
-							
+
 							if (reply.has("postId")) {
 							} else {
 								long id1 = (long) (Math.random() * -1000000000);
 								reply.put("postId", id1);
 							}
-							
+
 							Date date;
 							if (reply.has(Settings.JSON_epoch)) {
 								date = new Date(Long.valueOf(reply.getString(Settings.JSON_epoch)) * 1000L);
@@ -704,7 +645,7 @@ public class LoadThreads {
 							java.util.Date parsed = format.parse(formatted);
 
 							long postid = reply.getLong(Settings.JSON_postid);
-							String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
+							String user_id = reply.has(Settings.JSON_userid) ? reply.getString(Settings.JSON_userid) : "";
 							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
 									? reply.has("likes") ? reply.getLong("likes") : 0
@@ -715,30 +656,31 @@ public class LoadThreads {
 							String message = reply.getString(Settings.JSON_message);
 
 							String source = obj.getString(Settings.JSON_source);
-							Post _post=null;
+							Post _post = null;
 							try (Connection cnlocalnew = Settings.connlocal()) {
-								try(PreparedStatement ps = cnlocalnew.prepareStatement(query)){
+								try (PreparedStatement ps = cnlocalnew.prepareStatement(query)) {
 									ps.setLong(1, postid);
-									try(ResultSet rsnew = ps.executeQuery()){
-										if(!rsnew.next()) {
+									try (ResultSet rsnew = ps.executeQuery()) {
+										if (!rsnew.next()) {
 											_post = new Post(postid, source, user_id, time, likes, views, message);
-										}else{
-											Loader.repeatcomment();
+										} else {
+											
 											double polarity = rsnew.getDouble(Settings.lptable_polarity);
-											_post = new Post(postid, user_id, time, likes, views, message,polarity, source);
+											Loader.repeatcomment(rsnew.getLong(Settings.lptable_likes),rsnew.
+													getLong(Settings.lptable_views));
+											_post = new Post(postid, user_id, time, likes, views, message, polarity,
+													source);
 										}
 									}
 								}
-								
+
 							} catch (ClassNotFoundException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
+								
 							} catch (SQLException e) {
 								LOGGER.log(Level.SEVERE, "ERRO ON Tposts while getting info for new posts");
-								e.printStackTrace();
+								
 							}
-
-							
 
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
 							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
@@ -750,8 +692,8 @@ public class LoadThreads {
 									: "";
 							if (!"".equals(user_id)) {
 								Author author = new Author(user_id, source, name, age, gender, location);
-								if (!(Loader.users2.contains(author))) {
-									Loader.users2.add(author);
+								if (!(Loader.users_contains(author))) {
+									Loader.users_add(author);
 								}
 							}
 							_opin.addcomment(_post);
@@ -761,36 +703,34 @@ public class LoadThreads {
 
 					// //system.out.println("HELLO");
 				} catch (JSONException e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 9");
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 10");
 				} finally {
 					try {
 						if (rs != null)
 							rs.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 11");
 					}
 					try {
 						if (stmt != null)
 							stmt.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 12");
 					}
 					try {
 						if (cndata != null)
 							cndata.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 13");
 					}
 					try {
 						if (cnlocal != null)
 							cnlocal.close();
 
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 14");
 					}
 
 				}
@@ -804,7 +744,7 @@ public class LoadThreads {
 		/*
 		 * class Tmodels implements Runnable { private Model model; private Connection
 		 * conlocal;
-		 * 
+		 *
 		 * public Tmodels() { }
 		 */
 		public void Tmodels() {
@@ -815,8 +755,7 @@ public class LoadThreads {
 			try {
 				cnlocal = Settings.connlocal();
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 15");
 				return;
 			}
 			try {
@@ -848,21 +787,20 @@ public class LoadThreads {
 					if (rs != null)
 						rs.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 16");
 				}
 				try {
 					if (stmt != null)
 						stmt.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 17");
 				}
 				try {
 					if (cnlocal != null)
 						cnlocal.close();
 
 				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 18");
 				}
 
 			}

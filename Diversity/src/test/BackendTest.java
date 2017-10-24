@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.message.callback.PrivateKeyCallback.Request;
 
@@ -12,11 +14,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import general.Backend;
+import general.Logging;
 import general.Settings;
+import monitoring.Monitor;
 import monitoring.Oversight;
 
 public class BackendTest extends Thread {
-
+	private static final Logger LOGGER = new Logging().create(BackendTest.class.getName());
 	JSONObject obj, obj1;
 	Backend tester;
 	String result;
@@ -28,44 +32,54 @@ public class BackendTest extends Thread {
 
 	}
 
-
-
-	public void run(){
+	public void run() {
 		System.out.println("Thread");
 		try {
-			double rand = Math.round(Math.random()*13);
-			System.out.println(rand+"\n");
-	        switch ((int)rand) {
-	            case 1:  this.resolveRole();
-	                     break;
-	            case 2:  this.resolveGetTree();
-	                     break;
-	            case 3:  this.resolveGetTreePss();
-	                     break;
-	            case 4:  this.resolveTopreachglobalsentiment();
-	                     break;
-	            case 5:  this.resolveLoad();
-	                     break;
-	            case 6:  this.resolveGetposts();
-	                     break;
-	            case 7:  this.resolveGetmodels();
-	                     break;
-	            case 8:  this.resolveGetconfig();
-	                     break;
-	            case 9:  this.resolveGetModel();
-	                     break;
-	            case 10: this.resolveGetPSS();
-	                     break;
-	            case 11: this.resolveOpinionExtraction();
-	                     break;
-	            case 12: this.resolveOeRefresh();
-	                     break;
-	            default: this.resolveOeRefreshExtrapolate();
-	                     break;
-	        }
+			double rand = Math.round(Math.random() * 13);
+			System.out.println(rand + "\n");
+			switch ((int) rand) {
+			case 1:
+				this.resolveRole();
+				break;
+			case 2:
+				this.resolveGetTree();
+				break;
+			case 3:
+				this.resolveGetTreePss();
+				break;
+			case 4:
+				this.resolveTopreachglobalsentiment();
+				break;
+			case 5:
+				this.resolveLoad();
+				break;
+			case 6:
+				this.resolveGetposts();
+				break;
+			case 7:
+				this.resolveGetmodels();
+				break;
+			case 8:
+				this.resolveGetconfig();
+				break;
+			case 9:
+				this.resolveGetModel();
+				break;
+			case 10:
+				this.resolveGetPSS();
+				break;
+			case 11:
+				this.resolveOpinionExtraction();
+				break;
+			case 12:
+				this.resolveOeRefresh();
+				break;
+			default:
+				this.resolveOeRefreshExtrapolate();
+				break;
+			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.WARNING,"Class:BackendTest Error 1");
 		}
 	}
 
@@ -281,8 +295,7 @@ public class BackendTest extends Thread {
 	 * 
 	 * obj = new JSONObject(); tester = new Backend(7, obj); result =
 	 * "[{\"Op\":\"Error\",\"Message\":\"Cleaned Successfully\"}]";
-	 * assertEquals("Should be equal to the string", result, tester.resolve());
-	 * }
+	 * assertEquals("Should be equal to the string", result, tester.resolve()); }
 	 */
 
 	@Test
@@ -315,7 +328,7 @@ public class BackendTest extends Thread {
 		System.out.println("Prediction Test Output: " + tester.resolve().toString());
 
 	}
-	
+
 	@Test
 	public void resolvePredictionLifeCycle() throws JSONException {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
@@ -479,25 +492,23 @@ public class BackendTest extends Thread {
 		System.out.println("Tag Cloud Test Output: " + tester.resolve().toString());
 
 	}
-	
-	
+
 	@Test
 	public void resolveCollaboration() throws JSONException {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
 		new Backend(22, obj1).resolve();
 		obj = new JSONObject();
 		obj.put("Op", "collaboration");
-		//obj.put("Products", "71,74");
-		//obj.put("Services", "69,66");
-		//obj.put("Company", "DESMA");
+		// obj.put("Products", "71,74");
+		// obj.put("Services", "69,66");
+		// obj.put("Company", "DESMA");
 		obj.put("Key", "10");
 		System.out.println(obj.toString());
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
-		
 	}
-	
+
 	@Test
 	public void resolveCollaborationJustCompany() throws JSONException {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
@@ -510,8 +521,8 @@ public class BackendTest extends Thread {
 		tester = new Backend(33, obj);
 		System.out.println("Collaboration Test Output: " + tester.resolve().toString());
 
-		
 	}
+
 	@Test
 	public void resolveGet_user_roles() throws JSONException {
 		obj1 = new JSONObject("{\"Role\":\"DEVELOPER\",\"Op\":\"getrestrictions\",\"Key\":\"10\"}");
@@ -533,17 +544,14 @@ public class BackendTest extends Thread {
 		tester = new Backend(37, obj);
 		System.out.println("Get_user_roles Test Output: " + tester.resolve().toString());
 
-		
 	}
-	
-
 
 	@Test
 	public void multipletests() throws JSONException {
-		for (int i = 0; i < 1000; i++)
-			System.out.println("TEST: "+i+"\n");
+		for (int i = 0; i < 1000; i++) {
+			System.out.println("TEST: " + i + "\n");
 			(new Thread(this)).start();
+		}
 	}
-	
 
 }

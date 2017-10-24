@@ -235,6 +235,10 @@ function connect() {
 			return;
 		}
 
+		if (json[0].Op == "DBLoading") {
+			$('#dbload').show();
+		}
+
 		// If the message contains 'Snapshots', build a dropdown with the
 		// availiable snapshots to be loaded
 		if (json[0] == "Snapshots") {
@@ -325,10 +329,12 @@ function connect() {
 			if (json[1].hasOwnProperty("Error")) {
 				if (json[1].Error == "No_data") {
 					if(!triedwiki){
-						document.getElementById('radio_wiki').checked=true;
-						triedwiki=true;
-						changeRequest('wiki');
-						return;
+							if (json[2].hasOwnProperty('has_wiki') && json[2].has_wiki) {
+							document.getElementById('radio_wiki').checked=true;
+							triedwiki=true;
+							changeRequest('wiki');
+							return;
+						}
 					}
 
 					$('#loading')

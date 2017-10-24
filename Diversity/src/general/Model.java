@@ -1,5 +1,7 @@
 package general;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,15 +9,18 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mysql.fabric.xmlrpc.base.Array;
 import com.sun.media.jfxmedia.logging.Logger;
-
 import monitoring.Monitor;;
 
 // TODO: Auto-generated Javadoc
@@ -24,7 +29,6 @@ import monitoring.Monitor;;
  */
 public final class Model {
 
-	private Connection cnlocal;
 	private long id, pss, design_project;
 	private long frequency, user;
 	private String name, uri, age, gender, products;
@@ -91,14 +95,16 @@ public final class Model {
 	 * @return the JSON array with information if successful or not
 	 * @throws JSONException
 	 *             the JSON exception
+	 * @throws UnsupportedEncodingException 
 	 */
 	public JSONArray add_model(JSONObject msg) throws JSONException {
 		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		name = msg.getString("Name");
-		uri = msg.has("URI") ? msg.getString("URI") : "";
-		pss = Data.identifyPSSbyname(msg.getString("PSS"));
+		name = StringEscapeUtils.escapeHtml4(msg.getString("Name"));
+		uri = msg.has("URI") ? StringEscapeUtils.unescapeHtml4(msg.getString("URI")) : "";
+		//System.out.println(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
+		pss = Data.identifyPSSbyname(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
 		frequency = msg.getInt("Update");
 		archived = msg.getBoolean("Archive");
 		if (msg.has("mediawiki") && msg.getBoolean("mediawiki")) {
@@ -156,7 +162,6 @@ public final class Model {
 		nextupdate = cdate;
 		// age = msg.getString("Age");
 		// gender = msg.getString("Gender");
-		dbconnect();
 
 		String insert = "Insert into " + Settings.lmtable + "(" + Settings.lmtable_name + "," + Settings.lmtable_uri
 				+ "," + Settings.lmtable_pss + "," + Settings.lmtable_update + "," + Settings.lmtable_archived + ","
@@ -166,9 +171,8 @@ public final class Model {
 													 * + "," + Settings.lmtable_age + "," + Settings.lmtable_gender
 													 */
 				+ ") values (?,?,?,?,?,?,?,?,?,?,?"/* ,?,? */ + ")";
-		PreparedStatement query1 = null;
-		try {
-			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cnlocal = Settings.connlocal();
+				PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)) {
 			query1.setString(1, name);
 			query1.setString(2, uri);
 			query1.setLong(3, pss);
@@ -187,38 +191,26 @@ public final class Model {
 			// query1.setString(8, age);
 			// query1.setString(9, gender);
 			query1.executeUpdate();
-			ResultSet generatedKeys = query1.getGeneratedKeys();
+			try(ResultSet generatedKeys = query1.getGeneratedKeys()){
 			if (generatedKeys.next())
 				id = generatedKeys.getLong(1);
 			obj.put("id", id);
+			}
 		} catch (SQLIntegrityConstraintViolationException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.INFO,"Model name Already Exists");
 			obj.put("Op", "Error");
 			obj.put("Message", "Model name Already Exists");
 			result.put(obj);
 			return result;
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LOGGER.log(Level.INFO, "Error adding model to DB");
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+		} catch (ClassNotFoundException e) {
+			LOGGER.log(Level.SEVERE, "No Class Found");
 		}
 
 		obj.put("Op", "Error2");
@@ -263,15 +255,13 @@ public final class Model {
 						: ", " + Settings.lmtable_monitorfinal + "=?, " + Settings.lmtable_uri + "=?, "
 								+ Settings.lmtable_update + "=?, " + Settings.lmtable_add_mediawiki + "=? ")
 				+ "Where " + Settings.lmtable_id + "=? ";
-		PreparedStatement query1 = null;
-		try {
-			dbconnect();
-			query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS);
+		try (Connection cnlocal = Settings.connlocal();
+			PreparedStatement query1 = cnlocal.prepareStatement(insert, PreparedStatement.RETURN_GENERATED_KEYS)){
 			query1.setBoolean(rangeindex++, msg.getBoolean("Archive"));
 
 			if (msg.has("Final_Products")) {
 				if ("".equals(msg.getString("Final_Products"))) {
-					product ="";
+					product = "";
 				} else {
 					for (String a : msg.getString("Final_Products").split(";")) {
 						product += Data.identifyProduct(a) + ",";
@@ -294,28 +284,12 @@ public final class Model {
 			// query1.setString(2, msg.getString("Gender"));
 			// System.out.println(query1);
 			query1.execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException | ClassNotFoundException e) {
+			LOGGER.log(Level.INFO,"Error adding model to DB");
 			obj.put("Op", "Error");
 			obj.put("Message", "Error adding model to DB");
 			result.put(obj);
 			return result;
-		} finally {
-			try {
-				if (query1 != null)
-					query1.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (cnlocal != null)
-
-					cnlocal.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
 		}
 
 		this.uri = uri;
@@ -435,43 +409,31 @@ public final class Model {
 		return this.add_mediawiki;
 	}
 
-	public String getSources(boolean all) {
+	public ArrayList<String> getSources(boolean all) {
 		String[] sources = this.uri.split(";");
-		String result = "";
+		ArrayList<String> result = new ArrayList<>();
+		if("".equals(sources[0])) return result;
 		for (String s : sources) {
-			result += s.split(",")[0] + ",";
+			result.add(s.split(",")[0]);
 		}
 		if (this.add_mediawiki && all) {
-			result += "mediawiki";
-		} else {
-			return result.substring(0, result.length() - 1);
-		}
+			result.add("mediawiki");
+		} 
 		return result;
 	}
 
-	public String getAccounts(boolean all) {
-		String[] sources = this.uri.split(";");
-		String result = "";
-		for (String s : sources) {
+	public ArrayList<String> getAccounts(boolean all) {
+		String[] accounts = this.uri.split(";");
+		ArrayList<String> result = new ArrayList<>();
+		if("".equals(accounts[0])) return result;
+		for (String s : accounts) {
 			String[] temp = s.split(",");
 			if (temp.length > 1)
-				result += s.split(",")[1] + ",";
+				result.add(s.split(",")[1]);
 		}
 		if (this.add_mediawiki && all) {
-			result += "mediawiki";
-		} else {
-			if (!result.isEmpty())
-				return result.substring(0, result.length() - 1);
+			result.add("mediawiki");
 		}
 		return result;
-	}
-
-	private void dbconnect() {
-		try {
-			cnlocal = Settings.connlocal();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 }
