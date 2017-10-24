@@ -96,8 +96,8 @@ public class LoadThreads {
 							query2.setLong(5, post.getViews());
 							query2.setLong(6, opinion.getID());
 							query2.setString(7, post.getUID());
-							query2.setLong(8, post.getLikes());
-							query2.setLong(9, post.getViews());
+							query2.setLong(9, post.getLikes());
+							query2.setLong(8, post.getViews());
 							while (true) {
 								try {
 									query2.executeUpdate();
