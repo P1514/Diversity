@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
@@ -16,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.mysql.fabric.xmlrpc.base.Array;
 import com.sun.media.jfxmedia.logging.Logger;
 import org.apache.commons.text.StringEscapeUtils;
 import monitoring.Monitor;;
@@ -406,33 +408,28 @@ public final class Model {
 		return this.add_mediawiki;
 	}
 
-	public String getSources(boolean all) {
+	public ArrayList<String> getSources(boolean all) {
 		String[] sources = this.uri.split(";");
-		String result = "";
+		ArrayList<String> result = new ArrayList<>();
 		for (String s : sources) {
-			result += s.split(",")[0] + ",";
+			result.add(s.split(",")[0]);
 		}
 		if (this.add_mediawiki && all) {
-			result += "mediawiki";
-		} else {
-			return result.substring(0, result.length() - 1);
-		}
+			result.add("mediawiki");
+		} 
 		return result;
 	}
 
-	public String getAccounts(boolean all) {
+	public ArrayList<String> getAccounts(boolean all) {
 		String[] sources = this.uri.split(";");
-		String result = "";
+		ArrayList<String> result = new ArrayList<>();
 		for (String s : sources) {
 			String[] temp = s.split(",");
 			if (temp.length > 1)
-				result += s.split(",")[1] + ",";
+				result.add(s.split(",")[1]);
 		}
 		if (this.add_mediawiki && all) {
-			result += "mediawiki";
-		} else {
-			if (!result.isEmpty())
-				return result.substring(0, result.length() - 1);
+			result.add("mediawiki");
 		}
 		return result;
 	}

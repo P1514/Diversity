@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
@@ -252,7 +253,16 @@ public class Globalsentiment extends GetReach {
 		 * + 1), data.get(Calendar.YEAR), param, values, id, frequency);
 		 */
 
-		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where source in (?) AND account in (?)";
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where source in (";
+		int sourceaccountlength = model.getSources(false).size();
+		for (int i = 0; i < sourceaccountlength; i++)
+			query += "?,";
+		query = query.substring(0, query.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+		sourceaccountlength = model.getAccounts(false).size();
+		for (int i = 0; i < sourceaccountlength; i++)
+			query += "?,";
+
+		query = query.substring(0, query.length() - 1) + ")";
 		/*
 		 * Calendar data1 = Calendar.getInstance();
 		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000); Calendar
@@ -265,8 +275,13 @@ public class Globalsentiment extends GetReach {
 		 */
 
 		try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			query1.setString(1, model.getSources(false));
-			query1.setString(2, model.getAccounts(false));
+			int rangeindex=1;
+			ArrayList<String> sourceaccount = model.getSources(false);
+			for (int ii = 0; ii < sourceaccount.size(); ii++)
+				query1.setString(rangeindex++, sourceaccount.get(ii));
+			sourceaccount = model.getAccounts(false);
+			for (int ii = 0; ii < sourceaccount.size(); ii++)
+				query1.setString(rangeindex++, sourceaccount.get(ii));
 			// System.out.println("Query:" + query1.toString());
 			// LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
@@ -560,9 +575,18 @@ public class Globalsentiment extends GetReach {
 				+ " sum(case when (" + Settings.lptable_polarity + " >80 AND " + Settings.lptable_polarity
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where "
-				+ Settings.lotable_timestamp + ">? AND " + Settings.lotable_account + " in (?)" + " AND "
-				+ Settings.lotable_source
-				+ " in (?)";/*
+				+ Settings.lotable_timestamp + ">? AND " + Settings.lotable_source + " in (";
+		
+		int sourceaccountlength = model.getSources(false).size();
+		for (int i = 0; i < sourceaccountlength; i++)
+			query += "?,";
+		query = query.substring(0, query.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+		sourceaccountlength = model.getAccounts(false).size();
+		for (int i = 0; i < sourceaccountlength; i++)
+			query += "?,";
+
+		query = query.substring(0, query.length() - 1) + ")";
+		/*
 							 * AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id +
 							 * " from " + Settings.latable; if (par.age != null || par.gender != null ||
 							 * par.location != null) query += " where 1=1 "; if (par.age != null) query +=
@@ -587,8 +611,12 @@ public class Globalsentiment extends GetReach {
 			 * if (par.gender != null) query1.setString(rangeindex++, par.gender); if
 			 * (par.location != null) query1.setString(rangeindex++, par.location);
 			 */
-			query1.setString(rangeindex++, model.getAccounts(false));
-			query1.setString(rangeindex++, model.getSources(false));
+			ArrayList<String> sourceaccount = model.getSources(false);
+			for (int ii = 0; ii < sourceaccount.size(); ii++)
+				query1.setString(rangeindex++, sourceaccount.get(ii));
+			sourceaccount = model.getAccounts(false);
+			for (int ii = 0; ii < sourceaccount.size(); ii++)
+				query1.setString(rangeindex++, sourceaccount.get(ii));
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");

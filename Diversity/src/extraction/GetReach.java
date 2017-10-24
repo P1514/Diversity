@@ -164,8 +164,17 @@ public class GetReach {
 		 * " in (" + model.getProducts() + ")"; } } if (!model.getMediawiki()) insert +=
 		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		 */
-		if (model.getId() != -1 && !wiki)
-			insert += " account in (?) and source in (?)";
+		if (model.getId() != -1 && !wiki) {
+			insert += " source in (";
+			int sourceaccountlength = model.getSources(false).size();
+			for (int i = 0; i < sourceaccountlength; i++)
+				insert += "?,";
+			insert = insert.substring(0, insert.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+			sourceaccountlength = model.getAccounts(false).size();
+			for (int i = 0; i < sourceaccountlength; i++)
+				insert += "?,";
+			insert = insert.substring(0, insert.length() - 1) + ")";
+		}
 		insert += ")";
 		int nmonth = month - 1;
 
@@ -198,8 +207,12 @@ public class GetReach {
 			// query1.setLong(rangeindex++,
 			// Long.valueOf(Data.identifyProduct(par.products)));
 			if (model.getId() != -1 && !wiki) {
-				query1.setString(rangeindex++, model.getAccounts(false));
-				query1.setString(rangeindex++, model.getSources(false));
+				ArrayList<String> sourceaccount = model.getSources(false);
+				for (int ii = 0; ii < sourceaccount.size(); ii++)
+					query1.setString(rangeindex++, sourceaccount.get(ii));
+				sourceaccount = model.getAccounts(false);
+				for (int ii = 0; ii < sourceaccount.size(); ii++)
+					query1.setString(rangeindex++, sourceaccount.get(ii));
 			}
 
 			// LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);

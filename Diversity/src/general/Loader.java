@@ -63,8 +63,10 @@ public class Loader {
 		new Loader().loadPSS();
 	}
 
-	public static synchronized void repeatcomment() {
+	public static synchronized void repeatcomment(long likes, long views) {
 		totalcomments--;
+		totallikes-=likes;
+		totalviews-=views;
 	}
 
 	public static synchronized void repeatpost() {
@@ -938,9 +940,9 @@ public class Loader {
 					}
 				});
 
-				totalcomments += v.newcomments();
-				totallikes += v.newlikes();
-				totalviews += v.newviews();
+				totalcomments += v.ncomments();
+				totallikes += v.nlikes();
+				totalviews += v.nviews();
 			});
 			LOGGER.log(Level.INFO, " update opinions " + (System.nanoTime() - stime));
 			stime = System.nanoTime();

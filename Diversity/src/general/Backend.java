@@ -283,9 +283,9 @@ public class Backend {
 				result.put(mw);
 				
 				JSONObject sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				LOGGER.log(Level.INFO, result.toString());
 				// System.out.println(result.toString());
 				return result.toString();
@@ -593,8 +593,8 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "" );
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty() );
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty()+"");
 				result.put(sn);
 				LOGGER.log(Level.INFO, result.toString());
 
@@ -631,9 +631,9 @@ public class Backend {
 				result.put(mw);
 				
 				sn = new JSONObject();
-				sn.put("has_social", Data.getmodel(id).getAccounts(false) != "");
+				sn.put("has_social", !Data.getmodel(id).getAccounts(false).isEmpty());
 				result.put(sn);
-				LOGGER.log(Level.INFO, Data.getmodel(id).getAccounts(false));
+				LOGGER.log(Level.INFO, !Data.getmodel(id).getAccounts(false).isEmpty() + "");
 				LOGGER.log(Level.INFO, result.toString());
 				return result.toString();
 			/*
@@ -746,10 +746,10 @@ public class Backend {
 					in.close();
 					obj = new JSONObject(response.toString());
 
-					int user = msg.getInt("User");
-					int dp = msg.getInt("design_project");
-					String lat = obj.getString("latitude");
-					String lon = obj.getString("longitude");
+					int user = msg.has("User")?msg.getInt("User"):0;
+					int dp = msg.has("design_project")?msg.getInt("design_project"):0;
+					String lat = obj.has("latitude")?obj.getString("latitude"):"";
+					String lon = obj.has("longitude")?obj.getString("longitude"):"";
 
 					String link = Settings.has_steps_uri;
 

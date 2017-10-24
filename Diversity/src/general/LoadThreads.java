@@ -285,8 +285,6 @@ public class LoadThreads {
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (rs.next()) {
-							if (Loader.first_load)
-								Loader.totalposts--;
 							load(rs, false);
 						}
 					}
@@ -404,9 +402,9 @@ public class LoadThreads {
 					long product;
 					Post _post;
 					if (remote) {
+						message = obj.getString("post");
 						likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
 						views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
-						message = obj.getString("post");
 						/*
 						 * if (product == 0) { rs.close(); stmt.close(); conlocal.close();
 						 * condata.close(); return; }
@@ -417,6 +415,10 @@ public class LoadThreads {
 						views = rs.getLong(Settings.lptable_views);
 						message = rs.getString(Settings.lptable_message);
 						polarity = rs.getLong(Settings.lptable_polarity);
+						Loader.repeatcomment(likes, views);
+						
+						likes = obj.has("mediaSpecificInfo") ? obj.has("likes") ? obj.getLong("likes") : 0 : 0;
+						views = obj.has("mediaSpecificInfo") ? obj.has("views") ? obj.getLong("views") : 0 : 0;
 						_post = new Post(postid, user_id, time, likes, views, message, polarity, source);
 					}
 					product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
@@ -662,8 +664,10 @@ public class LoadThreads {
 										if (!rsnew.next()) {
 											_post = new Post(postid, source, user_id, time, likes, views, message);
 										} else {
-											Loader.repeatcomment();
+											
 											double polarity = rsnew.getDouble(Settings.lptable_polarity);
+											Loader.repeatcomment(rsnew.getLong(Settings.lptable_likes),rsnew.
+													getLong(Settings.lptable_views));
 											_post = new Post(postid, user_id, time, likes, views, message, polarity,
 													source);
 										}
