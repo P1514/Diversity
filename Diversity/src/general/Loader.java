@@ -65,8 +65,11 @@ public class Loader {
 
 	public static synchronized void repeatcomment(long likes, long views) {
 		totalcomments--;
-		totallikes-=likes;
-		totalviews-=views;
+		
+		if (totallikes > 0) {
+			totallikes-=likes;
+			totalviews-=views;
+		}
 	}
 
 	public static synchronized void repeatpost() {
@@ -82,11 +85,15 @@ public class Loader {
 	}
 	
 	private synchronized void incrementViews(long l) {
-		totalviews += l;
+		if (totalposts > 0 || totalcomments > 0) {
+			totalviews += l;
+		}
 	}
 	
 	private synchronized void incrementLikes(long l) {
-		totallikes += l;
+		if (totalposts > 0 || totalcomments > 0) {
+			totallikes += l;
+		}
 	}
 	
 	public String load(JSONArray json) throws JSONException {
