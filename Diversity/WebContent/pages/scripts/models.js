@@ -532,7 +532,8 @@ function addline() {
 
       var tmp = value.split("/dp/");
       //value = tmp[tmp.length - 1];
-      value = value.substring(value.lastIndexOf("/") + 1, value.length);
+      //value = value.substring(value.lastIndexOf("/") + 1, value.length);
+      value = tmp[1].split("/")[0];
     }
   }
 
@@ -570,7 +571,8 @@ function addline2(name, value) {
       name = "Amazon"
       var tmp = value.split("/dp/");
       //value = tmp[tmp.length - 1];
-      value = value.substring(value.lastIndexOf("/") + 1, value.length);
+      //value = value.substring(value.lastIndexOf("/") + 1, value.length);
+      value = tmp[1].split("/")[0];
     }
   }
   $('#table_div2').append(
