@@ -423,7 +423,6 @@ public class LoadThreads {
 					}
 					product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 					name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
-					name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
 					age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
 							? obj.getLong(Settings.JSON_age)
 							: 0;
@@ -683,7 +682,6 @@ public class LoadThreads {
 							}
 
 							String name = obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) + " " : "";
-							name += obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : "";
 							long age = obj.has(Settings.JSON_age) && obj.getString(Settings.JSON_age) != "null"
 									? obj.getLong(Settings.JSON_age)
 									: 0;
