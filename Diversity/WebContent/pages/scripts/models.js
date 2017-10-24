@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "DBLoading") {
 			$('#dbload').show();
 		}
-    
+
     if (json[0].Op == "pss") {
       jsonData = JSON.parse(JSON.stringify(json));
       populatePSS();
@@ -721,7 +721,7 @@ function send_config() {
     "Products" : final_products,
     "Archive" : false,
     "Name" : document.getElementById('model_name').value != "" ? escapeHtml2(document.getElementById('model_name').value) : erro = true,
-    "User" : escapeHtml2(localStorage.user),
+    "User" : escapeHtml2(localStorage.user) != "undefined" ? escapeHtml2(localStorage.user) : undefined,
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),
