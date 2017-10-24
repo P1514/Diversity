@@ -397,13 +397,38 @@ public class GetReach {
 	public long firstDate(long id) {
 		Model model = Data.getmodel(id);
 		long result = 0;
-		String insert = new String("Select min(timestamp) from opinions where pss=?");
-		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+		String insert = "Select min(timestamp) from opinions where ";
+		if (model.getMediawiki()) {
+			insert += "pss=? or ";
+		}
+		ArrayList<String> sources = model.getSources(false);
+		ArrayList<String> accounts = model.getAccounts(false);
+		if (sources.size() != 0) {
+			insert += "( account in (?";
+			for (int i = 1; i < accounts.size(); i++)
+				insert += ",?";
+			insert += ") and source in (?";
+			for (int i = 1; i < sources.size(); i++)
+				insert += ",?";
+			insert += "))";
+		} else {
+			insert += "1=0";
+		}
 
-			query1.setLong(1, model.getPSS());
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
+			int rangeindex = 1;
+			if (model.getMediawiki())
+				query1.setLong(rangeindex++, model.getPSS());
+
+			for (int i = 0; i < accounts.size(); i++)
+				query1.setString(rangeindex++, accounts.get(i));
+			for (int i = 0; i < sources.size(); i++)
+				query1.setString(rangeindex++, sources.get(i));
 
 			try (ResultSet rs = query1.executeQuery()) {
-				rs.next();
+				if (!rs.next())
+					return Calendar.getInstance().getTimeInMillis() * 2;
+
 				if (model.getDate() > rs.getLong(1))
 					result = model.getDate();
 				else

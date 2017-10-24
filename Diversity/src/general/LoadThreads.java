@@ -645,7 +645,7 @@ public class LoadThreads {
 							java.util.Date parsed = format.parse(formatted);
 
 							long postid = reply.getLong(Settings.JSON_postid);
-							String user_id = obj.has(Settings.JSON_userid) ? obj.getString(Settings.JSON_userid) : "";
+							String user_id = reply.has(Settings.JSON_userid) ? reply.getString(Settings.JSON_userid) : "";
 							long time = parsed.getTime();
 							long likes = reply.has("mediaSpecificInfo")
 									? reply.has("likes") ? reply.getLong("likes") : 0

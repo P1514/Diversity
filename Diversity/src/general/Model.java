@@ -411,6 +411,7 @@ public final class Model {
 	public ArrayList<String> getSources(boolean all) {
 		String[] sources = this.uri.split(";");
 		ArrayList<String> result = new ArrayList<>();
+		if("".equals(sources[0])) return result;
 		for (String s : sources) {
 			result.add(s.split(",")[0]);
 		}
@@ -421,9 +422,10 @@ public final class Model {
 	}
 
 	public ArrayList<String> getAccounts(boolean all) {
-		String[] sources = this.uri.split(";");
+		String[] accounts = this.uri.split(";");
 		ArrayList<String> result = new ArrayList<>();
-		for (String s : sources) {
+		if("".equals(accounts[0])) return result;
+		for (String s : accounts) {
 			String[] temp = s.split(",");
 			if (temp.length > 1)
 				result.add(s.split(",")[1]);
