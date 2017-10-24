@@ -721,7 +721,6 @@ function send_config() {
     "Products" : final_products,
     "Archive" : false,
     "Name" : document.getElementById('model_name').value != "" ? escapeHtml2(document.getElementById('model_name').value) : erro = true,
-    "User" : escapeHtml2(localStorage.user),
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),
@@ -729,6 +728,8 @@ function send_config() {
     'design_project' : localStorage.dp
 
   };
+  if(escapeHtml2(localStorage.user)!='undefined')
+  jsonData["User"] = escapeHtml2(localStorage.user);
 
   if (erro == true) {
       var code = 'All fields must be filled. <br><br><button class="btn btn-default" id="ok" onclick="$(\'#overlay\').hide();$(\'#overlay-back\').hide();">OK</button>';
