@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mysql.fabric.xmlrpc.base.Array;
 import com.sun.media.jfxmedia.logging.Logger;
-import org.apache.commons.text.StringEscapeUtils;
 import monitoring.Monitor;;
 
 // TODO: Auto-generated Javadoc
@@ -96,11 +97,11 @@ public final class Model {
 	 *             the JSON exception
 	 * @throws UnsupportedEncodingException 
 	 */
-	public JSONArray add_model(JSONObject msg) throws JSONException, UnsupportedEncodingException {
+	public JSONArray add_model(JSONObject msg) throws JSONException {
 		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		name = StringEscapeUtils.unescapeHtml4(msg.getString("Name"));
+		name = StringEscapeUtils.escapeHtml4(msg.getString("Name"));
 		uri = msg.has("URI") ? StringEscapeUtils.unescapeHtml4(msg.getString("URI")) : "";
 		//System.out.println(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
 		pss = Data.identifyPSSbyname(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
