@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang3.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mysql.fabric.xmlrpc.base.Array;
 import com.sun.media.jfxmedia.logging.Logger;
-import org.apache.commons.text.StringEscapeUtils;
 import monitoring.Monitor;;
 
 // TODO: Auto-generated Javadoc
@@ -96,11 +97,11 @@ public final class Model {
 	 *             the JSON exception
 	 * @throws UnsupportedEncodingException 
 	 */
-	public JSONArray add_model(JSONObject msg) throws JSONException, UnsupportedEncodingException {
+	public JSONArray add_model(JSONObject msg) throws JSONException {
 		// TODO Verify data that exists in sources to be updated
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-		name = StringEscapeUtils.unescapeHtml4(msg.getString("Name"));
+		name = StringEscapeUtils.escapeHtml4(msg.getString("Name"));
 		uri = msg.has("URI") ? StringEscapeUtils.unescapeHtml4(msg.getString("URI")) : "";
 		//System.out.println(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
 		pss = Data.identifyPSSbyname(StringEscapeUtils.unescapeHtml4(msg.getString("PSS")));
@@ -411,6 +412,7 @@ public final class Model {
 	public ArrayList<String> getSources(boolean all) {
 		String[] sources = this.uri.split(";");
 		ArrayList<String> result = new ArrayList<>();
+		if("".equals(sources[0])) return result;
 		for (String s : sources) {
 			result.add(s.split(",")[0]);
 		}
@@ -421,9 +423,10 @@ public final class Model {
 	}
 
 	public ArrayList<String> getAccounts(boolean all) {
-		String[] sources = this.uri.split(";");
+		String[] accounts = this.uri.split(";");
 		ArrayList<String> result = new ArrayList<>();
-		for (String s : sources) {
+		if("".equals(accounts[0])) return result;
+		for (String s : accounts) {
 			String[] temp = s.split(",");
 			if (temp.length > 1)
 				result.add(s.split(",")[1]);
