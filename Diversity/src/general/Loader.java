@@ -32,10 +32,10 @@ public class Loader {
 	private long pausetime = 0;
 	private long new_posts = 0;
 	LoadThreads multiThread = new LoadThreads();
-	static long totalposts;
-	static long totalviews;
-	static long totalcomments;
-	static long totallikes;
+	private static long totalposts;
+	private static long totalviews;
+	private static long totalcomments;
+	private static long totallikes;
 	private Calendar lastUpdated = Calendar.getInstance();
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	// protected ConcurrentHashMap<Long, Author> authordb = new
@@ -65,14 +65,37 @@ public class Loader {
 
 	public static synchronized void repeatcomment(long likes, long views) {
 		totalcomments--;
-		totallikes-=likes;
-		totalviews-=views;
+		
+		if (totallikes > 0) {
+			totallikes-=likes;
+			totalviews-=views;
+		}
 	}
 
 	public static synchronized void repeatpost() {
 		totalposts--;
 	}
 
+	private synchronized void incrementPosts(int amount) {
+		totalposts += amount;
+	}
+	
+	private synchronized void incrementComments(long l) {
+		totalcomments += l;
+	}
+	
+	private synchronized void incrementViews(long l) {
+		if (totalposts > 0 || totalcomments > 0) {
+			totalviews += l;
+		}
+	}
+	
+	private synchronized void incrementLikes(long l) {
+		if (totalposts > 0 || totalcomments > 0) {
+			totallikes += l;
+		}
+	}
+	
 	public String load(JSONArray json) throws JSONException {
 		if (json == null)
 			return null;
@@ -96,6 +119,7 @@ public class Loader {
 			return err;
 		loadtimescalc();
 		first_load = true;
+		System.out.println("Posts: " + totalposts + "\nComments: " + totalcomments + "\nViews: " + totalviews + "\nLikes: " + totallikes);
 		return done;
 
 	}
@@ -940,9 +964,12 @@ public class Loader {
 					}
 				});
 
-				totalcomments += v.ncomments();
-				totallikes += v.nlikes();
-				totalviews += v.nviews();
+//				totalcomments += v.ncomments();
+				incrementComments(v.ncomments());
+//				totallikes += v.nlikes();
+				incrementLikes(v.nlikes());
+//				totalviews += v.nviews();
+				incrementViews(v.nviews());
 			});
 			LOGGER.log(Level.INFO, " update opinions " + (System.nanoTime() - stime));
 			stime = System.nanoTime();
@@ -1076,7 +1103,8 @@ public class Loader {
 			return Backend.error_message(Settings.err_dbconnect).toString();
 
 		}
-		totalposts += opiniondb.size();
+//		totalposts += opiniondb.size();
+		incrementPosts(opiniondb.size());
 		try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 			query1.setLong(1, totalposts);
 			query1.setLong(2, totallikes);
