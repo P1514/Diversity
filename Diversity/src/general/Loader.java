@@ -808,7 +808,7 @@ public class Loader {
 						continue;
 					// System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
-							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : ""),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
 							(obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0),
 							(obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
@@ -827,7 +827,7 @@ public class Loader {
 					System.out.println("SOURCE: " + source1 + "\n");
 
 					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
-							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : ""),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
 							(obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0),
 							(obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));

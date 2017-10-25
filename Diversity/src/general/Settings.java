@@ -188,6 +188,7 @@ public class Settings {
 	public static final String JSON_gender = "gender";
 	public static final String JSON_location = "location";
 	public static final String JSON_fname = "Fname";
+	public static final String JSON_lname = "Lname";
 
 	// Common Repository DB Specs
 	private static final String crdbip = "127.0.0.1";
