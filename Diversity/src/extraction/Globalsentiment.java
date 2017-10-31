@@ -586,37 +586,49 @@ public class Globalsentiment extends GetReach {
 			query += "?,";
 
 		query = query.substring(0, query.length() - 1) + ")";
-		/*
-							 * AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id +
-							 * " from " + Settings.latable; if (par.age != null || par.gender != null ||
-							 * par.location != null) query += " where 1=1 "; if (par.age != null) query +=
-							 * " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?"; if
-							 * (par.gender != null) query += " AND " + Settings.latable_gender + "=?"; if
-							 * (par.location != null) query += " AND " + Settings.latable_location + "=?";
-							 */
-		query += ")";
+		query += " AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id +
+							 " from " + Settings.latable;
+		
+		if (par.age != null || par.gender != null || par.location != null) 
+			query += " where 1=1 "; 
+		if (par.age != null) 
+			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?"; 
+		if (par.gender != null) 
+			query += " AND " + Settings.latable_gender + "=?"; 
+		if (par.location != null) 
+			query += " AND " + Settings.latable_location + "=?";
+							 
+		query += "))";
 
 		try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			// query1.setLong(1, model.getPSS());
+			//query1.setLong(1, model.getPSS());
 			int rangeindex = 1;
-			/*
-			 * if (par.products != null) { query1.setLong(rangeindex++,
-			 * Long.valueOf(Data.identifyProduct(par.products))); }
-			 */
+			
+//			if (par.products != null) { 
+//				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products))); 
+//			}
+			 
 			query1.setLong(rangeindex++, model.getDate());
-			/*
-			 * if (par.age != null) { query1.setString(rangeindex++, par.age.split("-")[1]);
-			 * query1.setString(rangeindex++, par.age.split("-")[0]); }
-			 * 
-			 * if (par.gender != null) query1.setString(rangeindex++, par.gender); if
-			 * (par.location != null) query1.setString(rangeindex++, par.location);
-			 */
+			
+
 			ArrayList<String> sourceaccount = model.getSources(false);
 			for (int ii = 0; ii < sourceaccount.size(); ii++)
 				query1.setString(rangeindex++, sourceaccount.get(ii));
 			sourceaccount = model.getAccounts(false);
 			for (int ii = 0; ii < sourceaccount.size(); ii++)
 				query1.setString(rangeindex++, sourceaccount.get(ii));
+			
+			if (par.age != null) { 
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]); 
+			}
+			 
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender); 
+			if (par.location != null) 
+				query1.setString(rangeindex++, par.location);
+			
+			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return Backend.error_message("No results found");

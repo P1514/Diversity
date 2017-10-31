@@ -246,7 +246,7 @@ public class GetReach {
 			}
 
 			// LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
-			System.out.println(query1.toString());
+//			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
