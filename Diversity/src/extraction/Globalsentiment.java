@@ -728,6 +728,7 @@ public class Globalsentiment extends GetReach {
 					data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
 			if (tempvalue != -1)
 				globalSentiment = tempvalue;
+			Data.delmodel((long) -1);
 		}
 		return globalSentiment;
 

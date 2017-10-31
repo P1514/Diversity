@@ -50,25 +50,29 @@ public class Loader {
 	public static synchronized boolean users_contains(String user_id) {
 		return users.contains(user_id);
 	}
+
 	public static synchronized void users_add(String user_id) {
 		users.add(user_id);
 	}
+
 	public static synchronized boolean users_contains(Author author) {
 		return users2.contains(author);
 	}
+
 	public static synchronized void users_add(Author author) {
 		users2.add(author);
 	}
+
 	public static void requestPSS() {
 		new Loader().loadPSS();
 	}
 
 	public static synchronized void repeatcomment(long likes, long views) {
 		totalcomments--;
-		
+
 		if (totallikes > 0) {
-			totallikes-=likes;
-			totalviews-=views;
+			totallikes -= likes;
+			totalviews -= views;
 		}
 	}
 
@@ -79,23 +83,23 @@ public class Loader {
 	private synchronized void incrementPosts(int amount) {
 		totalposts += amount;
 	}
-	
+
 	private synchronized void incrementComments(long l) {
 		totalcomments += l;
 	}
-	
+
 	private synchronized void incrementViews(long l) {
 		if (totalposts > 0 || totalcomments > 0) {
 			totalviews += l;
 		}
 	}
-	
+
 	private synchronized void incrementLikes(long l) {
 		if (totalposts > 0 || totalcomments > 0) {
 			totallikes += l;
 		}
 	}
-	
+
 	public String load(JSONArray json) throws JSONException {
 		if (json == null)
 			return null;
@@ -119,7 +123,8 @@ public class Loader {
 			return err;
 		loadtimescalc();
 		first_load = true;
-		System.out.println("Posts: " + totalposts + "\nComments: " + totalcomments + "\nViews: " + totalviews + "\nLikes: " + totallikes);
+		System.out.println("Posts: " + totalposts + "\nComments: " + totalcomments + "\nViews: " + totalviews
+				+ "\nLikes: " + totallikes);
 		return done;
 
 	}
@@ -287,7 +292,7 @@ public class Loader {
 		// Fetch local DB models
 		String select = Settings.sqlselectall + Settings.lmtable;
 
-		try (Connection cnlocal = Settings.connlocal();Statement stmt = cnlocal.createStatement()) {
+		try (Connection cnlocal = Settings.connlocal(); Statement stmt = cnlocal.createStatement()) {
 			try (ResultSet rs = stmt.executeQuery(select)) {
 
 				if (rs.next()) {
@@ -331,7 +336,8 @@ public class Loader {
 				select += "?,";
 			select += "?)";
 
-			try (Connection cnlocal = Settings.connlocal();PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement stmt2 = cnlocal.prepareStatement(select)) {
 				for (int i = 0; i < users2.size(); i++) {
 					stmt2.setString(i + 1, querycond.split(",")[i]);
 				}
@@ -802,9 +808,9 @@ public class Loader {
 						continue;
 					// System.out.println("SOURCE: " + source1 + "\n");
 					auth = new Author(obj.getString(Settings.JSON_userid), source1,
-							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
-									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
-							0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+							(obj.has(Settings.JSON_age) ? obj.getInt(Settings.JSON_age) : 0),
+							(obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
 
 					if (!authordb2.containsKey(auth.getID() + "," + auth.getSource()))
@@ -821,11 +827,9 @@ public class Loader {
 					System.out.println("SOURCE: " + source1 + "\n");
 
 					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
-							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")
-									+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
-							/*
-							 * (obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0)
-							 */0, (obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
+							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),
+							(obj.has(Settings.JSON_age) ? obj.getLong(Settings.JSON_age) : 0),
+							(obj.has(Settings.JSON_gender) ? obj.getString(Settings.JSON_gender) : "Unknown"),
 							(obj.has(Settings.JSON_location) ? obj.getString(Settings.JSON_location) : "Unknown"));
 
 					/*
@@ -964,11 +968,11 @@ public class Loader {
 					}
 				});
 
-//				totalcomments += v.ncomments();
+				// totalcomments += v.ncomments();
 				incrementComments(v.ncomments());
-//				totallikes += v.nlikes();
+				// totallikes += v.nlikes();
 				incrementLikes(v.nlikes());
-//				totalviews += v.nviews();
+				// totalviews += v.nviews();
 				incrementViews(v.nviews());
 			});
 			LOGGER.log(Level.INFO, " update opinions " + (System.nanoTime() - stime));
@@ -1103,7 +1107,7 @@ public class Loader {
 			return Backend.error_message(Settings.err_dbconnect).toString();
 
 		}
-//		totalposts += opiniondb.size();
+		// totalposts += opiniondb.size();
 		incrementPosts(opiniondb.size());
 		try (PreparedStatement query1 = cnlocal.prepareStatement(update)) {
 			query1.setLong(1, totalposts);
@@ -1185,7 +1189,7 @@ public class Loader {
 			}
 
 		} catch (SQLException e1) {
-			LOGGER.log(Level.WARNING,"Class:Loader Error 1");
+			LOGGER.log(Level.WARNING, "Class:Loader Error 1");
 			return null;
 		}
 
