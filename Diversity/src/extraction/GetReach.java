@@ -130,7 +130,7 @@ public class GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", " + Settings.lotable + " WHERE "
 				+ Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "." + Settings.lotable_id + "="
 				+ Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? ";/*and "*//*
+				+ " AND opinions.id in (Select opinions.id from opinions,authors where opinions.authors_id = authors.id AND timestamp>? && timestamp<=? ";/*and "*//*
 																										 * &&
 																										 * (" + Settings.lptable + "
 																										 * ." +

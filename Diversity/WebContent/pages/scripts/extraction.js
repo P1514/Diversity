@@ -1487,6 +1487,9 @@ function drawChart() {
 				maxLines : 5,
 				position : 'bottom'
 			},
+			series: {
+
+			},
 			explorer : {
 				axis : 'horizontal',
 				keepInBounds : true,
