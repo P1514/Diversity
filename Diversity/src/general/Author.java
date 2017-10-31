@@ -66,6 +66,7 @@ public final class Author {
 	 */
 	public Author(String _id, String _source, String _name, long _age, String _gender, String _location) {
 		this.id2 = _id;
+		this.name=_name;
 		this.source = _source;
 		this.age = _age;
 		this.gender = _gender;

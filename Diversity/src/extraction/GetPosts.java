@@ -208,7 +208,7 @@ public class GetPosts {
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 				query1.setInt(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
-					rs.next();
+					if(rs.next())
 					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
 							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
 							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
@@ -244,7 +244,7 @@ public class GetPosts {
 			obj = new JSONObject();
 			String[] pre_results = pre_result[i].split(",,");
 			obj.put("Id", pre_results[n++]);
-			if (!wiki) {
+			if (!wiki&&pre_results.length>9) {
 				obj.put("Name", pre_results[n++]);
 				obj.put("Influence", trunc(pre_results[n++]));
 				obj.put("Location", pre_results[n++]);
