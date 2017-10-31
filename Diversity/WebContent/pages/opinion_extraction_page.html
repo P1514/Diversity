@@ -76,7 +76,7 @@ $(document).ready(function(){
 							<th><input type="radio" name="field" id="Age_radio"
 								value="Age" onclick="fixbuttons('Age');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Age"> &nbsp
 									Age </th>
-							<th><input type="radio" name="field" id="Final"
+							<th style="display: none"><input type="radio" name="field" id="Final"
 								value="Final" onclick="fixbuttons('Final');" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Filter the data by Final Product"> &nbsp
 									Final Product </th>
 							<th><input type="radio" name="field" id="Global"
@@ -93,7 +93,7 @@ $(document).ready(function(){
 							<th><select style="margin-left: 0;" id="agefilt" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Select an age segment to display">
 									<option value="All">All Ages
 							</select></th>
-							<th><select style="margin-left: 0;" id="finalfilt" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Select a final product segment to display">
+							<th style="display: none"><select style="margin-left: 0;" id="finalfilt" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Select a final product segment to display">
 									<option value="All">All Products
 							</select></th>
 						</tr>
