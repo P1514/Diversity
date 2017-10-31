@@ -130,7 +130,7 @@ public class GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", " + Settings.lotable + " WHERE "
 				+ Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "." + Settings.lotable_id + "="
 				+ Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? and ";/*
+				+ " AND opinions.id in (Select id from opinions where timestamp>? && timestamp<=? ";/*and "*//*
 																										 * &&
 																										 * (" + Settings.lptable + "
 																										 * ." +
@@ -156,20 +156,47 @@ public class GetReach {
 		 * null) insert += " AND " + Settings.latable + "." + Settings.latable_location
 		 * + "=?";
 		 */
-		/*
-		 * if (!wiki) { if (par.products != null) { if (par.products.equals("-1")) {
+		
+		if (par.age != null) 
+			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + 
+				 Settings.latable + "." + Settings.latable_age + ">?"; 
+		
+		if (par.gender != null) 
+			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?"; 
+		
+		if (par.location !=	 null) 
+			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
+		
+		 /* if (!wiki) { if (par.products != null) { if (par.products.equals("-1")) {
 		 * insert += " AND " + Settings.lotable_product + " in (" + model.getProducts()
 		 * + ")"; } else { insert += " AND " + Settings.lotable_product + "=?"; } } else
 		 * { if (!"polar".equals(type)) insert += " AND " + Settings.lotable_product +
 		 * " in (" + model.getProducts() + ")"; } } if (!model.getMediawiki()) insert +=
 		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		 */
+		
+		if (!wiki) { 
+			if (par.products != null) { 
+				if (par.products.equals("-1") && model.getProducts() != "") {
+					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
+				} else { 
+					insert += " AND " + Settings.lotable_product + "=?"; 
+				} 
+			} else { 
+				if (!"polar".equals(type) && model.getProducts() != "") 
+					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
+			} 
+		} 
+		
+		if (!model.getMediawiki()) {
+			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
+		}
 		if (model.getId() != -1 && !wiki) {
-			insert += " source in (";
+			insert += " AND opinions.source in (";
 			int sourceaccountlength = model.getSources(false).size();
 			for (int i = 0; i < sourceaccountlength; i++)
 				insert += "?,";
-			insert = insert.substring(0, insert.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+			insert = insert.substring(0, insert.length() - 1) + ") AND opinions." + Settings.lotable_account + " in (";
 			sourceaccountlength = model.getAccounts(false).size();
 			for (int i = 0; i < sourceaccountlength; i++)
 				insert += "?,";
@@ -194,18 +221,21 @@ public class GetReach {
 
 			if (wiki || model.getId() == -1)
 				query1.setLong(rangeindex++, model.getPSS());
-			/*
-			 * if (par.age != null) { query1.setString(rangeindex++, par.age.split("-")[1]);
-			 * query1.setString(rangeindex++, par.age.split("-")[0]); } if (par.gender !=
-			 * null) query1.setString(rangeindex++, par.gender); if (par.location != null)
-			 * query1.setString(rangeindex++, par.location); if (par.products != null)
-			 * <<<<<<< HEAD
-			 * 
-			 * 
-			 * ======= >>>>>>> refs/remotes/origin/master
-			 */
-			// query1.setLong(rangeindex++,
-			// Long.valueOf(Data.identifyProduct(par.products)));
+			
+			if (par.age != null) { 
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]); 
+			} 
+			
+			if (par.gender != null) 
+				query1.setString(rangeindex++, par.gender); 
+			
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location); 
+			
+			if (par.products != null)
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			
 			if (model.getId() != -1 && !wiki) {
 				ArrayList<String> sourceaccount = model.getSources(false);
 				for (int ii = 0; ii < sourceaccount.size(); ii++)
@@ -216,6 +246,7 @@ public class GetReach {
 			}
 
 			// LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
+			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -349,7 +380,7 @@ public class GetReach {
 		insert = "SELECT " + Settings.lotable + "." + Settings.lotable_reach + " FROM " + Settings.lptable + ", "
 				+ Settings.lotable + " WHERE " + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND timestamp>? && timestamp<? && opinions.id in (Select id from opinions where ";
+				+ " AND timestamp>? && timestamp<? && opinions.id in (Select opinions.id from opinions,authors where opinions.authors_id = authors.id ";
 
 		return calc_global(false, "reach", insert, par, month, model, year, day, -1);
 

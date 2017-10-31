@@ -389,8 +389,8 @@ public class Globalsentiment extends GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", " + Settings.lotable + " WHERE  "
 				+ Settings.lotable + "." + Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "."
 				+ Settings.lotable_id + "=" + Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND timestamp>? && timestamp<? && opinions.id in  (Select id from opinions where "
-				+ (model.getId() == -1 ? Settings.lotable_pss + "=?" : "");
+				+ " AND timestamp>? && timestamp<? && opinions.id in  (Select opinions.id from opinions,authors where "
+				+ (model.getId() == -1 ? Settings.lotable_pss + "=?" : " opinions.authors_id = authors.id ");
 
 		// LOGGER.log(Level.INFO, "PRE-QUery" + insert);
 		return calc_global(false, "polar", insert, par, month, model, year, day, frequency);
