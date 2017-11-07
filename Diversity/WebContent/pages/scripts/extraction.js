@@ -415,8 +415,8 @@ function connect() {
 			$('#posts tbody').empty();
 			for (var i = 1; i < json.length; i++) {
 				tr = $('<tr/>');
-				tr.append("<td>" + json[i].Name + "</td>");
-				tr.append("<td>" + json[i].Message + "</td>");
+				tr.append("<td>" + json[i].Name.replace(/</g, '&lt;') + "</td>");
+				tr.append("<td>" + json[i].Message.replace(/</g, '&lt;') + "</td>");
 				tr.append("<td>" + json[i].Comments + "</td>");
 				tr.append("<td>" + json[i].Date + "</td>");
 				tr.append("<td>" + json[i].Polarity + "</td>");
