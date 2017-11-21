@@ -175,7 +175,7 @@ public class GetReach {
 		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		 */
 		
-		if (!wiki) { 
+		/*if (!wiki) { 
 			if (par.products != null) { 
 				if (par.products.equals("-1") && model.getProducts() != "") {
 					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
@@ -183,10 +183,10 @@ public class GetReach {
 					insert += " AND " + Settings.lotable_product + "=?"; 
 				} 
 			} else { 
-				if (!"polar".equals(type) && model.getProducts() != "") 
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
+				//if (!"polar".equals(type) && model.getProducts() != "") 
+					//insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
 			} 
-		} 
+		} */
 		
 		if (!model.getMediawiki()) {
 			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
@@ -233,8 +233,8 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location); 
 			
-			if (par.products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			/*if (par.products != null)
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));*/
 			
 			if (model.getId() != -1 && !wiki) {
 				ArrayList<String> sourceaccount = model.getSources(false);
