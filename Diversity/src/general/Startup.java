@@ -44,7 +44,7 @@ public class Startup implements ServletContextListener {
 		Oversight o = new Oversight(true);
 		o.run();
 		running = new Oversight();
-		Connection cnlocal = null;
+		/*Connection cnlocal = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
@@ -69,7 +69,7 @@ public class Startup implements ServletContextListener {
 			 * System.out.println("\n1:"+json.getJSONObject(1).toString()+"\n");
 			 * System.out.println("\n2:"+json.getJSONObject(2).toString()+"\n");
 			 
-			// System.out.println(json.get("id"));*/
+			// System.out.println(json.get("id"));
 		}  catch (Exception e) {
 			// TODO Auto-generated catch block
 			LOGGER.log(Level.SEVERE,"ERROR Database Outdated",e);

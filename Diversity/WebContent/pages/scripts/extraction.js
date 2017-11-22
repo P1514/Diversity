@@ -220,6 +220,7 @@ function connect() {
 			$('#agefilt').hide();
 			$('#locationfilt').hide();
 			$('#finalfilt').hide();
+			$('#extrapolate_label').hide();
 		}
 
 		// If Op is 'Error', display the server message in an overlay window
@@ -1486,6 +1487,9 @@ function drawChart() {
 			legend : {
 				maxLines : 5,
 				position : 'bottom'
+			},
+			series: {
+
 			},
 			explorer : {
 				axis : 'horizontal',

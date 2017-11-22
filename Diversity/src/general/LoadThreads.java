@@ -451,6 +451,7 @@ public class LoadThreads {
 						cnlocal.close();
 				} catch (SQLException | JSONException | ParseException e) {
 					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 3");
+					e.printStackTrace();
 				}
 			}
 		}
