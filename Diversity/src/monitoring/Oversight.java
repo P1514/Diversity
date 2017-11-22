@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.sql.Connection;
 
@@ -39,7 +38,8 @@ public class Oversight extends TimerTask {
 	private Data dat = new Data();
 	private HashMap<String, update> updatelist = new HashMap<String, update>();
 	private String uri = "http://diversity.euprojects.net/";
-	private HashMap<String, url> requesturl = new HashMap<String, url>();
+	private HashMap<String, String> requestAccount = new HashMap<String, String>();
+	private HashMap<String, url> urlAccount = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
 	private static final Logger LOGGER = new Logging().create(Oversight.class.getName());
@@ -90,7 +90,8 @@ public class Oversight extends TimerTask {
 		// static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
 		updatelist = new HashMap<String, update>();
-		requesturl = new HashMap<String, url>();
+		requestAccount = new HashMap<String, String>();
+		urlAccount = new HashMap<String, url>();
 		now = Calendar.getInstance();
 
 		// TODO This is the method that run at 00:00 each 24h to update
@@ -122,7 +123,6 @@ public class Oversight extends TimerTask {
 					// System.out.println("Source: " + a);
 
 					updatelist = new HashMap<String, update>();
-					requesturl = new HashMap<String, url>();
 					try (Connection cnlocal = Settings.connlocal();
 							PreparedStatement query = cnlocal.prepareStatement(getsources)) {
 						query.setLong(1, now.getTimeInMillis());
@@ -166,28 +166,18 @@ public class Oversight extends TimerTask {
 					}
 
 					for (update d : updatelist.values()) {
-						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
-								: new url();
-						try {
-							local.accounts += "&accounts[]="
-									+ URLEncoder.encode(d.account, "UTF-8");
-							local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date + "", "UTF-8") + "&epochsTo[]="
-									+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
-						} catch (UnsupportedEncodingException e) {
-							LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
-							local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
-							local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
-						}
-						requesturl.put(d.pss.toString(), local);
+						url local = new url(d.account, d.date);
+						requestAccount.put(d.pss.toString(), d.account);
+						urlAccount.put(d.account, local);
 						// break;// TO TEST
 					}
 
-					requesturl.forEach((k, v) -> {
+					requestAccount.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
 						// FIX Media Wiki
-						v.accounts += "&accounts[]=mediawiki";
-						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
-
+//						v.accounts += "&accounts[]=mediawiki";
+//						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
+						url currentUrl = urlAccount.get(v);
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
@@ -195,9 +185,12 @@ public class Oversight extends TimerTask {
 							// "/intelligent-search/getFeedback"
 							// + v.epochs.replaceFirst("&", "?") + v.accounts +
 							// "&pssId=\"" + k + "\"";
+							if(!Data.getProduct(prodid).getFinal())
+								continue;
 							String request = "";
+						
 							try {
-								request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
+								request = Settings.JSON_uri + currentUrl.genEpochs().replaceFirst("&", "?") + currentUrl.genAccounts()
 										+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
 										+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
 												+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
@@ -206,6 +199,7 @@ public class Oversight extends TimerTask {
 							} 
 							// request = Settings.JSON_uri;
 							// System.out.println("REQUEST:" + request);
+						
 							try {
 								// System.out.println("TESTE: " +
 								// readUrl(request));
@@ -213,6 +207,8 @@ public class Oversight extends TimerTask {
 								Settings.currentProduct = prodid;
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request)));
+								currentUrl.setDate(Calendar.getInstance().getTimeInMillis());
+								urlAccount.put(v, currentUrl);
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
@@ -226,7 +222,7 @@ public class Oversight extends TimerTask {
 								 * each day Calendar cal=now; for (Model m : Data.modeldb.values()) { if
 								 * (m.getPSS().equals(k)) { cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());
 								 */
-								String[] account = v.accounts.replaceAll("\"", "").replaceFirst("&", "").split("&");
+								String[] account = currentUrl.genAccounts().replaceAll("\"", "").replaceFirst("&", "").split("&");
 								for (int i = 0; i < account.length; i++) {
 									update += " " + Settings.lutable_account + "=? OR";
 								}
@@ -283,8 +279,41 @@ public class Oversight extends TimerTask {
 	}
 
 	private class url {
-		public String accounts = "";
-		public String epochs = "";
+		public String account = "";
+		public Long date;
+		
+		public url(String _account, Long _date) {
+			account= _account;
+			date=_date;
+		}
+		
+		public String getAccount() {
+			return account;
+		}
+		
+		public void setDate(Long date) {
+			this.date = date;
+		}
+		
+		public String genAccounts() {
+			try {
+				return "&accounts[]="
+						+ URLEncoder.encode(account, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+				return "&accounts[]=" + account.replace(" ", "%20");
+			}
+		}
+		
+		public String genEpochs() {
+			try {
+				return "&epochsFrom[]=" + URLEncoder.encode(date + "", "UTF-8") + "&epochsTo[]="
+						+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+				return "&epochsFrom[]=" + date + "&epochsTo[]=" + now.getTimeInMillis();
+			}
+		}
 	}
 
 	private class update {
@@ -292,6 +321,8 @@ public class Oversight extends TimerTask {
 		public Long date;
 		public Long pss;
 	}
+	
+
 
 	public static String readUrl(String urlString) throws Exception {
 		BufferedReader reader = null;
