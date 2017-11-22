@@ -215,7 +215,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(60 * (long) 1000);
+					Thread.sleep(10 * (long) 1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				LOGGER.log(Level.INFO, "Thread Interrupted");
@@ -224,7 +224,7 @@ public class Loader {
 		}
 		pausetime = System.nanoTime() - pausetime;
 		ExecutorService es = Executors.newFixedThreadPool(10);
-		LOGGER.log(Level.INFO, "Finished Waiting for NULLS");
+
 		for (Opinion op : opiniondb.values())
 			es.execute(multiThread.new Topinions(op.getID()));
 		es.shutdown();
@@ -237,7 +237,6 @@ public class Loader {
 		es.shutdown();
 
 		err = awaittermination(es, "posts");
-		LOGGER.log(Level.INFO, "Finished Reimporting");
 		if (err != null)
 			return err;
 
@@ -249,7 +248,7 @@ public class Loader {
 	}
 
 	private boolean finishcalc() {
-		String query = "Select * from " + Settings.lptable + " Where " + Settings.lptable_polarity + " is null or "+ Settings.lptable_polarity + " = -1";
+		String query = "Select * from " + Settings.lptable + " Where " + Settings.lptable_polarity + " is null";
 		boolean done = false;
 
 		try (Connection cnlocal = Settings.connlocal(); Statement st = cnlocal.createStatement()) {
@@ -825,7 +824,7 @@ public class Loader {
 					user1 = obj.getString(Settings.JSON_userid);
 					if (authordb2.containsKey(user1 + "," + source1))
 						continue;
-					//System.out.println("SOURCE: " + source1 + "\n");
+					System.out.println("SOURCE: " + source1 + "\n");
 
 					auth = new Author(obj.getString(Settings.JSON_userid), obj.getString(Settings.JSON_source),
 							(obj.has(Settings.JSON_fname) ? obj.getString(Settings.JSON_fname) : "")+ (obj.has(Settings.JSON_lname) ? obj.getString(Settings.JSON_lname) : ""),

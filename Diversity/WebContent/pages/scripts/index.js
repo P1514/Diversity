@@ -194,7 +194,7 @@ ws.onmessage = function(event) {
   if (json[0].Op == "DBLoading") {
     $('#dbload').show();
   }
-
+  
   if (json[0].Op == 'Models') {
     populatePSS();
     var jsonData = {
@@ -459,36 +459,27 @@ function drawChart() {
  * globaldata.addColumn('number', counter[i].Filter); pssNumber++; } }
  */
   var pssNumber = 0;
-  var check = false;
-  var check2 = false;
   for (var i = 0; i < counter.length; i++) {
     if (counter[i].hasOwnProperty('Filter')) {
       globaldata.addColumn('number', counter[i].Filter);
       pssNumber++;
-    //  if(check2)
-    //    check=true;
     } else {
-  //    if(!check)
-        globaldata.addRow();
-  //    check2=true;
+      globaldata.addRow();
     }
   }
 
   globaldata.addRow();
 
   var column = 0;
-  var j=0;
-  for (var i = 0; i < counter.length - 1; i++) {
+  for (var i = 0; i < counter.length - (pssNumber - 1); i++) {
 
     if (!counter[i].hasOwnProperty('Filter')) {
       var time = counter[i].Date.split(" ");
-      globaldata.setCell(j, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
+      globaldata.setCell(i, 0, new Date(time[1] + "/" + time[0] + "/" + time[2]));
       if (counter[i].Value != -1) {
-        globaldata.setCell(j, column, counter[i].Value);
-        j++;
+        globaldata.setCell(i, column, counter[i].Value);
       }
     } else {
-      j=0;
       column++;
     }
   }

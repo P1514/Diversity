@@ -170,7 +170,7 @@ public class Oversight extends TimerTask {
 								: new url();
 						try {
 							local.accounts += "&accounts[]="
-									+ URLEncoder.encode(d.account, "UTF-8");
+									+ URLEncoder.encode(d.account.replace(" ", "%20"), "UTF-8");
 							local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date + "", "UTF-8") + "&epochsTo[]="
 									+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
 						} catch (UnsupportedEncodingException e) {
