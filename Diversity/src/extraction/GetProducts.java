@@ -40,7 +40,7 @@ public class GetProducts {
 				Product product = Data.getProduct(id);
 				if (!product.getFinal())
 					continue;
-				//if (product.getParent() == 0) {
+				if (product.getParent() == 0) {
 					sub_products.put(new JSONObject().put("Name", product.get_Name()));
 					for (Product product2 : Data.dbproductall()) {
 						if (product2.getParent() == product.get_Id()) {
@@ -58,7 +58,7 @@ public class GetProducts {
 						// to
 						// iterate over everything
 					}
-				//}
+				}
 			}
 			obj.put("Products", sub_products);
 			result.put(obj);

@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (json[0].Op == "DBLoading") {
 			$('#dbload').show();
 		}
-
+    
     if (json[0].Op == "pss") {
       jsonData = JSON.parse(JSON.stringify(json));
       populatePSS();
@@ -532,8 +532,7 @@ function addline() {
 
       var tmp = value.split("/dp/");
       //value = tmp[tmp.length - 1];
-      //value = value.substring(value.lastIndexOf("/") + 1, value.length);
-      value = tmp[1].split("/")[0];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
     }
   }
 
@@ -571,8 +570,7 @@ function addline2(name, value) {
       name = "Amazon"
       var tmp = value.split("/dp/");
       //value = tmp[tmp.length - 1];
-      //value = value.substring(value.lastIndexOf("/") + 1, value.length);
-      value = tmp[1].split("/")[0];
+      value = value.substring(value.lastIndexOf("/") + 1, value.length);
     }
   }
   $('#table_div2').append(
@@ -723,7 +721,6 @@ function send_config() {
     "Products" : final_products,
     "Archive" : false,
     "Name" : document.getElementById('model_name').value != "" ? escapeHtml2(document.getElementById('model_name').value) : erro = true,
-    "User" : escapeHtml2(localStorage.user) != "undefined" ? escapeHtml2(localStorage.user) : undefined,
     "Id":sessionStorage.id,
     "Start_date": document.getElementById('start_date').checked ? document.getElementById('date_input').value :undefined,
     'Key' : getCookie("JSESSIONID"),

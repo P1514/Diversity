@@ -135,34 +135,22 @@ public class Snapshot {
 			b.setMessage(operation, obj);
 			result = b.resolve();
 			create(name, cdate, timespan, user, "all", result, id);
-			
-			obj = new JSONObject(); 
-			obj.put("Id", id); 
-			obj.put("Filter", "Location");
-			b.setMessage(operation, obj); 
-			result = b.resolve(); 
-			create(name, cdate,	timespan, user, "location", result, id);
-			 
-			obj = new JSONObject(); 
-			obj.put("Id", id); 
-			obj.put("Filter", "Gender");
-			b.setMessage(operation, obj); 
-			result = b.resolve(); 
-			create(name, cdate,	timespan, user, "gender", result, id);
-			
-			obj = new JSONObject(); 
-			obj.put("Id", id); 
-			obj.put("Filter", "Age");
-			b.setMessage(operation, obj); 
-			result = b.resolve(); 
-			create(name, cdate, timespan, user, "age", result, id);
-			
-//			obj = new JSONObject(); 
-//			obj.put("Id", id); 
-//			obj.put("Filter", "Product");
-//			b.setMessage(19, obj); 
-//			result = b.resolve();
-			
+			/*
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Location");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "location", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Gender");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "gender", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Age");
+			 * b.setMessage(operation, obj); result = b.resolve(); create(name, cdate,
+			 * timespan, user, "age", result, id);
+			 * 
+			 * obj = new JSONObject(); obj.put("Id", id); obj.put("Filter", "Product");
+			 * b.setMessage(19, obj); result = b.resolve();
+			 */
 			return create(name, cdate, timespan, user, "product", result, id) == true ? "success" : "name_in_use";
 
 		} catch (JSONException e) {

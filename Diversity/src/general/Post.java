@@ -100,7 +100,7 @@ public class Post {
 		this.source = source;
 
 		// To replace with API
-		if ("SIM".equals(source)) {
+		if (Settings.LocalPolarity) {
 			String[] words = message.split("[^\\w'-]+");
 			int count = 0;
 			int sum = 0;
