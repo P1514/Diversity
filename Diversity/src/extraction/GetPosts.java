@@ -60,7 +60,7 @@ public class GetPosts {
 		boolean dateerror = false;
 		result.put(obj);
 		String insert = new String();
-		int[] topid = new int[MAXTOP];
+		Long[] topid = new Long[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);
 		insert = Settings.sqlselect + Settings.lotable_id + " FROM " + Settings.lotable + " where (";
@@ -168,7 +168,7 @@ public class GetPosts {
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {
-					topid[i] = rs.getInt("id");
+					topid[i] = rs.getLong("id");
 					pre_result[i] = topid[i] + ",,";
 					n_tops++;
 				}
@@ -184,7 +184,7 @@ public class GetPosts {
 
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
 						pre_result[i] += rs.getString(Settings.latable_name) + ",,"
@@ -206,7 +206,7 @@ public class GetPosts {
 
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if(rs.next())
 					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
@@ -225,7 +225,7 @@ public class GetPosts {
 
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next())
@@ -281,7 +281,7 @@ public class GetPosts {
 		boolean dateerror = false;
 		result.put(obj);
 		String insert = new String();
-		int[] topid = new int[MAXTOP];
+		Long[] topid = new Long[MAXTOP];
 		int n_tops = 0;
 		// System.out.print("TEST:"+product);´
 
@@ -402,7 +402,7 @@ public class GetPosts {
 			try (ResultSet rs = query1.executeQuery()) {
 
 				for (i = 0; rs.next(); i++) {
-					topid[i] = rs.getInt("id");
+					topid[i] = rs.getLong("id");
 					pre_result[i] = topid[i] + ",,";
 					n_tops++;
 				}
@@ -419,7 +419,7 @@ public class GetPosts {
 
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
 						pre_result[i] += rs.getString(Settings.latable_name) + ",,"
@@ -443,7 +443,7 @@ public class GetPosts {
 
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (!rs.next())
 						continue;
@@ -464,7 +464,7 @@ public class GetPosts {
 				continue;
 			try (Connection cnlocal = Settings.connlocal();
 					PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
-				query1.setInt(1, topid[i]);
+				query1.setLong(1, topid[i]);
 
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next())

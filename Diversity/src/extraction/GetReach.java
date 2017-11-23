@@ -93,6 +93,7 @@ public class GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
+		today.add(Calendar.MONTH,1);
 
 		int avg = 0;
 		double last_value = 0;
@@ -339,8 +340,10 @@ public class GetReach {
 		data.setTimeInMillis(firstDate(id));
 		if (frequency != -1) {
 			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+			today.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		} else {
 			data.add(Calendar.MONTH, 1);
+			today.add(Calendar.MONTH, 1);
 		}
 
 		if (firstDate(id) != 0) {

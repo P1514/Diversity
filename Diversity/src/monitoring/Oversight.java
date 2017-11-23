@@ -211,6 +211,7 @@ public class Oversight extends TimerTask {
 								urlAccount.put(v, currentUrl);
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
+								e.printStackTrace();
 								continue;
 							}
 							String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate

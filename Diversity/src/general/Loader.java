@@ -40,7 +40,7 @@ public class Loader {
 	private Calendar lastUpdated2 = Calendar.getInstance();
 	// protected ConcurrentHashMap<Long, Author> authordb = new
 	// ConcurrentHashMap<>();
-	protected ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
+	protected static ConcurrentHashMap<String, Author> authordb2 = new ConcurrentHashMap<>();
 	static ConcurrentHashMap<Long, Opinion> opiniondb = new ConcurrentHashMap<>();
 	private static final ArrayList<String> users = new ArrayList<String>();
 	private static final ArrayList<Author> users2 = new ArrayList<Author>();
@@ -103,8 +103,8 @@ public class Loader {
 	public String load(JSONArray json) throws JSONException {
 		if (json == null)
 			return null;
-		authordb2 = new ConcurrentHashMap<>();
-		opiniondb = new ConcurrentHashMap<>();
+		authordb2.clear();
+		opiniondb.clear();
 		// TODO protect for empty json
 		// System.out.println("json: " + json.length());
 		starttime = System.nanoTime();
@@ -215,7 +215,7 @@ public class Loader {
 		if (new_posts != 0) {
 			try {
 				do {
-					Thread.sleep(60 * (long) 1000);
+					Thread.sleep(10 * (long) 1000);
 				} while (finishcalc());
 			} catch (InterruptedException e) {
 				LOGGER.log(Level.INFO, "Thread Interrupted");
@@ -725,8 +725,6 @@ public class Loader {
 	private String loaduniqueopinionid(JSONArray json) throws JSONException {
 		String err;
 		// Load Opinions id first
-		if (json == null)
-			return loaduopid();
 
 		ExecutorService es = Executors.newFixedThreadPool(10);
 		for (int i = 0; i < json.length(); i++)
@@ -781,7 +779,7 @@ public class Loader {
 			return err;
 		if (json == null) {
 			// Load users from simulation DB
-			err = loadsimauthors(querycond);
+			//err = loadsimauthors(querycond);
 			if (err != null)
 				return err;
 		} else {
@@ -982,7 +980,7 @@ public class Loader {
 		}
 	}
 
-	private String loadsimauthors(String querycond) throws JSONException {
+	/*private String loadsimauthors(String querycond) throws JSONException {
 
 		String query = (Settings.sqlselectall + Settings.rutable + " where " + Settings.rutable_userid + " in "
 				+ querycond);
@@ -1006,7 +1004,7 @@ public class Loader {
 			return Backend.error_message("Error (2): Remote Database Error\r\n Please check if populated").toString();
 		}
 		return null;
-	}
+	}*/
 
 	private void evaluatedata() {
 		authordb2.forEach((k, v) -> {
@@ -1132,18 +1130,17 @@ public class Loader {
 		return null;
 	}
 
-	private String loaduopid() throws JSONException {
+	/*private String loaduopid() throws JSONException {
 		String err = null;
 		String query = "Select distinct case \r\n when " + Settings.rptable_rpostid + " is null then "
 				+ Settings.rptable_postid + "\r\n when " + Settings.rptable_rpostid + " is not null then "
 				+ Settings.rptable_rpostid + " end as 'ID' from " + Settings.rptable + Settings.sqlwhere
 				+ Settings.ptime + " > \'" + new java.sql.Date(lastUpdated.getTimeInMillis()) + "\' && "
 				+ Settings.ptime + " <= \'" + new java.sql.Date(lastUpdated2.getTimeInMillis()) + "\' ORDER BY ID ASC";
-		Connection cndata = null;
+		
 		Connection cnlocal = null;
 		try {
 			cnlocal = Settings.connlocal();
-			cndata = Settings.conndata();
 		} catch (Exception e1) {
 			LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e1);
 			return Backend.error_message(Settings.err_dbconnect).toString();
@@ -1209,7 +1206,7 @@ public class Loader {
 			}
 		}
 		return err;
-	}
+	}*/
 
 	private String awaittermination(ExecutorService es, String thread) throws JSONException {
 		try {
