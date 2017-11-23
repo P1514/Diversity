@@ -38,7 +38,7 @@ public class Oversight extends TimerTask {
 	private Data dat = new Data();
 	private HashMap<String, update> updatelist = new HashMap<String, update>();
 	private String uri = "http://diversity.euprojects.net/";
-	private HashMap<String, String> requestAccount = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> requestAccount = new HashMap<String, ArrayList<String>>();
 	private HashMap<String, url> urlAccount = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
@@ -90,7 +90,7 @@ public class Oversight extends TimerTask {
 		// static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
 		updatelist = new HashMap<String, update>();
-		requestAccount = new HashMap<String, String>();
+		requestAccount = new HashMap<String, ArrayList<String>>();
 		urlAccount = new HashMap<String, url>();
 		now = Calendar.getInstance();
 
@@ -149,6 +149,7 @@ public class Oversight extends TimerTask {
 											tmp.account = b.split(",")[1];
 											tmp.date = Long.valueOf(date);
 											tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
+											tmp.source = source;
 											updatelist.put(tmp.account, tmp);
 										}
 									}
@@ -166,18 +167,25 @@ public class Oversight extends TimerTask {
 					}
 
 					for (update d : updatelist.values()) {
-						url local = new url(d.account, d.date);
-						requestAccount.put(d.pss.toString(), d.account);
+						url local = new url(d.account, d.date,d.source);
+						if(requestAccount.containsKey(d.pss.toString()))
+							requestAccount.get(d.pss.toString()).add(d.account);
+						else {
+							ArrayList<String> aux =new ArrayList<>();
+							aux.add(d.account);
+						requestAccount.put(d.pss.toString(), aux);
+						}
 						urlAccount.put(d.account, local);
 						// break;// TO TEST
 					}
 
 					requestAccount.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
+						for(String auxAccount : v) {
 						// FIX Media Wiki
 //						v.accounts += "&accounts[]=mediawiki";
 //						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
-						url currentUrl = urlAccount.get(v);
+						url currentUrl = urlAccount.get(auxAccount);
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
@@ -205,56 +213,24 @@ public class Oversight extends TimerTask {
 								// readUrl(request));
 								// request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
+								
+								Calendar updateTime= Calendar.getInstance();
+								
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request)));
-								currentUrl.setDate(Calendar.getInstance().getTimeInMillis());
-								urlAccount.put(v, currentUrl);
+								
+								currentUrl.setDate(updateTime.getTimeInMillis());
+								urlAccount.put(auxAccount, currentUrl);
+								Monitor.updateSource(currentUrl.getSource(), currentUrl.account, updateTime.getTimeInMillis(), Settings.currentPss);
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
 							}
-							String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate
-									+ "=? where (" + Settings.lutable_pss + "=? AND " + Settings.lutable_source
-									+ "=?) AND (";
-							try {
-								/*
-								 * TODO Missing check standard update time update time, currently doing update
-								 * each day Calendar cal=now; for (Model m : Data.modeldb.values()) { if
-								 * (m.getPSS().equals(k)) { cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());
-								 */
-								String[] account = currentUrl.genAccounts().replaceAll("\"", "").replaceFirst("&", "").split("&");
-								for (int i = 0; i < account.length; i++) {
-									update += " " + Settings.lutable_account + "=? OR";
-								}
-								update = update.substring(0, update.length() - 3);
-								update += ")";
-								Calendar cc = (Calendar) now.clone();
-								cc.add(Calendar.DAY_OF_MONTH, 1);
-								try (Connection cnlocal = Settings.connlocal();
-										PreparedStatement query1 = cnlocal.prepareStatement(update)) {
-									query1.setLong(1, now.getTimeInMillis());
-									query1.setString(2, k);
-									query1.setString(3, a.split(";;;")[0]);
-									int i = 4;
-									for (String acc : account) {
-										query1.setString(i++, acc.split("=")[1]);
-									}
-									// System.out.println(query1);
-									query1.execute();
-
-								}
-								/*
-								 * } }
-								 */
-							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
-							}
+							
 						}
+					}
 					});
-
-					// break;// TO TEST
 				}
-				// TODO missing uodate DB
 			} catch (SQLException e) {
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
@@ -279,16 +255,18 @@ public class Oversight extends TimerTask {
 	}
 
 	private class url {
-		public String account = "";
-		public Long date;
+		private String account;
+		private Long date;
+		private String source;
 		
-		public url(String _account, Long _date) {
+		public url(String _account, Long _date, String _source) {
 			account= _account;
 			date=_date;
+			source=_source;
 		}
 		
-		public String getAccount() {
-			return account;
+		public String getSource() {
+			return source;
 		}
 		
 		public void setDate(Long date) {
@@ -320,6 +298,7 @@ public class Oversight extends TimerTask {
 		public String account;
 		public Long date;
 		public Long pss;
+		public String source;
 	}
 	
 
