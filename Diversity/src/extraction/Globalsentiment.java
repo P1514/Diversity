@@ -254,7 +254,7 @@ public class Globalsentiment extends GetReach {
 		 * + 1), data.get(Calendar.YEAR), param, values, id, frequency);
 		 */
 
-		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions, sentimentanalysis.authors where opinions.source in (";
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions left join authors on authors.id=opinions.authors_id where opinions.source in (";
 		int sourceaccountlength = model.getSources(false).size();
 		for (int i = 0; i < sourceaccountlength; i++)
 			query += "?,";
@@ -275,10 +275,6 @@ public class Globalsentiment extends GetReach {
 
 		if (par.location != null)
 			query += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-
-		if (par.gender != null || par.age != null || par.location != null)
-			query += " AND " + Settings.latable + "." + Settings.latable_id + "=" + Settings.lotable + "."
-					+ Settings.lotable_author;
 		/*
 		 * Calendar data1 = Calendar.getInstance();
 		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000); Calendar
@@ -289,7 +285,6 @@ public class Globalsentiment extends GetReach {
 		 * System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(
 		 * Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");
 		 */
-		// Logger.getLogger(Globalsentiment.class.getName()).log(Level.INFO, "New Query "+query);
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(query)) {
 			int rangeindex = 1;
 			ArrayList<String> sourceaccount = model.getSources(false);
