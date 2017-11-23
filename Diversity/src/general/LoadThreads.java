@@ -267,9 +267,10 @@ public class LoadThreads {
 			
 			Loader.authordb2.put(author.getID() + ","+ author.getSource(),author);
 		
-
+			Opinion _op = new Opinion(_post, rs.getLong(Settings.lotable_pss), rs.getLong(Settings.lotable_product), source, account);
+			//_op.setComments(rs.getLong(Settings.lotable_comments));
 			Loader.opiniondb.put(postid,
-					new Opinion(_post, rs.getLong(Settings.lotable_pss), rs.getLong(Settings.lotable_product), source, account));
+					_op);
 
 		}
 
@@ -286,7 +287,7 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account, "
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account,"
 						+ "sentimentanalysis.authors.name, authors.age, authors.gender, authors.influence, authors.comments, authors.likes, "
 						+ "authors.location, authors.posts, authors.views, opinions.product, opinions.pss FROM sentimentanalysis.posts left join (sentimentanalysis.opinions, "
 						+ "sentimentanalysis.authors) on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id and "
@@ -498,10 +499,11 @@ public class LoadThreads {
 							+ "authors.comments, authors.likes, authors.location, authors.posts, authors.views, "
 							+ "opinions.product FROM sentimentanalysis.posts left join (sentimentanalysis.opinions,"
 							+ "sentimentanalysis.authors) on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id "
-							+ "and sentimentanalysis.authors.id =sentimentanalysis.posts.authors_id where sentimentanalysis.posts.id="+id)	){
+							+ "and sentimentanalysis.authors.id =sentimentanalysis.posts.authors_id where sentimentanalysis.posts.opinions_id="+id)	){
 					if(!rs.next()) {
 						throw new SQLException("No data found locally");
 					}
+					do {
 					Long id = rs.getLong(Settings.lptable_id);
 					String source = rs.getString(Settings.lotable_source);
 					String userid = rs.getString(Settings.lptable_authorid);
@@ -516,6 +518,7 @@ public class LoadThreads {
 					Post post = new Post(id, source, userid, (long)0, likes, views, message);
 					post.setPolarity(polarity);
 					_opin.addcomment(post);
+					Loader.opiniondb.put(_opin.getID(), _opin);
 					
 					String name = rs.getString(Settings.latable_name);
 					String gender = rs.getString(Settings.latable_gender);
@@ -524,6 +527,7 @@ public class LoadThreads {
 					Author auth = new Author(userid, source, name, age, gender, location);
 					Loader.authordb2.put(auth.getID() + ","+ auth.getSource(), auth);
 					
+					}while(rs.next());
 					
 					
 				}catch(SQLException | ClassNotFoundException e) {
