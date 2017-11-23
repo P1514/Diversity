@@ -181,11 +181,10 @@ public class Oversight extends TimerTask {
 
 					requestAccount.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
-						for(String auxAccount : v) {
+						
 						// FIX Media Wiki
 //						v.accounts += "&accounts[]=mediawiki";
 //						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
-						url currentUrl = urlAccount.get(auxAccount);
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
@@ -198,10 +197,25 @@ public class Oversight extends TimerTask {
 							String request = "";
 						
 							try {
-								request = Settings.JSON_uri + currentUrl.genEpochs().replaceFirst("&", "?") + currentUrl.genAccounts()
+								request = Settings.JSON_uri;
+								boolean firsttime = true;
+								for(String auxAccount : v) {
+									url currentUrl = urlAccount.get(auxAccount);
+									if(firsttime) {
+									request+=currentUrl.genEpochs().replaceFirst("&", "?") + currentUrl.genAccounts()
+									+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
+									+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
+											+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+									firsttime = false;
+									}
+									else {
+										request+=currentUrl.genEpochs() + currentUrl.genAccounts()
 										+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
 										+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
 												+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+									}
+								}
+								 
 							} catch (NumberFormatException | UnsupportedEncodingException e1) {
 								LOGGER.log(Level.SEVERE, "Unsupported encoding exception");
 							} 
@@ -218,17 +232,19 @@ public class Oversight extends TimerTask {
 								
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request)));
-								
+								for(String auxAccount : v) {
+								url currentUrl = urlAccount.get(auxAccount);
 								currentUrl.setDate(updateTime.getTimeInMillis());
 								urlAccount.put(auxAccount, currentUrl);
 								Monitor.updateSource(currentUrl.getSource(), currentUrl.account, updateTime.getTimeInMillis(), Settings.currentPss);
+								}
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
 								continue;
 							}
 							
 						}
-					}
+					
 					});
 				}
 			} catch (SQLException e) {
