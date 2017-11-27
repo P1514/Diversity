@@ -252,18 +252,25 @@ public class LoadThreads {
 			String message = remote ? rs.getString(Settings.rptable_message) : rs.getString(Settings.lptable_message);
 			String source = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_source);
 			String account = remote ? rs.getString(Settings.latable_source) : rs.getString(Settings.lotable_account);
-			long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
+			/*long product = Settings.JSON_use ? Settings.currentProduct : Data.identifyProduct(message);
 			if (product == 0) {
 				return;
-			}
+			}*/
 			Post _post = remote ? new Post(postid, source, user_id, time, likes, views, message)
 					: new Post(postid, user_id, (long) 0, likes, views, message, polarity, "");
-			if (!(Loader.users_contains(user_id))) {
-				Loader.users_add(user_id);
-			}
-
+			Author author = new Author(rs.getString(Settings.lptable_authorid), source, rs.getString(Settings.latable_name),
+					rs.getInt(Settings.latable_age),rs.getString(Settings.latable_gender), Settings.latable_location);
+			author.setComments(rs.getLong(Settings.latable_comments));
+			author.setLikes(rs.getLong(Settings.latable_likes));
+			author.setPosts(rs.getLong(Settings.latable_posts)-1);
+			author.setViews(rs.getLong(Settings.latable_views));
+			
+			Loader.authordb2.put(author.getID() + ","+ author.getSource(),author);
+		
+			Opinion _op = new Opinion(_post, rs.getLong(Settings.lotable_pss), rs.getLong(Settings.lotable_product), source, account);
+			//_op.setComments(rs.getLong(Settings.lotable_comments));
 			Loader.opiniondb.put(postid,
-					new Opinion(_post, Data.identifyPSSbyproduct(product), product, source, account));
+					_op);
 
 		}
 
@@ -280,8 +287,11 @@ public class LoadThreads {
 					LOGGER.log(Level.SEVERE, Settings.err_dbconnect, e);
 					return;
 				}
-				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account FROM sentimentanalysis.posts left join sentimentanalysis.opinions on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id"
-						+ Settings.sqlwhere + "posts." + Settings.lptable_id + " = " + id);
+				String query = ("SELECT sentimentanalysis.posts.*, sentimentanalysis.opinions.source,sentimentanalysis.opinions.account,"
+						+ "sentimentanalysis.authors.name, authors.age, authors.gender, authors.influence, authors.comments, authors.likes, "
+						+ "authors.location, authors.posts, authors.views, opinions.product, opinions.pss FROM sentimentanalysis.posts left join (sentimentanalysis.opinions, "
+						+ "sentimentanalysis.authors) on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id and "
+						+ "sentimentanalysis.authors.id =sentimentanalysis.posts.authors_id where sentimentanalysis.posts.id=" + id);
 				try (Statement stmt = cnlocal.createStatement()) {
 					try (ResultSet rs = stmt.executeQuery(query)) {
 						if (rs.next()) {
@@ -307,29 +317,7 @@ public class LoadThreads {
 				// FInished load order
 
 				return;
-				// boolean remote = true;
-				// query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere +
-				// Settings.rptable + "."
-				// + Settings.rptable_postid + " = " + id);
-				// // system.out.println(query);
-				// try (Statement stmt = cndata.createStatement()) {
-				// try (ResultSet rs = stmt.executeQuery(query)) {
-				// if (!rs.next()) {
-				// remote = false;
-				// } else {
-				// load(rs, remote);
-				// cndata.close();
-				// }
-				// }
-				// } catch (Exception e) {
-				// LOGGER.log(Level.SEVERE, Settings.err_unknown, e);
-				// try {
-				// cndata.close();
-				// } catch (SQLException e1) {
-				// LOGGER.log(Level.INFO, Settings.err_unknown, e1);
-				// }
-				// return;
-				// }
+				
 			} else
 
 			{
@@ -451,6 +439,7 @@ public class LoadThreads {
 						cnlocal.close();
 				} catch (SQLException | JSONException | ParseException e) {
 					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 3");
+					e.printStackTrace();
 				}
 			}
 		}
@@ -500,118 +489,56 @@ public class LoadThreads {
 		public void run() {
 			if (_opin == null)
 				return;
-			Statement stmt = null;
-			ResultSet rs = null;
-			Connection cndata = null;
-			Connection cnlocal = null;
+			
 			if (obj == null) {
-				try {
-					// //system.out.println("HELLO1");
-					cndata = Settings.conndata();
-					String query = (Settings.sqlselectall + Settings.rptable + Settings.sqlwhere
-							+ Settings.rptable_rpostid + " = " + id);
-					stmt = cndata.createStatement();
-					// //system.out.println(query);
-					rs = stmt.executeQuery(query);
-					if (rs.next()) {
-						do {
-							// //system.out.println("HELLO2");
-							long postid = rs.getLong(Settings.rptable_postid);
-							String user_id = rs.getString(Settings.rptable_userid);
-							long time = 0;
-
-							SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-							java.util.Date date = null;
-							try {
-								date = df.parse(rs.getString(Settings.rptable_date));
-							} catch (ParseException e) {
-								// system.out.print("Error Parsing Date from
-								// Local DB");
-							}
-							time = date.getTime();
-
-							long likes = rs.getLong(Settings.rptable_likes);
-							long views = rs.getLong(Settings.rptable_views);
-							String message = rs.getString(Settings.rptable_message);
-							message = message.trim();
-							if (message.length() <= 1)
-								continue;
-							Post _post = new Post(postid, "", user_id, time, likes, views, message);
-							if (!(Loader.users_contains(user_id))) {
-								Loader.users_add(user_id);
-							}
-							_opin.addcomment(_post);
-						} while (rs.next());
+				try(Connection cnlocal = Settings.connlocal();
+					Statement stmt = cnlocal.createStatement();
+					ResultSet rs = stmt.executeQuery("SELECT sentimentanalysis.posts.*, "
+							+ "sentimentanalysis.opinions.source,sentimentanalysis.opinions.account, "
+							+ "sentimentanalysis.authors.name, authors.age, authors.gender, authors.influence, "
+							+ "authors.comments, authors.likes, authors.location, authors.posts, authors.views, "
+							+ "opinions.product FROM sentimentanalysis.posts left join (sentimentanalysis.opinions,"
+							+ "sentimentanalysis.authors) on sentimentanalysis.posts.opinions_id=sentimentanalysis.opinions.id "
+							+ "and sentimentanalysis.authors.id =sentimentanalysis.posts.authors_id where sentimentanalysis.posts.opinions_id="+id)	){
+					if(!rs.next()) {
+						throw new SQLException("No data found locally");
 					}
-					rs.close();
-					stmt.close();
-					cndata.close();
-					cnlocal = Settings.connlocal();
-					query = (Settings.sqlselectall + Settings.lptable
-							+ " left JOIN  sentimentanalysis.authors ON authors.id=sentimentanalysis.posts.authors_id "
-							+ Settings.sqlwhere + Settings.lptable_opinion + " = " + id);
-					// system.out.println(query);
-					stmt = cnlocal.createStatement();
-					rs = stmt.executeQuery(query);
-					if (rs.next()) {
-						do {
-							// //system.out.println("HELLO3");
-							long postid = rs.getLong(Settings.lptable_id);
-							String user_id = rs.getString(Settings.lptable_authorid);
-							long likes = rs.getLong(Settings.lptable_likes);
-							long views = rs.getLong(Settings.lptable_views);
-							String message = rs.getString(Settings.lptable_message);
-							double polarity = rs.getDouble(Settings.lptable_polarity);
-							String source = rs.getString(Settings.latable_source);
-							Post _post = new Post(postid, user_id, 0, likes, views, message, polarity, source);
-							if (!(Loader.users_contains(user_id)))
-								Loader.users_add(user_id);
-							_opin.addcomment(_post);
-						} while (rs.next());
-					}
-					if (rs != null)
-						rs.close();
-					if (stmt != null)
-						stmt.close();
-					if (cndata != null)
-						cndata.close();
-					if (cnlocal != null)
-						cnlocal.close();
-					Loader.opiniondb.put(id, _opin);
-				} catch (ClassNotFoundException e) {
-					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 4");
-				} catch (SQLException e) {
-					LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 5");
-				} finally {
-					try {
-						if (rs != null)
-							rs.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 6");
-					}
-					try {
-						if (stmt != null)
-							stmt.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 7");
-					}
-					try {
-						if (cndata != null)
-							cndata.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 8");
-					}
-					try {
-						if (cnlocal != null)
-							cnlocal.close();
-
-					} catch (SQLException e) {
-						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 9");
-					}
-
+					do {
+					Long id = rs.getLong(Settings.lptable_id);
+					String source = rs.getString(Settings.lotable_source);
+					String userid = rs.getString(Settings.lptable_authorid);
+					Long likes = rs.getLong(Settings.lptable_likes);
+					Double polarity = rs.getDouble(Settings.lptable_polarity);
+					Long views = rs.getLong(Settings.lptable_views);
+					String message = rs.getString(Settings.lptable_message);
+					
+					
+					
+					
+					Post post = new Post(id, source, userid, (long)0, likes, views, message);
+					post.setPolarity(polarity);
+					_opin.addcomment(post);
+					Loader.opiniondb.put(_opin.getID(), _opin);
+					
+					String name = rs.getString(Settings.latable_name);
+					String gender = rs.getString(Settings.latable_gender);
+					String location = rs.getString(Settings.latable_location);
+					int age = rs.getInt(Settings.latable_age);
+					Author auth = new Author(userid, source, name, age, gender, location);
+					Loader.authordb2.put(auth.getID() + ","+ auth.getSource(), auth);
+					
+					}while(rs.next());
+					
+					
+				}catch(SQLException | ClassNotFoundException e) {
+					LOGGER.log(Level.SEVERE, "ERROR on TPOST DB Connection "+ e.getMessage());
+					
 				}
 
 			} else {
+				Statement stmt = null;
+				ResultSet rs = null;
+				Connection cnlocal = null;
 				try {
 
 					if (obj.has(Settings.JSON_replies) || obj.has("Replies")) {
@@ -718,12 +645,6 @@ public class LoadThreads {
 							stmt.close();
 					} catch (Exception e) {
 						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 12");
-					}
-					try {
-						if (cndata != null)
-							cndata.close();
-					} catch (Exception e) {
-						LOGGER.log(Level.WARNING, "Class:LoadThreads ERROR 13");
 					}
 					try {
 						if (cnlocal != null)

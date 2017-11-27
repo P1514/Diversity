@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.sql.Connection;
 
@@ -39,7 +38,8 @@ public class Oversight extends TimerTask {
 	private Data dat = new Data();
 	private HashMap<String, update> updatelist = new HashMap<String, update>();
 	private String uri = "http://diversity.euprojects.net/";
-	private HashMap<String, url> requesturl = new HashMap<String, url>();
+	private HashMap<String, ArrayList<String>> requestAccount = new HashMap<String, ArrayList<String>>();
+	private HashMap<String, url> urlAccount = new HashMap<String, url>();
 	private Calendar now = Calendar.getInstance();
 	private boolean local = Settings.JSON_use;
 	private static final Logger LOGGER = new Logging().create(Oversight.class.getName());
@@ -90,7 +90,8 @@ public class Oversight extends TimerTask {
 		// static hashmaps on Data Class
 		sourcelist = new ArrayList<String>();
 		updatelist = new HashMap<String, update>();
-		requesturl = new HashMap<String, url>();
+		requestAccount = new HashMap<String, ArrayList<String>>();
+		urlAccount = new HashMap<String, url>();
 		now = Calendar.getInstance();
 
 		// TODO This is the method that run at 00:00 each 24h to update
@@ -122,7 +123,6 @@ public class Oversight extends TimerTask {
 					// System.out.println("Source: " + a);
 
 					updatelist = new HashMap<String, update>();
-					requesturl = new HashMap<String, url>();
 					try (Connection cnlocal = Settings.connlocal();
 							PreparedStatement query = cnlocal.prepareStatement(getsources)) {
 						query.setLong(1, now.getTimeInMillis());
@@ -149,6 +149,7 @@ public class Oversight extends TimerTask {
 											tmp.account = b.split(",")[1];
 											tmp.date = Long.valueOf(date);
 											tmp.pss = Long.valueOf(rs.getString(Settings.lmtable_pss));
+											tmp.source = source;
 											updatelist.put(tmp.account, tmp);
 										}
 									}
@@ -166,28 +167,24 @@ public class Oversight extends TimerTask {
 					}
 
 					for (update d : updatelist.values()) {
-						url local = requesturl.containsKey(d.pss.toString()) ? requesturl.get(d.pss.toString())
-								: new url();
-						try {
-							local.accounts += "&accounts[]="
-									+ URLEncoder.encode(d.account, "UTF-8");
-							local.epochs += "&epochsFrom[]=" + URLEncoder.encode(d.date + "", "UTF-8") + "&epochsTo[]="
-									+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
-						} catch (UnsupportedEncodingException e) {
-							LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
-							local.accounts += "&accounts[]=" + d.account.replace(" ", "%20");
-							local.epochs += "&epochsFrom[]=" + d.date + "&epochsTo[]=" + now.getTimeInMillis();
+						url local = new url(d.account, d.date,d.source);
+						if(requestAccount.containsKey(d.pss.toString()))
+							requestAccount.get(d.pss.toString()).add(d.account);
+						else {
+							ArrayList<String> aux =new ArrayList<>();
+							aux.add(d.account);
+						requestAccount.put(d.pss.toString(), aux);
 						}
-						requesturl.put(d.pss.toString(), local);
+						urlAccount.put(d.account, local);
 						// break;// TO TEST
 					}
 
-					requesturl.forEach((k, v) -> {
+					requestAccount.forEach((k, v) -> {
 						Settings.currentPss = Long.parseLong(k);
+						
 						// FIX Media Wiki
-						v.accounts += "&accounts[]=mediawiki";
-						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
-
+//						v.accounts += "&accounts[]=mediawiki";
+//						v.epochs += "&epochsFrom[]=1&epochsTo[]=1507376292000";
 						ArrayList<Long> products = Data.getpss(Settings.currentPss).get_products();
 						for (Long prodid : products) {
 							// String request = uri +
@@ -195,70 +192,62 @@ public class Oversight extends TimerTask {
 							// "/intelligent-search/getFeedback"
 							// + v.epochs.replaceFirst("&", "?") + v.accounts +
 							// "&pssId=\"" + k + "\"";
+							if(!Data.getProduct(prodid).getFinal())
+								continue;
 							String request = "";
+						
 							try {
-								request = Settings.JSON_uri + v.epochs.replaceFirst("&", "?") + v.accounts
+								request = Settings.JSON_uri;
+								boolean firsttime = true;
+								for(String auxAccount : v) {
+									url currentUrl = urlAccount.get(auxAccount);
+									if(firsttime) {
+									request+=currentUrl.genEpochs().replaceFirst("&", "?") + currentUrl.genAccounts()
+									+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
+									+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
+											+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+									firsttime = false;
+									}
+									else {
+										request+=currentUrl.genEpochs() + currentUrl.genAccounts()
 										+ "&pssId=" + URLEncoder.encode("" +k,"UTF-8") + "&pssName=" + URLEncoder.encode(Data.getpss(Long.parseLong(k)).getName(),"UTF-8")
 										+ (Data.getProduct(prodid).getFinal() ? "&finalProductId=" + URLEncoder.encode(""+prodid,"UTF-8")
 												+ "&finalProductName=" + URLEncoder.encode(Data.getProduct(prodid).get_Name(),"UTF-8") : "");
+									}
+								}
+								 
 							} catch (NumberFormatException | UnsupportedEncodingException e1) {
 								LOGGER.log(Level.SEVERE, "Unsupported encoding exception");
 							} 
 							// request = Settings.JSON_uri;
 							// System.out.println("REQUEST:" + request);
+						
 							try {
 								// System.out.println("TESTE: " +
 								// readUrl(request));
 								// request = request.replaceAll(" ", "%20");
 								Settings.currentProduct = prodid;
+								
+								Calendar updateTime= Calendar.getInstance();
+								
 								LOGGER.log(Level.INFO, "URL TO REQUEST" + request);
 								(new Loader()).load(new JSONArray(readUrl(request)));
+								for(String auxAccount : v) {
+								url currentUrl = urlAccount.get(auxAccount);
+								currentUrl.setDate(updateTime.getTimeInMillis());
+								urlAccount.put(auxAccount, currentUrl);
+								Monitor.updateSource(currentUrl.getSource(), currentUrl.account, updateTime.getTimeInMillis(), Settings.currentPss);
+								}
 							} catch (Exception e) {
 								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH");
+								e.printStackTrace();
 								continue;
 							}
-							String update = "Update " + Settings.lutable + " SET " + Settings.lutable_lastupdate
-									+ "=? where (" + Settings.lutable_pss + "=? AND " + Settings.lutable_source
-									+ "=?) AND (";
-							try {
-								/*
-								 * TODO Missing check standard update time update time, currently doing update
-								 * each day Calendar cal=now; for (Model m : Data.modeldb.values()) { if
-								 * (m.getPSS().equals(k)) { cal.add(Calendar.DAY_OF_MONTH, m.getFrequency());
-								 */
-								String[] account = v.accounts.replaceAll("\"", "").replaceFirst("&", "").split("&");
-								for (int i = 0; i < account.length; i++) {
-									update += " " + Settings.lutable_account + "=? OR";
-								}
-								update = update.substring(0, update.length() - 3);
-								update += ")";
-								Calendar cc = (Calendar) now.clone();
-								cc.add(Calendar.DAY_OF_MONTH, 1);
-								try (Connection cnlocal = Settings.connlocal();
-										PreparedStatement query1 = cnlocal.prepareStatement(update)) {
-									query1.setLong(1, now.getTimeInMillis());
-									query1.setString(2, k);
-									query1.setString(3, a.split(";;;")[0]);
-									int i = 4;
-									for (String acc : account) {
-										query1.setString(i++, acc.split("=")[1]);
-									}
-									// System.out.println(query1);
-									query1.execute();
-
-								}
-								/*
-								 * } }
-								 */
-							} catch (Exception e) {
-								LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
-							}
+							
 						}
+					
 					});
-
-					// break;// TO TEST
 				}
-				// TODO missing uodate DB
 			} catch (SQLException e) {
 				LOGGER.log(Level.SEVERE, "ERROR ON JSON OVERWATCH", e);
 			}
@@ -283,15 +272,53 @@ public class Oversight extends TimerTask {
 	}
 
 	private class url {
-		public String accounts = "";
-		public String epochs = "";
+		private String account;
+		private Long date;
+		private String source;
+		
+		public url(String _account, Long _date, String _source) {
+			account= _account;
+			date=_date;
+			source=_source;
+		}
+		
+		public String getSource() {
+			return source;
+		}
+		
+		public void setDate(Long date) {
+			this.date = date;
+		}
+		
+		public String genAccounts() {
+			try {
+				return "&accounts[]="
+						+ URLEncoder.encode(account, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+				return "&accounts[]=" + account.replace(" ", "%20");
+			}
+		}
+		
+		public String genEpochs() {
+			try {
+				return "&epochsFrom[]=" + URLEncoder.encode(date + "", "UTF-8") + "&epochsTo[]="
+						+ URLEncoder.encode(now.getTimeInMillis() + "", "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				LOGGER.log(Level.INFO, "ERROR ENCONDING URL - Trying Unencoded");
+				return "&epochsFrom[]=" + date + "&epochsTo[]=" + now.getTimeInMillis();
+			}
+		}
 	}
 
 	private class update {
 		public String account;
 		public Long date;
 		public Long pss;
+		public String source;
 	}
+	
+
 
 	public static String readUrl(String urlString) throws Exception {
 		BufferedReader reader = null;

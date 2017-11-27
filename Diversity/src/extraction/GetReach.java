@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.glassfish.jersey.internal.util.collection.Values;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.mysql.fabric.xmlrpc.base.Value;
 
 import general.Data;
 import general.Logging;
@@ -90,6 +93,7 @@ public class GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
+		today.add(Calendar.MONTH,1);
 
 		int avg = 0;
 		double last_value = 0;
@@ -175,7 +179,7 @@ public class GetReach {
 		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		 */
 		
-		if (!wiki) { 
+		/*if (!wiki) { 
 			if (par.products != null) { 
 				if (par.products.equals("-1") && model.getProducts() != "") {
 					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
@@ -183,10 +187,10 @@ public class GetReach {
 					insert += " AND " + Settings.lotable_product + "=?"; 
 				} 
 			} else { 
-				if (!"polar".equals(type) && model.getProducts() != "") 
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
+				//if (!"polar".equals(type) && model.getProducts() != "") 
+					//insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
 			} 
-		} 
+		} */
 		
 		if (!model.getMediawiki()) {
 			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
@@ -233,8 +237,8 @@ public class GetReach {
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location); 
 			
-			if (par.products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));
+			/*if (par.products != null)
+				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));*/
 			
 			if (model.getId() != -1 && !wiki) {
 				ArrayList<String> sourceaccount = model.getSources(false);
@@ -336,8 +340,10 @@ public class GetReach {
 		data.setTimeInMillis(firstDate(id));
 		if (frequency != -1) {
 			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+			today.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		} else {
 			data.add(Calendar.MONTH, 1);
+			today.add(Calendar.MONTH, 1);
 		}
 
 		if (firstDate(id) != 0) {
@@ -394,7 +400,7 @@ public class GetReach {
 	}
 
 	protected static parameters split_params(String param, String value) {
-		if (param == null)
+		if (param == null|| value==null)
 			return new parameters();
 		String[] params = param.split(",");
 		String[] values = value.split(",");

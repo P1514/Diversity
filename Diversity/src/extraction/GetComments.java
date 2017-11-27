@@ -54,7 +54,7 @@ public class GetComments {
 
 	public JSONArray getAll(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
-		String[] preresult = new String[50];
+		String[] preresult = new String[10000];
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "comments");
 		result.put(obj);
@@ -70,7 +70,7 @@ public class GetComments {
 
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, msg.getString("Values"));
-			query1.setInt(2, msg.getInt("Values"));
+			query1.setLong(2, msg.getLong("Values"));
 
 			try (ResultSet rs = query1.executeQuery()) {
 

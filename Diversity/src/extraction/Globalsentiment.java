@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import extraction.GetReach.parameters;
 import general.Backend;
 import general.Data;
 import general.Logging;
@@ -134,8 +135,8 @@ public class Globalsentiment extends GetReach {
 	public String globalsentiment() {
 
 		String select = "Select * from " + Settings.lrtable;
-		
-		try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(select)) {
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
 					String output = rs.getString(1);
@@ -253,16 +254,27 @@ public class Globalsentiment extends GetReach {
 		 * + 1), data.get(Calendar.YEAR), param, values, id, frequency);
 		 */
 
-		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions where source in (";
+		String query = "SELECT sum(polarity*reach)/sum(reach) FROM sentimentanalysis.opinions left join authors on authors.id=opinions.authors_id where opinions.source in (";
 		int sourceaccountlength = model.getSources(false).size();
 		for (int i = 0; i < sourceaccountlength; i++)
 			query += "?,";
-		query = query.substring(0, query.length() - 1) + ") AND " + Settings.lotable_account + " in (";
+		query = query.substring(0, query.length() - 1) + ") AND " + Settings.lotable + "." + Settings.lotable_account
+				+ " in (";
 		sourceaccountlength = model.getAccounts(false).size();
 		for (int i = 0; i < sourceaccountlength; i++)
 			query += "?,";
 
 		query = query.substring(0, query.length() - 1) + ")";
+		parameters par = split_params(param, values);
+		if (par.age != null)
+			query += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
+					+ Settings.latable_age + ">?";
+
+		if (par.gender != null)
+			query += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
+
+		if (par.location != null)
+			query += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
 		/*
 		 * Calendar data1 = Calendar.getInstance();
 		 * data1.setTimeInMillis(model.getLastUpdate()-frequency*86400000); Calendar
@@ -273,9 +285,8 @@ public class Globalsentiment extends GetReach {
 		 * System.out.println(data2.get(Calendar.DAY_OF_MONTH)+"-"+(data2.get(
 		 * Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");
 		 */
-
-		try (Connection cnlocal=Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			int rangeindex=1;
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+			int rangeindex = 1;
 			ArrayList<String> sourceaccount = model.getSources(false);
 			for (int ii = 0; ii < sourceaccount.size(); ii++)
 				query1.setString(rangeindex++, sourceaccount.get(ii));
@@ -285,14 +296,24 @@ public class Globalsentiment extends GetReach {
 			// System.out.println("Query:" + query1.toString());
 			// LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
+			if (par.age != null) {
+				query1.setString(rangeindex++, par.age.split("-")[1]);
+				query1.setString(rangeindex++, par.age.split("-")[0]);
+			}
+
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+
+			if (par.location != null)
+				query1.setString(rangeindex++, par.location);
 
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next()) {
-					globalSentiment = getLastSentiment(model);
+					globalSentiment = getLastSentiment(model, param, values);
 				} else if (rs.getDouble(1) != 0)
 					globalSentiment = rs.getDouble(1);
 				else
-					globalSentiment = getLastSentiment(model);
+					globalSentiment = getLastSentiment(model, param, values);
 			}
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "Error", e);
@@ -347,7 +368,7 @@ public class Globalsentiment extends GetReach {
 		 * Calendar.MONTH)+1)+"-"+data2.get(Calendar.YEAR)+"\n");
 		 */
 
-		try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(query)) {
 			query1.setLong(1, model.getPSS());
 			LOGGER.log(Level.SEVERE, "Query:" + query1.toString());
 			// obj.put("query", query1.toString());
@@ -576,7 +597,7 @@ public class Globalsentiment extends GetReach {
 				+ "<=100) then 1 else 0 end) '++' " + "from " + Settings.lptable + " where " + Settings.lptable_opinion
 				+ " in (Select " + Settings.lotable_id + " from " + Settings.lotable + " where "
 				+ Settings.lotable_timestamp + ">? AND " + Settings.lotable_source + " in (";
-		
+
 		int sourceaccountlength = model.getSources(false).size();
 		for (int i = 0; i < sourceaccountlength; i++)
 			query += "?,";
@@ -586,30 +607,30 @@ public class Globalsentiment extends GetReach {
 			query += "?,";
 
 		query = query.substring(0, query.length() - 1) + ")";
-		query += " AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id +
-							 " from " + Settings.latable;
-		
-		if (par.age != null || par.gender != null || par.location != null) 
-			query += " where 1=1 "; 
-		if (par.age != null) 
-			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?"; 
-		if (par.gender != null) 
-			query += " AND " + Settings.latable_gender + "=?"; 
-		if (par.location != null) 
+		query += " AND " + Settings.lptable_authorid + " in (Select " + Settings.latable_id + " from "
+				+ Settings.latable;
+
+		if (par.age != null || par.gender != null || par.location != null)
+			query += " where 1=1 ";
+		if (par.age != null)
+			query += " AND " + Settings.latable_age + "<=? AND " + Settings.latable_age + ">?";
+		if (par.gender != null)
+			query += " AND " + Settings.latable_gender + "=?";
+		if (par.location != null)
 			query += " AND " + Settings.latable_location + "=?";
-							 
+
 		query += "))";
 
-		try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
-			//query1.setLong(1, model.getPSS());
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+			// query1.setLong(1, model.getPSS());
 			int rangeindex = 1;
-			
-//			if (par.products != null) { 
-//				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products))); 
-//			}
-			 
+
+			// if (par.products != null) {
+			// query1.setLong(rangeindex++,
+			// Long.valueOf(Data.identifyProduct(par.products)));
+			// }
+
 			query1.setLong(rangeindex++, model.getDate());
-			
 
 			ArrayList<String> sourceaccount = model.getSources(false);
 			for (int ii = 0; ii < sourceaccount.size(); ii++)
@@ -617,17 +638,17 @@ public class Globalsentiment extends GetReach {
 			sourceaccount = model.getAccounts(false);
 			for (int ii = 0; ii < sourceaccount.size(); ii++)
 				query1.setString(rangeindex++, sourceaccount.get(ii));
-			
-			if (par.age != null) { 
+
+			if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
-				query1.setString(rangeindex++, par.age.split("-")[0]); 
+				query1.setString(rangeindex++, par.age.split("-")[0]);
 			}
-			 
+
 			if (par.gender != null)
-				query1.setString(rangeindex++, par.gender); 
-			if (par.location != null) 
+				query1.setString(rangeindex++, par.gender);
+			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
-			
+
 			System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
@@ -683,8 +704,8 @@ public class Globalsentiment extends GetReach {
 				+ "=?" + " AND " + Settings.lotable_timestamp + ">? ";
 		// query += ")";
 		query += "and opinions.source like 'mediawiki')";
-		
-		try (Connection cnlocal = Settings.connlocal();PreparedStatement query1 = cnlocal.prepareStatement(query)) {
+
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(query)) {
 			query1.setLong(1, model.getPSS());
 			int rangeindex = 2;
 			query1.setLong(rangeindex++, model.getDate());
@@ -723,7 +744,7 @@ public class Globalsentiment extends GetReach {
 
 	}
 
-	private Double getLastSentiment(Model model) {
+	private Double getLastSentiment(Model model, String param, String values) {
 		int month;
 		double tempvalue, globalSentiment = 0;
 		Calendar today = Calendar.getInstance();
@@ -737,7 +758,7 @@ public class Globalsentiment extends GetReach {
 			Data.addmodel((long) -1,
 					new Model(-1, 0, 0, "", "", model.getPSS(), "0,150", "All", "-1", false, 0, 0, -1, true));
 			tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
-					data.get(Calendar.YEAR) + month / 12, "Global", "", (long) -1, -1);
+					data.get(Calendar.YEAR) + month / 12, param, values, (long) -1, -1);
 			if (tempvalue != -1)
 				globalSentiment = tempvalue;
 			Data.delmodel((long) -1);
