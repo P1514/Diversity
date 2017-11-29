@@ -223,4 +223,9 @@ public class Post {
 		return source;
 	}
 
+	public void setNewstatus() {
+		this.time=1;
+		
+	}
+
 }
