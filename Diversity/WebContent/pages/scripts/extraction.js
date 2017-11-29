@@ -150,9 +150,10 @@ function getPosts() {
 			'Key' : getCookie("JSESSIONID"),
 			"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 		}
-
+		
 		ws.send(JSON.stringify(json));
 	}
+	$('#sel_word').html('');
 }
 
 /*
@@ -823,13 +824,17 @@ function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
 	var avg_frequency=0;
-	for(var i=0; i < words.length;i++){
+	var range = words.length;
+	if (range > 40) {
+		range = 40;
+	}
+	for(var i=0; i < range;i++){
 		avg_frequency+=words[i].frequency;
 	}
 	avg_frequency = avg_frequency/words.length;
 
 
-	for (var i = 0; i < words.length; i++) {
+	for (var i = 0; i < range; i++) {
 		if(words[i].frequency < avg_frequency) continue;
 		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
 				+ '");\' rel=' + words[i].frequency + '>' + words[i].word
@@ -872,6 +877,7 @@ function tagClick(word) {
 		'Key' : getCookie("JSESSIONID")
 	}
 	refreshTag = false;
+	$('#sel_word').html("Selected word: " + word + ".");
 	ws.send(JSON.stringify(json));
 }
 
