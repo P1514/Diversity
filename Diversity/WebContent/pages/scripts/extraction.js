@@ -836,9 +836,12 @@ function makeCloud(words) {
 
 	for (var i = 0; i < range; i++) {
 		if(words[i].frequency < avg_frequency) continue;
-		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
-				+ '");\' rel=' + words[i].frequency + '>' + words[i].word
-				+ '</a>';
+		
+		if (words[i].word != '') {
+			str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
+					+ '");\' rel=' + words[i].frequency + '>' + words[i].word
+					+ '</a>';
+		}
 		if (word_counter > 5) {
 			str += "<br>"
 			word_counter = 0;
