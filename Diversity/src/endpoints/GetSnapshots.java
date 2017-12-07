@@ -71,6 +71,7 @@ public class GetSnapshots {
 			StringBuilder bld = new StringBuilder();
 			for (int i = 0; i < snapshots.length(); i++) {
 				obj = snapshots.getJSONObject(i);
+				bld.delete(0, bld.length());
 				if (obj.has("Type") && obj.getString("Type").equals("prediction")) {
 					bld.append(urlPred);
 				} else {

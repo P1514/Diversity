@@ -165,6 +165,8 @@ public class Settings {
 //	public static final String JSON_uri = "http://localhost:8080/SimInterface/endpoints/getSimulatedData";
 	public static final String register_uri = "http://localhost:8080/SimInterface/endpoints/registerSFE";
 	public static final String JSON_uri = "http://localhost:8080/SimInterface/endpoints/getSimulatedData";
+	//public static final String register_uri = "https://diversity.euprojects.net/socialfeedbackextraction/registerSFE";
+	//public static final String JSON_uri = "http://opennebula.euprojects.net/intelligent-search/getFeedback";
 	public static final String collaboration_uri = "https://diversity.euprojects.net/collaborationTool/suggestions";
 	public static final String has_steps_uri = "https://diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=REPLACE_USER&design_project_id=REPLACE_DP&status=1&lat=REPLACE_LATITUDE&lng=REPLACE_LONGITUDE";
 	public static final String geoip_uri = "https://freegeoip.net/json/";
@@ -644,7 +646,7 @@ public class Settings {
         p.setMaxWait(10000);
         p.setRemoveAbandonedTimeout(60);
         p.setMinEvictableIdleTimeMillis(30000);
-        p.setMinIdle(30);
+        p.setMinIdle(10);
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
         p.setJdbcInterceptors(
@@ -668,11 +670,11 @@ public class Settings {
         p.setValidationInterval(30000);
         p.setTimeBetweenEvictionRunsMillis(30000);
         p.setMaxActive(40);
-        p.setInitialSize(10);
+        p.setInitialSize(3);
         p.setMaxWait(10000);
         p.setRemoveAbandonedTimeout(60);
         p.setMinEvictableIdleTimeMillis(30000);
-        p.setMinIdle(10);
+        p.setMinIdle(3);
         p.setLogAbandoned(true);
         p.setRemoveAbandoned(true);
         p.setJdbcInterceptors(
