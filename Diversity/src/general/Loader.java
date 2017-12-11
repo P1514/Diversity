@@ -370,7 +370,7 @@ public class Loader {
 		}
 	}
 
-	private void loadPSS() {
+	public static void loadPSS() {
 		if (!request)
 			return;
 		request = false;
@@ -591,7 +591,7 @@ public class Loader {
 		}
 	}
 
-	private void loadUsers() {
+	public static void loadUsers() {
 
 		String select = Settings.sqlselectall + Settings.crdbname + "." + Settings.crusertable + " INNER JOIN  "
 				+ Settings.crdbname + "." + Settings.cruserrtable + " ON " + Settings.crusertable + "."

@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /*
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
-				$('#all').click();
+				$('#all').prop('checked', true);
 			}
 */
 	    		return;
@@ -392,4 +392,15 @@ function submit() {
 	//console.log(JSON.stringify(result));
 */
 
+}
+
+function refresh_users() {
+	var json = {
+		'Op' : 'refresh_users',
+		'Key' : "Colab",
+	};
+
+	ws.send(JSON.stringify(json));
+	
+	location.reload();
 }

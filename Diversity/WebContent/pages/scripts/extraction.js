@@ -433,22 +433,19 @@ function connect() {
 			$('.table > tbody > tr').click(function(e) {
 				clicker($(this).find('input[name="id"]').val());
 			});
-			var type;
-			switch ($("input[name='radioName']:checked").val()) {
-				case 1:
-					type = 'All';
-					break;
-				case 2:
-					type = 'Positive';
-					break;
-				case 3:
-					type = 'Negative';
-					break;
-				default:
-					type = 'All';
+			var type = "All";
+			if ($('#tagPositive').is(':checked')) {
+				type = "Positive";
 			}
+			
+			if ($('#tagNegative').is(':checked')) {
+				type = "Negative";
+			}
+			
 			// Request the tagcloud for the current user
 			if (refreshTag) {
+				
+				
 				var json = {
 					"Op" : "tagcloud",
 					"Id" : sessionStorage.id,
@@ -800,13 +797,24 @@ $(".custom-menu li").click(function(e) {
 
 function ignore_words(word) { // sends a message to start ignoring the word we
 	// clicked on
+	
+	var type = "All";
+	if ($('#tagPositive').is(':checked')) {
+		type = "Positive";
+	}
+	
+	if ($('#tagNegative').is(':checked')) {
+		type = "Negative";
+	}
+	
 	var json = {
 		'Op' : 'set_ignore_word',
 		"Id" : sessionStorage.id,
 		'Word' : word,
 		'User' : user,
 		'Key' : getCookie("JSESSIONID"),
-		'Wiki' : document.getElementById('radio_wiki').checked
+		'Wiki' : document.getElementById('radio_wiki').checked,
+		'Type' : type
 	}
 
 	ws.send(JSON.stringify(json));

@@ -41,6 +41,8 @@ public class Operations {
 		permission.put(35, 1);
 		permission.put(36, 1);
 		permission.put(37, 1);
+		permission.put(38, 1);
+		permission.put(39, 1);
 		permission.put(99, 99);
 	}
 	private static HashMap<String, Integer> op;
@@ -82,6 +84,8 @@ public class Operations {
 		op.put("get_roles", 35); // get all user roles
 		op.put("send_collab", 36); // send collaboration data to endpoint
 		op.put("get_user_roles", 37); // send completion data to has_steps
+		op.put("refresh_users", 38); // clear users and reload them from DB
+		op.put("refresh_products", 39); // clear products and reload them from DB
 		op.put("testing", 99); // Admin only
 	}
 

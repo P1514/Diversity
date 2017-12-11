@@ -807,3 +807,12 @@ function escapeHtml2 (string) {
     return entityMap[s];
   });
 }
+
+function refresh_products() {
+	var json = {
+      "Op" : "refresh_products",
+      'Key' : getCookie("JSESSIONID")
+    }
+	
+	ws.send(JSON.stringify(json));
+}
