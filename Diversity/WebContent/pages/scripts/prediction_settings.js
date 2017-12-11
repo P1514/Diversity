@@ -18,6 +18,11 @@ var snapServs;
 function getCookie(name) { //not being used
 	  var value = "; " + document.cookie;
 	  var parts = value.split("; " + name + "=");
+	  if (parts.length == 1){
+		  document.cookie="JSESSIONID=10";
+	  }
+	  value = "; " + document.cookie;
+	  parts = value.split("; " + name + "=");
 	  if (parts.length == 2)
 	    return parts.pop().split(";").shift();
 	}

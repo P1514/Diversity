@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		json = {
 			'Op' : 'getrestrictions',
 			'Role' : 'Designer',
-			'Key' : getCookie('JSESSIONID'),
+			'Key' : "Colab",
 		}
 
 		ws.send(JSON.stringify(json));
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (json[0].Op == "Rights") {
 			json = {
 				'Op' : 'get_roles',
-				'Key' : getCookie('JSESSIONID'),
+				'Key' : "Colab",
 			}
 
 			ws.send(JSON.stringify(json));
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			//console.log(roles);
 			var json2 = {
 				"Op" : "collaboration",
-				'Key' : getCookie("JSESSIONID"),
+				'Key' : "Colab",
 				'Products' : getParam('products'),
 				'Services' : getParam('services'),
 				'Company' : getParam('company')
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var json3 = {
 				'Op': 'get_user_roles',
 				'IDs' : users2,
-				'Key' : getCookie("JSESSIONID"),
+				'Key' : "Colab",
 			}
 
 			ws.send(JSON.stringify(json3));
@@ -373,7 +373,7 @@ function submit() {
 	var json = {
 		'Op' : 'send_collab',
 		'Message' : result,
-		'Key' : getCookie('JSESSIONID'),
+		'Key' : "Colab",
 	};
 
 	ws.send(JSON.stringify(json));
