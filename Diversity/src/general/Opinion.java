@@ -140,7 +140,11 @@ public class Opinion {
 			// System.out.println("COMMENTS: " + v.getUID() + " - " + v.getSource());
 
 			if (v.getSource() != null) {
+				try {
 				total_inf += authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
+				}catch(Exception e) {
+					System.out.println("TESTE");
+				}
 				polarity += v.getPolarity() * authordb.get(v.getUID() + "," + v.getSource()).getInfluence();
 			} else {
 				total_inf += authordb.get(v.getUID()).getInfluence();

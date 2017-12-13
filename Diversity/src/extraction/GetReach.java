@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.glassfish.jersey.internal.util.collection.Values;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.mysql.fabric.xmlrpc.base.Value;
 
 import general.Data;
 import general.Logging;
@@ -90,6 +93,7 @@ public class GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
+		today.add(Calendar.MONTH,1);
 
 		int avg = 0;
 		double last_value = 0;
@@ -305,8 +309,10 @@ public class GetReach {
 		data.setTimeInMillis(firstDate(id));
 		if (frequency != -1) {
 			data.add(Calendar.DAY_OF_MONTH, (int) frequency);
+			today.add(Calendar.DAY_OF_MONTH, (int) frequency);
 		} else {
 			data.add(Calendar.MONTH, 1);
+			today.add(Calendar.MONTH, 1);
 		}
 
 		if (firstDate(id) != 0) {
@@ -363,7 +369,7 @@ public class GetReach {
 	}
 
 	protected static parameters split_params(String param, String value) {
-		if (param == null)
+		if (param == null|| value==null)
 			return new parameters();
 		String[] params = param.split(",");
 		String[] values = value.split(",");

@@ -37,6 +37,7 @@ public class DBHandler extends Handler {
 			return;
 		}
 		String msg;
+//		Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
 		try {
 			msg = getFormatter().format(record);
 		} catch (Exception ex) {
@@ -57,9 +58,13 @@ public class DBHandler extends Handler {
 				insert.setString(3, record.getLevel() + " " + record.getMessage());
 				insert.executeUpdate();
 		} catch (ClassNotFoundException e1) {
-			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
+//			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
+			System.err.println("ERROR ON DBHANDLER");
+			e1.printStackTrace();
 		} catch (SQLException e1) {
-			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
+//			Logger.logMsg(Level.SEVERE.intValue(), "ERROR ON DBHANDLER");
+			System.err.println("ERROR ON DBHANDLER");
+			e1.printStackTrace();
 		}
 
 	}

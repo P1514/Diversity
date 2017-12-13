@@ -132,6 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					$('#snap_label').html('<p style="margin-left:50px">Created by ' + snap_user + ' on ' + snap_date + '</p><br><p style="margin-left:50px"><b>Products:</b> ' + prodsHTML.substring(0, prodsHTML.length - 4) + '</p><br><p style="margin-left:50px"><b>Services:</b> ' + servsHTML.substring(0, servsHTML.length - 4)  + '</p>');
 			}
       drawChart();
+  	  $('#overlay').fadeOut(2000);
+  	  $('#overlay-back').fadeOut(2000);
     }
 		//If the message contains the string 'Snapshots', build a dropdown with all the saved snapshots and display it
 		if (json[0] == "Snapshots") {
@@ -327,6 +329,9 @@ function submit() {
   snap = false;
   $('#page_title').html('Create Prediction');
   ws.send(JSON.stringify(json));
+  $('#error').html('<i class="fa fa-spinner fa-3x fa-spin" aria-hidden="true"></i><br>Loading, please wait...');
+  $('#overlay').show();
+  $('#overlay-back').show();
 }
 
 /*
