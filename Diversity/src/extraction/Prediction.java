@@ -339,7 +339,7 @@ public class Prediction extends Globalsentiment {
 			}
 			try {
 				obj = new JSONObject();
-				obj.put("Month", time[data.get(Calendar.MONTH)]);
+				obj.put("Month", time[(month) % 12]);
 				obj.put("Value", mean);
 				obj.put("Variance", Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd)));// 95%
 																								// confidence
@@ -452,7 +452,7 @@ public class Prediction extends Globalsentiment {
 			// System.out.println((today.get(Calendar.DAY_OF_MONTH)) + "/"
 			// + (today.get(Calendar.MONTH) + 1) + "/" +
 			// today.get(Calendar.YEAR));
-			data.set(firstdate.get(Calendar.YEAR), month, firstdate.get(Calendar.DAY_OF_MONTH));
+			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
 
 			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
 			// (data.get(Calendar.MONTH) + 1) + "/"
@@ -464,7 +464,7 @@ public class Prediction extends Globalsentiment {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
-					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 					if(tempvalue==0)
 						tempvalue=-1;
@@ -479,7 +479,7 @@ public class Prediction extends Globalsentiment {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
 
-					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 					if(tempvalue==0)
 						tempvalue=-1;
@@ -492,7 +492,7 @@ public class Prediction extends Globalsentiment {
 			}
 
 			mean = (totalGsweight) / (totalWeight == 0 ? 1 : totalWeight);
-			data.set(firstdate.get(Calendar.YEAR), month, firstdate.get(Calendar.DAY_OF_MONTH));
+			data.set(firstdate.get(Calendar.YEAR), firstdate.get(Calendar.MONTH), firstdate.get(Calendar.DAY_OF_MONTH));
 			// System.out.println((data.get(Calendar.DAY_OF_MONTH)) + "/" +
 			// (data.get(Calendar.MONTH) + 1) + "/"
 			// + data.get(Calendar.YEAR));
@@ -500,7 +500,7 @@ public class Prediction extends Globalsentiment {
 				pssweights.forEach((k, v) -> {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 					if(tempvalue==0)
 						tempvalue=-1;
@@ -512,7 +512,7 @@ public class Prediction extends Globalsentiment {
 				pssweightss.forEach((k, v) -> {
 					Data.addmodel((long) -1,
 							new Model(-1, 0, 0, "", "", k, "0,150", "All", "-1", false, 0, 0, -1, true));
-					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), month,
+					tempvalue = globalsentimentby(data.get(Calendar.DAY_OF_MONTH), data.get(Calendar.MONTH),
 							data.get(Calendar.YEAR), "Global", "", (long) -1, -1);
 					if(tempvalue==0)
 						tempvalue=-1;
@@ -541,6 +541,7 @@ public class Prediction extends Globalsentiment {
 												// confidence
 												// interval
 				result.put(obj);
+				firstdate.add(Calendar.MONTH, 1);
 			} catch (JSONException e) {
 				LOGGER.log(Level.WARNING,"Class:Prediction, ERROR 5");
 			}

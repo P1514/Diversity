@@ -54,7 +54,7 @@ public class GetComments {
 
 	public JSONArray getAll(JSONObject msg) throws JSONException {
 		JSONArray result = new JSONArray();
-		String[] preresult = new String[10000];
+		String[] preresult = new String[50];
 		JSONObject obj = new JSONObject();
 		obj.put("Op", "comments");
 		result.put(obj);
@@ -71,7 +71,11 @@ public class GetComments {
 
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, msg.getString("Values"));
+<<<<<<< HEAD
 			query1.setString(2, msg.getString("Values"));
+=======
+			query1.setInt(2, msg.getInt("Values"));
+>>>>>>> parent of 31146ae... Merge branch 'master' into FS
 
 			try (ResultSet rs = query1.executeQuery()) {
 

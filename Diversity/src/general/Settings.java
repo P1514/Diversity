@@ -23,7 +23,7 @@ public class Settings {
 	public static final String version = "2.6";
 	
 	private static DataSource conlocal = null;
-	//private static DataSource condata;
+	private static DataSource condata;
 	private static DataSource concr;
 	
 	// To be replaced by properties file
@@ -352,7 +352,7 @@ public class Settings {
 	 * @throws SQLException
 	 *             the SQL exception
 	 */
-	/*public static Connection conndata() throws ClassNotFoundException, SQLException {
+	public static Connection conndata() throws ClassNotFoundException, SQLException {
 		  try {
 			  while(condata==null){}
 		    Future<Connection> future = condata.getConnectionAsync();
@@ -369,7 +369,7 @@ public class Settings {
 			  LOGGER.log(Level.SEVERE, err_dbconnect);
 			  return null;
 		  }
-	}*/
+	}
 
 	/**
 	 * Connlocal.
@@ -597,7 +597,7 @@ public class Settings {
 	
 	public static void startconnections(){
 		PoolProperties p = new PoolProperties();
-        /*p.setUrl(rurl);
+        p.setUrl(rurl);
         p.setDriverClassName("com.mysql.jdbc.Driver");
         p.setUsername(ruser);
         p.setPassword(rpass);
@@ -623,7 +623,7 @@ public class Settings {
           + "org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer;"
           + "org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer");
         condata = new DataSource();
-        condata.setPoolProperties(p);*/
+        condata.setPoolProperties(p);
         
         p = new PoolProperties();
         p.setMaxIdle(40);

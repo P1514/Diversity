@@ -134,27 +134,6 @@ public class Monitor {
 		 */
 
 	}
-	
-	public static boolean updateSource(String source, String account, long timestamp, long pss) {
-		String query = "UPDATE " + Settings.lutable + " SET " + Settings.lutable_lastupdate + "=? WHERE "
-				+ Settings.lutable_source + "=? AND " + Settings.lutable_pss + "=? AND " + Settings.lutable_account
-				+ "=?";
-		try(Connection cnlocal = Settings.connlocal();
-				PreparedStatement stmt = cnlocal.prepareStatement(query)) {
-			stmt.setLong(1, timestamp);
-			stmt.setString(2, source);
-			stmt.setLong(3, pss);
-			stmt.setString(4, account);
-			stmt.execute();
-			return true;
-		} catch (ClassNotFoundException | SQLException s) {
-			Logger.getLogger(Monitor.class.getName()).log(Level.WARNING, "Could not Update Sources Table", s);
-			return false;
-		}
-
-		
-	}
-	
 
 	public static void load(String uri, long pss) {
 

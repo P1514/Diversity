@@ -415,8 +415,8 @@ function connect() {
 			$('#posts tbody').empty();
 			for (var i = 1; i < json.length; i++) {
 				tr = $('<tr/>');
-				tr.append("<td>" + json[i].Name.replace(/</g, '&lt;') + "</td>");
-				tr.append("<td>" + json[i].Message.replace(/</g, '&lt;') + "</td>");
+				tr.append("<td>" + json[i].Name + "</td>");
+				tr.append("<td>" + json[i].Message + "</td>");
 				tr.append("<td>" + json[i].Comments + "</td>");
 				tr.append("<td>" + json[i].Date + "</td>");
 				tr.append("<td>" + json[i].Polarity + "</td>");
@@ -1394,11 +1394,12 @@ function drawChart() {
 					if (jsonData[i].Graph == 'Bottom_Right') {
 						sentimentdata.setCell(ii, 0, new Date(time[2],
 								time[1] - 1, time[0]));
-						sentimentdata.setCell(ii, filt, jsonData[i].Value + '');
+						sentimentdata.setCell(ii, filt, jsonData[i].Value);
 
 					}
 				} else {
-					//sentimentdata.setCell(ii--, 0, new Date(time[2], time[1] - 1, time[0]));
+					sentimentdata.setCell(ii--, 0, new Date(time[2] +"/"+ time[1] - 1+"/"+
+							time[0]));
 
 				}
 
@@ -1422,11 +1423,12 @@ function drawChart() {
 						sentimentdata.setCell(iii, 0, new Date(time2[2],
 							time2[1] - 1, time2[0]));
 
-						sentimentdata.setCell(iii, filt, jsonData[i].Value + '');
+						sentimentdata.setCell(iii, filt, jsonData[i].Value);
 					}
 				}
 			}
 		}
+
 		colors = new Array();
 		for (var color = 1; color < filt; color++) {
 			colors.push(chartcolor(sentimentdata.getColumnLabel(color)));
@@ -1500,7 +1502,6 @@ function drawChart() {
 				maxZoomIn : 4.0,
 				maxZoomOut : 1,
 			},
-			interpolateNulls: true,
 			pointsVisible : (localStorage.showPoints != undefined && localStorage.showPoints == 'true') ? true
 					: false,
 		};

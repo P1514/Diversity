@@ -34,7 +34,7 @@ public final class Author {
 	 * @param _location
 	 *            the location
 	 */
-	/*public Author(String _id, String _name, long _age, String _gender, String _location) {
+	public Author(String _id, String _name, long _age, String _gender, String _location) {
 		this.id2 = _id;
 		this.age = _age;
 		this.name = _name;
@@ -46,7 +46,7 @@ public final class Author {
 		this.views = 0;
 		this.source = "";
 
-	}*/
+	}
 
 	/**
 	 * Instantiates a new author.
