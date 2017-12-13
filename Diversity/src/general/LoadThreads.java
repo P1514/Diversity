@@ -524,6 +524,10 @@ public class LoadThreads {
 					String location = rs.getString(Settings.latable_location);
 					int age = rs.getInt(Settings.latable_age);
 					Author auth = new Author(userid, source, name, age, gender, location);
+					auth.setComments(rs.getLong(Settings.latable_comments));
+					auth.setViews(rs.getLong(Settings.latable_views));
+					auth.setLikes(rs.getLong(Settings.latable_likes));
+					auth.setPosts(rs.getLong(Settings.latable_posts));
 					Loader.authordb2.put(auth.getID() + ","+ auth.getSource(), auth);
 					
 					}while(rs.next());

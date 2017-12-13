@@ -62,15 +62,16 @@ public class GetComments {
 		int ntops = 0;
 		insert = "Select " + Settings.latable_name + "," + Settings.latable_influence + "," + Settings.latable_location
 				+ "," + Settings.latable_gender + "," + Settings.latable_age + "," + Settings.lptable_polarity + ","
-				+ Settings.lptable_message + " from " + Settings.lptable + "," + Settings.latable + " where ( ("
-				+ Settings.lptable + "." + Settings.lptable_id + "=? OR"
-				+ " " + Settings.lptable_opinion + "=? )AND " + Settings.lptable + "." + Settings.lptable_authorid + "="
-				+ Settings.latable + "." + Settings.latable_id + ") ORDER BY " + Settings.lptable + "."
-				+ Settings.lptable_id + " ASC";
+				+ Settings.lptable_message + " from " + Settings.lptable + " p left join " + Settings.latable + " a on "+Settings.lptable_authorid+"=a."+Settings.latable_id+" where ( ("
+				+ "p." + Settings.lptable_id + "=? OR"
+				+ " " + Settings.lptable_opinion + "=? )AND p." + Settings.lptable_authorid + "=a." + Settings.latable_id + ") ORDER BY Abs(p."
+				+Settings.lptable_id+"-"+Settings.lptable_opinion+") ASC";
+		
+		//LOGGER.log(Level.INFO, "Get Comments Query"+insert);
 
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, msg.getString("Values"));
-			query1.setLong(2, msg.getLong("Values"));
+			query1.setString(2, msg.getString("Values"));
 
 			try (ResultSet rs = query1.executeQuery()) {
 

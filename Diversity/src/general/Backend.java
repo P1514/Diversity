@@ -437,7 +437,7 @@ public class Backend {
 							msg.has("Services") ? msg.getString("Services") : "");
 				} else {
 					res = snapshot.saveExtraction((msg.has("Wiki") ? msg.getBoolean("Wiki") : false),msg.getString("name"), msg.getString("creation_date"),
-							msg.getInt("timespan"), msg.getString("user"), msg.has("Id") ? msg.getInt("Id") : 0);
+							msg.getInt("timespan"), msg.has("user") ? msg.getString("user"): "0", msg.has("Id") ? msg.getInt("Id") : 0);
 
 				}
 
@@ -800,6 +800,7 @@ public class Backend {
 			}
 		} catch (JSONException e) {
 			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 7");
+			e.printStackTrace();
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING,"Class:Backend, ERROR 8");
 		}

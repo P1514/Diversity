@@ -40,7 +40,6 @@ public class Snapshot {
 	String error = "error";
 
 	public boolean create(String name, long date, int timespan, String user, String type, String result, int id) {
-		
 		String insert = new String("SELECT * FROM " + Settings.lsstable + " where " + Settings.lsstable_name + "=? && "
 				+ Settings.lsstable_type + "=?;");
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
@@ -108,6 +107,8 @@ public class Snapshot {
 			LOGGER.log(Level.WARNING,"Class:Snapshot, ERROR 2");
 		}
 		result = b.resolve();
+		if(result.contains("No prediction available"))
+			return "";
 		// System.out.println("TEST" + result);
 		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
 

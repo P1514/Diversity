@@ -564,7 +564,7 @@ public class GetPosts {
 			insert += " gender=? AND";
 		if (par.location != null)
 			insert += " location=? AND";
-		insert += " timestamp<? AND " + Settings.lotable_timestamp + ">=? AND ";
+		insert += " " + Settings.lotable_timestamp + ">=? AND ";
 		insert += " source in (";
 		int source_length = model.getSources(false).size();
 		for (int i = 0; i < source_length; i++)
@@ -593,9 +593,9 @@ public class GetPosts {
 				query1.setString(rangeindex++, par.gender);
 			if (par.location != null)
 				query1.setString(rangeindex++, par.location);
-			inputdate.add(Calendar.MONTH, 1);
+			/*inputdate.add(Calendar.MONTH, 1);
 			query1.setLong(rangeindex, inputdate.getTimeInMillis());
-			rangeindex++;
+			rangeindex++;*/
 			/*
 			 * inputdate.add(Calendar.YEAR, -1); query1.setLong(rangeindex,
 			 * inputdate.getTimeInMillis()); rangeindex++;
