@@ -634,6 +634,13 @@ public class Loader {
 	}
 
 	private String loadGeneral() throws JSONException {
+		
+		String delete = "Delete from reach";
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
+			query1.execute();
+		} catch (Exception e) {
+			LOGGER.log(Level.INFO, "ERROR", e);
+		}
 
 		String select = Settings.sqlselectall + " " + Settings.gentable + " WHERE " + Settings.gentable_id + "=1";
 		Connection cnlocal = null;

@@ -513,34 +513,21 @@ public class Backend {
 					for (int i = 0; i < msg.getString("PSS").split(";").length; i++)
 						pss.add(Data.identifyPSSbyname(msg.getString("PSS").split(";")[i]));
 					LOGGER.log(Level.INFO, "PSSID's:" + pss.toString());
-					gs.globalsentiment(null, null, pss);
+					//if(!msg.toString().equals(Settings.top5ReachRequest))
+					gs.globalsentiment(null, null, pss,msg.toString());
 
 				} else
-					gs.globalsentiment(null, null, gr.getTOPReach(5));// computes
-																		// the
-																		// value
-																		// and
-																		// puts
-																		// it in
-																		// the
-																		// DB
-																		// TODO:
-																		// change
-																		// it to
-																		// compute
-																		// only
-																		// if
-																		// not
-																		// computed
-																		// before
+					//if(!msg.toString().equals(Settings.top5ReachRequest))
+					gs.globalsentiment(null, null, gr.getTOPReach(5),msg.toString());
 
-				LOGGER.log(Level.INFO, gs.globalsentiment());
+				LOGGER.log(Level.INFO, gs.globalsentiment(msg.toString()));
 
 				try {
-					result.put(new JSONArray(gs.globalsentiment()));
+					result.put(new JSONArray(gs.globalsentiment(msg.toString())));
 				} catch (JSONException e) {
 					result.put(new JSONObject().put("Graph", "ERROR"));
 				}
+				Settings.top5ReachRequest=msg.toString();
 				return result.toString();
 
 			case 19:
