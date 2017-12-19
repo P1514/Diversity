@@ -184,7 +184,7 @@ public class Prediction extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
+		boolean check_if_calcs=false;
 		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
@@ -330,7 +330,7 @@ public class Prediction extends Globalsentiment {
 			variance += Math.pow(200 - mean, 2);
 
 			if (totalGsweight != 0) {
-
+				check_if_calcs=true;
 				variance = variance / totalGsweight;
 				stDeviation = Math.sqrt(variance);
 			} else {
@@ -351,7 +351,14 @@ public class Prediction extends Globalsentiment {
 			}
 			month++;
 		}
-
+		if(!check_if_calcs) {
+			obj = new JSONObject();
+			result = new JSONArray();
+			obj.put("Op", "Error");
+			obj.put("Message", "No prediction available");
+			result.put(obj);
+			return result;
+		}
 		String productsName = "";
 		String servicesName = "";
 		if (!productsId.equals("")) {
@@ -386,7 +393,7 @@ public class Prediction extends Globalsentiment {
 			throws JSONException {
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
-
+		boolean check_if_calcs=false;
 		HashMap<Long, Double> pssweights = Extrapolation.getSimilarityThreshold(productsId, 75, true);
 		HashMap<Long, Double> pssweightss = Extrapolation.getSimilarityThreshold(servicesId, 60, false);
 
@@ -525,7 +532,7 @@ public class Prediction extends Globalsentiment {
 			variance += Math.pow(200 - mean, 2);
 
 			if (totalGsweight != 0) {
-
+				check_if_calcs=true;
 				variance = variance / totalGsweight;
 				stDeviation = Math.sqrt(variance);
 				variance = Math.round((1.96 * stDeviation) / Math.sqrt(numbOfProd));
@@ -546,7 +553,14 @@ public class Prediction extends Globalsentiment {
 			}
 
 		}
-
+		if(!check_if_calcs) {
+			obj = new JSONObject();
+			result = new JSONArray();
+			obj.put("Op", "Error");
+			obj.put("Message", "No prediction available");
+			result.put(obj);
+			return result;
+		}
 		String productsName = "";
 		String servicesName = "";
 		if (!productsId.equals("")) {

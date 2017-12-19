@@ -60,9 +60,10 @@ public class GetPrediction {
 		b.setMessage(22, new JSONObject("{\"Op\":\"getrestrictions\",\"Role\":\"DEVELOPER\",\"Key\":\"3gwnd3m3ipc0000\"}"));
 		b.resolve();
 		Snapshot s = new Snapshot(b);
-		String name = "Self generated snapshot " + System.currentTimeMillis();
+		DateFormat dfname = new SimpleDateFormat("YY-MM-dd HH:mm:ss.SSS");
+		String name = "Self generated snapshot " + dfname.format(new Date());
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		String err = s.savePrediction(name, df.format(new Date()).split(" ")[0], 1, "-1", products.replace(',', ';'), services.replace(',', ';'));
+		String err = s.savePrediction(name, df.format(new Date()).split(" ")[0], 1, "-1", products.replace(',', ';'), services.replace(',', ';'), "Self Generated");
 		if ("".equals(err))
 			return Response.status(Response.Status.BAD_REQUEST).entity("No Prediction Available").build();
 		JSONArray json = p.predict(1, products.replace(',', ';'), services.replace(',', ';'));
