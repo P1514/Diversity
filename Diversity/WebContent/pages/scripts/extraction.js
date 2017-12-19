@@ -303,7 +303,7 @@ function connect() {
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapID = window.location.href.split("snapshot=")[1]
-						.split("&")[0].replace('%20', ' ');
+						.split("&")[0].replace('%20', ' ').replace('%3A',':');
 
 				snap = true;
 				json = {
@@ -312,8 +312,8 @@ function connect() {
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
-				$('#Cookie').html = 'Snapshot: ' + snap_name;
-				name = snap_name;
+				$('#Cookie').html = 'Snapshot: ' + snapID.replace(/\+/g, ' ');
+				name = snapID;
 			} else {
 				json = {
 					"Op" : "opinion_extraction",

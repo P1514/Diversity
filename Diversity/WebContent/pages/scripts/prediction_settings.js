@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
   //Request products and services tree
   ws.onopen = function () {
 		if (window.location.href.indexOf('snapshot=') != -1) {
-			var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ');
+			var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace('%20',' ').replace('%3A',':');
 			snap_name = snapName;
 			//snap = true;
 			json = {
