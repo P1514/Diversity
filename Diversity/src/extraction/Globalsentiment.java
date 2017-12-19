@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.sun.crypto.provider.RSACipher;
+
 import extraction.GetReach.parameters;
 import general.Backend;
 import general.Data;
@@ -61,17 +63,25 @@ public class Globalsentiment extends GetReach {
 	 * @throws JSONException
 	 *             is case JSON creation fails
 	 */
-	public void globalsentiment(String param, String values, List<Long> psslist) throws JSONException {
+	public void globalsentiment(String param, String values, List<Long> psslist, String request) throws JSONException {
 		if (psslist.isEmpty())
 			return;
-		StringBuilder buildstring = new StringBuilder();
-		String result = "";
-		String delete = "Delete from reach";
-		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(delete)) {
-			query1.execute();
+		ResultSet rs;
+		String select = "Select * from " + Settings.lrtable + " where request=?";
+		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+			query1.setString(1, request);
+			rs=query1.executeQuery();
+			if(rs.next())
+				return;
+
 		} catch (Exception e) {
 			LOGGER.log(Level.INFO, "ERROR", e);
 		}
+
+			
+		StringBuilder buildstring = new StringBuilder();
+		String result = "";
+
 
 		long frequency = calcFrequency(psslist);
 		Calendar date = Calendar.getInstance();
@@ -88,9 +98,12 @@ public class Globalsentiment extends GetReach {
 		if ("".equals(result))
 			return;
 
-		String insert = "Insert into " + Settings.lrtable + " values (?)";
+		String insert = "Insert into " + Settings.lrtable + "(value,request) values (?,?) ON duplicate key update value=?";
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(insert)) {
 			query1.setString(1, result);
+			query1.setString(2, request);
+			query1.setString(3, result);
+			LOGGER.log(Level.INFO, query1.toString());
 			query1.execute();
 			// System.out.println("TESTE:" + query1.toString());
 
@@ -132,14 +145,14 @@ public class Globalsentiment extends GetReach {
 	 *
 	 * @return String
 	 */
-	public String globalsentiment() {
+	public String globalsentiment(String request) {
 
-		String select = "Select * from " + Settings.lrtable;
-
+		String select = "Select * from " + Settings.lrtable + " where request= \'" + request+"\'";
+		LOGGER.log(Level.SEVERE, select);
 		try (Connection cnlocal = Settings.connlocal(); PreparedStatement query1 = cnlocal.prepareStatement(select)) {
 			try (ResultSet rs = query1.executeQuery()) {
 				while (rs.next()) {
-					String output = rs.getString(1);
+					String output = rs.getString("value");
 					cnlocal.close();
 					return output;
 				}

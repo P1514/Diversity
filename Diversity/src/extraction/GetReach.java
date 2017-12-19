@@ -7,7 +7,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +20,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.mysql.fabric.xmlrpc.base.Value;
+import com.sun.jna.platform.win32.Advapi32Util.Account;
+import com.sun.jndi.toolkit.ctx.Continuation;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import general.Data;
 import general.Logging;
@@ -33,6 +39,34 @@ public class GetReach {
 	private static final Logger LOGGER = new Logging().create(GetReach.class.getName());
 	private String[] time = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
+	class PssSA {
+		ArrayList<String> accounts = new ArrayList<>();
+		ArrayList<String> sources = new ArrayList<>();
+		int avgReach;
+
+		void addSourceAccount(String source, String account) {
+			accounts.add(account);
+			sources.add(source);
+		}
+
+		public void setAvgReach(int avgReach) {
+			this.avgReach = avgReach;
+		}
+
+		public ArrayList<String> getAccounts() {
+			return accounts;
+		}
+
+		public int getAvgReach() {
+			return avgReach;
+		}
+
+		public ArrayList<String> getSources() {
+			return sources;
+		}
+
+	}
+
 	/**
 	 * Returns an array list with the nTOP number of pss's with higher reach on the
 	 * of the last 12 months.
@@ -41,23 +75,83 @@ public class GetReach {
 	 *            - Number of PSS wanted
 	 * @return ArrayList of pss id's
 	 */
+
 	public List<Long> getTOPReach(int nTOP) {
 		ArrayList<Long> tops = new ArrayList<>();
+		HashMap<Long, PssSA> psss = new HashMap<>();
+		HashMap<Long, Float> avgReachByPss = new HashMap<>();
 
-		String select = "Select " + Settings.lotable_pss + " from " + Settings.lotable + " where "
-				+ Settings.lotable_pss + " in (Select distinct " + Settings.lmtable_pss + " from " + Settings.lmtable
-				+ " where " + Settings.lmtable_archived + "=0) group by " + Settings.lotable_pss + " order by AVG("
-				+ Settings.lotable_reach + ") desc limit " + nTOP;
+		for (Model mod : Data.getAllModels().values()) {
+			if (mod.getArchived())
+				continue;
+			String[] sourceAcounts = mod.getURI().split(";");
+			long pssId = mod.getPSS();
 
-		try (Connection cnlocal = Settings.connlocal();
-				PreparedStatement query1 = cnlocal.prepareStatement(select);
-				ResultSet rs = query1.executeQuery()) {
-			while (rs.next()) {
-				tops.add(rs.getLong(Settings.lotable_pss));
+			if (psss.containsKey(pssId)) {
+				for (String sourceAccount : sourceAcounts)
+					psss.get(pssId).addSourceAccount(sourceAccount.split(",")[0], sourceAccount.split(",")[1]);
+			} else {
+				PssSA p = new PssSA();
+				for (String sourceAccount : sourceAcounts)
+					p.addSourceAccount(sourceAccount.split(",")[0], sourceAccount.split(",")[1]);
+				psss.put(pssId, p);
 			}
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "ERROR", e);
-			return new ArrayList<>();
+
+		}
+
+		psss.forEach((k, v) -> {
+			// String select = "Select avg(reach) from opinions where account in (";
+			// for (String account : v.getAccounts())
+			// select += "\"" + account + "\",";
+			// select = select.substring(0, select.length() - 1);
+			// select += ") and source in (";
+			// for (String source : v.getSources())
+			// select += "\"" + source + "\",";
+			// select = select.substring(0, select.length() - 1);
+			// select += ")";
+
+			String select = "Select avg(reach) from opinions where ";
+			for (int i = 0; i < v.getAccounts().size(); i++) {
+				if (i == 0)
+					select += "(account=? AND source=?)";
+				else
+					select += " OR (account=? AND source=?)";
+			}
+
+			try (Connection cnlocal = Settings.connlocal();
+					PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+				int range_index = 1;
+				for (int i = 0; i < v.getAccounts().size(); i++) {
+					query1.setString(range_index++, v.getAccounts().get(i));
+					query1.setString(range_index++, v.getSources().get(i));
+				}
+				try (ResultSet rs = query1.executeQuery()) {
+					while (rs.next()) {
+						avgReachByPss.put(k, rs.getFloat(1));
+						Logger.getLogger(GetReach.class.getName()).log(Level.INFO,
+								select + " PSS:" + k + "Average Reach: " + rs.getFloat("avg(reach)"));
+					}
+				}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "ERROR", e);
+			}
+
+		});
+
+		for (int i = 0; i < nTOP; i++) {
+			Map.Entry<Long, Float> maxEntry = null;
+
+			for (Map.Entry<Long, Float> entry : avgReachByPss.entrySet()) {
+				if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+					maxEntry = entry;
+				}
+			}
+
+			if (avgReachByPss.isEmpty())
+				break;
+			Logger.getLogger(GetReach.class.getName()).log(Level.INFO, "Maxreach: " + maxEntry.getValue() + "\n");
+			tops.add(maxEntry.getKey());
+			avgReachByPss.remove(maxEntry.getKey());
 		}
 
 		return tops;
@@ -93,7 +187,7 @@ public class GetReach {
 
 		data.setTimeInMillis(firstDate(id));
 		data.add(Calendar.MONTH, 1);
-		today.add(Calendar.MONTH,1);
+		today.add(Calendar.MONTH, 1);
 
 		int avg = 0;
 		double last_value = 0;
@@ -134,18 +228,27 @@ public class GetReach {
 				+ Settings.lotable_reach + " FROM " + Settings.lptable + ", " + Settings.lotable + " WHERE "
 				+ Settings.lotable_timestamp + ">=? AND " + Settings.lotable + "." + Settings.lotable_id + "="
 				+ Settings.lptable + "." + Settings.lptable_opinion
-				+ " AND opinions.id in (Select opinions.id from opinions,authors where opinions.authors_id = authors.id AND timestamp>? && timestamp<=? ";/*and "*//*
-																										 * &&
-																										 * (" + Settings.lptable + "
-																										 * ." +
-																										 * Settings.
-																										 * lptable_authorid
-																										 * + "=" +
-																										 * Settings.
-																										 * latable + "."
-																										 * + Settings.
-																										 * latable_id;
-																										 */
+				+ " AND opinions.id in (Select opinions.id from opinions,authors where opinions.authors_id = authors.id AND timestamp>? && timestamp<=? ";/*
+																																							 * and
+																																							 * "
+																																							 *//*
+																																								 * &&
+																																								 * (" + Settings.lptable + "
+																																								 * ."
+																																								 * +
+																																								 * Settings.
+																																								 * lptable_authorid
+																																								 * +
+																																								 * "="
+																																								 * +
+																																								 * Settings.
+																																								 * latable
+																																								 * +
+																																								 * "."
+																																								 * +
+																																								 * Settings.
+																																								 * latable_id;
+																																								 */
 		return calc_global(false, "reach", insert, par, month, model, year, day, frequency);
 	}
 
@@ -160,38 +263,35 @@ public class GetReach {
 		 * null) insert += " AND " + Settings.latable + "." + Settings.latable_location
 		 * + "=?";
 		 */
-		
-		if (par.age != null) 
-			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + 
-				 Settings.latable + "." + Settings.latable_age + ">?"; 
-		
-		if (par.gender != null) 
-			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?"; 
-		
-		if (par.location !=	 null) 
+
+		if (par.age != null)
+			insert += " AND " + Settings.latable + "." + Settings.latable_age + "<=? AND " + Settings.latable + "."
+					+ Settings.latable_age + ">?";
+
+		if (par.gender != null)
+			insert += " AND " + Settings.latable + "." + Settings.latable_gender + "=?";
+
+		if (par.location != null)
 			insert += " AND " + Settings.latable + "." + Settings.latable_location + "=?";
-		
-		 /* if (!wiki) { if (par.products != null) { if (par.products.equals("-1")) {
+
+		/*
+		 * if (!wiki) { if (par.products != null) { if (par.products.equals("-1")) {
 		 * insert += " AND " + Settings.lotable_product + " in (" + model.getProducts()
 		 * + ")"; } else { insert += " AND " + Settings.lotable_product + "=?"; } } else
 		 * { if (!"polar".equals(type)) insert += " AND " + Settings.lotable_product +
 		 * " in (" + model.getProducts() + ")"; } } if (!model.getMediawiki()) insert +=
 		 * " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		 */
-		
-		/*if (!wiki) { 
-			if (par.products != null) { 
-				if (par.products.equals("-1") && model.getProducts() != "") {
-					insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
-				} else { 
-					insert += " AND " + Settings.lotable_product + "=?"; 
-				} 
-			} else { 
-				//if (!"polar".equals(type) && model.getProducts() != "") 
-					//insert += " AND " + Settings.lotable_product + " in (" + model.getProducts() + ")"; 
-			} 
-		} */
-		
+
+		/*
+		 * if (!wiki) { if (par.products != null) { if (par.products.equals("-1") &&
+		 * model.getProducts() != "") { insert += " AND " + Settings.lotable_product +
+		 * " in (" + model.getProducts() + ")"; } else { insert += " AND " +
+		 * Settings.lotable_product + "=?"; } } else { //if (!"polar".equals(type) &&
+		 * model.getProducts() != "") //insert += " AND " + Settings.lotable_product +
+		 * " in (" + model.getProducts() + ")"; } }
+		 */
+
 		if (!model.getMediawiki()) {
 			insert += " AND " + Settings.lotable + "." + Settings.lotable_product + " is not null";
 		}
@@ -225,21 +325,23 @@ public class GetReach {
 
 			if (wiki || model.getId() == -1)
 				query1.setLong(rangeindex++, model.getPSS());
-			
-			if (par.age != null) { 
+
+			if (par.age != null) {
 				query1.setString(rangeindex++, par.age.split("-")[1]);
-				query1.setString(rangeindex++, par.age.split("-")[0]); 
-			} 
-			
-			if (par.gender != null) 
-				query1.setString(rangeindex++, par.gender); 
-			
+				query1.setString(rangeindex++, par.age.split("-")[0]);
+			}
+
+			if (par.gender != null)
+				query1.setString(rangeindex++, par.gender);
+
 			if (par.location != null)
-				query1.setString(rangeindex++, par.location); 
-			
-			/*if (par.products != null)
-				query1.setLong(rangeindex++, Long.valueOf(Data.identifyProduct(par.products)));*/
-			
+				query1.setString(rangeindex++, par.location);
+
+			/*
+			 * if (par.products != null) query1.setLong(rangeindex++,
+			 * Long.valueOf(Data.identifyProduct(par.products)));
+			 */
+
 			if (model.getId() != -1 && !wiki) {
 				ArrayList<String> sourceaccount = model.getSources(false);
 				for (int ii = 0; ii < sourceaccount.size(); ii++)
@@ -250,7 +352,7 @@ public class GetReach {
 			}
 
 			// LOGGER.log(Level.INFO," WIKI "+ wiki + " " +query1);
-//			System.out.println(query1.toString());
+			// System.out.println(query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 				result = calc_avg(type, rs);
 
@@ -400,7 +502,7 @@ public class GetReach {
 	}
 
 	protected static parameters split_params(String param, String value) {
-		if (param == null|| value==null)
+		if (param == null || value == null)
 			return new parameters();
 		String[] params = param.split(",");
 		String[] values = value.split(",");

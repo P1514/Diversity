@@ -344,6 +344,8 @@ public class Settings {
 	public static final String err_unknown = "ERROR ";
 	public static final String err_dbconnect = "Cannot connect to database Please Try Again Later.";
 	public static final String err_cr = "Cannot connect to common repository";
+	
+	public static String top5ReachRequest = null;
 
 	/**
 	 * Conndata.
