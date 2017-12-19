@@ -111,21 +111,26 @@ public class GetReach {
 			// select += ")";
 
 			String select = "Select avg(reach) from opinions where ";
-			for (int i = 0; i < v.getAccounts().size();i++) {
-				if(i==0)
-					select += "(account=\"" + v.getAccounts().get(i) + "\" AND source=\"" + v.getSources().get(i) + "\")";
+			for (int i = 0; i < v.getAccounts().size(); i++) {
+				if (i == 0)
+					select += "(account=? AND source=?)";
 				else
-					select += " OR (account=\"" + v.getAccounts().get(i) + "\" AND source=\"" + v.getSources().get(i) + "\")";				
+					select += " OR (account=? AND source=?)";
 			}
-				
 
 			try (Connection cnlocal = Settings.connlocal();
-					PreparedStatement query1 = cnlocal.prepareStatement(select);
-					ResultSet rs = query1.executeQuery()) {
-				while (rs.next()) {
-					avgReachByPss.put(k, rs.getFloat(1));
-					Logger.getLogger(GetReach.class.getName()).log(Level.INFO,
-							select + " PSS:" + k + "Average Reach: " + rs.getFloat("avg(reach)"));
+					PreparedStatement query1 = cnlocal.prepareStatement(select)) {
+				int range_index = 1;
+				for (int i = 0; i < v.getAccounts().size(); i++) {
+					query1.setString(range_index++, v.getAccounts().get(i));
+					query1.setString(range_index++, v.getSources().get(i));
+				}
+				try (ResultSet rs = query1.executeQuery()) {
+					while (rs.next()) {
+						avgReachByPss.put(k, rs.getFloat(1));
+						Logger.getLogger(GetReach.class.getName()).log(Level.INFO,
+								select + " PSS:" + k + "Average Reach: " + rs.getFloat("avg(reach)"));
+					}
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, "ERROR", e);
