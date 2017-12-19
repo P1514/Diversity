@@ -64,6 +64,9 @@
 											<td style="" valign="middle">
 												<select class="form-control" id="pss" style="box-shadow: 2px 2px 5px 2px rgba(0, 0, 0, .2);" data-toggle="tooltip" data-delay='{"show":"1000", "hide":"500"}' data-placement="auto" title="Select the PSS for this model" onchange="makeTree();"></select><br>
 											</td>
+											<td style="" valign="middle">
+												<i class="fa fa-refresh" onclick="refresh_products()" aria-hidden="true"></i>
+											</td>
 									</tr>
 									<tr>
 											<td style="margin-right:20px">
@@ -91,7 +94,7 @@
 						<div id="final_input" >
 							<!--list added through javascript-->
 						</div>
-						<div><button onclick="refresh_products()" id="load" class="btn btn-default" style="align: center" >Refresh products</button></div>
+						
 					</div>
 				</div>
 			</div>

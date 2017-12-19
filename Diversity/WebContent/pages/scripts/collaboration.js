@@ -121,17 +121,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
       drawTable();
 
-
+      	if (sessionStorage.all == undefined || sessionStorage.unranked == undefined) {
 			if (getParam('products') === undefined && getParam('services') === undefined && getParam('company') === undefined) {
 				$('#all').click();
 				$('#unranked').click();
 			}
 
-	    if (getParam('products') == 'null' && getParam('services') == 'null') {
-				$('#all').click();
-				$('#unranked').click();
-			}
+		    if (getParam('products') == 'null' && getParam('services') == 'null') {
+					$('#all').click();
+					$('#unranked').click();
+				}
+      	} else {
+		    if (sessionStorage.unranked != undefined && (document.getElementById('unranked').checked.toString() != sessionStorage.unranked)) {
+		    	$('#unranked').click();
+		    }
+		    
+		    if (sessionStorage.all != undefined && (document.getElementById('all').checked.toString() != sessionStorage.all)) {
+		    	$('#all').click();
+		    }
+	    }
 
+	    
 /*
 			if (getParam('company') == 'null' || getParam('company') === undefined) {
 				$('#all').prop('checked', true);
@@ -157,6 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					}
 				}
 			}
+			
+
 			return;
 		}
 
@@ -400,7 +412,8 @@ function refresh_users() {
 		'Key' : "Colab",
 	};
 
+	sessionStorage.all = document.getElementById('all').checked;
+	sessionStorage.unranked = document.getElementById('unranked').checked;
 	ws.send(JSON.stringify(json));
-	
-	location.reload();
+	window.location.reload();
 }

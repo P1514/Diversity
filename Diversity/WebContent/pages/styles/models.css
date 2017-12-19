@@ -19,6 +19,10 @@
 	cursor: hand;
 }
 
+i:hover {
+    cursor: pointer;
+}
+
 #overlay-back {
     position   : absolute;
     top        : 0;
