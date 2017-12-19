@@ -16,6 +16,7 @@ var jsonData;
 var newData;
 var all_models = [];
 var timespan;
+var globaldata;
 var entityMap = {
   '&': '&amp;',
   '<': '&lt;',
@@ -450,7 +451,7 @@ function drawChart() {
   var data = JSON.parse(JSON.stringify(newData));
 
 
-  var globaldata = new google.visualization.DataTable();
+  globaldata= new google.visualization.DataTable();
   globaldata.addColumn('date', 'Date');
 
   var counter = data[1];
@@ -587,6 +588,7 @@ function drawChart() {
   });
 
   dashboard.bind(control, chart);
+  //globaldata.sort({column: 0, asc: true},{column: 2, asc: true}); 
   dashboard.draw(globaldata);
  // middle.draw(globaldata, options);
 }

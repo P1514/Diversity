@@ -162,6 +162,8 @@ public class Opinion {
 	 *            the comment
 	 */
 	public void addcomment(Post _comment) {
+		if(comments.containsKey(_comment.getID()))
+			_comment.setNewstatus();
 		comments.put(_comment.getID(), _comment);
 	}
 

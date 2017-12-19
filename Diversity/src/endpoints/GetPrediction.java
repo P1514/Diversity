@@ -62,8 +62,9 @@ public class GetPrediction {
 		Snapshot s = new Snapshot(b);
 		String name = "Self generated snapshot " + System.currentTimeMillis();
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		s.savePrediction(name, df.format(new Date()).split(" ")[0], 1, "-1", products.replace(',', ';'), services.replace(',', ';'));
-
+		String err = s.savePrediction(name, df.format(new Date()).split(" ")[0], 1, "-1", products.replace(',', ';'), services.replace(',', ';'));
+		if ("".equals(err))
+			return Response.status(Response.Status.BAD_REQUEST).entity("No Prediction Available").build();
 		JSONArray json = p.predict(1, products.replace(',', ';'), services.replace(',', ';'));
 		double sum = 0;
 		int count = 0;
@@ -76,7 +77,6 @@ public class GetPrediction {
 		}
 
 		double avg = sum / (count != 0 ? count : 12);
-
 		JSONArray result = new JSONArray();
 		JSONObject obj = new JSONObject();
 		String url = ui.getBaseUri().toString();

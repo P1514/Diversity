@@ -150,9 +150,10 @@ function getPosts() {
 			'Key' : getCookie("JSESSIONID"),
 			"Wiki" : document.getElementById('radio_wiki').checked ? true : false,
 		}
-
+		
 		ws.send(JSON.stringify(json));
 	}
+	$('#sel_word').html('');
 }
 
 /*
@@ -432,22 +433,19 @@ function connect() {
 			$('.table > tbody > tr').click(function(e) {
 				clicker($(this).find('input[name="id"]').val());
 			});
-			var type;
-			switch ($("input[name='radioName']:checked").val()) {
-				case 1:
-					type = 'All';
-					break;
-				case 2:
-					type = 'Positive';
-					break;
-				case 3:
-					type = 'Negative';
-					break;
-				default:
-					type = 'All';
+			var type = "All";
+			if ($('#tagPositive').is(':checked')) {
+				type = "Positive";
 			}
+			
+			if ($('#tagNegative').is(':checked')) {
+				type = "Negative";
+			}
+			
 			// Request the tagcloud for the current user
 			if (refreshTag) {
+				
+				
 				var json = {
 					"Op" : "tagcloud",
 					"Id" : sessionStorage.id,
@@ -799,13 +797,24 @@ $(".custom-menu li").click(function(e) {
 
 function ignore_words(word) { // sends a message to start ignoring the word we
 	// clicked on
+	
+	var type = "All";
+	if ($('#tagPositive').is(':checked')) {
+		type = "Positive";
+	}
+	
+	if ($('#tagNegative').is(':checked')) {
+		type = "Negative";
+	}
+	
 	var json = {
 		'Op' : 'set_ignore_word',
 		"Id" : sessionStorage.id,
 		'Word' : word,
 		'User' : user,
 		'Key' : getCookie("JSESSIONID"),
-		'Wiki' : document.getElementById('radio_wiki').checked
+		'Wiki' : document.getElementById('radio_wiki').checked,
+		'Type' : type
 	}
 
 	ws.send(JSON.stringify(json));
@@ -823,17 +832,31 @@ function makeCloud(words) {
 	var str = '';
 	var word_counter = 0;
 	var avg_frequency=0;
-	for(var i=0; i < words.length;i++){
+	var range = words.length;
+	if (range > 40) {
+		range = 40;
+	}
+	for(var i=0; i < range;i++){
 		avg_frequency+=words[i].frequency;
 	}
 	avg_frequency = avg_frequency/words.length;
 
 
-	for (var i = 0; i < words.length; i++) {
-		if(words[i].frequency < avg_frequency) continue;
-		str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
-				+ '");\' rel=' + words[i].frequency + '>' + words[i].word
-				+ '</a>';
+	for (var i = 0; i < range; i++) {
+		if(words[i].frequency < avg_frequency) {
+			if (range < words.length-1) {
+				range++;
+			} else {
+				range = words.length;
+			}
+			continue;
+		}
+		
+		if (words[i].word != '') {
+			str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
+					+ '");\' rel=' + words[i].frequency + '>' + words[i].word
+					+ '</a>';
+		}
 		if (word_counter > 5) {
 			str += "<br>"
 			word_counter = 0;
@@ -872,6 +895,7 @@ function tagClick(word) {
 		'Key' : getCookie("JSESSIONID")
 	}
 	refreshTag = false;
+	$('#sel_word').html("Selected word: " + word + ".");
 	ws.send(JSON.stringify(json));
 }
 

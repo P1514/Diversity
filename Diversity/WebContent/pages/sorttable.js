@@ -39,6 +39,13 @@ sorttable = {
 
   },
 
+  onAdd: function (/**Event*/evt) {
+	   var itemEl = evt.item;  // dragged HTMLElement
+	     let origParent = evt.from;
+	     origParent.appendChild(itemEl);
+	     // update store
+	   },
+	   
   makeSortable: function(table) {
     if (table.getElementsByTagName('thead').length == 0) {
       // table doesn't have a tHead. Since it should have, create one and
