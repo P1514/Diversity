@@ -303,17 +303,22 @@ function connect() {
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapID = window.location.href.split("snapshot=")[1]
-						.split("&")[0].replace('%20', ' ').replace('%3A',':');
-
+						.split("&")[0].replace(/\+/g, ' ').replace(/\%2F/g, '/').replace(/\%3A/g, ':');
+				var n = snapID
+				var decoded = decodeURI(snapID);
 				snap = true;
 				json = {
 					"Op" : "load_snapshot",
-					"Name" : snapID,
+					"Name" : decoded,
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
-				$('#Cookie').html = 'Snapshot: ' + snapID.replace(/\+/g, ' ');
-				name = snapID;
+				snap_name = snapID;
+				console.log(decoded);
+				document.getElementById("Cookie").innerHTML = 'Snapshot: ' + decoded;
+//				$('#Cookie').text = 'Snapshot: ' + decoded;
+				
+				name = decoded;
 			} else {
 				json = {
 					"Op" : "opinion_extraction",
@@ -389,7 +394,7 @@ function connect() {
 						snap_pss = jsonData[jsonData.length - 1].PSS;
 					}
 					if (document)
-					document.getElementById("Cookie").innerHTML = "Snapshot: " + (getParam('snapshot') !== undefined ? getParam('snapshot') : name) + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + name + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
 				} else {
 					document.getElementById("Cookie").innerHTML = "Model: "
 							+ window.sessionStorage.model + "; PSS: "

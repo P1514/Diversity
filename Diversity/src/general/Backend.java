@@ -411,7 +411,7 @@ public class Backend {
 					case "Positive":
 						// System.out.println("POSITIVE");
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 49, 100,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, 100,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
