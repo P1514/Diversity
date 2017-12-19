@@ -303,17 +303,22 @@ function connect() {
 
 			if (window.location.href.indexOf('snapshot=') != -1) {
 				var snapID = window.location.href.split("snapshot=")[1]
-						.split("&")[0].replace('%20', ' ');
-
+						.split("&")[0].replace(/\+/g, ' ').replace(/\%2F/g, '/').replace(/\%3A/g, ':');
+				var n = snapID
+				var decoded = decodeURI(snapID);
 				snap = true;
 				json = {
 					"Op" : "load_snapshot",
-					"Name" : snapID,
+					"Name" : decoded,
 					"Type" : "All",
 					'Key' : getCookie("JSESSIONID")
 				}
-				$('#Cookie').html = 'Snapshot: ' + snap_name;
-				name = snap_name;
+				snap_name = snapID;
+				console.log(decoded);
+				document.getElementById("Cookie").innerHTML = 'Snapshot: ' + decoded;
+//				$('#Cookie').text = 'Snapshot: ' + decoded;
+				
+				name = decoded;
 			} else {
 				json = {
 					"Op" : "opinion_extraction",
@@ -389,7 +394,7 @@ function connect() {
 						snap_pss = jsonData[jsonData.length - 1].PSS;
 					}
 					if (document)
-					document.getElementById("Cookie").innerHTML = "Snapshot: " + (getParam('snapshot') !== undefined ? getParam('snapshot') : name) + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
+					document.getElementById("Cookie").innerHTML = "Snapshot: " + name + "<br>Created by " + snap_user + " on " + snap_date + "<br>PSS: " + snap_pss;
 				} else {
 					document.getElementById("Cookie").innerHTML = "Model: "
 							+ window.sessionStorage.model + "; PSS: "
@@ -836,21 +841,28 @@ function makeCloud(words) {
 	if (range > 40) {
 		range = 40;
 	}
+	var tmp = words;
+	/*
 	for(var i=0; i < range;i++){
 		avg_frequency+=words[i].frequency;
 	}
 	avg_frequency = avg_frequency/words.length;
-
-
+	 */
+	
+	words = words.sort(function(a, b) {
+        return -(a.frequency - b.frequency);
+    });
+	console.log(words);
+	
 	for (var i = 0; i < range; i++) {
-		if(words[i].frequency < avg_frequency) {
-			if (range < words.length-1) {
-				range++;
-			} else {
-				range = words.length;
-			}
-			continue;
-		}
+//		if(words[i].frequency < avg_frequency) {
+//			if (range < words.length-1) {
+//				range++;
+//			} else {
+//				range = words.length;
+//			}
+//			continue;
+//		}
 		
 		if (words[i].word != '') {
 			str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
@@ -879,6 +891,7 @@ function makeCloud(words) {
 	word_counter++;
 	$('#cloud a').tagcloud();
 }
+
 
 function tagClick(word) {
 	var json = {

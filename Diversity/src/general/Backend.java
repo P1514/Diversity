@@ -369,7 +369,7 @@ public class Backend {
 					case "Positive":
 						// System.out.println("POSITIVE");
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, 100,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
@@ -377,19 +377,19 @@ public class Backend {
 					case "Negative":
 						// System.out.println("NEGATIVE");
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 0, 50,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 0, 100,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 					}
 				} else {
 					tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 0, 100,
 							msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017), id,
 							msg.has("User") ? msg.getLong("User") : 0);
 				}
@@ -411,7 +411,7 @@ public class Backend {
 					case "Positive":
 						// System.out.println("POSITIVE");
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, -1,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 50, 100,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
@@ -419,19 +419,19 @@ public class Backend {
 					case "Negative":
 						// System.out.println("NEGATIVE");
 						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, 50,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", 0, 50,
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 						break;
 					default:
-						tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+						tag = new Tagcloud(gp.getTop(msg.getBoolean("Wiki"),param, values, id,
+								(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",
 								msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017),
 								id, msg.has("User") ? msg.getLong("User") : 0);
 					}
 				} else {
-					tag = new Tagcloud(gp.getTopWithPolarity(msg.getBoolean("Wiki"),param, values, id,
-							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "", -1, -1,
+					tag = new Tagcloud(gp.getTop(msg.getBoolean("Wiki"),param, values, id,
+							(msg.has("Product") ? msg.getString("Product") : "noproduct"), "",
 							msg.has("Day") ? msg.getInt("Day") : 1, msg.has("Year") ? msg.getInt("Year") : 2017), id,
 							msg.has("User") ? msg.getLong("User") : 0);
 				}
