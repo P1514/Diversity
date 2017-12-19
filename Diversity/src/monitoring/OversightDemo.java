@@ -164,7 +164,7 @@ public class OversightDemo extends TimerTask {
 		Globalsentiment gs = new Globalsentiment();
 		GetReach gr = new GetReach();
 		try {
-			gs.globalsentiment(null, null, gr.getTOPReach(5));
+			gs.globalsentiment(null, null, gr.getTOPReach(5),"default");
 		} catch (JSONException e) {
 			LOGGER.log(Level.WARNING, "Class:Oversight Error 4");
 		}

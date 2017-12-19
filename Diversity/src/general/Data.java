@@ -196,6 +196,10 @@ public class Data {
 	public static ConcurrentHashMap<Long, DesignProject> getallDp() {
 		return designProjectdb;
 	}
+	
+	public static ConcurrentHashMap<Long, Model> getAllModels() {
+		return modeldb;
+	}
 
 	public static User getUser(long id) {
 		if (userdb.containsKey(id))
