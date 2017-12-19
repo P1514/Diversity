@@ -182,6 +182,7 @@ public class Backend {
 				return result.toString();
 			case 39:
 				Data.productdb.clear();
+				Data.pssdb.clear();
 				
 				Loader.loadPSS();
 				
