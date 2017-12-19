@@ -401,6 +401,7 @@ public class GetPosts {
 			LOGGER.log(Level.INFO, query1.toString());
 			try (ResultSet rs = query1.executeQuery()) {
 
+				System.out.println(query1.toString());
 				for (i = 0; rs.next(); i++) {
 					topid[i] = rs.getLong("id");
 					pre_result[i] = topid[i] + ",,";

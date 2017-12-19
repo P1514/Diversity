@@ -836,21 +836,28 @@ function makeCloud(words) {
 	if (range > 40) {
 		range = 40;
 	}
+	var tmp = words;
+	/*
 	for(var i=0; i < range;i++){
 		avg_frequency+=words[i].frequency;
 	}
 	avg_frequency = avg_frequency/words.length;
-
-
+	 */
+	
+	words = words.sort(function(a, b) {
+        return -(a.frequency - b.frequency);
+    });
+	console.log(words);
+	
 	for (var i = 0; i < range; i++) {
-		if(words[i].frequency < avg_frequency) {
-			if (range < words.length-1) {
-				range++;
-			} else {
-				range = words.length;
-			}
-			continue;
-		}
+//		if(words[i].frequency < avg_frequency) {
+//			if (range < words.length-1) {
+//				range++;
+//			} else {
+//				range = words.length;
+//			}
+//			continue;
+//		}
 		
 		if (words[i].word != '') {
 			str += '<a class=\'word\' onclick=\'tagClick("' + words[i].word
@@ -879,6 +886,7 @@ function makeCloud(words) {
 	word_counter++;
 	$('#cloud a').tagcloud();
 }
+
 
 function tagClick(word) {
 	var json = {
