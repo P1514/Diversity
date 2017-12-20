@@ -810,7 +810,7 @@ function escapeHtml2 (string) {
 
 function refresh_products() {
 	var json = {
-      "Op" : "refresh_products",
+      "Op" : "getpss",
       'Key' : getCookie("JSESSIONID")
     }
 	
