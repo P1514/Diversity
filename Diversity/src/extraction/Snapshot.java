@@ -76,7 +76,7 @@ public class Snapshot {
 	}
 
 	public String savePrediction(String name, String date, int timespan, String user, String products,
-			String services) {
+			String services, String type) {
 		String result;
 		JSONObject obj = new JSONObject();
 		long cdate;
@@ -110,7 +110,7 @@ public class Snapshot {
 		if(result.contains("No prediction available"))
 			return "";
 		// System.out.println("TEST" + result);
-		return create(name, cdate, timespan, user, "prediction", result, -10) == true ? "success" : "name_in_use";
+		return create(name, cdate, timespan, user, type, result, -10) == true ? "success" : "name_in_use";
 
 	}
 
@@ -222,6 +222,7 @@ public class Snapshot {
 				query1.setString(2, "prediction");
 			else
 				query1.setString(2, type);
+			if(name.contains("Self generated")) query1.setString(2,"Self Generated");
 			try (ResultSet rs = query1.executeQuery()) {
 				if (!rs.next())
 					return "";
