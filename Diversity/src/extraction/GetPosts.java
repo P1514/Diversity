@@ -23,6 +23,7 @@ import general.Data;
 import general.Logging;
 import general.Model;
 import general.Settings;
+import javassist.bytecode.annotation.AnnotationsWriter;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -53,7 +54,7 @@ public class GetPosts {
 	public JSONArray getTop(boolean wiki, String param, String month, long id, String product, String word, int day,
 			int year) throws JSONException {
 		JSONArray result = new JSONArray();
-		String[] pre_result = new String[MAXTOP];
+		ArrayList<Post_gp> pre_result = new ArrayList<>();
 		JSONObject obj = new JSONObject();
 		Calendar inputdate = Calendar.getInstance();
 		obj.put("Op", "table");
@@ -169,7 +170,9 @@ public class GetPosts {
 
 				for (i = 0; rs.next(); i++) {
 					topid[i] = rs.getLong("id");
-					pre_result[i] = topid[i] + ",,";
+					Post_gp temp = new Post_gp();
+					temp.id=topid[i];
+					pre_result.add(temp);
 					n_tops++;
 				}
 			}
@@ -187,10 +190,11 @@ public class GetPosts {
 				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
-						pre_result[i] += rs.getString(Settings.latable_name) + ",,"
-								+ rs.getDouble(Settings.latable_influence) + ",,"
-								+ rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
-								+ ",," + rs.getInt(Settings.latable_age) + ",,";
+						pre_result.get(i).name=rs.getString(Settings.latable_name);
+						pre_result.get(i).influence=rs.getDouble(Settings.latable_influence);
+						pre_result.get(i).location=rs.getString(Settings.latable_location);
+						pre_result.get(i).gender=rs.getString(Settings.latable_gender);
+						pre_result.get(i).age=rs.getInt(Settings.latable_age);
 					}
 				}
 			} catch (Exception e) {
@@ -209,9 +213,10 @@ public class GetPosts {
 				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if(rs.next())
-					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
-							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
-							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
+						pre_result.get(i).date = rs.getLong(Settings.lotable_timestamp);
+						pre_result.get(i).polarity = rs.getDouble(Settings.lotable_polarity);
+						pre_result.get(i).reach = rs.getDouble(Settings.lotable_reach);
+						pre_result.get(i).comments = rs.getInt(Settings.lotable_comments);
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e);
@@ -229,9 +234,7 @@ public class GetPosts {
 
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next())
-						pre_result[i] += rs.getString(Settings.lptable_message);
-					else
-						pre_result[i] += "";
+						pre_result.get(i).message = rs.getString(Settings.lptable_message);
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e);
@@ -240,30 +243,21 @@ public class GetPosts {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < n_tops; i++) {
-			int n = 0;
+			
 			obj = new JSONObject();
-			String[] pre_results = pre_result[i].split(",,");
-			obj.put("Id", pre_results[n++]);
-			if (!wiki&&pre_results.length>9) {
-				obj.put("Name", pre_results[n++]);
-				obj.put("Influence", trunc(pre_results[n++]));
-				obj.put("Location", pre_results[n++]);
-				obj.put("Gender", pre_results[n++]);
-				obj.put("Age", pre_results[n++]);
-			} else {
-				obj.put("Name", "No Name");
-				obj.put("Influence", 0);
-				obj.put("Location", "None");
-				obj.put("Gender", "None");
-				obj.put("Age", 0);
-			}
-
-			Date date = new Date(Long.parseLong(pre_results[n++]));
+			Post_gp answer = pre_result.get(i);
+			obj.put("Id", answer.id);
+			obj.put("Name", answer.name);
+			obj.put("Influence", trunc(answer.influence+""));
+			obj.put("Location", answer.location);
+			obj.put("Gender", answer.gender);
+			obj.put("Age", answer.age);
+			Date date = new Date(answer.date);
 			obj.put("Date", df.format(date));
-			obj.put("Polarity", trunc(pre_results[n++]));
-			obj.put("Reach", trunc(pre_results[n++]));
-			obj.put("Comments", pre_results[n++]);
-			obj.put("Message", pre_results[n++]);
+			obj.put("Polarity", trunc(answer.polarity+""));
+			obj.put("Reach", trunc(answer.reach+""));
+			obj.put("Comments", answer.comments);
+			obj.put("Message", answer.message);
 			result.put(obj);
 		}
 
@@ -274,7 +268,7 @@ public class GetPosts {
 	public JSONArray getTopWithPolarity(boolean wiki, String param, String month, long id, String product, String word,
 			int min, int max, int day, int year) throws JSONException {
 		JSONArray result = new JSONArray();
-		String[] pre_result = new String[MAXTOP];
+		ArrayList<Post_gp> pre_result = new ArrayList<>();
 		JSONObject obj = new JSONObject();
 		Calendar inputdate = Calendar.getInstance();
 		obj.put("Op", "table");
@@ -404,7 +398,9 @@ public class GetPosts {
 				System.out.println(query1.toString());
 				for (i = 0; rs.next(); i++) {
 					topid[i] = rs.getLong("id");
-					pre_result[i] = topid[i] + ",,";
+					Post_gp temp = new Post_gp();
+					temp.id = topid[i];
+					pre_result.add(temp);
 					n_tops++;
 				}
 			}
@@ -423,10 +419,11 @@ public class GetPosts {
 				query1.setLong(1, topid[i]);
 				try (ResultSet rs = query1.executeQuery()) {
 					if (rs.next()) {
-						pre_result[i] += rs.getString(Settings.latable_name) + ",,"
-								+ rs.getDouble(Settings.latable_influence) + ",,"
-								+ rs.getString(Settings.latable_location) + ",," + rs.getString(Settings.latable_gender)
-								+ ",," + rs.getInt(Settings.latable_age) + ",,";
+						pre_result.get(i).name=rs.getString(Settings.latable_name);
+						pre_result.get(i).influence = rs.getDouble(Settings.latable_influence);
+						pre_result.get(i).location= rs.getString(Settings.latable_location);
+						pre_result.get(i).gender = rs.getString(Settings.latable_gender);
+						pre_result.get(i).age=rs.getInt(Settings.latable_age);
 					}
 				}
 			} catch (Exception e) {
@@ -448,9 +445,10 @@ public class GetPosts {
 				try (ResultSet rs = query1.executeQuery()) {
 					if (!rs.next())
 						continue;
-					pre_result[i] += rs.getLong(Settings.lotable_timestamp) + ",,"
-							+ rs.getDouble(Settings.lotable_polarity) + ",," + rs.getDouble(Settings.lotable_reach)
-							+ ",," + rs.getInt(Settings.lotable_comments) + ",,";
+					pre_result.get(i).date= rs.getLong(Settings.lotable_timestamp); 
+					pre_result.get(i).polarity = rs.getDouble(Settings.lotable_polarity);
+					pre_result.get(i).reach = rs.getDouble(Settings.lotable_reach);
+					pre_result.get(i).comments = rs.getInt(Settings.lotable_comments);
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e);
@@ -468,10 +466,8 @@ public class GetPosts {
 				query1.setLong(1, topid[i]);
 
 				try (ResultSet rs = query1.executeQuery()) {
-					if (rs.next())
-						pre_result[i] += rs.getString(Settings.lptable_message) + " ";
-					else
-						pre_result[i] += " ";
+					pre_result.get(i).message = rs.getString(Settings.lptable_message) + " ";
+					
 				}
 			} catch (Exception e) {
 				LOGGER.log(Level.INFO, Settings.err_unknown, e);
@@ -480,32 +476,22 @@ public class GetPosts {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < n_tops; i++) {
-			if ("".equals(pre_result[i]))
-				continue;
 			obj = new JSONObject();
 			int n = 0;
-			String[] pre_results = pre_result[i].split(",,");
-			obj.put("Id", pre_results[n++]);
-			if (!wiki) {
-				obj.put("Name", pre_results[n++]);
-				obj.put("Influence", trunc(pre_results[n++]));
-				obj.put("Location", pre_results[n++]);
-				obj.put("Gender", pre_results[n++]);
-				obj.put("Age", pre_results[n++]);
-			} else {
-				obj.put("Name", "No Name");
-				obj.put("Influence", 0);
-				obj.put("Location", "None");
-				obj.put("Gender", "None");
-				obj.put("Age", 0);
-			}
+			Post_gp pre_results = pre_result.get(i);
+			obj.put("Id", pre_results.id);
+			obj.put("Name", pre_results.name);
+			obj.put("Influence", trunc(pre_results.influence + ""));
+			obj.put("Location", pre_results.location);
+			obj.put("Gender", pre_results.gender);
+			obj.put("Age", pre_results.age);
 
-			Date date = new Date(Long.parseLong(pre_results[n++]));
+			Date date = new Date(pre_results.date);
 			obj.put("Date", df.format(date));
-			obj.put("Polarity", trunc(pre_results[n++]));
-			obj.put("Reach", trunc(pre_results[n++]));
-			obj.put("Comments", pre_results[n++]);
-			obj.put("Message", pre_results[n++]);
+			obj.put("Polarity", trunc(pre_results.polarity + ""));
+			obj.put("Reach", trunc(pre_results.reach + ""));
+			obj.put("Comments", pre_results.comments);
+			obj.put("Message", pre_results.message);
 			result.put(obj);
 		}
 
@@ -672,6 +658,21 @@ public class GetPosts {
 
 		}
 		return Double.toString(result);
+
+	}
+	
+	class Post_gp{
+		public Long id = (long)-1;
+		public String name = "No Name";
+		public double influence = 0.0;
+		public String location = "No Location";
+		public String gender = "No Gender";
+		public int age = 0;
+		public Long date = (long)0;
+		public Double polarity = 0.0;
+		public Double reach = 0.0;
+		public Integer comments = 0;
+		public String message = "No Message";
 
 	}
 }
