@@ -154,19 +154,10 @@ public class Settings {
 	public static long currentProduct = 0;
 	public static long currentPss = 0;
 
-	
-	//testing epochs:
-	//http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200123&epochsTo[]=1500476864598&pssId=31&accounts[]=AirForce1&accounts[]=AirForcse1
-	
-	// public static String JSON_uri =
-	// "http://diversity.euprojects.net/socialfeedbackextraction/getPosts/?epochsFrom[]=111&epochsFrom[]=111&epochsTo[]=333333333&epochsTo[]=333333333&pssId=3&accounts[]=Spyros&accounts[]=JohnSmith";
-	//public static String JSON_uri = "http://www.atb-bremen.de/projects/diversitysoap/index.php/getFeedback?epochsFrom[]=0&epochsFrom[]=0&epochsTo[]=999999999999&epochsTo[]=99999999990&pssId=1&accounts[]=Spyros&accounts[]=OEM";
-	//public static final String JSON_uri = "http://opennebula.euprojects.net:8922/intelligent-search/getFeedback?epochsFrom[]=1372350200000&epochsTo[]=1498054243000&pssId=31&accounts[]=AirForce1";
-//	public static final String JSON_uri = "http://localhost:8080/SimInterface/endpoints/getSimulatedData";
-	public static final String register_uri = "http://localhost:8080/SimInterface/endpoints/registerSFE";
-	public static final String JSON_uri = "http://localhost:8080/SimInterface/endpoints/getSimulatedData";
-	//public static final String register_uri = "https://diversity.euprojects.net/socialfeedbackextraction/registerSFE";
-	//public static final String JSON_uri = "http://opennebula.euprojects.net/intelligent-search/getFeedback";
+	//public static final String register_uri = "http://localhost:8080/SimInterface/endpoints/registerSFE";
+	//public static final String JSON_uri = "http://localhost:8080/SimInterface/endpoints/getSimulatedData";
+	public static final String register_uri = "https://diversity.euprojects.net/socialfeedbackextraction/registerSFE";
+	public static final String JSON_uri = "http://opennebula.euprojects.net/intelligent-search/getFeedback";
 	public static final String collaboration_uri = "https://diversity.euprojects.net/collaborationTool/suggestions";
 	public static final String has_steps_uri = "https://diversity.euprojects.net/designProjectHistory/update/sentiment?user_id=REPLACE_USER&design_project_id=REPLACE_DP&status=1&lat=REPLACE_LATITUDE&lng=REPLACE_LONGITUDE";
 	public static final String geoip_uri = "https://freegeoip.net/json/";

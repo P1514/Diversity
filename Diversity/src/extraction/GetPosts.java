@@ -246,17 +246,17 @@ public class GetPosts {
 			
 			obj = new JSONObject();
 			Post_gp answer = pre_result.get(i);
-			obj.put("Id", answer.id);
+			obj.put("Id", answer.id+"");
 			obj.put("Name", answer.name);
 			obj.put("Influence", trunc(answer.influence+""));
 			obj.put("Location", answer.location);
 			obj.put("Gender", answer.gender);
-			obj.put("Age", answer.age);
+			obj.put("Age", answer.age+"");
 			Date date = new Date(answer.date);
 			obj.put("Date", df.format(date));
 			obj.put("Polarity", trunc(answer.polarity+""));
 			obj.put("Reach", trunc(answer.reach+""));
-			obj.put("Comments", answer.comments);
+			obj.put("Comments", answer.comments+"");
 			obj.put("Message", answer.message);
 			result.put(obj);
 		}
@@ -479,7 +479,7 @@ public class GetPosts {
 			obj = new JSONObject();
 			int n = 0;
 			Post_gp pre_results = pre_result.get(i);
-			obj.put("Id", pre_results.id);
+			obj.put("Id", pre_results.id+"");
 			obj.put("Name", pre_results.name);
 			obj.put("Influence", trunc(pre_results.influence + ""));
 			obj.put("Location", pre_results.location);

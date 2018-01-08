@@ -113,8 +113,8 @@ public class GetComments {
 			obj.put("Influence", trunc(answer.influence+""));
 			obj.put("Location", answer.location);
 			obj.put("Gender", answer.gender);
-			obj.put("Age", answer.age);
-			obj.put("Polarity", trunc(answer.polarity+""));
+			obj.put("Age", answer.age+"");
+			obj.put("Polarity", trunc(answer.polarity+"")+"");
 			obj.put("Message", answer.message);
 			result.put(obj);
 
