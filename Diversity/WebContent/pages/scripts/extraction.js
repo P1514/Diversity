@@ -205,6 +205,12 @@ function connect() {
 
 		if (window.location.href.indexOf('snapshot') != -1) {
 			document.cookie = "JSESSIONID=Extract;";
+			var jsonData = {
+				      "Op" : 'getrestrictions',// create or update
+				      "Role": "Designer",
+				      'Key' : getCookie("JSESSIONID")
+				    };
+				      ws.send(JSON.stringify(jsonData));
 		}
 		
 		json = {
