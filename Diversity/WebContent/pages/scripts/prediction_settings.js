@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var snapName = window.location.href.split("snapshot=")[1].split("&")[0].replace(/\%20/g,' ').replace(/\+/g, ' ').replace(/\%2F/g, '/').replace(/\%3A/g, ':');
 			snap_name = snapName;
 			//snap = true;
+			document.cookie = "JSESSIONID=predict;"
 			json = {
 				'Op' : 'getrestrictions',
 				'Role' : 'DEVELOPER',
@@ -368,7 +369,7 @@ function load() {
 function send(val) {
   var json = {
     "Op" : "Snapshot",
-    "type" : "Prediction",
+    "Type" : "Prediction",
     "name" : val,
     "creation_date" : new Date(),
     "timespan" : count,
@@ -403,6 +404,7 @@ function requestSnapshot(val) {
   var json = {
     "Op" : "load_snapshot",
     "Name" : val,
+    "Type" : "prediction",
     'Key' : getCookie("JSESSIONID")
   }
   snap = true;
