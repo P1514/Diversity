@@ -203,11 +203,16 @@ function connect() {
 	// settings (gender, location and age segments to be displayed)
 	ws.onopen = function() {
 
+		if (window.location.href.indexOf('snapshot') != -1) {
+			document.cookie = "JSESSIONID=Extract;";
+		}
+		
 		json = {
 			"Op" : "getconfig",
 			"Id" : sessionStorage.id,
 			"Key" : getCookie("JSESSIONID")
 		}
+		
 
 		ws.send(JSON.stringify(json));
 	};
@@ -222,6 +227,16 @@ function connect() {
 			$('#locationfilt').hide();
 			$('#finalfilt').hide();
 			$('#extrapolate_label').hide();
+		}
+		
+		if (json[0].Op == "Rights") {
+			json = {
+				'Op' : 'get_roles',
+				'Key' : 'Extract',
+			}
+
+			ws.send(JSON.stringify(json));
+			return;
 		}
 
 		// If Op is 'Error', display the server message in an overlay window
@@ -311,7 +326,7 @@ function connect() {
 					"Op" : "load_snapshot",
 					"Name" : decoded,
 					"Type" : "All",
-					'Key' : getCookie("JSESSIONID")
+					'Key' : getCookie("JSESSIONID") != undefined ? getCookie("JSESSIONID") : "Extract"
 				}
 				snap_name = snapID;
 				console.log(decoded);
@@ -930,7 +945,7 @@ function load() {
 	var json = {
 		"Op" : "load_snapshot",
 		"Type" : "Extraction",
-		'Key' : getCookie("JSESSIONID")
+		'Key' : getCookie("JSESSIONID") != undefined ? getCookie("JSESSIONID") : "Extract"
 	}
 
 	ws.send(JSON.stringify(json));
@@ -980,7 +995,7 @@ function requestSnapshot(val) {
 		"Op" : "load_snapshot",
 		"Name" : val,
 		"Type" : "All",
-		'Key' : getCookie("JSESSIONID")
+		'Key' : getCookie("JSESSIONID") != undefined ? getCookie("JSESSIONID") : "Extract"
 	}
 	snap = true;
 	ws.send(JSON.stringify(json));
@@ -1720,7 +1735,7 @@ function changeRequest(type) {
 			"Type" : "",
 			"Name" : name,
 			"Id" : sessionStorage.id,
-			'Key' : getCookie("JSESSIONID"),
+			'Key' : getCookie("JSESSIONID") != undefined ? getCookie("JSESSIONID") : "Extract",
 		};
 
 		if (globalradio == true) {
